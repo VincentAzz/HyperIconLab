@@ -1,0 +1,19 @@
+# build
+/.idea/
+/.kotlin/
+/.gradle/
+/build/
+/app/build/
+
+# cxx
+/.cxx/
+/app/.cxx/
+**/*.so
+**/*.a
+/.artifacts/
+/app/src/main/jni/opencv-mobile-4.13.0-android/
+
+# doc
+/md/
+/miuix-doc/
+/python/

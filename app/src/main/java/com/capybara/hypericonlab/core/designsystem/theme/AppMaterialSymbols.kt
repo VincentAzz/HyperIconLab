@@ -1,0 +1,47 @@
+package com.capybara.hypericonlab.core.designsystem.theme
+
+object AppMaterialSymbols
+
+/*
+
+curl -o AddSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/add.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o ArrowBackSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/arrow_back.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o MenuSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/menu.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o MenuOpenSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/menu_open.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o BlurOnSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/blur_on.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o StyleSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/style.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o DarkModeSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/dark_mode.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o DesignServicesSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/design_services.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o InvertColorsSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/invert_colors.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o WallpaperSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/wallpaper.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o RefreshSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/refresh.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o OpenInFullSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/open_in_full.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o CheckSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/check.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o SwapHorizSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/swap_horiz.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o CloseSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/close.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o ArrowDownwardSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/arrow_downward.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o DesignServicesSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/design_services.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o StyleSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/style.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o HomeSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/home.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o ColorLensSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/color_lens.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o SettingsSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/settings.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o InfoSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/info.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o DoneSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/done.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o HistorySymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/history.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o ClearAllSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/clear_all.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o CommitSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/commit.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o DatabaseSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/database.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o DownloadSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/download.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o Inventory2Symbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/inventory_2.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o Package2Symbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/package_2.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o AutorenewSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/autorenew.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o DeployedCodeSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/deployed_code.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o AndroidSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/android.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o SyncSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/sync.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o TaskAltSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/task_alt.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+
+curl -o Symbol.kt ""
+curl -o Symbol.kt ""
+curl -o Symbol.kt ""
+curl -o Symbol.kt ""
+*/

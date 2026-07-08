@@ -1,0 +1,59 @@
+package com.capybara.hypericonlab.modules.settings.data.local
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+class AppDataStore(
+    private val dataStore: DataStore<Preferences>
+) {
+    val data: Flow<Preferences> = dataStore.data
+
+    companion object {
+        val UI_USE_BLUR = booleanPreferencesKey("ui_use_blur")
+        val UI_USE_LIQUID_GLASS_BOTTOM_SHEET =
+            booleanPreferencesKey("ui_use_liquid_glass_bottom_sheet")
+        val UI_LIQUID_GLASS_BLUR_RADIUS =
+            intPreferencesKey("ui_liquid_glass_blur_radius")
+        val UI_USE_MIUIX_SQUIRCLE = booleanPreferencesKey("ui_use_miuix_squircle")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
+        val THEME_PALETTE_STYLE = stringPreferencesKey("theme_palette_style")
+        val THEME_COLOR_SPEC = stringPreferencesKey("theme_color_spec")
+        val THEME_USE_DYNAMIC_COLOR = booleanPreferencesKey("theme_use_dynamic_color")
+        val THEME_SEED_COLOR = intPreferencesKey("theme_seed_color")
+        val UI_USE_FLOATING_BOTTOM_BAR = booleanPreferencesKey("ui_use_floating_bottom_bar")
+        val UI_USE_FLOATING_BOTTOM_BAR_BLUR =
+            booleanPreferencesKey("ui_use_floating_bottom_bar_blur")
+        val UI_USE_FLOATING_BAR_COMPACT =
+            booleanPreferencesKey("ui_use_floating_bottom_bar_compact")
+        val UI_FLOATING_BAR_COMPACT_TYPE =
+            stringPreferencesKey("ui_floating_bottom_bar_compact_type")
+        val LAST_MAIN_PAGE_INDEX = intPreferencesKey("last_main_page_index")
+    }
+
+    suspend fun putString(key: Preferences.Key<String>, value: String) {
+        dataStore.edit { it[key] = value }
+    }
+
+    fun getString(key: Preferences.Key<String>, default: String = ""): Flow<String> =
+        dataStore.data.map { it[key] ?: default }
+
+    suspend fun putInt(key: Preferences.Key<Int>, value: Int) {
+        dataStore.edit { it[key] = value }
+    }
+
+    fun getInt(key: Preferences.Key<Int>, default: Int = 0): Flow<Int> =
+        dataStore.data.map { it[key] ?: default }
+
+    suspend fun putBoolean(key: Preferences.Key<Boolean>, value: Boolean) {
+        dataStore.edit { it[key] = value }
+    }
+
+    fun getBoolean(key: Preferences.Key<Boolean>, default: Boolean = false): Flow<Boolean> =
+        dataStore.data.map { it[key] ?: default }
+}

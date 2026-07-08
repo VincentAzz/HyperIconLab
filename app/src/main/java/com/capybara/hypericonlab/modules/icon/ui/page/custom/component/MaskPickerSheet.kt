@@ -1,0 +1,391 @@
+package com.capybara.hypericonlab.modules.icon.ui.page.custom.component
+
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
+import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
+import com.capybara.hypericonlab.core.designsystem.symbol.check
+import com.capybara.hypericonlab.core.designsystem.symbol.close
+import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
+import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import top.yukonga.miuix.kmp.blur.LayerBackdrop
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MaskPickerSheet(
+    onDismiss: () -> Unit,
+    selectedMasks: List<String>,
+    onMasksConfirmed: (List<String>) -> Unit,
+    horizontalPadding: Dp = 8.dp,
+    bottomPadding: Dp = 4.dp,
+    cornerRadius: Dp = ExtraLargeRadius,
+    backdrop: LayerBackdrop? = null,
+    useLiquidGlass: Boolean = false,
+    liquidGlassBlurRadius: Dp = 24.dp,
+) {
+    val context = LocalContext.current
+    var currentSelection by remember { mutableStateOf(selectedMasks) }
+    var allMasks by remember { mutableStateOf<List<String>>(emptyList()) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    val gridState = rememberLazyGridState()
+
+    val isAtTop by remember {
+        derivedStateOf {
+            (gridState.firstVisibleItemIndex == 0) && (gridState.firstVisibleItemScrollOffset == 0)
+        }
+    }
+    val showScrollHint by remember {
+        derivedStateOf {
+            isAtTop && gridState.canScrollForward
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val masks = withContext(Dispatchers.IO) {
+            context.assets.list("masks")
+                ?.asSequence()
+                ?.filter { it.endsWith(".png") }
+                ?.map { it.removePrefix("mask_").removeSuffix("_512.png") }
+                ?.sorted()
+                ?.toList() ?: emptyList()
+        }
+        allMasks = masks
+    }
+
+    val commonMasks = listOf(
+        "m3_round",
+        "m3_square",
+        "oneui",
+        "super_squircle",
+        "squircle",
+        "hyper_2",
+        "hyper_3"
+    )
+    val otherMasks = allMasks.filter { it !in commonMasks }
+
+    FloatingBottomSheet(
+        onDismiss = onDismiss,
+        sheetState = sheetState,
+        dragHandle = null,
+        horizontalPadding = horizontalPadding,
+        bottomPadding = bottomPadding,
+        cornerRadius = cornerRadius,
+        backdrop = backdrop,
+        useLiquidGlass = useLiquidGlass,
+        liquidGlassBlurRadius = liquidGlassBlurRadius,
+    ) {
+        // Header
+        CenterAlignedTopAppBar(
+            title = { Text("选择形状") },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent
+            ),
+            navigationIcon = {
+                Surface(
+                    onClick = {
+                        coroutineScope.launch {
+                            sheetState.hide()
+                        }.invokeOnCompletion {
+                            if (!sheetState.isVisible) onDismiss()
+                        }
+                    },
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier
+                        .padding(start = 12.dp)
+                        .size(36.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            AppMaterialSymbols.close,
+                            contentDescription = "关闭",
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            },
+            actions = {
+                val enabled = currentSelection.isNotEmpty()
+                Surface(
+                    onClick = {
+                        if (enabled) {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    onMasksConfirmed(currentSelection)
+                                }
+                            }
+                        }
+                    },
+                    enabled = enabled,
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .size(36.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            AppMaterialSymbols.check,
+                            contentDescription = "确定",
+                            modifier = Modifier
+                                .size(20.dp)
+                                .alpha(if (enabled) 1f else 0.38f),
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Text(
+                text = "最多5个，多选形状将加入随机池进行生成",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Box(modifier = Modifier.weight(1f, fill = false)) {
+                LazyVerticalGrid(
+                    state = gridState,
+                    columns = GridCells.Fixed(4),
+                    contentPadding = PaddingValues(bottom = 32.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    item(span = { GridItemSpan(4) }) {
+                        Text(
+                            "常用形状",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    items(commonMasks.filter { it in allMasks }) { mask ->
+                        MaskItem(
+                            name = mask,
+                            isSelected = mask in currentSelection,
+                            onClick = {
+                                currentSelection = if (mask in currentSelection) {
+                                    currentSelection - mask
+                                } else {
+                                    if (currentSelection.size < 5) currentSelection + mask else currentSelection
+                                }
+                            }
+                        )
+                    }
+
+                    item(span = { GridItemSpan(4) }) {
+                        Text(
+                            "Material 3 形状",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    items(otherMasks) { mask ->
+                        MaskItem(
+                            name = mask,
+                            isSelected = mask in currentSelection,
+                            onClick = {
+                                currentSelection = if (mask in currentSelection) {
+                                    currentSelection - mask
+                                } else {
+                                    if (currentSelection.size < 5) currentSelection + mask else currentSelection
+                                }
+                            }
+                        )
+                    }
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showScrollHint,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 8.dp)
+                ) {
+                    Surface(
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f),
+                        modifier = Modifier.size(36.dp),
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = AppMaterialSymbols.arrow_downward,
+                                contentDescription = "向下滚动",
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f),
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MaskItem(
+    name: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val context = LocalContext.current
+    val isDark = !MaterialTheme.colorScheme.surface.isLight()
+
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(name) {
+        withContext(Dispatchers.IO) {
+            try {
+                context.assets.open("masks/mask_${name}_512.png").use {
+                    bitmap = BitmapFactory.decodeStream(it)
+                }
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    // Animate shape and colors
+    val cornerRadius by animateDpAsState(
+        targetValue = if (isSelected) CardCornerRadius else ExtraLargeRadius,
+        animationSpec = tween(durationMillis = 400),
+        label = "cornerRadius"
+    )
+    val containerColor by animateColorAsState(
+        targetValue = if (isSelected) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            if (isDark) Color(0xFF2C2C2C) else Color(0xFFE0E0E0)
+        },
+        animationSpec = tween(durationMillis = 400),
+        label = "containerColor"
+    )
+    val contentColor by animateColorAsState(
+        targetValue = if (isSelected) {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            if (isDark) Color.White else Color.Black
+        },
+        animationSpec = tween(durationMillis = 400),
+        label = "contentColor"
+    )
+
+    val shape = rememberMiuixSquircleShape(cornerRadius)
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onClick,
+                indication = null,
+                interactionSource = interactionSource
+            )
+    ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .clip(shape)
+                .background(containerColor),
+            contentAlignment = Alignment.Center
+        ) {
+            bitmap?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = name,
+                    modifier = Modifier.size(36.dp),
+                    colorFilter = ColorFilter.tint(contentColor)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = name.replace("m3_", ""),
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+private fun Color.isLight(): Boolean {
+    val luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+    return luminance > 0.5
+}
