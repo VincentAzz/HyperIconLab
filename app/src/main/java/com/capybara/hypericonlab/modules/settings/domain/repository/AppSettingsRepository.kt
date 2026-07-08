@@ -23,7 +23,8 @@ enum class BooleanSetting {
     ThemeUseDynamicColor,
     UiUseFloatingBottomBar,
     UiUseFloatingBottomBarBlur,
-    UiUseFloatingBottomBarCompact
+    UiUseFloatingBottomBarCompact,
+    UiUseProgressiveBlurTopAppBar
 }
 
 interface AppSettingsRepository {

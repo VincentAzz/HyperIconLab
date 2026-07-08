@@ -30,6 +30,8 @@ class AppSettingsRepositoryImpl(
             useMiuixSquircle = prefs[AppDataStore.UI_USE_MIUIX_SQUIRCLE] ?: true,
             useBlur = prefs[AppDataStore.UI_USE_BLUR]
                 ?: (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
+            useProgressiveBlurTopAppBar = prefs[AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR]
+                ?: false,
             useLiquidGlassBottomSheet = prefs[AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET]
                 ?: false,
             liquidGlassBlurRadius = prefs[AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS] ?: 24,
@@ -103,5 +105,6 @@ class AppSettingsRepositoryImpl(
             BooleanSetting.UiUseFloatingBottomBar -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR
             BooleanSetting.UiUseFloatingBottomBarBlur -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR_BLUR
             BooleanSetting.UiUseFloatingBottomBarCompact -> AppDataStore.UI_USE_FLOATING_BAR_COMPACT
+            BooleanSetting.UiUseProgressiveBlurTopAppBar -> AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR
         }
 }

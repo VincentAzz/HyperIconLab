@@ -8,8 +8,10 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -31,9 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
+import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
-import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.symbol.info
 import com.capybara.hypericonlab.core.designsystem.symbol.inventory_2
@@ -139,7 +142,10 @@ fun SettingsPage(
             ?: ScaffoldDefaults.contentWindowInsets,
         topBar = {
             TopAppBar(
-                modifier = Modifier.material3BlurEffect(backdrop),
+                modifier = Modifier.appBarBlurEffect(
+                    backdrop = backdrop,
+                    useProgressiveBlur = uiState.useProgressiveBlurTopAppBar
+                ),
                 windowInsets = windowInsetsSides?.let { TopAppBarDefaults.windowInsets.only(it) }
                     ?: TopAppBarDefaults.windowInsets,
                 title = {
@@ -148,7 +154,8 @@ fun SettingsPage(
                         selectedIndex = uiState.selectedTab,
                         onSelected = { viewModel.dispatch(ThemeSettingsAction.SetSelectedTab(it)) },
                         icons = settingIcons,
-                        containerColor = Color.Transparent,
+                        // containerColor = Color.Transparent,
+                        // alignment = FloatingTabRowAlignment.CENTER,
                         indicatorPadding = 4.dp,
                     )
                 },

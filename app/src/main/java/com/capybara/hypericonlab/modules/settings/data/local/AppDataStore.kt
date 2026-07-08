@@ -31,6 +31,8 @@ class AppDataStore(
             booleanPreferencesKey("ui_use_floating_bottom_bar_blur")
         val UI_USE_FLOATING_BAR_COMPACT =
             booleanPreferencesKey("ui_use_floating_bottom_bar_compact")
+        val UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR =
+            booleanPreferencesKey("ui_use_progressive_blur_top_app_bar")
         val UI_FLOATING_BAR_COMPACT_TYPE =
             stringPreferencesKey("ui_floating_bottom_bar_compact_type")
         val LAST_MAIN_PAGE_INDEX = intPreferencesKey("last_main_page_index")

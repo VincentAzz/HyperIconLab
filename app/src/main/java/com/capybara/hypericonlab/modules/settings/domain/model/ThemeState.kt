@@ -21,6 +21,7 @@ data class ThemeState(
     val seedColor: Color = PresetColors.first().color,
     val useMiuixSquircle: Boolean = true,
     val useBlur: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
+    val useProgressiveBlurTopAppBar: Boolean = false,
     val useLiquidGlassBottomSheet: Boolean = false,
     val liquidGlassBlurRadius: Int = 24,
 )

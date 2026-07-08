@@ -128,6 +128,21 @@ fun SettingsTab(
                     item(animatedVisibility = uiState.useBlur) {
                         SwitchWidget(
                             iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_progressive_blur_top_app_bar),
+                            description = stringResource(R.string.theme_settings_use_progressive_blur_top_app_bar_desc),
+                            checked = uiState.useProgressiveBlurTopAppBar,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseProgressiveBlurTopAppBar(
+                                        it
+                                    )
+                                )
+                            }
+                        )
+                    }
+                    item(animatedVisibility = uiState.useBlur) {
+                        SwitchWidget(
+                            iconPlaceholder = false,
                             title = stringResource(R.string.theme_settings_use_liquid_glass_bottom_sheet),
                             description = stringResource(R.string.theme_settings_use_liquid_glass_bottom_sheet_desc),
                             checked = uiState.useLiquidGlassBottomSheet,

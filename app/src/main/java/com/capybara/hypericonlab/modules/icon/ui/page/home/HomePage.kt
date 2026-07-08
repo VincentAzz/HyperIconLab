@@ -35,7 +35,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
-import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.symbol.history
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
@@ -76,7 +76,10 @@ fun HomePage(
             ?: ScaffoldDefaults.contentWindowInsets,
         topBar = {
             TopAppBar(
-                modifier = Modifier.material3BlurEffect(backdrop),
+                modifier = Modifier.appBarBlurEffect(
+                    backdrop = backdrop,
+                    useProgressiveBlur = themeState.useProgressiveBlurTopAppBar
+                ),
                 title = { Text("主页") },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(

@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
-import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
@@ -87,7 +87,10 @@ fun CustomPage(
             ?: ScaffoldDefaults.contentWindowInsets,
         topBar = {
             TopAppBar(
-                modifier = Modifier.material3BlurEffect(backdrop),
+                modifier = Modifier.appBarBlurEffect(
+                    backdrop = backdrop,
+                    useProgressiveBlur = themeState.useProgressiveBlurTopAppBar
+                ),
                 windowInsets = windowInsetsSides?.let { TopAppBarDefaults.windowInsets.only(it) }
                     ?: TopAppBarDefaults.windowInsets,
                 title = {

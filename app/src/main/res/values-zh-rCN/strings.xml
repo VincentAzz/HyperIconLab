@@ -18,6 +18,8 @@
     <string name="theme_settings_floating_bottom_bar_compact_type">紧凑样式类型</string>
     <string name="theme_settings_use_blur">启用模糊</string>
     <string name="theme_settings_use_blur_desc">为应用启用模糊效果</string>
+    <string name="theme_settings_use_progressive_blur_top_app_bar">启用渐变模糊顶栏</string>
+    <string name="theme_settings_use_progressive_blur_top_app_bar_desc">为应用顶栏启用渐变模糊效果</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet">启用液态玻璃底部弹出菜单</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">为底部弹出菜单启用液态玻璃效果</string>
     <string name="theme_settings_liquid_glass_blur_radius">菜单液态玻璃模糊半径</string>

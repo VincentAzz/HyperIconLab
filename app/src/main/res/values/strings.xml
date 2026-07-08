@@ -18,6 +18,8 @@
     <string name="theme_settings_floating_bottom_bar_compact_type">Compact bar type</string>
     <string name="theme_settings_use_blur">Enable Blur</string>
     <string name="theme_settings_use_blur_desc">Enable blur for the app</string>
+    <string name="theme_settings_use_progressive_blur_top_app_bar">Enable Progressive Blur Top App Bar</string>
+    <string name="theme_settings_use_progressive_blur_top_app_bar_desc">Apply progressive blur to the top app bar</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet">Enable Liquid Glass Bottom Sheet</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">Enable liquid glass effect for bottom sheets</string>
     <string name="theme_settings_liquid_glass_blur_radius">Liquid Glass Blur Radius</string>

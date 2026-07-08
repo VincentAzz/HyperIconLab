@@ -62,6 +62,7 @@ class SettingsViewModel(
         ThemeSettingsState(
             useMiuixSquircle = themeState.useMiuixSquircle,
             useBlur = themeState.useBlur,
+            useProgressiveBlurTopAppBar = themeState.useProgressiveBlurTopAppBar,
             useLiquidGlassBottomSheet = themeState.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = themeState.liquidGlassBlurRadius,
             themeMode = themeState.themeMode,
@@ -94,6 +95,13 @@ class SettingsViewModel(
             is ThemeSettingsAction.SetUseBlur -> viewModelScope.launch {
                 updateSetting(
                     BooleanSetting.UiUseBlur,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseProgressiveBlurTopAppBar -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseProgressiveBlurTopAppBar,
                     action.enable
                 )
             }

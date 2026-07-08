@@ -8,6 +8,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 data class AppPreferences(
     val useMiuixSquircle: Boolean = true,
     val useBlur: Boolean,
+    val useProgressiveBlurTopAppBar: Boolean = false,
     val useLiquidGlassBottomSheet: Boolean = false,
     val liquidGlassBlurRadius: Int = 24,
     val themeMode: ThemeMode,

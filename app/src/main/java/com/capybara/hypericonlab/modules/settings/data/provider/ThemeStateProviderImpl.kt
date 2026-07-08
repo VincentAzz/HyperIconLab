@@ -40,6 +40,7 @@ class ThemeStateProviderImpl(
             seedColor = effectiveSeedColor,
             useMiuixSquircle = prefs.useMiuixSquircle,
             useBlur = prefs.useBlur,
+            useProgressiveBlurTopAppBar = prefs.useProgressiveBlurTopAppBar,
             useLiquidGlassBottomSheet = prefs.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = prefs.liquidGlassBlurRadius,
         )

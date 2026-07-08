@@ -9,6 +9,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 sealed interface ThemeSettingsAction {
     data class SetUseMiuixSquircle(val enable: Boolean) : ThemeSettingsAction
     data class SetUseBlur(val enable: Boolean) : ThemeSettingsAction
+    data class SetUseProgressiveBlurTopAppBar(val enable: Boolean) : ThemeSettingsAction
     data class SetUseLiquidGlassBottomSheet(val enable: Boolean) : ThemeSettingsAction
     data class SetLiquidGlassBlurRadius(val value: Int) : ThemeSettingsAction
     data class SetThemeMode(val mode: ThemeMode) : ThemeSettingsAction

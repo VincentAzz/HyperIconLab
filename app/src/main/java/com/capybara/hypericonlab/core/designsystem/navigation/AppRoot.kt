@@ -12,11 +12,9 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppRoot(uiState: ThemeState) {
-    // 在 MainActivity 的 setContent 中调用，LocalViewModelStoreOwner.current 默认即 ComponentActivity，
-    // 无需显式传入 viewModelStoreOwner。
     val sharedViewModel: SettingsSharedViewModel = koinViewModel()
-
     val backgroundColor = MaterialTheme.colorScheme.surfaceContainer
+
     Box(
         modifier = Modifier
             .fillMaxSize()
