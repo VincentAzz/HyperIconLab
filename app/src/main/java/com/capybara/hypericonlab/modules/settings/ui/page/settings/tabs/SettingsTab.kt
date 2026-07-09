@@ -109,68 +109,6 @@ fun SettingsTab(
                             }
                         )
                     }
-                    item {
-                        SwitchWidget(
-                            // icon = AppIcons.Blur,
-                            iconPlaceholder = false,
-                            title = stringResource(R.string.theme_settings_use_blur),
-                            description = stringResource(R.string.theme_settings_use_blur_desc),
-                            checked = uiState.useBlur,
-                            onCheckedChange = {
-                                viewModel.dispatch(
-                                    ThemeSettingsAction.SetUseBlur(
-                                        it
-                                    )
-                                )
-                            }
-                        )
-                    }
-                    item(animatedVisibility = uiState.useBlur) {
-                        SwitchWidget(
-                            iconPlaceholder = false,
-                            title = stringResource(R.string.theme_settings_use_progressive_blur_top_app_bar),
-                            description = stringResource(R.string.theme_settings_use_progressive_blur_top_app_bar_desc),
-                            checked = uiState.useProgressiveBlurTopAppBar,
-                            onCheckedChange = {
-                                viewModel.dispatch(
-                                    ThemeSettingsAction.SetUseProgressiveBlurTopAppBar(
-                                        it
-                                    )
-                                )
-                            }
-                        )
-                    }
-                    item(animatedVisibility = uiState.useBlur) {
-                        SwitchWidget(
-                            iconPlaceholder = false,
-                            title = stringResource(R.string.theme_settings_use_liquid_glass_bottom_sheet),
-                            description = stringResource(R.string.theme_settings_use_liquid_glass_bottom_sheet_desc),
-                            checked = uiState.useLiquidGlassBottomSheet,
-                            onCheckedChange = {
-                                viewModel.dispatch(
-                                    ThemeSettingsAction.SetUseLiquidGlassBottomSheet(
-                                        it
-                                    )
-                                )
-                            }
-                        )
-                    }
-                    item(animatedVisibility = uiState.useBlur && uiState.useLiquidGlassBottomSheet) { shape ->
-                        SliderWidget(
-                            title = stringResource(R.string.theme_settings_liquid_glass_blur_radius),
-                            value = uiState.liquidGlassBlurRadius.toFloat(),
-                            onValueChange = {
-                                viewModel.dispatch(
-                                    ThemeSettingsAction.SetLiquidGlassBlurRadius(
-                                        it.toInt()
-                                    )
-                                )
-                            },
-                            valueRange = 0f..48f,
-                            valueDisplay = "${uiState.liquidGlassBlurRadius} dp",
-                            shape = shape
-                        )
-                    }
                 }
                 item {
                     SwitchWidget(
@@ -181,21 +119,6 @@ fun SettingsTab(
                         onCheckedChange = {
                             viewModel.dispatch(
                                 ThemeSettingsAction.SetUseFloatingBottomBar(
-                                    it
-                                )
-                            )
-                        }
-                    )
-                }
-                item(animatedVisibility = uiState.useFloatingBottomBar) {
-                    SwitchWidget(
-                        iconPlaceholder = false,
-                        title = stringResource(R.string.theme_settings_use_floating_bottom_bar_blur),
-                        description = stringResource(R.string.theme_settings_use_floating_bottom_bar_blur_desc),
-                        checked = uiState.useFloatingBottomBarBlur,
-                        onCheckedChange = {
-                            viewModel.dispatch(
-                                ThemeSettingsAction.SetUseFloatingBottomBarBlur(
                                     it
                                 )
                             )
@@ -252,6 +175,91 @@ fun SettingsTab(
                                     }
                                 }
                         }
+                    }
+                }
+            }
+        }
+
+        item {
+            SegmentedColumn(
+                title = "应用材质"
+            ) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    item {
+                        SwitchWidget(
+                            iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_blur),
+                            description = stringResource(R.string.theme_settings_use_blur_desc),
+                            checked = uiState.useBlur,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseBlur(
+                                        it
+                                    )
+                                )
+                            }
+                        )
+                    }
+                    item(animatedVisibility = uiState.useBlur) {
+                        SwitchWidget(
+                            iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_progressive_blur_top_app_bar),
+                            description = stringResource(R.string.theme_settings_use_progressive_blur_top_app_bar_desc),
+                            checked = uiState.useProgressiveBlurTopAppBar,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseProgressiveBlurTopAppBar(
+                                        it
+                                    )
+                                )
+                            }
+                        )
+                    }
+                    item(animatedVisibility = uiState.useFloatingBottomBar) {
+                        SwitchWidget(
+                            iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_floating_bottom_bar_blur),
+                            description = stringResource(R.string.theme_settings_use_floating_bottom_bar_blur_desc),
+                            checked = uiState.useFloatingBottomBarBlur,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseFloatingBottomBarBlur(
+                                        it
+                                    )
+                                )
+                            }
+                        )
+                    }
+                    item(animatedVisibility = uiState.useBlur) {
+                        SwitchWidget(
+                            iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_liquid_glass_bottom_sheet),
+                            description = stringResource(R.string.theme_settings_use_liquid_glass_bottom_sheet_desc),
+                            checked = uiState.useLiquidGlassBottomSheet,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseLiquidGlassBottomSheet(
+                                        it
+                                    )
+                                )
+                            }
+                        )
+                    }
+                    item(animatedVisibility = uiState.useBlur && uiState.useLiquidGlassBottomSheet) { shape ->
+                        SliderWidget(
+                            title = stringResource(R.string.theme_settings_liquid_glass_blur_radius),
+                            value = uiState.liquidGlassBlurRadius.toFloat(),
+                            onValueChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetLiquidGlassBlurRadius(
+                                        it.toInt()
+                                    )
+                                )
+                            },
+                            valueRange = 0f..48f,
+                            valueDisplay = "${uiState.liquidGlassBlurRadius} dp",
+                            shape = shape
+                        )
                     }
                 }
             }
