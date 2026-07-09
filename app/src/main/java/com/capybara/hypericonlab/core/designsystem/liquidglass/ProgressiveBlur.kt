@@ -89,11 +89,11 @@ half4 main(float2 coord) {
 fun Modifier.progressiveBlurEffect(
     backdrop: LayerBackdrop?,
     enabled: Boolean = true,
-    blurRadius: Dp = 4.dp,
+    blurRadius: Dp = 5.dp,
     tintColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     tintIntensity: Float = 0.5f,
     fadeStartRatio: Float = 1.0f,
-    fadeEndRatio: Float = 0.5f,
+    fadeEndRatio: Float = 0.7f,
     shape: Shape = RectangleShape,
 ): Modifier {
     if (!enabled || backdrop == null) return this
@@ -119,12 +119,7 @@ fun Modifier.progressiveBlurEffect(
     )
 }
 
-/**
- * 顶栏模糊统一入口：根据 [useProgressiveBlur] 选择渐进式模糊或普通模糊。
- *
- * 供 HomePage / CustomPage / SettingsPage 的 TopAppBar 使用，
- * 其他部位（FloatingBottomBar、FloatingBottomSheet 等）继续直接使用 [material3BlurEffect]。
- */
+// 顶栏模糊
 @Composable
 fun Modifier.appBarBlurEffect(
     backdrop: LayerBackdrop?,

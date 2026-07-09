@@ -88,7 +88,7 @@ fun FloatingTabRow(
     onSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
     icons: List<ImageVector>? = null,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceBright,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
     indicatorColor: Color = MaterialTheme.colorScheme.primary,
     barCornerRadius: Dp = TabRowBarCornerRadius,
     indicatorCornerRadius: Dp = TabRowIndicatorCornerRadius,

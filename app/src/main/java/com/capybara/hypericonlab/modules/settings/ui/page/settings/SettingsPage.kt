@@ -176,7 +176,7 @@ fun SettingsPage(
                         selectedIndex = uiState.selectedTab,
                         onSelected = { viewModel.dispatch(ThemeSettingsAction.SetSelectedTab(it)) },
                         icons = settingIcons,
-                        containerColor = if (uiState.useTabRowTransparentBackground) Color.Transparent else MaterialTheme.colorScheme.surfaceBright,
+                        containerColor = if (uiState.useTabRowTransparentBackground) Color.Transparent else MaterialTheme.colorScheme.surfaceContainerHighest, // surfaceContainerHighest 稍暗一点
                         alignment = if (uiState.useTabRowCenterAlignment) FloatingTabRowAlignment.CENTER else FloatingTabRowAlignment.START,
                         widthMode = if (uiState.useTabRowFillWidth) FloatingTabRowWidthMode.FILL else FloatingTabRowWidthMode.WRAP_CONTENT,
                         indicatorPadding = 4.dp,

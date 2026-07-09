@@ -123,7 +123,7 @@ fun CustomPage(
                         selectedIndex = selectedTab,
                         onSelected = { viewModel.updateConfig { c -> c.copy(selectedTab = it) } },
                         indicatorPadding = 4.dp,
-                        containerColor = if (themeState.useTabRowTransparentBackground) Color.Transparent else MaterialTheme.colorScheme.surfaceBright,
+                        containerColor = if (themeState.useTabRowTransparentBackground) Color.Transparent else MaterialTheme.colorScheme.surfaceContainerHighest,
                         alignment = if (themeState.useTabRowCenterAlignment) FloatingTabRowAlignment.CENTER else FloatingTabRowAlignment.START,
                         widthMode = if (themeState.useTabRowFillWidth) FloatingTabRowWidthMode.FILL else FloatingTabRowWidthMode.WRAP_CONTENT,
                     )

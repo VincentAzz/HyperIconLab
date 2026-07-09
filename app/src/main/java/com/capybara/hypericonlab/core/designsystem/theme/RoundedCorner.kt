@@ -6,6 +6,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -44,19 +45,13 @@ val LargeCardRadius = 20.dp
 val ExtraLargeRadius = 32.dp
 
 object TabRowRoundedCorner {
-    val TabRowIndicatorCornerRadius = 12.dp
+    val TabRowIndicatorCornerRadius = 24.dp
 
     val TabRowBarCornerRadius = TabRowIndicatorCornerRadius + 4.dp
 }
 
 
-/**
- * 自定义 Shape：开启时绘制 miuix-squircle 连续曲率圆角，关闭/低版本时退化为普通圆角矩形。
- * 用于需要把 Shape 作为参数传入组件（Card / Surface 等）的场景。
- *
- * 注：仅支持 uniform 圆角；per-corner 场景请改用 squircleSurface / squircleClip 修饰符的 per-corner 重载。
- * 开关状态由 [rememberMiuixSquircleShape] 在 Composable 上下文中读取后传入，避免在 createOutline 中调用 @Composable。
- */
+
 class MiuixSquircleShape(
     private val cornerRadius: Dp,
     private val extension: Float = SquircleDefaults.Extension,
@@ -65,8 +60,13 @@ class MiuixSquircleShape(
     override fun createOutline(
         size: Size, layoutDirection: LayoutDirection, density: Density
     ): Outline {
-        val path = Path()
         val radiusPx = with(density) { cornerRadius.toPx() }
+        val halfMinSide = minOf(size.width, size.height) / 2f
+        // 圆角超过半边长 → 直接用标准圆形，绕过 squircle
+        // if (radiusPx > halfMinSide) {
+        //     return RoundedCornerShape(50).createOutline(size, layoutDirection, density)
+        // }
+        val path = Path()
         path.addSquircleRect(
             width = size.width,
             height = size.height,
@@ -78,10 +78,7 @@ class MiuixSquircleShape(
     }
 }
 
-/**
- * 在 Composable 中按当前开关状态构建 [MiuixSquircleShape]。
- * 开关变化或圆角参数变化时自动重建并缓存。
- */
+
 @Composable
 fun rememberMiuixSquircleShape(
     cornerRadius: Dp,
