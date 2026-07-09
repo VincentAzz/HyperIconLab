@@ -38,6 +38,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 
 val LocalSegmentedItemShape = compositionLocalOf<Shape> { RoundedCornerShape(CornerRadius) }
 
+val LocalSegmentedContainerColorAlpha = compositionLocalOf<Float> { 1f }
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BaseWidget(
@@ -72,7 +74,7 @@ fun BaseWidget(
         MaterialTheme.colorScheme.primaryContainer
     } else {
         MaterialTheme.colorScheme.surfaceBright
-    }
+    }.copy(alpha = LocalSegmentedContainerColorAlpha.current)
 
     val baseContentColor = if (selected) {
         MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primaryContainer)

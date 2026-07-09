@@ -39,11 +39,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
+import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
 import com.capybara.hypericonlab.core.designsystem.symbol.clear_all
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
+import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.LogEntry
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.LogType
@@ -89,7 +92,7 @@ fun LogSheet(
         liquidGlassBlurRadius = liquidGlassBlurRadius,
     ) {
         CenterAlignedTopAppBar(
-            title = { Text("运行日志") },
+            title = { SheetTitle("运行日志") },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent
             ),
@@ -108,13 +111,13 @@ fun LogSheet(
                     color = MaterialTheme.colorScheme.secondaryContainer,
                     modifier = Modifier
                         .padding(start = 12.dp)
-                        .size(36.dp)
+                        .size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             AppMaterialSymbols.close,
                             contentDescription = "关闭",
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
@@ -127,13 +130,13 @@ fun LogSheet(
                     color = MaterialTheme.colorScheme.secondaryContainer,
                     modifier = Modifier
                         .padding(end = 12.dp)
-                        .size(36.dp)
+                        .size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             AppMaterialSymbols.clear_all,
                             contentDescription = "清除日志",
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
@@ -149,38 +152,47 @@ fun LogSheet(
                 Text("暂无日志", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
-            Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(logs.reversed()) { entry ->
-                        LogItem(entry)
-                    }
-                }
 
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = showScrollHint,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 8.dp)
-                ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f),
-                        modifier = Modifier.size(36.dp),
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp, 0.dp, 8.dp, 8.dp),
+                shape = rememberMiuixSquircleShape(ExtraLargeRadius - 8.dp),
+                color = Color.White.copy(alpha = 0.6f)
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = AppMaterialSymbols.arrow_downward,
-                                contentDescription = "向下滚动",
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f),
-                                modifier = Modifier.size(24.dp)
-                            )
+                        items(logs.reversed()) { entry ->
+                            LogItem(entry)
+                        }
+                    }
+
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = showScrollHint,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 8.dp)
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f),
+                            modifier = Modifier.size(36.dp),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = AppMaterialSymbols.arrow_downward,
+                                    contentDescription = "向下滚动",
+                                    tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     }
                 }

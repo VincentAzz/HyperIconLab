@@ -1,6 +1,7 @@
 package com.capybara.hypericonlab.core.designsystem.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -9,7 +10,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -28,6 +28,8 @@ import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.symbol.done
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
@@ -57,7 +59,7 @@ fun <T> SelectionSheet(
         liquidGlassBlurRadius = liquidGlassBlurRadius
     ) {
         CenterAlignedTopAppBar(
-            title = { Text(title, style = MaterialTheme.typography.titleMedium) },
+            title = { SheetTitle(title) },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             navigationIcon = {
                 Surface(
@@ -70,13 +72,13 @@ fun <T> SelectionSheet(
                     color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f),
                     modifier = Modifier
                         .padding(start = 12.dp)
-                        .size(36.dp)
+                        .size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             AppMaterialSymbols.close,
                             contentDescription = stringResource(R.string.close),
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
@@ -98,13 +100,13 @@ fun <T> SelectionSheet(
                     color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f),
                     modifier = Modifier
                         .padding(end = 12.dp)
-                        .size(36.dp)
+                        .size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             AppMaterialSymbols.done,
                             contentDescription = stringResource(R.string.confirm),
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
@@ -113,7 +115,10 @@ fun <T> SelectionSheet(
         )
 
         SegmentedColumn(
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(8.dp, 0.dp, 8.dp, 8.dp),
+            outerCornerRadius = CornerRadius,
+            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
+            containerColorAlpha = 0.8f
         ) {
             items.forEach { item ->
                 item(key = item) {

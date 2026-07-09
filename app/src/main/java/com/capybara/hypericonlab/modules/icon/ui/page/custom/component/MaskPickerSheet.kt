@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
+import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
@@ -136,7 +137,7 @@ fun MaskPickerSheet(
     ) {
         // Header
         CenterAlignedTopAppBar(
-            title = { Text("选择形状") },
+            title = { SheetTitle("选择形状") },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent
             ),
@@ -153,13 +154,13 @@ fun MaskPickerSheet(
                     color = MaterialTheme.colorScheme.secondaryContainer,
                     modifier = Modifier
                         .padding(start = 12.dp)
-                        .size(36.dp)
+                        .size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             AppMaterialSymbols.close,
                             contentDescription = "关闭",
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
@@ -184,14 +185,14 @@ fun MaskPickerSheet(
                     color = MaterialTheme.colorScheme.secondaryContainer,
                     modifier = Modifier
                         .padding(end = 12.dp)
-                        .size(36.dp)
+                        .size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             AppMaterialSymbols.check,
                             contentDescription = "确定",
                             modifier = Modifier
-                                .size(20.dp)
+                                .size(24.dp)
                                 .alpha(if (enabled) 1f else 0.38f),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
@@ -290,8 +291,6 @@ fun MaskPickerSheet(
                     }
                 }
             }
-
-            // Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -304,7 +303,6 @@ fun MaskItem(
     onClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val isDark = !MaterialTheme.colorScheme.surface.isLight()
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
 
@@ -329,7 +327,7 @@ fun MaskItem(
         targetValue = if (isSelected) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
-            if (isDark) Color(0xFF2C2C2C) else Color(0xFFE0E0E0)
+            MaterialTheme.colorScheme.surfaceContainerHighest
         },
         animationSpec = tween(durationMillis = 400),
         label = "containerColor"
@@ -338,7 +336,7 @@ fun MaskItem(
         targetValue = if (isSelected) {
             MaterialTheme.colorScheme.onPrimaryContainer
         } else {
-            if (isDark) Color.White else Color.Black
+            MaterialTheme.colorScheme.onSurface
         },
         animationSpec = tween(durationMillis = 400),
         label = "contentColor"
@@ -383,9 +381,4 @@ fun MaskItem(
             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
         )
     }
-}
-
-private fun Color.isLight(): Boolean {
-    val luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
-    return luminance > 0.5
 }

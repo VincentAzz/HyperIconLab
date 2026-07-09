@@ -114,10 +114,12 @@ class SegmentedColumnScope {
 fun SegmentedColumn(
     modifier: Modifier = Modifier,
     title: String = "",
+    outerCornerRadius: Dp = CornerRadius,
     contentPadding: PaddingValues = PaddingValues(
         horizontal = PADDING_HORIZONTAL.dp,
         vertical = PADDING_VERTICAL.dp
     ),
+    containerColorAlpha: Float = 1f,
     content: SegmentedColumnScope.() -> Unit
 ) {
     val scope = SegmentedColumnScope().apply(content)
@@ -166,8 +168,8 @@ fun SegmentedColumn(
                         val isLast =
                             index == lastVisibleIndex || (index == allItems.lastIndex && !itemData.visible)
 
-                        val baseTopRadius = if (isFirst) CornerRadius else ConnectionRadius
-                        val baseBottomRadius = if (isLast) CornerRadius else ConnectionRadius
+                        val baseTopRadius = if (isFirst) outerCornerRadius else ConnectionRadius
+                        val baseBottomRadius = if (isLast) outerCornerRadius else ConnectionRadius
 
                         val targetTopRadius = if (itemData.forceFlatTop) 0.dp else baseTopRadius
                         val targetBottomRadius =
@@ -243,7 +245,10 @@ fun SegmentedColumn(
                                     alpha = (currentProgress * 1.5f).coerceIn(0f, 1f)
                                 }
                         ) {
-                            CompositionLocalProvider(LocalSegmentedItemShape provides shape) {
+                            CompositionLocalProvider(
+                                LocalSegmentedItemShape provides shape,
+                                LocalSegmentedContainerColorAlpha provides containerColorAlpha
+                            ) {
                                 Column(modifier = Modifier.padding(top = currentTopPadding)) {
                                     itemData.content(shape)
                                 }
