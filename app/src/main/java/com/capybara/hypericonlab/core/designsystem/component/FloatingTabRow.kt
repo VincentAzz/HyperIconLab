@@ -194,7 +194,6 @@ fun FloatingTabRow(
         }
     }
 
-    // 响应外部 selectedIndex 变化（如 ViewModel 更新）
     LaunchedEffect(selectedIndex) {
         if (selectedIndex.toFloat() != dampedDragAnimation.targetValue) {
             currentIndex = selectedIndex
@@ -206,7 +205,6 @@ fun FloatingTabRow(
     val selectedTextColor = MaterialTheme.colorScheme.onPrimary
     val tabTextStyle = MaterialTheme.typography.titleSmall
 
-    // 拖拽结束/取消时的统一处理：吸附到最近 tab 并回调
     val onDragStopped: () -> Unit = {
         val targetIndex =
             dampedDragAnimation.targetValue.fastRoundToInt().fastCoerceIn(0, tabsCount - 1)
@@ -218,7 +216,6 @@ fun FloatingTabRow(
         onSelected(targetIndex)
     }
 
-    // FILL 模式下铺满父容器宽度，alignment 失效；WRAP_CONTENT 模式下按 alignment 对齐
     val alignmentModifier = when (widthMode) {
         FloatingTabRowWidthMode.FILL -> Modifier.fillMaxWidth()
         FloatingTabRowWidthMode.WRAP_CONTENT -> when (alignment) {
@@ -230,13 +227,12 @@ fun FloatingTabRow(
     }
 
     val isFill = widthMode == FloatingTabRowWidthMode.FILL
-    // FILL 模式下 tab 项使用 weight(1f) 均分宽度，文本居中
+
     val tabArrangement = if (isFill) Arrangement.Center else Arrangement.Start
 
     Box(
         modifier = modifier.then(alignmentModifier), contentAlignment = Alignment.CenterStart
     ) {
-        // 底层：Bar 背景 + Tab 文本（未选中颜色）
         Row(
             Modifier
                 .then(if (isFill) Modifier.fillMaxWidth() else Modifier)
@@ -247,9 +243,6 @@ fun FloatingTabRow(
                 .clip(barShape)
                 .background(containerColor, barShape)
                 .pointerInput(tabsCount) {
-                    // 使用 detectDragGestures 替代 dampedDragAnimation.modifier：
-                    // 1. 超过 touch slop 才触发拖拽，不拦截 tap 点击（clickable 仍可用）
-                    // 2. onDrag 中 consume 事件，阻止冒泡到父级 HorizontalPager
                     detectDragGestures(onDragStart = { dampedDragAnimation.press() }, onDragEnd = {
                         onDragStopped()
                         dampedDragAnimation.release()
@@ -313,7 +306,6 @@ fun FloatingTabRow(
             }
         }
 
-        // 上层：滑动指示器 + 选中颜色文本 overlay
         if (indicatorWidth > 0f) {
             val tabWidthDp = with(density) { indicatorWidth.toDp() }
 
@@ -322,8 +314,6 @@ fun FloatingTabRow(
                     .height(innerHeight)
                     .width(tabWidthDp)
                     .graphicsLayer {
-                        // indicatorX 是相对于底层 Row (已包含 indicatorPadding) 的位置
-                        // 我们需要在 Box 坐标系中加上初始的 indicatorPadding 偏移
                         translationX =
                             with(density) { indicatorPadding.toPx() } + indicatorX + panelOffset
                     }
@@ -333,13 +323,10 @@ fun FloatingTabRow(
                 Row(
                     Modifier
                         .clearAndSetSemantics {}
-                        // 忽略外部约束，强制宽度 = 底层内容区宽度 (Bar总宽 - 2*padding)
                         .wrapContentWidth(align = Alignment.Start, unbounded = true)
                         .requiredWidth(with(density) { (totalWidthPx - 2 * indicatorPadding.toPx()).toDp() })
-                        .height(innerHeight) // 高度与指示器 Box 内部高度一致
-                        // 注意：此处不再应用 padding(indicatorPadding)，避免二次偏移
+                        .height(innerHeight)
                         .graphicsLayer {
-                            // 偏移 -indicatorX 使选中文字与底层完全重合
                             translationX = if (isLtr) -indicatorX else indicatorX
                             compositingStrategy = CompositingStrategy.Offscreen
                         },

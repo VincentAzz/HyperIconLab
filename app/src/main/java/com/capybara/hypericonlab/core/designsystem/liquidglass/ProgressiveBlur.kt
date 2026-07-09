@@ -31,9 +31,9 @@ import top.yukonga.miuix.kmp.shader.isRuntimeShaderSupported
  */
 fun BackdropEffectScope.progressiveBlur(
     tintColor: Color,
-    tintIntensity: Float = 0.8f,
+    tintIntensity: Float = 0.5f,
     fadeStartRatio: Float = 1.0f,
-    fadeEndRatio: Float = 0.75f,
+    fadeEndRatio: Float = 0.5f,
 ) {
     if (!isRuntimeShaderSupported()) return
 
@@ -89,11 +89,11 @@ half4 main(float2 coord) {
 fun Modifier.progressiveBlurEffect(
     backdrop: LayerBackdrop?,
     enabled: Boolean = true,
-    blurRadius: Dp = 6.dp,
+    blurRadius: Dp = 4.dp,
     tintColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     tintIntensity: Float = 0.5f,
     fadeStartRatio: Float = 1.0f,
-    fadeEndRatio: Float = 0.4f,
+    fadeEndRatio: Float = 0.5f,
     shape: Shape = RectangleShape,
 ): Modifier {
     if (!enabled || backdrop == null) return this
