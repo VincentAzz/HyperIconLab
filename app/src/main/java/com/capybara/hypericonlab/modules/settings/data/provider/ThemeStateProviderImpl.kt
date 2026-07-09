@@ -41,6 +41,9 @@ class ThemeStateProviderImpl(
             useMiuixSquircle = prefs.useMiuixSquircle,
             useBlur = prefs.useBlur,
             useProgressiveBlurTopAppBar = prefs.useProgressiveBlurTopAppBar,
+            useTabRowCenterAlignment = prefs.useTabRowCenterAlignment,
+            useTabRowTransparentBackground = prefs.useTabRowTransparentBackground,
+            useTabRowFillWidth = prefs.useTabRowFillWidth,
             useLiquidGlassBottomSheet = prefs.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = prefs.liquidGlassBlurRadius,
         )

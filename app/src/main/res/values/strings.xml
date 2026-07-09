@@ -26,6 +26,12 @@
     <string name="theme_settings_liquid_glass_blur_radius_desc">Adjust the blur intensity of the liquid glass effect (0–48 dp)</string>
     <string name="theme_settings_use_miuix_squircle">Enable Squircle</string>
     <string name="theme_settings_use_miuix_squircle_desc">Use miuix-squircle smooth corners in the app</string>
+    <string name="theme_settings_use_tab_row_center_alignment">Center Top Tab Row</string>
+    <string name="theme_settings_use_tab_row_center_alignment_desc">Center align the top tab row</string>
+    <string name="theme_settings_use_tab_row_transparent_background">Transparent Top Tab Row Background</string>
+    <string name="theme_settings_use_tab_row_transparent_background_desc">Make the top tab row background transparent</string>
+    <string name="theme_settings_use_tab_row_fill_width">Fill Width Top Tab Row</string>
+    <string name="theme_settings_use_tab_row_fill_width_desc">Stretch the top tab row to fill the full width</string>
     <string name="theme_settings_theme_mode">Theme Mode</string>
     <string name="theme_settings_theme_mode_desc">Select theme mode</string>
     <string name="theme_settings_theme_mode_light">Light theme</string>

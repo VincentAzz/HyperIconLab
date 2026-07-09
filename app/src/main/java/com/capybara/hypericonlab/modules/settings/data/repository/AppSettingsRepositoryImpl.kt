@@ -32,6 +32,12 @@ class AppSettingsRepositoryImpl(
                 ?: (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
             useProgressiveBlurTopAppBar = prefs[AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR]
                 ?: false,
+            useTabRowCenterAlignment = prefs[AppDataStore.UI_USE_TAB_ROW_CENTER_ALIGNMENT]
+                ?: false,
+            useTabRowTransparentBackground = prefs[AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND]
+                ?: false,
+            useTabRowFillWidth = prefs[AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH]
+                ?: false,
             useLiquidGlassBottomSheet = prefs[AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET]
                 ?: false,
             liquidGlassBlurRadius = prefs[AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS] ?: 24,
@@ -106,5 +112,8 @@ class AppSettingsRepositoryImpl(
             BooleanSetting.UiUseFloatingBottomBarBlur -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR_BLUR
             BooleanSetting.UiUseFloatingBottomBarCompact -> AppDataStore.UI_USE_FLOATING_BAR_COMPACT
             BooleanSetting.UiUseProgressiveBlurTopAppBar -> AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR
+            BooleanSetting.UiUseTabRowCenterAlignment -> AppDataStore.UI_USE_TAB_ROW_CENTER_ALIGNMENT
+            BooleanSetting.UiUseTabRowTransparentBackground -> AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND
+            BooleanSetting.UiUseTabRowFillWidth -> AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH
         }
 }

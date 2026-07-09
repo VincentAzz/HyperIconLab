@@ -63,6 +63,9 @@ class SettingsViewModel(
             useMiuixSquircle = themeState.useMiuixSquircle,
             useBlur = themeState.useBlur,
             useProgressiveBlurTopAppBar = themeState.useProgressiveBlurTopAppBar,
+            useTabRowCenterAlignment = themeState.useTabRowCenterAlignment,
+            useTabRowTransparentBackground = themeState.useTabRowTransparentBackground,
+            useTabRowFillWidth = themeState.useTabRowFillWidth,
             useLiquidGlassBottomSheet = themeState.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = themeState.liquidGlassBlurRadius,
             themeMode = themeState.themeMode,
@@ -102,6 +105,27 @@ class SettingsViewModel(
             is ThemeSettingsAction.SetUseProgressiveBlurTopAppBar -> viewModelScope.launch {
                 updateSetting(
                     BooleanSetting.UiUseProgressiveBlurTopAppBar,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseTabRowCenterAlignment -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseTabRowCenterAlignment,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseTabRowTransparentBackground -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseTabRowTransparentBackground,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseTabRowFillWidth -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseTabRowFillWidth,
                     action.enable
                 )
             }

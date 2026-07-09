@@ -24,7 +24,10 @@ enum class BooleanSetting {
     UiUseFloatingBottomBar,
     UiUseFloatingBottomBarBlur,
     UiUseFloatingBottomBarCompact,
-    UiUseProgressiveBlurTopAppBar
+    UiUseProgressiveBlurTopAppBar,
+    UiUseTabRowCenterAlignment,
+    UiUseTabRowTransparentBackground,
+    UiUseTabRowFillWidth
 }
 
 interface AppSettingsRepository {

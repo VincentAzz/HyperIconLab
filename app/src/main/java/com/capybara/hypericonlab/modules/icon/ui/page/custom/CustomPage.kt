@@ -37,6 +37,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
+import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
+import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidthMode
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
 import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
@@ -99,8 +101,9 @@ fun CustomPage(
                         selectedIndex = selectedTab,
                         onSelected = { viewModel.updateConfig { c -> c.copy(selectedTab = it) } },
                         indicatorPadding = 4.dp,
-                        containerColor = Color.Transparent,
-                        // alignment = FloatingTabRowAlignment.CENTER,
+                        containerColor = if (themeState.useTabRowTransparentBackground) Color.Transparent else MaterialTheme.colorScheme.surfaceBright,
+                        alignment = if (themeState.useTabRowCenterAlignment) FloatingTabRowAlignment.CENTER else FloatingTabRowAlignment.START,
+                        widthMode = if (themeState.useTabRowFillWidth) FloatingTabRowWidthMode.FILL else FloatingTabRowWidthMode.WRAP_CONTENT,
                     )
                 },
                 scrollBehavior = scrollBehavior,

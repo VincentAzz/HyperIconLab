@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
+import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidthMode
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
 import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
@@ -154,8 +155,9 @@ fun SettingsPage(
                         selectedIndex = uiState.selectedTab,
                         onSelected = { viewModel.dispatch(ThemeSettingsAction.SetSelectedTab(it)) },
                         icons = settingIcons,
-                        // containerColor = Color.Transparent,
-                        // alignment = FloatingTabRowAlignment.CENTER,
+                        containerColor = if (uiState.useTabRowTransparentBackground) Color.Transparent else MaterialTheme.colorScheme.surfaceBright,
+                        alignment = if (uiState.useTabRowCenterAlignment) FloatingTabRowAlignment.CENTER else FloatingTabRowAlignment.START,
+                        widthMode = if (uiState.useTabRowFillWidth) FloatingTabRowWidthMode.FILL else FloatingTabRowWidthMode.WRAP_CONTENT,
                         indicatorPadding = 4.dp,
                     )
                 },

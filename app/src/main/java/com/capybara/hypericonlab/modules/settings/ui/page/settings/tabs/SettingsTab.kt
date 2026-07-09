@@ -113,6 +113,51 @@ fun SettingsTab(
                 item {
                     SwitchWidget(
                         iconPlaceholder = false,
+                        title = stringResource(R.string.theme_settings_use_tab_row_center_alignment),
+                        description = stringResource(R.string.theme_settings_use_tab_row_center_alignment_desc),
+                        checked = uiState.useTabRowCenterAlignment,
+                        onCheckedChange = {
+                            viewModel.dispatch(
+                                ThemeSettingsAction.SetUseTabRowCenterAlignment(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                }
+                item {
+                    SwitchWidget(
+                        iconPlaceholder = false,
+                        title = stringResource(R.string.theme_settings_use_tab_row_transparent_background),
+                        description = stringResource(R.string.theme_settings_use_tab_row_transparent_background_desc),
+                        checked = uiState.useTabRowTransparentBackground,
+                        onCheckedChange = {
+                            viewModel.dispatch(
+                                ThemeSettingsAction.SetUseTabRowTransparentBackground(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                }
+                item {
+                    SwitchWidget(
+                        iconPlaceholder = false,
+                        title = stringResource(R.string.theme_settings_use_tab_row_fill_width),
+                        description = stringResource(R.string.theme_settings_use_tab_row_fill_width_desc),
+                        checked = uiState.useTabRowFillWidth,
+                        onCheckedChange = {
+                            viewModel.dispatch(
+                                ThemeSettingsAction.SetUseTabRowFillWidth(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                }
+                item {
+                    SwitchWidget(
+                        iconPlaceholder = false,
                         title = stringResource(R.string.theme_settings_use_floating_bottom_bar),
                         description = stringResource(R.string.theme_settings_use_floating_bottom_bar_desc),
                         checked = uiState.useFloatingBottomBar,

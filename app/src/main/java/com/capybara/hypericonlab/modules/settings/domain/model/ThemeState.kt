@@ -22,6 +22,9 @@ data class ThemeState(
     val useMiuixSquircle: Boolean = true,
     val useBlur: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
     val useProgressiveBlurTopAppBar: Boolean = false,
+    val useTabRowCenterAlignment: Boolean = false,
+    val useTabRowTransparentBackground: Boolean = false,
+    val useTabRowFillWidth: Boolean = false,
     val useLiquidGlassBottomSheet: Boolean = false,
     val liquidGlassBlurRadius: Int = 24,
 )
