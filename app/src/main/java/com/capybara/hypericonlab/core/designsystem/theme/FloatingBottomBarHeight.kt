@@ -13,7 +13,7 @@ val FloatingBottomBarIndicatorHeight =
 // FloatingBottomBarCompact 56 6
 val FloatingBottomBarCompactHeight = 54.dp
 
-val FloatingBottomBarCompactIndicatorPadding = 6.dp
+val FloatingBottomBarCompactIndicatorPadding = 4.dp
 
 val FloatingBottomBarCompactIndicatorHeight =
     FloatingBottomBarCompactHeight - FloatingBottomBarCompactIndicatorPadding * 2

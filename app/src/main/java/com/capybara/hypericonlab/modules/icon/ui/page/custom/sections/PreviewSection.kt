@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs
+package com.capybara.hypericonlab.modules.icon.ui.page.custom.sections
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -75,41 +76,61 @@ fun PreviewSection(
                 }
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            // Spacer(modifier = Modifier.height(8.dp))
 
-            // Icons Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = AppMaterialSymbols.wallpaper,
-                    contentDescription = "更换壁纸",
-                    tint = MaterialTheme.colorScheme.primary,
+                Box(
                     modifier = Modifier
-                        .size(22.dp)
-                        .clickable { onPickWallpaper() }
-                )
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f))
+                        .clickable { onPickWallpaper() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = AppMaterialSymbols.wallpaper,
+                        contentDescription = "更换壁纸",
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.weight(1f))
-                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                    Icon(
-                        imageVector = AppMaterialSymbols.refresh,
-                        contentDescription = "刷新",
-                        tint = MaterialTheme.colorScheme.primary,
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Box(
                         modifier = Modifier
-                            .size(22.dp)
-                            .clickable { onRefresh() }
-                    )
-                    Icon(
-                        imageVector = AppMaterialSymbols.open_in_full,
-                        contentDescription = "全屏",
-                        tint = MaterialTheme.colorScheme.primary,
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f))
+                            .clickable { onRefresh() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = AppMaterialSymbols.refresh,
+                            contentDescription = "刷新",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                    Box(
                         modifier = Modifier
-                            .size(22.dp)
-                            .clickable { onExpand() }
-                    )
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f))
+                            .clickable { onExpand() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = AppMaterialSymbols.open_in_full,
+                            contentDescription = "全屏",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
                 }
             }
         }

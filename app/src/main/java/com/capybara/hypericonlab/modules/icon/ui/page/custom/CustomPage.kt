@@ -48,8 +48,8 @@ import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.ForegroundTab
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.FullScreenPreview
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.PreviewSection
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.FullScreenPreview
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.PreviewSection
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.layerBackdrop
