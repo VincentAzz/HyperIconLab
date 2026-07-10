@@ -27,7 +27,8 @@ import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.liquidglass.liquidGlassEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.theme.BottomSheetCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
 /**
@@ -38,7 +39,7 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
  * @param sheetState State of the bottom sheet.
  * @param horizontalPadding Horizontal padding from the screen edges.
  * @param bottomPadding Bottom padding from the screen edge.
- * @param cornerRadius Radius for all four corners (squircle when enabled).
+ * @param cornerRadius Radius for all four corners (smoother rounded corners when enabled).
  * @param containerColor Color of the sheet's container.
  * @param tonalElevation Tonal elevation of the sheet's surface.
  * @param scrimColor Color of the background scrim.
@@ -47,8 +48,8 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
  * @param backdrop Optional backdrop for blur effect.
  * @param useLiquidGlass When true and a backdrop is present, apply a liquid glass effect
  *  (refraction + edge highlight) instead of the standard blur. Falls back to standard blur
- *  when runtime shaders are unsupported. Requires a CornerBasedShape, so squircle is disabled
- *  in this mode.
+ *  when runtime shaders are unsupported. Requires a CornerBasedShape, so smoother rounded corners
+ *  are disabled in this mode.
  * @param liquidGlassBlurRadius Gaussian blur radius used by the liquid glass effect; ignored when
  *  [useLiquidGlass] is false. Defaults to 24.dp.
  * @param content The content of the sheet.
@@ -81,11 +82,11 @@ fun FloatingBottomSheet(
         }
     }
 
-    // Liquid glass requires a CornerBasedShape (lens SDF); squircle paths are incompatible.
+    // Liquid glass requires a CornerBasedShape (lens SDF); smoother rounded corner paths are incompatible.
     val shape = if (useLiquidGlass && backdrop != null) {
         RoundedCornerShape(cornerRadius)
     } else {
-        rememberMiuixSquircleShape(cornerRadius)
+        rememberKyantRoundedRectangleShape(cornerRadius)
     }
 
     ModalBottomSheet(
@@ -142,13 +143,14 @@ fun SheetTitle(
     val backgroundColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f)
     val contentColor = MaterialTheme.colorScheme.onSecondaryContainer
     val titleHeight = 40.dp
-    val capsuleRadius = titleHeight / 2
+    // val capsuleRadius = titleHeight / 2
 
     Surface(
         modifier = modifier
             .height(titleHeight)
             .padding(horizontal = 8.dp),
-        shape = rememberMiuixSquircleShape(capsuleRadius),
+        // shape = rememberKyantRoundedRectangleShape(capsuleRadius),
+        shape = rememberKyantCapsuleShape(),
         color = backgroundColor
 
     ) {

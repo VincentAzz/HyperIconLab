@@ -27,7 +27,7 @@ class AppSettingsRepositoryImpl(
 
     override val preferencesFlow: Flow<AppPreferences> = appDataStore.data.map { prefs ->
         AppPreferences(
-            useMiuixSquircle = prefs[AppDataStore.UI_USE_MIUIX_SQUIRCLE] ?: true,
+            useSmootherRoundedCorners = prefs[AppDataStore.UI_USE_SMOOTHER_ROUNDED_CORNERS] ?: true,
             useBlur = prefs[AppDataStore.UI_USE_BLUR]
                 ?: (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
             useProgressiveBlurTopAppBar = prefs[AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR]
@@ -104,7 +104,7 @@ class AppSettingsRepositoryImpl(
 
     private fun booleanKey(setting: BooleanSetting): Preferences.Key<Boolean> =
         when (setting) {
-            BooleanSetting.UiUseMiuixSquircle -> AppDataStore.UI_USE_MIUIX_SQUIRCLE
+            BooleanSetting.UiUseSmootherRoundedCorners -> AppDataStore.UI_USE_SMOOTHER_ROUNDED_CORNERS
             BooleanSetting.UiUseBlur -> AppDataStore.UI_USE_BLUR
             BooleanSetting.UiUseLiquidGlassBottomSheet -> AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET
             BooleanSetting.ThemeUseDynamicColor -> AppDataStore.THEME_USE_DYNAMIC_COLOR

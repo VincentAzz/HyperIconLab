@@ -38,7 +38,7 @@ class ThemeStateProviderImpl(
             useFloatingBottomBarCompact = prefs.useFloatingBottomBarCompact,
             floatingBottomBarCompactType = prefs.floatingBottomBarCompactType,
             seedColor = effectiveSeedColor,
-            useMiuixSquircle = prefs.useMiuixSquircle,
+            useSmootherRoundedCorners = prefs.useSmootherRoundedCorners,
             useBlur = prefs.useBlur,
             useProgressiveBlurTopAppBar = prefs.useProgressiveBlurTopAppBar,
             useTabRowCenterAlignment = prefs.useTabRowCenterAlignment,

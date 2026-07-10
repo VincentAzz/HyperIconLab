@@ -7,7 +7,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 
 sealed interface ThemeSettingsAction {
-    data class SetUseMiuixSquircle(val enable: Boolean) : ThemeSettingsAction
+    data class SetUseSmootherRoundedCorners(val enable: Boolean) : ThemeSettingsAction
     data class SetUseBlur(val enable: Boolean) : ThemeSettingsAction
     data class SetUseProgressiveBlurTopAppBar(val enable: Boolean) : ThemeSettingsAction
     data class SetUseTabRowCenterAlignment(val enable: Boolean) : ThemeSettingsAction

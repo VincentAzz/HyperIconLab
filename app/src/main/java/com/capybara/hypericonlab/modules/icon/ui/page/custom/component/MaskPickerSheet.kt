@@ -64,7 +64,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -342,7 +342,7 @@ fun MaskItem(
         label = "contentColor"
     )
 
-    val shape = rememberMiuixSquircleShape(cornerRadius)
+    val shape = rememberKyantRoundedRectangleShape(cornerRadius)
     val interactionSource = remember { MutableInteractionSource() }
 
     Column(

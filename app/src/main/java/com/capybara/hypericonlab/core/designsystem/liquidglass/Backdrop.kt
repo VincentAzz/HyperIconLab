@@ -76,7 +76,7 @@ fun Modifier.material3BlurEffect(
  *
  * @param backdrop The layer backdrop to sample and refract.
  * @param shape A [androidx.compose.foundation.shape.CornerBasedShape] (e.g. RoundedCornerShape);
- *  the lens SDF requires corner radii, so squircle paths are not supported.
+ *  the lens SDF requires corner radii, so smoother rounded corner paths are not supported.
  * @param cornerRadius Radius used to scale the lens refraction depth; typically matches the shape.
  * @param blurRadius Gaussian blur radius applied to the sampled backdrop; larger values increase
  *  the blur strength (and readability of the surface). Defaults to 24.dp.

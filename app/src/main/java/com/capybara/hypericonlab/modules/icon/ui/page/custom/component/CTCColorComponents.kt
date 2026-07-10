@@ -47,8 +47,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.LargeCardRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
-import top.yukonga.miuix.kmp.squircle.squircleClip
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun CTCColorSwatchPreviewIcon(
@@ -68,7 +68,7 @@ fun CTCColorSwatchPreviewIcon(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .squircleClip(cornerRadius = LargeCardRadius)
+            .clip(rememberKyantRoundedRectangleShape(LargeCardRadius))
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp)
     ) {
@@ -77,7 +77,7 @@ fun CTCColorSwatchPreviewIcon(
                 .size(64.dp)
                 .background(
                     color = squircleBackgroundColor,
-                    shape = rememberMiuixSquircleShape(CardCornerRadius)
+                    shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
                 ),
             contentAlignment = Alignment.Center
         ) {

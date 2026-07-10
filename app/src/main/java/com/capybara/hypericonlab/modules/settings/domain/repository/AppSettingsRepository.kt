@@ -17,7 +17,7 @@ enum class IntSetting {
 }
 
 enum class BooleanSetting {
-    UiUseMiuixSquircle,
+    UiUseSmootherRoundedCorners,
     UiUseBlur,
     UiUseLiquidGlassBottomSheet,
     ThemeUseDynamicColor,

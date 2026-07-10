@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -37,7 +36,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.wallpaper
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 @Composable
 fun PreviewSection(
@@ -50,7 +49,7 @@ fun PreviewSection(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp, 0.dp, 16.dp, 0.dp),
-        shape = rememberMiuixSquircleShape(CardCornerRadius),
+        shape = rememberKyantRoundedRectangleShape(CardCornerRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceBright
         )
@@ -61,7 +60,7 @@ fun PreviewSection(
                     .fillMaxWidth()
                     .padding(6.dp)
                     .aspectRatio(1.6f)
-                    .clip(rememberMiuixSquircleShape(PreviewCornerRadius))
+                    .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
                     .background(Color.Gray)
             ) {
                 if (bitmap != null) {

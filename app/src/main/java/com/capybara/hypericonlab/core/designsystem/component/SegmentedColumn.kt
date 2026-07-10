@@ -40,7 +40,7 @@ import androidx.compose.ui.zIndex
 import com.capybara.hypericonlab.core.designsystem.theme.ConnectionRadius
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
-import top.yukonga.miuix.kmp.squircle.isSquircleEnabled
+import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import kotlin.math.roundToInt
 
 private const val PADDING_HORIZONTAL = 16
@@ -128,7 +128,7 @@ fun SegmentedColumn(
 
     if (allItems.isEmpty()) return
 
-    val squircleEnabled = isSquircleEnabled()
+    val smootherRoundedCornersEnabled = isSmootherRoundedCornersEnabled()
 
     Column(modifier = modifier.padding(contentPadding)) {
         if (title.isNotEmpty()) {
@@ -202,7 +202,7 @@ fun SegmentedColumn(
                             topEnd = currentTopRadius,
                             bottomEnd = currentBottomRadius,
                             bottomStart = currentBottomRadius,
-                            enabled = squircleEnabled
+                            enabled = smootherRoundedCornersEnabled
                         )
 
                         val targetTopPadding = itemData.customTopPadding

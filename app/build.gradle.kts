@@ -71,7 +71,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.miuix.blur)
     implementation(libs.miuix.shader)
-    implementation(libs.miuix.squircle)
     implementation(libs.monetcompat)
     implementation(libs.androidx.palette)
     implementation(libs.materialKolor)

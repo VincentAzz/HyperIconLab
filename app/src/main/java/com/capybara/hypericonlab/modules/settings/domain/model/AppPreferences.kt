@@ -6,7 +6,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 
 data class AppPreferences(
-    val useMiuixSquircle: Boolean = true,
+    val useSmootherRoundedCorners: Boolean = true,
     val useBlur: Boolean,
     val useProgressiveBlurTopAppBar: Boolean = false,
     val useTabRowCenterAlignment: Boolean = false,

@@ -19,7 +19,7 @@ data class ThemeState(
     val useFloatingBottomBarCompact: Boolean = false,
     val floatingBottomBarCompactType: FloatingBottomBarCompactType = FloatingBottomBarCompactType.MIXED_ICON,
     val seedColor: Color = PresetColors.first().color,
-    val useMiuixSquircle: Boolean = true,
+    val useSmootherRoundedCorners: Boolean = true,
     val useBlur: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
     val useProgressiveBlurTopAppBar: Boolean = false,
     val useTabRowCenterAlignment: Boolean = false,

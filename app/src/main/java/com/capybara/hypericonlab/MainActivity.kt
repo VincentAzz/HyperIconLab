@@ -16,7 +16,7 @@ import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import top.yukonga.miuix.kmp.squircle.LocalSquircleEnabled
+import com.capybara.hypericonlab.core.designsystem.theme.LocalSmootherRoundedCornersEnabled
 
 class MainActivity : ComponentActivity(), KoinComponent {
     private val themeStateProvider by inject<ThemeStateProvider>()
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
             CompositionLocalProvider(
                 LocalWindowLayoutInfo provides layoutInfo,
-                LocalSquircleEnabled provides uiState.useMiuixSquircle
+                LocalSmootherRoundedCornersEnabled provides uiState.useSmootherRoundedCorners
             ) {
                 AppTheme(
                     themeMode = uiState.themeMode,

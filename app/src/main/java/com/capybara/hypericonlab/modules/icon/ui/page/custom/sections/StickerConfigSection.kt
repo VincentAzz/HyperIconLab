@@ -34,7 +34,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.SwatchPreviewCornerRadi
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerDialog
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ConfigCard
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
-import top.yukonga.miuix.kmp.squircle.squircleClip
+import androidx.compose.ui.draw.clip
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 @Composable
 fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel) {
@@ -174,7 +175,7 @@ fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.pa
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .squircleClip(cornerRadius = SwatchPreviewCornerRadius)
+                                    .clip(rememberKyantRoundedRectangleShape(SwatchPreviewCornerRadius))
                                     .background(Color(stickerLineColor.toColorInt()))
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -193,7 +194,7 @@ fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.pa
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .squircleClip(cornerRadius = SwatchPreviewCornerRadius)
+                                    .clip(rememberKyantRoundedRectangleShape(SwatchPreviewCornerRadius))
                                     .background(Color(stickerFillColor.toColorInt()))
                             )
                             Spacer(modifier = Modifier.width(4.dp))

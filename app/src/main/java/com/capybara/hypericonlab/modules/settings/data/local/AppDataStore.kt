@@ -20,7 +20,7 @@ class AppDataStore(
             booleanPreferencesKey("ui_use_liquid_glass_bottom_sheet")
         val UI_LIQUID_GLASS_BLUR_RADIUS =
             intPreferencesKey("ui_liquid_glass_blur_radius")
-        val UI_USE_MIUIX_SQUIRCLE = booleanPreferencesKey("ui_use_miuix_squircle")
+        val UI_USE_SMOOTHER_ROUNDED_CORNERS = booleanPreferencesKey("ui_use_smoother_rounded_corners")
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val THEME_PALETTE_STYLE = stringPreferencesKey("theme_palette_style")
         val THEME_COLOR_SPEC = stringPreferencesKey("theme_color_spec")

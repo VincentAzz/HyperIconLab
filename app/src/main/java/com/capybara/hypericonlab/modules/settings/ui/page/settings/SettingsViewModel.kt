@@ -60,7 +60,7 @@ class SettingsViewModel(
             } else PresetColors
 
         ThemeSettingsState(
-            useMiuixSquircle = themeState.useMiuixSquircle,
+            useSmootherRoundedCorners = themeState.useSmootherRoundedCorners,
             useBlur = themeState.useBlur,
             useProgressiveBlurTopAppBar = themeState.useProgressiveBlurTopAppBar,
             useTabRowCenterAlignment = themeState.useTabRowCenterAlignment,
@@ -88,9 +88,9 @@ class SettingsViewModel(
 
     fun dispatch(action: ThemeSettingsAction) {
         when (action) {
-            is ThemeSettingsAction.SetUseMiuixSquircle -> viewModelScope.launch {
+            is ThemeSettingsAction.SetUseSmootherRoundedCorners -> viewModelScope.launch {
                 updateSetting(
-                    BooleanSetting.UiUseMiuixSquircle,
+                    BooleanSetting.UiUseSmootherRoundedCorners,
                     action.enable
                 )
             }

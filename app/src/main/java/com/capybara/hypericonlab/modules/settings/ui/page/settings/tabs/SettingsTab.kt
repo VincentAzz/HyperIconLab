@@ -97,12 +97,12 @@ fun SettingsTab(
                     item {
                         SwitchWidget(
                             iconPlaceholder = false,
-                            title = stringResource(R.string.theme_settings_use_miuix_squircle),
-                            description = stringResource(R.string.theme_settings_use_miuix_squircle_desc),
-                            checked = uiState.useMiuixSquircle,
+                            title = stringResource(R.string.theme_settings_use_smoother_rounded_corners),
+                            description = stringResource(R.string.theme_settings_use_smoother_rounded_corners_desc),
+                            checked = uiState.useSmootherRoundedCorners,
                             onCheckedChange = {
                                 viewModel.dispatch(
-                                    ThemeSettingsAction.SetUseMiuixSquircle(
+                                    ThemeSettingsAction.SetUseSmootherRoundedCorners(
                                         it
                                     )
                                 )

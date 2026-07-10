@@ -34,11 +34,11 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.core.designsystem.util.getDisplayName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import top.yukonga.miuix.kmp.squircle.squircleClip
+import androidx.compose.ui.draw.clip
 import java.util.concurrent.ConcurrentHashMap
 
 private val colorSchemeCache = ConcurrentHashMap<String, ColorScheme>()
@@ -83,7 +83,7 @@ fun ColorSwatchPreview(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .squircleClip(cornerRadius = LargeCardRadius)
+            .clip(rememberKyantRoundedRectangleShape(LargeCardRadius))
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp)
     ) {
@@ -153,7 +153,7 @@ fun ColorSwatchPreviewIcon(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .squircleClip(cornerRadius = LargeCardRadius)
+            .clip(rememberKyantRoundedRectangleShape(LargeCardRadius))
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp)
     ) {
@@ -194,7 +194,7 @@ private fun IconSwatchContent(scheme: ColorScheme, isSelected: Boolean) {
             .size(64.dp)
             .background(
                 color = squircleBackgroundColor,
-                shape = rememberMiuixSquircleShape(CardCornerRadius)
+                shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -248,7 +248,7 @@ private fun FallbackIconSwatchContent(baseColor: Color, isSelected: Boolean) {
             .size(64.dp)
             .background(
                 color = baseColor.copy(alpha = 0.1f),
-                shape = rememberMiuixSquircleShape(CardCornerRadius)
+                shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -291,7 +291,7 @@ private fun FullSwatchContent(scheme: ColorScheme, isSelected: Boolean) {
             .size(64.dp)
             .background(
                 color = squircleBackgroundColor,
-                shape = rememberMiuixSquircleShape(CardCornerRadius)
+                shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -349,7 +349,7 @@ private fun FallbackSwatchContent(baseColor: Color, isSelected: Boolean) {
             .size(64.dp)
             .background(
                 color = baseColor.copy(alpha = 0.1f),
-                shape = rememberMiuixSquircleShape(CardCornerRadius)
+                shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
             ),
         contentAlignment = Alignment.Center
     ) {

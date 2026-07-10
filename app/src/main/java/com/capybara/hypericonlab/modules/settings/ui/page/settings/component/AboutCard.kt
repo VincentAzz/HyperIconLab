@@ -31,7 +31,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 @Composable
 fun AboutCard(
@@ -39,7 +39,7 @@ fun AboutCard(
 ) {
     Card(
         modifier = modifier,
-        shape = rememberMiuixSquircleShape(CardCornerRadius),
+        shape = rememberKyantRoundedRectangleShape(CardCornerRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceBright
         )
@@ -51,7 +51,7 @@ fun AboutCard(
                     surfaceColor = MaterialTheme.colorScheme.surfaceBright,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(rememberMiuixSquircleShape(PreviewCornerRadius))
+                        .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
                 ) {
                     Column(
                         modifier = Modifier

@@ -46,7 +46,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.LogEntry
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.LogType
@@ -157,7 +157,7 @@ fun LogSheet(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp, 0.dp, 8.dp, 8.dp),
-                shape = rememberMiuixSquircleShape(ExtraLargeRadius - 8.dp),
+                shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
                 color = Color.White.copy(alpha = 0.6f)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {

@@ -45,7 +45,8 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPick
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreviewIcon
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
-import top.yukonga.miuix.kmp.squircle.squircleClip
+import androidx.compose.ui.draw.clip
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -234,7 +235,7 @@ fun ColorSourceSection(
                         Box(
                             modifier = Modifier
                                 .size(24.dp)
-                                .squircleClip(cornerRadius = SwatchPreviewCornerRadius)
+                                .clip(rememberKyantRoundedRectangleShape(SwatchPreviewCornerRadius))
                                 .background(Color(configColor.toColorInt()))
                         )
                         Spacer(modifier = Modifier.width(4.dp))

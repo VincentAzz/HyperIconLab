@@ -53,7 +53,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -90,7 +90,7 @@ fun ConfigCard(
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = rememberMiuixSquircleShape(CardCornerRadius),
+            shape = rememberKyantRoundedRectangleShape(CardCornerRadius),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceBright
             )
@@ -125,7 +125,7 @@ fun StyleChip(
     Surface(
         onClick = onClick,
         enabled = enabled,
-        shape = rememberMiuixSquircleShape(ChipCornerRadius),
+        shape = rememberKyantRoundedRectangleShape(ChipCornerRadius),
         color = backgroundColor,
         modifier = modifier.height(36.dp)
     ) {
