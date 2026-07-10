@@ -52,7 +52,7 @@ import androidx.compose.ui.util.lerp
 import com.capybara.hypericonlab.core.designsystem.animation.DampedDragAnimation
 import com.capybara.hypericonlab.core.designsystem.theme.TabRowRoundedCorner.TabRowBarCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.TabRowRoundedCorner.TabRowIndicatorCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberMiuixSquircleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sign
@@ -106,8 +106,8 @@ fun FloatingTabRow(
     val tabHorizontalPadding: Dp = 16.dp
     val innerHeight = barHeight - indicatorPadding * 2
 
-    val barShape = rememberMiuixSquircleShape(cornerRadius = barCornerRadius)
-    val indicatorShape = rememberMiuixSquircleShape(cornerRadius = indicatorCornerRadius)
+    val barShape = rememberKyantCapsuleShape()
+    val indicatorShape = rememberKyantCapsuleShape()
 
     var totalWidthPx by remember { mutableFloatStateOf(0f) }
     val tabPositions = remember { mutableStateMapOf<Int, Float>() }

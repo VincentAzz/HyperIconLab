@@ -25,7 +25,7 @@
     <string name="theme_settings_liquid_glass_blur_radius">菜单液态玻璃模糊半径</string>
     <string name="theme_settings_liquid_glass_blur_radius_desc">调整液态玻璃效果的模糊强度（0–48 dp）</string>
     <string name="theme_settings_use_miuix_squircle">启用平滑圆角</string>
-    <string name="theme_settings_use_miuix_squircle_desc">在应用中使用miuix-squircle平滑圆角</string>
+    <string name="theme_settings_use_miuix_squircle_desc">在应用中使用连续曲率的平滑圆角</string>
     <string name="theme_settings_use_tab_row_center_alignment">居中显示顶栏菜单</string>
     <string name="theme_settings_use_tab_row_center_alignment_desc">将顶栏菜单居中对齐显示</string>
     <string name="theme_settings_use_tab_row_transparent_background">透明顶栏菜单背景</string>

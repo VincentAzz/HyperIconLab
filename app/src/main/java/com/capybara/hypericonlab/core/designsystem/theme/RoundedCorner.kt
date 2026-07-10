@@ -11,6 +11,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.core.designsystem.shape.Capsule
+import com.capybara.hypericonlab.core.designsystem.shape.RoundedCornerStyle
 import top.yukonga.miuix.kmp.squircle.SquircleDefaults
 import top.yukonga.miuix.kmp.squircle.addSquircleRect
 import top.yukonga.miuix.kmp.squircle.isSquircleEnabled
@@ -51,7 +53,6 @@ object TabRowRoundedCorner {
 }
 
 
-
 class MiuixSquircleShape(
     private val cornerRadius: Dp,
     private val extension: Float = SquircleDefaults.Extension,
@@ -61,11 +62,6 @@ class MiuixSquircleShape(
         size: Size, layoutDirection: LayoutDirection, density: Density
     ): Outline {
         val radiusPx = with(density) { cornerRadius.toPx() }
-        val halfMinSide = minOf(size.width, size.height) / 2f
-        // 圆角超过半边长 → 直接用标准圆形，绕过 squircle
-        // if (radiusPx > halfMinSide) {
-        //     return RoundedCornerShape(50).createOutline(size, layoutDirection, density)
-        // }
         val path = Path()
         path.addSquircleRect(
             width = size.width,
@@ -78,14 +74,25 @@ class MiuixSquircleShape(
     }
 }
 
-
+// miuix squircle shape
 @Composable
 fun rememberMiuixSquircleShape(
     cornerRadius: Dp,
     extension: Float = SquircleDefaults.Extension
 ): Shape {
-    val enabled = isSquircleEnabled() // 结合 LocalSquircleEnabled 与运行时 shader 支持
+    val enabled = isSquircleEnabled()
     return remember(cornerRadius, extension, enabled) {
         MiuixSquircleShape(cornerRadius, extension, enabled)
+    }
+}
+
+// kyant capsule shape，结合 isSquircleEnabled 判断，未启用时回退到 RoundedCornerShape(50)
+@Composable
+fun rememberKyantCapsuleShape(
+    style: RoundedCornerStyle = RoundedCornerStyle.Continuous
+): Shape {
+    val enabled = isSquircleEnabled()
+    return remember(enabled, style) {
+        if (enabled) Capsule(style = style) else RoundedCornerShape(50)
     }
 }

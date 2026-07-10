@@ -25,7 +25,7 @@
     <string name="theme_settings_liquid_glass_blur_radius">Liquid Glass Blur Radius</string>
     <string name="theme_settings_liquid_glass_blur_radius_desc">Adjust the blur intensity of the liquid glass effect (0–48 dp)</string>
     <string name="theme_settings_use_miuix_squircle">Enable Squircle</string>
-    <string name="theme_settings_use_miuix_squircle_desc">Use miuix-squircle smooth corners in the app</string>
+    <string name="theme_settings_use_miuix_squircle_desc">Use continuous curvature smooth corners in the app</string>
     <string name="theme_settings_use_tab_row_center_alignment">Center Top Tab Row</string>
     <string name="theme_settings_use_tab_row_center_alignment_desc">Center align the top tab row</string>
     <string name="theme_settings_use_tab_row_transparent_background">Transparent Top Tab Row Background</string>
