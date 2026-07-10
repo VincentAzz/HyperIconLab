@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.capybara.hypericonlab.core.designsystem.theme.ConnectionRadius
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
+import top.yukonga.miuix.kmp.squircle.isSquircleEnabled
 import kotlin.math.roundToInt
 
 private const val PADDING_HORIZONTAL = 16
@@ -127,6 +128,8 @@ fun SegmentedColumn(
 
     if (allItems.isEmpty()) return
 
+    val squircleEnabled = isSquircleEnabled()
+
     Column(modifier = modifier.padding(contentPadding)) {
         if (title.isNotEmpty()) {
             Text(
@@ -194,11 +197,12 @@ fun SegmentedColumn(
                             ).value.coerceAtLeast(0.dp)
                         } else targetBottomRadius
 
-                        val shape = RoundedCornerShape(
+                        val shape = kyantUnevenRoundedShape(
                             topStart = currentTopRadius,
                             topEnd = currentTopRadius,
+                            bottomEnd = currentBottomRadius,
                             bottomStart = currentBottomRadius,
-                            bottomEnd = currentBottomRadius
+                            enabled = squircleEnabled
                         )
 
                         val targetTopPadding = itemData.customTopPadding

@@ -2,19 +2,14 @@ package com.capybara.hypericonlab.core.designsystem.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.shape.Capsule
 import com.capybara.hypericonlab.core.designsystem.shape.RoundedCornerStyle
-import top.yukonga.miuix.kmp.squircle.SquircleDefaults
-import top.yukonga.miuix.kmp.squircle.addSquircleRect
+import com.capybara.hypericonlab.core.designsystem.shape.RoundedRectangle
+import com.capybara.hypericonlab.core.designsystem.shape.UnevenRoundedRectangle
 import top.yukonga.miuix.kmp.squircle.isSquircleEnabled
 
 // 基础圆角大小，常用于主要组件
@@ -52,40 +47,6 @@ object TabRowRoundedCorner {
     val TabRowBarCornerRadius = TabRowIndicatorCornerRadius + 4.dp
 }
 
-
-class MiuixSquircleShape(
-    private val cornerRadius: Dp,
-    private val extension: Float = SquircleDefaults.Extension,
-    private val squircleEnabled: Boolean
-) : Shape {
-    override fun createOutline(
-        size: Size, layoutDirection: LayoutDirection, density: Density
-    ): Outline {
-        val radiusPx = with(density) { cornerRadius.toPx() }
-        val path = Path()
-        path.addSquircleRect(
-            width = size.width,
-            height = size.height,
-            cornerRadius = radiusPx,
-            extension = extension,
-            squircleEnabled = squircleEnabled
-        )
-        return Outline.Generic(path)
-    }
-}
-
-// miuix squircle shape
-@Composable
-fun rememberMiuixSquircleShape(
-    cornerRadius: Dp,
-    extension: Float = SquircleDefaults.Extension
-): Shape {
-    val enabled = isSquircleEnabled()
-    return remember(cornerRadius, extension, enabled) {
-        MiuixSquircleShape(cornerRadius, extension, enabled)
-    }
-}
-
 // kyant capsule shape
 @Composable
 fun rememberKyantCapsuleShape(
@@ -94,5 +55,45 @@ fun rememberKyantCapsuleShape(
     val enabled = isSquircleEnabled()
     return remember(enabled, style) {
         if (enabled) Capsule(style = style) else RoundedCornerShape(50)
+    }
+}
+
+// kyant rounded rectangle shape
+@Composable
+fun rememberKyantRoundedRectangleShape(
+    cornerRadius: Dp,
+    style: RoundedCornerStyle = RoundedCornerStyle.Continuous
+): Shape {
+    val enabled = isSquircleEnabled()
+    return remember(cornerRadius, style, enabled) {
+        if (enabled) RoundedRectangle(cornerRadius = cornerRadius, style = style)
+        else RoundedCornerShape(cornerRadius)
+    }
+}
+
+// kyant 非对称圆角
+fun kyantUnevenRoundedShape(
+    topStart: Dp,
+    topEnd: Dp,
+    bottomEnd: Dp,
+    bottomStart: Dp,
+    enabled: Boolean,
+    style: RoundedCornerStyle = RoundedCornerStyle.Continuous
+): Shape {
+    return if (enabled) {
+        UnevenRoundedRectangle(
+            topStart = topStart,
+            topEnd = topEnd,
+            bottomEnd = bottomEnd,
+            bottomStart = bottomStart,
+            style = style
+        )
+    } else {
+        RoundedCornerShape(
+            topStart = topStart,
+            topEnd = topEnd,
+            bottomEnd = bottomEnd,
+            bottomStart = bottomStart
+        )
     }
 }
