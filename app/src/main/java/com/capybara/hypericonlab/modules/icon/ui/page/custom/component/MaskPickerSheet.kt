@@ -64,6 +64,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -375,6 +376,7 @@ fun MaskItem(
         Text(
             text = name.replace("m3_", ""),
             fontSize = 10.sp,
+            fontFamily = GoogleSansCodeFontFamily,
             textAlign = TextAlign.Center,
             maxLines = 1,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,

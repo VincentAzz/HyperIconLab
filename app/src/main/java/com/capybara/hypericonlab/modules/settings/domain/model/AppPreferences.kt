@@ -14,6 +14,7 @@ data class AppPreferences(
     val useTabRowFillWidth: Boolean = false,
     val useLiquidGlassBottomSheet: Boolean = false,
     val liquidGlassBlurRadius: Int = 24,
+    val useGoogleSansFlex: Boolean = false,
     val themeMode: ThemeMode,
     val paletteStyle: PaletteStyle,
     val colorSpec: ThemeColorSpec,

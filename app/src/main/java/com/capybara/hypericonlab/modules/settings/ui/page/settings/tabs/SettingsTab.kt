@@ -113,6 +113,21 @@ fun SettingsTab(
                 item {
                     SwitchWidget(
                         iconPlaceholder = false,
+                        title = stringResource(R.string.theme_settings_use_google_sans_flex),
+                        description = stringResource(R.string.theme_settings_use_google_sans_flex_desc),
+                        checked = uiState.useGoogleSansFlex,
+                        onCheckedChange = {
+                            viewModel.dispatch(
+                                ThemeSettingsAction.SetUseGoogleSansFlex(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                }
+                item {
+                    SwitchWidget(
+                        iconPlaceholder = false,
                         title = stringResource(R.string.theme_settings_use_tab_row_center_alignment),
                         description = stringResource(R.string.theme_settings_use_tab_row_center_alignment_desc),
                         checked = uiState.useTabRowCenterAlignment,

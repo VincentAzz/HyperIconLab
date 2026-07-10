@@ -26,6 +26,8 @@
     <string name="theme_settings_liquid_glass_blur_radius_desc">Adjust the blur intensity of the liquid glass effect (0–48 dp)</string>
     <string name="theme_settings_use_smoother_rounded_corners">Enable Smoother Rounded Corners</string>
     <string name="theme_settings_use_smoother_rounded_corners_desc">Use continuous curvature smooth corners in the app</string>
+    <string name="theme_settings_use_google_sans_flex">Use Google Sans Flex Font</string>
+    <string name="theme_settings_use_google_sans_flex_desc">Replace the system default font with Google Sans Flex</string>
     <string name="theme_settings_use_tab_row_center_alignment">Center Top Tab Row</string>
     <string name="theme_settings_use_tab_row_center_alignment_desc">Center align the top tab row</string>
     <string name="theme_settings_use_tab_row_transparent_background">Transparent Top Tab Row Background</string>

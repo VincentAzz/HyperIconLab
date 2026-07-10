@@ -44,8 +44,8 @@ import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
 import com.capybara.hypericonlab.core.designsystem.symbol.clear_all
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.LogEntry
@@ -158,7 +158,7 @@ fun LogSheet(
                     .fillMaxSize()
                     .padding(8.dp, 0.dp, 8.dp, 8.dp),
                 shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
-                color = Color.White.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     LazyColumn(
@@ -214,12 +214,14 @@ fun LogItem(entry: LogEntry) {
             Text(
                 text = "[${entry.formattedTime}]",
                 style = MaterialTheme.typography.labelSmall,
+                fontFamily = GoogleSansCodeFontFamily,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(end = 8.dp)
             )
             Text(
                 text = entry.type.name,
                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                fontFamily = GoogleSansCodeFontFamily,
                 color = color
             )
             entry.duration?.let {
@@ -227,6 +229,7 @@ fun LogItem(entry: LogEntry) {
                 Text(
                     text = "[$it]",
                     style = MaterialTheme.typography.labelSmall,
+                    fontFamily = GoogleSansCodeFontFamily,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
@@ -234,6 +237,7 @@ fun LogItem(entry: LogEntry) {
         Text(
             text = entry.message,
             style = MaterialTheme.typography.bodyMedium,
+            fontFamily = GoogleSansCodeFontFamily,
             color = color,
             modifier = Modifier.padding(top = 2.dp)
         )

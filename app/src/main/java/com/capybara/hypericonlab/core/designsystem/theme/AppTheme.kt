@@ -126,15 +126,39 @@ fun AppMaterialExpressiveTheme(
         }
     }
 
-    val typography = Typography(
-        bodyLarge = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
-            letterSpacing = 0.5.sp
+    val useGoogleSansFlex = isGoogleSansFlexEnabled()
+    val baseTypography = Typography()
+    val typography = if (useGoogleSansFlex) {
+        baseTypography.run {
+            copy(
+                displayLarge = displayLarge.copy(fontFamily = GoogleSansFlexFontFamily),
+                displayMedium = displayMedium.copy(fontFamily = GoogleSansFlexFontFamily),
+                displaySmall = displaySmall.copy(fontFamily = GoogleSansFlexFontFamily),
+                headlineLarge = headlineLarge.copy(fontFamily = GoogleSansFlexFontFamily),
+                headlineMedium = headlineMedium.copy(fontFamily = GoogleSansFlexFontFamily),
+                headlineSmall = headlineSmall.copy(fontFamily = GoogleSansFlexFontFamily),
+                titleLarge = titleLarge.copy(fontFamily = GoogleSansFlexFontFamily),
+                titleMedium = titleMedium.copy(fontFamily = GoogleSansFlexFontFamily),
+                titleSmall = titleSmall.copy(fontFamily = GoogleSansFlexFontFamily),
+                bodyLarge = bodyLarge.copy(fontFamily = GoogleSansFlexFontFamily),
+                bodyMedium = bodyMedium.copy(fontFamily = GoogleSansFlexFontFamily),
+                bodySmall = bodySmall.copy(fontFamily = GoogleSansFlexFontFamily),
+                labelLarge = labelLarge.copy(fontFamily = GoogleSansFlexFontFamily),
+                labelMedium = labelMedium.copy(fontFamily = GoogleSansFlexFontFamily),
+                labelSmall = labelSmall.copy(fontFamily = GoogleSansFlexFontFamily)
+            )
+        }
+    } else {
+        Typography(
+            bodyLarge = TextStyle(
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                letterSpacing = 0.5.sp
+            )
         )
-    )
+    }
 
     MaterialExpressiveTheme(
         colorScheme = colorScheme,

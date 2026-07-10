@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 
 @Composable
 fun SliderWidget(
@@ -50,6 +51,7 @@ fun SliderWidget(
                 Text(
                     text = valueDisplay,
                     style = MaterialTheme.typography.bodyMedium,
+                    fontFamily = GoogleSansCodeFontFamily,
                     color = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
                         alpha = 0.38f
                     )

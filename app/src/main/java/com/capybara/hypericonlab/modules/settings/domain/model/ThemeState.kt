@@ -27,4 +27,5 @@ data class ThemeState(
     val useTabRowFillWidth: Boolean = false,
     val useLiquidGlassBottomSheet: Boolean = false,
     val liquidGlassBlurRadius: Int = 24,
+    val useGoogleSansFlex: Boolean = false,
 )

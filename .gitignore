@@ -13,8 +13,5 @@
 /.artifacts/
 /app/src/main/jni/opencv-mobile-4.13.0-android/
 
-# doc
-/md/
-/miuix-doc/
-/python/
+# external
 /external/

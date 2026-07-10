@@ -10,13 +10,14 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.navigation.AppRoot
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
+import com.capybara.hypericonlab.core.designsystem.theme.LocalSmootherRoundedCornersEnabled
+import com.capybara.hypericonlab.core.designsystem.theme.LocalUseGoogleSansFlex
 import com.capybara.hypericonlab.core.designsystem.util.LocalWindowLayoutInfo
 import com.capybara.hypericonlab.core.designsystem.util.rememberWindowLayoutInfo
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.capybara.hypericonlab.core.designsystem.theme.LocalSmootherRoundedCornersEnabled
 
 class MainActivity : ComponentActivity(), KoinComponent {
     private val themeStateProvider by inject<ThemeStateProvider>()
@@ -42,7 +43,8 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
             CompositionLocalProvider(
                 LocalWindowLayoutInfo provides layoutInfo,
-                LocalSmootherRoundedCornersEnabled provides uiState.useSmootherRoundedCorners
+                LocalSmootherRoundedCornersEnabled provides uiState.useSmootherRoundedCorners,
+                LocalUseGoogleSansFlex provides uiState.useGoogleSansFlex
             ) {
                 AppTheme(
                     themeMode = uiState.themeMode,

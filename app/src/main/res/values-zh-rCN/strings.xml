@@ -26,6 +26,8 @@
     <string name="theme_settings_liquid_glass_blur_radius_desc">调整液态玻璃效果的模糊强度（0–48 dp）</string>
     <string name="theme_settings_use_smoother_rounded_corners">启用平滑圆角</string>
     <string name="theme_settings_use_smoother_rounded_corners_desc">在应用中使用连续曲率的平滑圆角</string>
+    <string name="theme_settings_use_google_sans_flex">使用 Google Sans Flex 字体</string>
+    <string name="theme_settings_use_google_sans_flex_desc">使用 Google Sans Flex 替换系统默认字体</string>
     <string name="theme_settings_use_tab_row_center_alignment">居中显示顶栏菜单</string>
     <string name="theme_settings_use_tab_row_center_alignment_desc">将顶栏菜单居中对齐显示</string>
     <string name="theme_settings_use_tab_row_transparent_background">透明顶栏菜单背景</string>

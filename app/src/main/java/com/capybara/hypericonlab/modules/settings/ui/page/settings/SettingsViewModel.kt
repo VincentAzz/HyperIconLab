@@ -68,6 +68,7 @@ class SettingsViewModel(
             useTabRowFillWidth = themeState.useTabRowFillWidth,
             useLiquidGlassBottomSheet = themeState.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = themeState.liquidGlassBlurRadius,
+            useGoogleSansFlex = themeState.useGoogleSansFlex,
             themeMode = themeState.themeMode,
             paletteStyle = themeState.paletteStyle,
             colorSpec = themeState.colorSpec,
@@ -141,6 +142,13 @@ class SettingsViewModel(
                 updateSetting(
                     IntSetting.UiLiquidGlassBlurRadius,
                     action.value
+                )
+            }
+
+            is ThemeSettingsAction.SetUseGoogleSansFlex -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseGoogleSansFlex,
+                    action.enable
                 )
             }
 

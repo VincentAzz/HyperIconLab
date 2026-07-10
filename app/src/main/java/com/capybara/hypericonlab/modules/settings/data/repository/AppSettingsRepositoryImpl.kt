@@ -41,6 +41,7 @@ class AppSettingsRepositoryImpl(
             useLiquidGlassBottomSheet = prefs[AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET]
                 ?: false,
             liquidGlassBlurRadius = prefs[AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS] ?: 24,
+            useGoogleSansFlex = prefs[AppDataStore.UI_USE_GOOGLE_SANS_FLEX] ?: false,
             themeMode = ThemeMode.fromValueOrDefault(
                 prefs[AppDataStore.THEME_MODE] ?: ThemeMode.SYSTEM.name
             ),
@@ -115,5 +116,6 @@ class AppSettingsRepositoryImpl(
             BooleanSetting.UiUseTabRowCenterAlignment -> AppDataStore.UI_USE_TAB_ROW_CENTER_ALIGNMENT
             BooleanSetting.UiUseTabRowTransparentBackground -> AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND
             BooleanSetting.UiUseTabRowFillWidth -> AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH
+            BooleanSetting.UiUseGoogleSansFlex -> AppDataStore.UI_USE_GOOGLE_SANS_FLEX
         }
 }

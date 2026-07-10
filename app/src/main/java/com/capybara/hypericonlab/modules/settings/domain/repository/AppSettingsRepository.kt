@@ -27,7 +27,8 @@ enum class BooleanSetting {
     UiUseProgressiveBlurTopAppBar,
     UiUseTabRowCenterAlignment,
     UiUseTabRowTransparentBackground,
-    UiUseTabRowFillWidth
+    UiUseTabRowFillWidth,
+    UiUseGoogleSansFlex
 }
 
 interface AppSettingsRepository {
