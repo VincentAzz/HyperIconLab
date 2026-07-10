@@ -66,6 +66,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarHeight
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarIndicatorHeight
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarIndicatorPadding
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
@@ -185,7 +186,7 @@ fun RowScope.FloatingBottomBarItem(
 
     Column(
         modifier
-            .clip(CircleShape)
+            .clip(rememberKyantCapsuleShape())
             .clickable(
                 interactionSource = null,
                 indication = null,
@@ -224,7 +225,7 @@ fun FloatingBottomBar(
     content: @Composable RowScope.() -> Unit
 ) {
     val isInDark = AppTheme.isDark
-    val pillShape = remember { CircleShape }
+    val pillShape = if (isBlurEnabled) CircleShape else rememberKyantCapsuleShape()
     val containerColor =
         if (isBlurEnabled || isStandardBlurEnabled) colors.containerColor.copy(0.4f) else colors.containerColor
 

@@ -86,7 +86,7 @@ fun rememberMiuixSquircleShape(
     }
 }
 
-// kyant capsule shape，结合 isSquircleEnabled 判断，未启用时回退到 RoundedCornerShape(50)
+// kyant capsule shape
 @Composable
 fun rememberKyantCapsuleShape(
     style: RoundedCornerStyle = RoundedCornerStyle.Continuous
