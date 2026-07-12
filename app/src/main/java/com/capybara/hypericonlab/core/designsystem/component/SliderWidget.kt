@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,7 +24,8 @@ fun SliderWidget(
     steps: Int = 0,
     valueDisplay: String = String.format("%.2f", value),
     shape: Shape = MaterialTheme.shapes.medium,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    useMiuixSlider: Boolean = false
 ) {
     BaseItemContainer(
         shape = shape,
@@ -57,7 +57,8 @@ fun SliderWidget(
                     )
                 )
             }
-            Slider(
+            // Spacer(Modifier.height(4.dp))
+            ExpressiveSlider(
                 value = value,
                 onValueChange = onValueChange,
                 valueRange = valueRange,

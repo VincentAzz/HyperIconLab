@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +27,7 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.ExpressiveSlider
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.symbol.style
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
@@ -38,7 +38,9 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ConfigCar
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 
 @Composable
-fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel) {
+fun StickerConfigSection(
+    viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel,
+) {
     val config by viewModel.config.collectAsStateWithLifecycle()
     val fillStyle = config.sticker.fillStyle
     val stickerStrokeWidth = config.sticker.strokeWidth
@@ -119,7 +121,7 @@ fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.pa
                     stickerStrokeWidth
                 )
             ) {
-                Slider(
+                ExpressiveSlider(
                     value = stickerStrokeWidth,
                     onValueChange = {
                         viewModel.updateConfig { c ->
@@ -146,7 +148,7 @@ fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.pa
                         glowIntensity
                     )
                 ) {
-                    Slider(
+                    ExpressiveSlider(
                         value = glowIntensity,
                         onValueChange = {
                             viewModel.updateConfig { c ->
