@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -225,7 +226,7 @@ fun MaskPickerSheet(
                 ) {
                     item(span = { GridItemSpan(4) }) {
                         Text(
-                            "常用形状",
+                            "常用形状 (${commonMasks.count { it in allMasks }})",
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -247,7 +248,7 @@ fun MaskPickerSheet(
 
                     item(span = { GridItemSpan(4) }) {
                         Text(
-                            "Material 3 形状",
+                            "Material 3 形状 (${otherMasks.size})",
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -374,11 +375,13 @@ fun MaskItem(
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = name.replace("m3_", ""),
+            text = name.replace("m3_", "").replace("_", " "),
             fontSize = 10.sp,
+            lineHeight = 16.sp,
             fontFamily = GoogleSansCodeFontFamily,
             textAlign = TextAlign.Center,
-            maxLines = 1,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
         )
