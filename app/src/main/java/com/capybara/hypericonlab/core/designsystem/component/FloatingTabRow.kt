@@ -90,6 +90,7 @@ fun FloatingTabRow(
     icons: List<ImageVector>? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
     indicatorColor: Color = MaterialTheme.colorScheme.primary,
+    barHeight: Dp = 48.dp,
     barCornerRadius: Dp = TabRowBarCornerRadius,
     indicatorCornerRadius: Dp = TabRowIndicatorCornerRadius,
     indicatorPadding: Dp = 4.dp,
@@ -102,9 +103,9 @@ fun FloatingTabRow(
     val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr
     val animationScope = rememberCoroutineScope()
 
-    val barHeight: Dp = 48.dp
+    val barHeightValue: Dp = barHeight
     val tabHorizontalPadding: Dp = 16.dp
-    val innerHeight = barHeight - indicatorPadding * 2
+    val innerHeight = barHeightValue - indicatorPadding * 2
 
     val barShape = rememberKyantCapsuleShape()
     val indicatorShape = rememberKyantCapsuleShape()
@@ -263,7 +264,7 @@ fun FloatingTabRow(
                         }
                     })
                 }
-                .height(barHeight)
+                .height(barHeightValue)
                 .padding(indicatorPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {

@@ -1,5 +1,7 @@
 package com.capybara.hypericonlab.core.designsystem.component
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -126,7 +128,14 @@ fun FloatingBottomSheet(
             tonalElevation = tonalElevation
         ) {
             Column(
-                modifier = modifier.then(if (fillMaxHeight) Modifier.fillMaxSize() else Modifier.wrapContentHeight())
+                modifier = modifier
+                    .then(if (fillMaxHeight) Modifier.fillMaxSize() else Modifier.wrapContentHeight())
+                    .then(
+                        if (!fillMaxHeight) Modifier.animateContentSize(
+                            animationSpec = tween(250),
+                            alignment = Alignment.TopStart
+                        ) else Modifier
+                    )
             ) {
                 content()
             }

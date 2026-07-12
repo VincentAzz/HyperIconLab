@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.unit.dp
@@ -31,11 +32,10 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.symbol.style
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.SwatchPreviewCornerRadius
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerDialog
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ConfigCard
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
-import androidx.compose.ui.draw.clip
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 @Composable
 fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel) {
@@ -175,7 +175,11 @@ fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.pa
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .clip(rememberKyantRoundedRectangleShape(SwatchPreviewCornerRadius))
+                                    .clip(
+                                        rememberKyantRoundedRectangleShape(
+                                            SwatchPreviewCornerRadius
+                                        )
+                                    )
                                     .background(Color(stickerLineColor.toColorInt()))
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -194,7 +198,11 @@ fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.pa
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .clip(rememberKyantRoundedRectangleShape(SwatchPreviewCornerRadius))
+                                    .clip(
+                                        rememberKyantRoundedRectangleShape(
+                                            SwatchPreviewCornerRadius
+                                        )
+                                    )
                                     .background(Color(stickerFillColor.toColorInt()))
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -207,7 +215,7 @@ fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.pa
     }
 
     if (showLineColorPicker) {
-        ColorPickerDialog(
+        ColorPickerSheet(
             initialColor = stickerLineColor,
             onDismiss = { showLineColorPicker = false },
             onColorSelected = {
@@ -222,7 +230,7 @@ fun StickerConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.pa
         )
     }
     if (showFillColorPicker) {
-        ColorPickerDialog(
+        ColorPickerSheet(
             initialColor = stickerFillColor,
             onDismiss = { showFillColorPicker = false },
             onColorSelected = {

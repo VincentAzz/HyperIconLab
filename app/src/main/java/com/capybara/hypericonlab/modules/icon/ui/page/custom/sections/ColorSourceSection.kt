@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
@@ -37,16 +39,14 @@ import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.symbol.design_services
 import com.capybara.hypericonlab.core.designsystem.symbol.style
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.SwatchPreviewCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.CTCConfigSection
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerDialog
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreviewIcon
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
-import androidx.compose.ui.draw.clip
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -172,11 +172,7 @@ fun ColorSourceSection(
                             label = "自定义",
                             selected = colorSource == "custom",
                             onClick = {
-                                viewModel.updateConfig {
-                                    if (isForeground) it.copy(
-                                        fgColorSource = "custom"
-                                    ) else it.copy(bgColorSource = "custom")
-                                }
+                                viewModel.switchToCustomColor(isForeground)
                             },
                             modifier = Modifier.weight(1f)
                         )
@@ -227,21 +223,23 @@ fun ColorSourceSection(
             topPadding = ListItemDefaults.SegmentedGap,
         ) {
             BaseWidget(
-                icon = AppMaterialSymbols.style,
+                icon = null,
+                iconPlaceholder = false,
                 title = "自定义颜色",
                 onClick = { showColorPicker = true },
                 trailingContent = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(24.dp)
-                                .clip(rememberKyantRoundedRectangleShape(SwatchPreviewCornerRadius))
+                                .size(32.dp)
+                                .clip(CircleShape)
                                 .background(Color(configColor.toColorInt()))
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = configColor.uppercase(),
-                            fontSize = 12.sp,
+                            fontFamily = GoogleSansCodeFontFamily,
+                            fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -366,7 +364,7 @@ fun ColorSourceSection(
     }
 
     if (showColorPicker) {
-        ColorPickerDialog(
+        ColorPickerSheet(
             initialColor = configColor,
             onDismiss = { showColorPicker = false },
             onColorSelected = { color ->
@@ -379,7 +377,10 @@ fun ColorSourceSection(
                     }
                 }
                 showColorPicker = false
-            }
+            },
+            backdrop = backdrop,
+            useLiquidGlass = useLiquidGlass,
+            liquidGlassBlurRadius = liquidGlassBlurRadius
         )
     }
 }

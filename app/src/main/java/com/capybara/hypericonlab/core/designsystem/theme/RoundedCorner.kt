@@ -31,6 +31,9 @@ val LargeCardRadius = 20.dp
 
 val ExtraLargeRadius = 32.dp
 
+// SelectionSheet.kt：BottomSheetCornerRadius
+// ColorPickerSheet.kt：ExtraLargeRadius
+
 object TabRowRoundedCorner {
     val TabRowIndicatorCornerRadius = 24.dp
 

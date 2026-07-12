@@ -264,6 +264,22 @@ class IconViewModel(
         _config.value = update(_config.value)
     }
 
+    // 切换到自定义颜色时，继承当前实际使用的颜色作为初始值
+    fun switchToCustomColor(isFg: Boolean) {
+        val config = _config.value
+        val resolvedColor = generatePreviewUseCase.resolveConfigColors(
+            isFg = isFg,
+            config = config,
+            wallpaperColorsLight = wallpaperColorsLight.value,
+            wallpaperColorsDark = wallpaperColorsDark.value,
+            appColorSchemes = appColorSchemes
+        )
+        updateConfig {
+            if (isFg) it.copy(fgColorSource = "custom", fgColor = resolvedColor)
+            else it.copy(bgColorSource = "custom", bgColor = resolvedColor)
+        }
+    }
+
 
     fun generateLivePreview() {
         previewJob?.cancel()

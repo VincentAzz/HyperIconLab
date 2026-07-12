@@ -233,7 +233,7 @@ class GeneratePreviewUseCase(private val context: Context) {
         return results
     }
 
-    private fun resolveConfigColors(
+    fun resolveConfigColors(
         isFg: Boolean,
         config: IconConfigState,
         wallpaperColorsLight: MonetColorExtractor.ColorScheme?,
