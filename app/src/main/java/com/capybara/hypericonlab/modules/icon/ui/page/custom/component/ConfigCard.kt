@@ -218,21 +218,13 @@ fun MaskThumbnail(mask: String) {
         }
     }
 
-    Box(
-        modifier = Modifier
-            .size(28.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)),
-        contentAlignment = Alignment.Center
-    ) {
-        bitmap?.let { bmp ->
-            Image(
-                bitmap = bmp.asImageBitmap(),
-                contentDescription = mask,
-                modifier = Modifier.size(20.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
-            )
-        }
+    bitmap?.let { bmp ->
+        Image(
+            bitmap = bmp.asImageBitmap(),
+            contentDescription = mask,
+            modifier = Modifier.size(32.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
+        )
     }
 }
 

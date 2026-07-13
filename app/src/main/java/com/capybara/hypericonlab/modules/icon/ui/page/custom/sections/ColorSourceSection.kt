@@ -226,21 +226,22 @@ fun ColorSourceSection(
                 icon = null,
                 iconPlaceholder = false,
                 title = "自定义颜色",
+                titleStyle = MaterialTheme.typography.titleSmall,
                 onClick = { showColorPicker = true },
                 trailingContent = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(Color(configColor.toColorInt()))
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = configColor.uppercase(),
                             fontFamily = GoogleSansCodeFontFamily,
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(Color(configColor.toColorInt()))
                         )
                     }
                 }

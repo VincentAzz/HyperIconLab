@@ -27,14 +27,13 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
-import com.capybara.hypericonlab.core.designsystem.component.ExpressiveSlider
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
+import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.symbol.style
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.SwatchPreviewCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerSheet
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ConfigCard
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 
 @Composable
@@ -112,57 +111,53 @@ fun StickerConfigSection(
             }
         }
 
-        item {
-            ConfigCard(
+        item { shape ->
+            SliderWidget(
                 title = "描边粗细",
+                value = stickerStrokeWidth,
+                onValueChange = {
+                    viewModel.updateConfig { c ->
+                        c.copy(
+                            sticker = c.sticker.copy(
+                                strokeWidth = it
+                            )
+                        )
+                    }
+                },
+                valueRange = 0.05f..0.3f,
+                steps = 10,
                 valueDisplay = String.format(
                     LocalLocale.current.platformLocale,
                     "%.2f",
                     stickerStrokeWidth
-                )
-            ) {
-                ExpressiveSlider(
-                    value = stickerStrokeWidth,
+                ),
+                shape = shape
+            )
+        }
+
+        if (fillStyle == "glow" && colorSource != "black_white") {
+            item { shape ->
+                SliderWidget(
+                    title = "光晕强度",
+                    value = glowIntensity,
                     onValueChange = {
                         viewModel.updateConfig { c ->
                             c.copy(
                                 sticker = c.sticker.copy(
-                                    strokeWidth = it
+                                    glowIntensity = it
                                 )
                             )
                         }
                     },
-                    valueRange = 0.05f..0.3f,
-                    steps = 10
-                )
-            }
-        }
-
-        if (fillStyle == "glow" && colorSource != "black_white") {
-            item {
-                ConfigCard(
-                    title = "光晕强度",
+                    valueRange = 0.1f..1.0f,
+                    steps = 10,
                     valueDisplay = String.format(
                         LocalLocale.current.platformLocale,
                         "%.2f",
                         glowIntensity
-                    )
-                ) {
-                    ExpressiveSlider(
-                        value = glowIntensity,
-                        onValueChange = {
-                            viewModel.updateConfig { c ->
-                                c.copy(
-                                    sticker = c.sticker.copy(
-                                        glowIntensity = it
-                                    )
-                                )
-                            }
-                        },
-                        valueRange = 0.1f..1.0f,
-                        steps = 10
-                    )
-                }
+                    ),
+                    shape = shape
+                )
             }
         }
 

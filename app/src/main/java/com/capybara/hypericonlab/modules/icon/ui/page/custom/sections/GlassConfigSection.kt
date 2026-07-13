@@ -10,8 +10,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
-import com.capybara.hypericonlab.core.designsystem.symbol.design_services
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 
 @Composable
 fun GlassConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel) {
@@ -68,7 +66,8 @@ fun GlassConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.page
         }
         item {
             BaseWidget(
-                icon = AppMaterialSymbols.design_services,
+                icon = null,
+                iconPlaceholder = false,
                 title = "阴影开关",
                 trailingContent = {
                     Switch(
