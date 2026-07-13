@@ -40,6 +40,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.design_services
 import com.capybara.hypericonlab.core.designsystem.symbol.style
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
+import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.CTCConfigSection
@@ -66,21 +67,25 @@ fun ColorSourceSection(
     val presetSeedColor = config.preset.seedColor
     val presetPaletteStyle = config.preset.paletteStyle
     val presetColorSpec = config.preset.colorSpec
+    val wallpaperPaletteStyle = config.wallpaper.paletteStyle
+    val wallpaperColorSpec = config.wallpaper.colorSpec
 
     var showColorPicker by remember { mutableStateOf(false) }
     var showPaletteStyleSheet by remember { mutableStateOf(false) }
     var showColorSpecSheet by remember { mutableStateOf(false) }
+    var showWallpaperPaletteStyleSheet by remember { mutableStateOf(false) }
+    var showWallpaperColorSpecSheet by remember { mutableStateOf(false) }
 
     if (showPaletteStyleSheet) {
         SelectionSheet(
             title = "调色板样式",
-            items = com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle.entries,
+            items = PaletteStyle.entries,
             selectedItem = presetPaletteStyle,
             onDismiss = { showPaletteStyleSheet = false },
-            onConfirm = { style: com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle ->
+            onConfirm = { style: PaletteStyle ->
                 viewModel.updateConfig { c -> c.copy(preset = c.preset.copy(paletteStyle = style)) }
             },
-            itemLabel = { style: com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle -> style.displayName },
+            itemLabel = { style: PaletteStyle -> style.displayName },
             backdrop = backdrop,
             useLiquidGlass = useLiquidGlass,
             liquidGlassBlurRadius = liquidGlassBlurRadius
@@ -95,6 +100,38 @@ fun ColorSourceSection(
             onDismiss = { showColorSpecSheet = false },
             onConfirm = { spec: ThemeColorSpec ->
                 viewModel.updateConfig { c -> c.copy(preset = c.preset.copy(colorSpec = spec)) }
+            },
+            itemLabel = { spec: ThemeColorSpec -> spec.displayName },
+            backdrop = backdrop,
+            useLiquidGlass = useLiquidGlass,
+            liquidGlassBlurRadius = liquidGlassBlurRadius
+        )
+    }
+
+    if (showWallpaperPaletteStyleSheet) {
+        SelectionSheet(
+            title = "壁纸调色板样式",
+            items = PaletteStyle.entries,
+            selectedItem = wallpaperPaletteStyle,
+            onDismiss = { showWallpaperPaletteStyleSheet = false },
+            onConfirm = { style: PaletteStyle ->
+                viewModel.updateConfig { c -> c.copy(wallpaper = c.wallpaper.copy(paletteStyle = style)) }
+            },
+            itemLabel = { style: PaletteStyle -> style.displayName },
+            backdrop = backdrop,
+            useLiquidGlass = useLiquidGlass,
+            liquidGlassBlurRadius = liquidGlassBlurRadius
+        )
+    }
+
+    if (showWallpaperColorSpecSheet) {
+        SelectionSheet(
+            title = "壁纸色彩规格",
+            items = ThemeColorSpec.entries,
+            selectedItem = wallpaperColorSpec,
+            onDismiss = { showWallpaperColorSpecSheet = false },
+            onConfirm = { spec: ThemeColorSpec ->
+                viewModel.updateConfig { c -> c.copy(wallpaper = c.wallpaper.copy(colorSpec = spec)) }
             },
             itemLabel = { spec: ThemeColorSpec -> spec.displayName },
             backdrop = backdrop,
@@ -192,39 +229,6 @@ fun ColorSourceSection(
         }
 
         item(
-            animatedVisibility = colorSource == "wallpaper",
-            topPadding = ListItemDefaults.SegmentedGap,
-        ) {
-            BaseItemContainer {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    StyleChip(
-                        label = "浅色",
-                        selected = previewThemeMode == "light",
-                        onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "light") } },
-                        modifier = Modifier.weight(1f)
-                    )
-                    StyleChip(
-                        label = "中性",
-                        selected = previewThemeMode == "neutral",
-                        onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "neutral") } },
-                        modifier = Modifier.weight(1f)
-                    )
-                    StyleChip(
-                        label = "暗色",
-                        selected = previewThemeMode == "dark",
-                        onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "dark") } },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-        }
-
-        item(
             animatedVisibility = colorSource == "custom" && (!isForeground || style != "sticker"),
             topPadding = ListItemDefaults.SegmentedGap,
         ) {
@@ -252,6 +256,59 @@ fun ColorSourceSection(
                     }
                 }
             )
+        }
+    }
+
+    if (colorSource == "wallpaper") {
+        SegmentedColumn(
+            title = "基于壁纸色彩配置",
+            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
+        ) {
+            item {
+                BaseItemContainer {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        StyleChip(
+                            label = "浅色",
+                            selected = previewThemeMode == "light",
+                            onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "light") } },
+                            modifier = Modifier.weight(1f)
+                        )
+                        StyleChip(
+                            label = "中性",
+                            selected = previewThemeMode == "neutral",
+                            onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "neutral") } },
+                            modifier = Modifier.weight(1f)
+                        )
+                        StyleChip(
+                            label = "暗色",
+                            selected = previewThemeMode == "dark",
+                            onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "dark") } },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+            item {
+                BaseWidget(
+                    icon = AppMaterialSymbols.style,
+                    title = "调色板样式",
+                    description = wallpaperPaletteStyle.displayName,
+                    onClick = { showWallpaperPaletteStyleSheet = true }
+                )
+            }
+            item {
+                BaseWidget(
+                    icon = AppMaterialSymbols.design_services,
+                    title = "色彩规格",
+                    description = wallpaperColorSpec.displayName,
+                    onClick = { showWallpaperColorSpecSheet = true }
+                )
+            }
         }
     }
 

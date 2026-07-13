@@ -18,6 +18,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.PresetUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerUiState
+import com.capybara.hypericonlab.modules.icon.domain.model.WallpaperUiState
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
@@ -99,6 +100,10 @@ class IconViewModel(
     val preset = _config.map { it.preset }.stateIn(
         viewModelScope, SharingStarted.Eagerly,
         PresetUiState()
+    )
+    val wallpaperConfig = _config.map { it.wallpaper }.stateIn(
+        viewModelScope, SharingStarted.Eagerly,
+        WallpaperUiState()
     )
 
     // UI Status State
@@ -257,6 +262,13 @@ class IconViewModel(
                     updateConfig { it.copy(bgStyle = "solid", bgColorSource = "wallpaper") }
                 }
             }
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            _config
+                .map { it.wallpaper }
+                .distinctUntilChanged()
+                .collect { reextractWallpaperColors() }
         }
         // 仅在业务字段变化时触发，忽略selectedTab变化
         viewModelScope.launch {
@@ -494,7 +506,18 @@ class IconViewModel(
 
     fun updateWallpaper(bmp: Bitmap) {
         wallpaperBitmap.value = bmp
-        wallpaperColorScheme.value = MonetColorExtractor.extractFromBitmap(bmp)
+        reextractWallpaperColors()
         generateLivePreview()
+    }
+
+
+    private fun reextractWallpaperColors() {
+        val bmp = wallpaperBitmap.value ?: return
+        val wp = _config.value.wallpaper
+        wallpaperColorScheme.value = MonetColorExtractor.extractFromBitmap(
+            bitmap = bmp,
+            paletteStyle = wp.paletteStyle,
+            colorSpec = wp.colorSpec
+        )
     }
 }

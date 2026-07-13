@@ -32,6 +32,12 @@ data class PresetUiState(
     val colorSpec: ThemeColorSpec = ThemeColorSpec.SPEC_2025
 )
 
+// 默认 TonalSpot + SPEC_2021
+data class WallpaperUiState(
+    val paletteStyle: PaletteStyle = PaletteStyle.TonalSpot,
+    val colorSpec: ThemeColorSpec = ThemeColorSpec.SPEC_2021
+)
+
 data class IconConfigState(
     val colorMode: ColorMode = ColorMode.CUSTOM,
     val fgColor: String = "#FFFFFFFF",
@@ -48,7 +54,8 @@ data class IconConfigState(
     val sticker: StickerUiState = StickerUiState(),
     val glass: GlassUiState = GlassUiState(),
     val ctc: CtcUiState = CtcUiState(),
-    val preset: PresetUiState = PresetUiState()
+    val preset: PresetUiState = PresetUiState(),
+    val wallpaper: WallpaperUiState = WallpaperUiState()
 )
 
 data class PreviewState(
