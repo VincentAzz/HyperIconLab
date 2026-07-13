@@ -1,20 +1,15 @@
 package com.capybara.hypericonlab.core.preview
 
-import android.Manifest
-import android.app.WallpaperManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.graphics.drawable.BitmapDrawable
-import androidx.annotation.RequiresPermission
 import androidx.core.graphics.createBitmap
 
 // 预览生成器
 object PreviewGenerator {
-    @RequiresPermission(anyOf = ["android.permission.READ_WALLPAPER_INTERNAL", Manifest.permission.MANAGE_EXTERNAL_STORAGE])
     fun generateMainPreview(
         context: Context,
         icons: List<Bitmap>,
@@ -22,21 +17,17 @@ object PreviewGenerator {
     ): Bitmap {
         val targetWidth = 1080
         val targetHeight = 2400
-        val bg = if (wallpaper != null) {
-            getCenterCroppedBitmap(wallpaper, targetWidth, targetHeight)
-        } else {
-            getSystemWallpaper(context, targetWidth, targetHeight)
-        }
-
         val result = createBitmap(targetWidth, targetHeight)
         val canvas = Canvas(result)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-        canvas.drawBitmap(
-            bg,
-            null,
-            Rect(0, 0, targetWidth, targetHeight),
-            Paint(Paint.ANTI_ALIAS_FLAG)
-        )
+        if (wallpaper != null) {
+            val bg = getCenterCroppedBitmap(wallpaper, targetWidth, targetHeight)
+            canvas.drawBitmap(bg, null, Rect(0, 0, targetWidth, targetHeight), paint)
+            if (bg != wallpaper) bg.recycle()
+        } else {
+            canvas.drawColor(Color.LTGRAY)
+        }
 
         val rows = 8
         val cols = 4
@@ -60,12 +51,10 @@ object PreviewGenerator {
             }
         }
 
-        if (wallpaper != null && bg != wallpaper) bg.recycle()
         return result
     }
 
     // 小预览图
-    @RequiresPermission(anyOf = ["android.permission.READ_WALLPAPER_INTERNAL", Manifest.permission.MANAGE_EXTERNAL_STORAGE])
     fun generateStorePreview(
         context: Context,
         icons: List<Bitmap>,
@@ -89,8 +78,7 @@ object PreviewGenerator {
             }
 
             else -> {
-                val wallpaper = getSystemWallpaper(context, width, height)
-                canvas.drawBitmap(wallpaper, null, Rect(0, 0, width, height), paint)
+                canvas.drawColor(Color.LTGRAY)
             }
         }
 
@@ -147,37 +135,5 @@ object PreviewGenerator {
             Paint(Paint.FILTER_BITMAP_FLAG)
         )
         return dest
-    }
-
-    @RequiresPermission(anyOf = ["android.permission.READ_WALLPAPER_INTERNAL", Manifest.permission.MANAGE_EXTERNAL_STORAGE])
-    private fun getSystemWallpaper(context: Context, width: Int, height: Int): Bitmap {
-        val wm = WallpaperManager.getInstance(context)
-
-        val drawable = try {
-            wm.drawable ?: wm.builtInDrawable
-        } catch (e: SecurityException) {
-            null
-        } catch (e: Exception) {
-            null
-        }
-
-        val bmp = if (drawable is BitmapDrawable) {
-            drawable.bitmap
-        } else if (drawable != null) {
-            val b = createBitmap(
-                drawable.intrinsicWidth.coerceAtLeast(1),
-                drawable.intrinsicHeight.coerceAtLeast(1)
-            )
-            val c = Canvas(b)
-            drawable.setBounds(0, 0, c.width, c.height)
-            drawable.draw(c)
-            b
-        } else {
-            createBitmap(width, height).apply {
-                eraseColor(Color.LTGRAY)
-            }
-        }
-
-        return getCenterCroppedBitmap(bmp, width, height)
     }
 }

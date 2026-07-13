@@ -209,6 +209,12 @@ fun ColorSourceSection(
                         modifier = Modifier.weight(1f)
                     )
                     StyleChip(
+                        label = "中性",
+                        selected = previewThemeMode == "neutral",
+                        onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "neutral") } },
+                        modifier = Modifier.weight(1f)
+                    )
+                    StyleChip(
                         label = "暗色",
                         selected = previewThemeMode == "dark",
                         onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "dark") } },

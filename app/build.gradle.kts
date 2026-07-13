@@ -73,7 +73,6 @@ dependencies {
     implementation(libs.miuix.shader)
     implementation(libs.miuix.ui)
     implementation(libs.monetcompat)
-    implementation(libs.androidx.palette)
     implementation(libs.materialKolor)
     implementation(libs.androidsvg)
     testImplementation(libs.junit)

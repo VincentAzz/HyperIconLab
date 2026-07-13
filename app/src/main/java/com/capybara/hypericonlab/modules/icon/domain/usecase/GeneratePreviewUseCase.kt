@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import androidx.annotation.RequiresPermission
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
@@ -33,12 +32,10 @@ class GeneratePreviewUseCase(private val context: Context) {
     private val lawniconsBase = File(filesDir, "lawnicons")
     private val mapperBase = File(filesDir, "icon_mapper")
 
-    @RequiresPermission(anyOf = ["android.permission.READ_WALLPAPER_INTERNAL", android.Manifest.permission.MANAGE_EXTERNAL_STORAGE])
     suspend fun execute(
         config: IconConfigState,
         wallpaperBitmap: Bitmap?,
-        wallpaperColorsLight: MonetColorExtractor.ColorScheme?,
-        wallpaperColorsDark: MonetColorExtractor.ColorScheme?,
+        wallpaperColorScheme: MonetColorExtractor.WallpaperColorScheme?,
         appColorSchemes: Map<String, Pair<String, String>>,
         onStorePreviewGenerated: (Bitmap) -> Unit
     ): Bitmap? = withContext(Dispatchers.Default) {
@@ -88,8 +85,7 @@ class GeneratePreviewUseCase(private val context: Context) {
             svgDir,
             maskBitmaps,
             config,
-            wallpaperColorsLight,
-            wallpaperColorsDark,
+            wallpaperColorScheme,
             appColorSchemes
         )
         val storePreview =
@@ -103,8 +99,7 @@ class GeneratePreviewUseCase(private val context: Context) {
             svgDir,
             maskBitmaps,
             config,
-            wallpaperColorsLight,
-            wallpaperColorsDark,
+            wallpaperColorScheme,
             appColorSchemes
         )
         val mainPreview =
@@ -121,8 +116,7 @@ class GeneratePreviewUseCase(private val context: Context) {
         svgDir: File,
         maskBitmaps: List<Bitmap>,
         config: IconConfigState,
-        wallpaperColorsLight: MonetColorExtractor.ColorScheme?,
-        wallpaperColorsDark: MonetColorExtractor.ColorScheme?,
+        wallpaperColorScheme: MonetColorExtractor.WallpaperColorScheme?,
         appColorSchemes: Map<String, Pair<String, String>>
     ): List<Bitmap> {
         val results = mutableListOf<Bitmap>()
@@ -134,16 +128,14 @@ class GeneratePreviewUseCase(private val context: Context) {
                 val currentFg = resolveConfigColors(
                     true,
                     config,
-                    wallpaperColorsLight,
-                    wallpaperColorsDark,
+                    wallpaperColorScheme,
                     appColorSchemes,
                     packageName
                 )
                 val currentBg = resolveConfigColors(
                     false,
                     config,
-                    wallpaperColorsLight,
-                    wallpaperColorsDark,
+                    wallpaperColorScheme,
                     appColorSchemes,
                     packageName
                 )
@@ -236,8 +228,7 @@ class GeneratePreviewUseCase(private val context: Context) {
     fun resolveConfigColors(
         isFg: Boolean,
         config: IconConfigState,
-        wallpaperColorsLight: MonetColorExtractor.ColorScheme?,
-        wallpaperColorsDark: MonetColorExtractor.ColorScheme?,
+        wallpaperColorScheme: MonetColorExtractor.WallpaperColorScheme?,
         appColorSchemes: Map<String, Pair<String, String>>,
         packageName: String? = null
     ): String {
@@ -257,15 +248,18 @@ class GeneratePreviewUseCase(private val context: Context) {
 
         return when (source) {
             "wallpaper" -> {
-                val scheme =
-                    if (config.previewThemeMode == "dark") wallpaperColorsDark else wallpaperColorsLight
-                scheme?.let { if (isFg) it.foregroundColor else it.backgroundColor }
-                    ?: run {
-                        val mode = if (config.previewThemeMode == "dark")
-                            MonetColorExtractor.ThemeMode.DARK else MonetColorExtractor.ThemeMode.LIGHT
-                        val systemScheme = MonetColorExtractor.extractFromSystem(context, mode)
-                        if (isFg) systemScheme.foregroundColor else systemScheme.backgroundColor
+
+                // - light (亮色): fg=light.primary, bg=light.primaryContainer
+                // - neutral (中性, 反转亮色): fg=light.primaryContainer, bg=light.primary
+                // - dark (暗色): fg=dark.onPrimaryContainer, bg=dark.onPrimary
+                wallpaperColorScheme?.let { scheme ->
+                    when (config.previewThemeMode) {
+                        "light" -> if (isFg) scheme.light.primary else scheme.light.primaryContainer
+                        "neutral" -> if (isFg) scheme.light.primaryContainer else scheme.light.primary
+                        "dark" -> if (isFg) scheme.dark.onPrimaryContainer else scheme.dark.onPrimary
+                        else -> defaultColor
                     }
+                } ?: defaultColor
             }
 
             "app" -> {

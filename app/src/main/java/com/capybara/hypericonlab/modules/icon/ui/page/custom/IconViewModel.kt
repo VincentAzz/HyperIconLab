@@ -123,8 +123,8 @@ class IconViewModel(
     // Data State
 
     val wallpaperBitmap = MutableStateFlow<Bitmap?>(null)
-    private val wallpaperColorsLight = MutableStateFlow<MonetColorExtractor.ColorScheme?>(null)
-    private val wallpaperColorsDark = MutableStateFlow<MonetColorExtractor.ColorScheme?>(null)
+    private val wallpaperColorScheme =
+        MutableStateFlow<MonetColorExtractor.WallpaperColorScheme?>(null)
 
     val mapperExists = MutableStateFlow(false)
     val useStreaming = MutableStateFlow(true)
@@ -277,8 +277,7 @@ class IconViewModel(
         val resolvedColor = generatePreviewUseCase.resolveConfigColors(
             isFg = isFg,
             config = config,
-            wallpaperColorsLight = wallpaperColorsLight.value,
-            wallpaperColorsDark = wallpaperColorsDark.value,
+            wallpaperColorScheme = wallpaperColorScheme.value,
             appColorSchemes = appColorSchemes
         )
         updateConfig {
@@ -314,8 +313,7 @@ class IconViewModel(
                 val result = generatePreviewUseCase.execute(
                     config = _config.value,
                     wallpaperBitmap = wallpaperBitmap.value,
-                    wallpaperColorsLight = wallpaperColorsLight.value,
-                    wallpaperColorsDark = wallpaperColorsDark.value,
+                    wallpaperColorScheme = wallpaperColorScheme.value,
                     appColorSchemes = appColorSchemes,
                     onStorePreviewGenerated = { _storePreviewBitmap.value = it }
                 )
@@ -496,10 +494,7 @@ class IconViewModel(
 
     fun updateWallpaper(bmp: Bitmap) {
         wallpaperBitmap.value = bmp
-        wallpaperColorsLight.value =
-            MonetColorExtractor.extractFromBitmap(bmp, MonetColorExtractor.ThemeMode.LIGHT)
-        wallpaperColorsDark.value =
-            MonetColorExtractor.extractFromBitmap(bmp, MonetColorExtractor.ThemeMode.DARK)
+        wallpaperColorScheme.value = MonetColorExtractor.extractFromBitmap(bmp)
         generateLivePreview()
     }
 }
