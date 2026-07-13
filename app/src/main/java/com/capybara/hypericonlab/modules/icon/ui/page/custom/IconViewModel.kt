@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -255,8 +256,14 @@ class IconViewModel(
                 if (config.fgStyle == "hollow" && config.bgStyle == "none") {
                     updateConfig { it.copy(bgStyle = "solid", bgColorSource = "wallpaper") }
                 }
-                generateLivePreview()
             }
+        }
+        // 仅在业务字段变化时触发，忽略selectedTab变化
+        viewModelScope.launch {
+            _config
+                .map { it.copy(selectedTab = 0) }
+                .distinctUntilChanged()
+                .collect { generateLivePreview() }
         }
     }
 
