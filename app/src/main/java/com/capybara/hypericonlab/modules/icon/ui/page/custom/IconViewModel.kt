@@ -112,6 +112,12 @@ class IconViewModel(
         viewModelScope, SharingStarted.Eagerly,
         ImageFillingUiState()
     )
+    val selectedStaticImages = _config.map { it.selectedStaticImages }.stateIn(
+        viewModelScope, SharingStarted.Eagerly, emptyList()
+    )
+    val selectedFillingImages = _config.map { it.selectedFillingImages }.stateIn(
+        viewModelScope, SharingStarted.Eagerly, emptyList()
+    )
 
     // UI Status State
     private val _statusText = MutableStateFlow("就绪")
@@ -317,6 +323,25 @@ class IconViewModel(
         }
     }
 
+
+    /**
+     * 图片背景选择确认回调。
+     * @param isStatic true=静态图片，false=图片填充
+     * @param images 新的图片引用列表
+     * @param deletedRefs 被删除的自选图片引用列表（用于清理磁盘文件）
+     */
+    fun confirmImageSelection(isStatic: Boolean, images: List<String>, deletedRefs: List<String>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // 清理被删除的自选图片磁盘文件
+            deletedRefs.forEach { ref ->
+                BgImageLoader.deleteCustomFile(context, ref)
+            }
+        }
+        updateConfig {
+            if (isStatic) it.copy(selectedStaticImages = images)
+            else it.copy(selectedFillingImages = images)
+        }
+    }
 
     fun generateLivePreview() {
         previewJob?.cancel()
