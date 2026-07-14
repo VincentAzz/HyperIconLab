@@ -36,8 +36,10 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
+import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.symbol.design_services
 import com.capybara.hypericonlab.core.designsystem.symbol.style
+import com.capybara.hypericonlab.core.designsystem.symbol.sync
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
@@ -69,6 +71,19 @@ fun ColorSourceSection(
     val presetColorSpec = config.preset.colorSpec
     val wallpaperPaletteStyle = config.wallpaper.paletteStyle
     val wallpaperColorSpec = config.wallpaper.colorSpec
+    val syncColorSource = config.syncColorSource
+
+    // 同步联动设置颜色来源，同时修改前景和背景
+    fun applyColorSource(source: String) {
+        viewModel.updateConfig {
+            if (syncColorSource) {
+                it.copy(fgColorSource = source, bgColorSource = source)
+            } else {
+                if (isForeground) it.copy(fgColorSource = source)
+                else it.copy(bgColorSource = source)
+            }
+        }
+    }
 
     var showColorPicker by remember { mutableStateOf(false) }
     var showPaletteStyleSheet by remember { mutableStateOf(false) }
@@ -156,25 +171,13 @@ fun ColorSourceSection(
                         StyleChip(
                             label = "基于壁纸",
                             selected = colorSource == "wallpaper",
-                            onClick = {
-                                viewModel.updateConfig {
-                                    if (isForeground) it.copy(
-                                        fgColorSource = "wallpaper"
-                                    ) else it.copy(bgColorSource = "wallpaper")
-                                }
-                            },
+                            onClick = { applyColorSource("wallpaper") },
                             modifier = Modifier.weight(1f)
                         )
                         StyleChip(
                             label = "基于应用",
                             selected = colorSource == "app",
-                            onClick = {
-                                viewModel.updateConfig {
-                                    if (isForeground) it.copy(
-                                        fgColorSource = "app"
-                                    ) else it.copy(bgColorSource = "app")
-                                }
-                            },
+                            onClick = { applyColorSource("app") },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -182,25 +185,13 @@ fun ColorSourceSection(
                         StyleChip(
                             label = "Material 3 预设",
                             selected = colorSource == "preset",
-                            onClick = {
-                                viewModel.updateConfig {
-                                    if (isForeground) it.copy(
-                                        fgColorSource = "preset"
-                                    ) else it.copy(bgColorSource = "preset")
-                                }
-                            },
+                            onClick = { applyColorSource("preset") },
                             modifier = Modifier.weight(1f)
                         )
                         StyleChip(
                             label = "中国传统色预设",
                             selected = colorSource == "ctc",
-                            onClick = {
-                                viewModel.updateConfig {
-                                    if (isForeground) it.copy(
-                                        fgColorSource = "ctc"
-                                    ) else it.copy(bgColorSource = "ctc")
-                                }
-                            },
+                            onClick = { applyColorSource("ctc") },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -217,7 +208,7 @@ fun ColorSourceSection(
                             StyleChip(
                                 label = "黑白",
                                 selected = colorSource == "black_white",
-                                onClick = { viewModel.updateConfig { it.copy(fgColorSource = "black_white") } },
+                                onClick = { applyColorSource("black_white") },
                                 modifier = Modifier.weight(1f)
                             )
                         } else {
@@ -254,6 +245,21 @@ fun ColorSourceSection(
                                 .background(Color(configColor.toColorInt()))
                         )
                     }
+                }
+            )
+        }
+
+        item(
+            animatedVisibility = colorSource != "custom" && colorSource != "black_white",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) {
+            SwitchWidget(
+                icon = AppMaterialSymbols.sync,
+                title = "同步前景与背景",
+                description = if (syncColorSource) "启用" else "禁用",
+                checked = syncColorSource,
+                onCheckedChange = { enabled ->
+                    viewModel.updateConfig { it.copy(syncColorSource = enabled) }
                 }
             )
         }

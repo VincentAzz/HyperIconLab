@@ -55,7 +55,8 @@ data class IconConfigState(
     val glass: GlassUiState = GlassUiState(),
     val ctc: CtcUiState = CtcUiState(),
     val preset: PresetUiState = PresetUiState(),
-    val wallpaper: WallpaperUiState = WallpaperUiState()
+    val wallpaper: WallpaperUiState = WallpaperUiState(),
+    val syncColorSource: Boolean = true
 )
 
 data class PreviewState(
