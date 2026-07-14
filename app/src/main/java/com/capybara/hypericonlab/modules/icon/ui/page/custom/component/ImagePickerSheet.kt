@@ -369,27 +369,31 @@ private fun AddImageButton(
     onClick: () -> Unit
 ) {
     val cornerShape = rememberKyantRoundedRectangleShape(CardCornerRadius)
-    Box(
-        modifier = Modifier
-            .size(64.dp)
-            .combinedClickable(
-                enabled = enabled,
-                onClick = onClick,
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            )
-            .clip(cornerShape)
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = AppMaterialSymbols.add,
-            contentDescription = "选择图片",
-            modifier = Modifier
-                .size(24.dp)
-                .alpha(if (enabled) 1f else 0.38f),
-            tint = MaterialTheme.colorScheme.onSurface
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.combinedClickable(
+            enabled = enabled,
+            onClick = onClick,
+            indication = null,
+            interactionSource = remember { MutableInteractionSource() }
         )
+    ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(cornerShape)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = AppMaterialSymbols.add,
+                contentDescription = "选择图片",
+                modifier = Modifier
+                    .size(24.dp)
+                    .alpha(if (enabled) 1f else 0.38f),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
 

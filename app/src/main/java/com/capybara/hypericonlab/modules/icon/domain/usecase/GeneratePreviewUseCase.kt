@@ -203,7 +203,36 @@ class GeneratePreviewUseCase(private val context: Context) {
                     }
 
                     if (processedIcon != null) {
-                        val bgBitmap = BackgroundGenerator.createBackground(512, finalBg, maskBmp)
+                        val bgBitmap = when (config.bgStyle) {
+                            "static" -> {
+                                val imgRef = config.selectedStaticImages.randomOrNull()
+                                if (imgRef != null) {
+                                    BackgroundGenerator.createStaticImageBackground(
+                                        context, imgRef, 512
+                                    )
+                                } else {
+                                    BackgroundGenerator.createBackground(512, finalBg, maskBmp)
+                                }
+                            }
+
+                            "image" -> {
+                                val imgRef = config.selectedFillingImages.randomOrNull()
+                                if (imgRef != null) {
+                                    BackgroundGenerator.createImageFillingBackground(
+                                        context = context,
+                                        imageRef = imgRef,
+                                        iconSize = 512,
+                                        maskBitmap = maskBmp,
+                                        randomRotation = config.imageFilling.randomRotation,
+                                        scaleMode = config.imageFilling.scaleMode
+                                    )
+                                } else {
+                                    BackgroundGenerator.createBackground(512, finalBg, maskBmp)
+                                }
+                            }
+
+                            else -> BackgroundGenerator.createBackground(512, finalBg, maskBmp)
+                        } ?: BackgroundGenerator.createBackground(512, finalBg, maskBmp)
                         val finalBitmap = LayerMerger.merge(
                             background = bgBitmap,
                             icon = processedIcon,

@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.domain.usecase
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.core.graphics.toColorInt
@@ -22,7 +23,9 @@ import java.util.zip.ZipOutputStream
 
 // 图标生成流水线
 
-class IconPipelineUseCase {
+class IconPipelineUseCase(
+    private val context: Context
+) {
     fun executeWithFiles(
         config: IconBuildConfig,
         iconMap: Map<String, String>,
@@ -112,9 +115,36 @@ class IconPipelineUseCase {
                         if (processedIcon != null) {
                             val maskBmp =
                                 if (maskBitmaps.isNotEmpty()) maskBitmaps.random() else null
-                            val bgBitmap = BackgroundGenerator.createBackground(
+                            val fallbackColor =
+                                if (config.bgStyle == "none") "#00000000" else currentBg
+                            val bgBitmap = when (config.bgStyle) {
+                                "static" -> {
+                                    val imgRef = config.selectedStaticImages.randomOrNull()
+                                    if (imgRef != null) {
+                                        BackgroundGenerator.createStaticImageBackground(
+                                            context, imgRef, config.iconSize
+                                        )
+                                    } else null
+                                }
+
+                                "image" -> {
+                                    val imgRef = config.selectedFillingImages.randomOrNull()
+                                    if (imgRef != null) {
+                                        BackgroundGenerator.createImageFillingBackground(
+                                            context = context,
+                                            imageRef = imgRef,
+                                            iconSize = config.iconSize,
+                                            maskBitmap = maskBmp,
+                                            randomRotation = config.imageFillingRandomRotation,
+                                            scaleMode = config.imageFillingScaleMode
+                                        )
+                                    } else null
+                                }
+
+                                else -> null
+                            } ?: BackgroundGenerator.createBackground(
                                 iconSize = config.iconSize,
-                                colorHex = if (config.bgStyle == "none") "#00000000" else currentBg,
+                                colorHex = fallbackColor,
                                 maskBitmap = maskBmp
                             )
                             val finalBitmap = LayerMerger.merge(
