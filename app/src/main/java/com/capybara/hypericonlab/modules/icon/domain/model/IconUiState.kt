@@ -56,7 +56,22 @@ data class IconConfigState(
     val ctc: CtcUiState = CtcUiState(),
     val preset: PresetUiState = PresetUiState(),
     val wallpaper: WallpaperUiState = WallpaperUiState(),
-    val syncColorSource: Boolean = true
+    // 前景与背景颜色来源是否同步联动，默认启用
+    val syncColorSource: Boolean = true,
+    // 静态图片背景：已选图片引用列表（最多5个），独立保存
+    val selectedStaticImages: List<String> = emptyList(),
+    // 图片填充背景：已选图片引用列表（最多5个），独立保存
+    val selectedFillingImages: List<String> = emptyList(),
+    // 图片填充配置
+    val imageFilling: ImageFillingUiState = ImageFillingUiState()
+)
+
+/** 图片填充配置 */
+data class ImageFillingUiState(
+    // 是否随机旋转
+    val randomRotation: Boolean = false,
+    // 缩放模式："scale"=缩放填充(默认), "crop"=居中裁切
+    val scaleMode: String = "scale"
 )
 
 data class PreviewState(

@@ -15,7 +15,14 @@ data class IconBuildConfig(
     val fgStyle: String = "line",
     val bgStyle: String = "solid",
     val stickerConfig: StickerConfig? = null,
-    val glassConfig: GlassConfig? = null
+    val glassConfig: GlassConfig? = null,
+    // 静态图片背景：已选图片引用列表
+    val selectedStaticImages: List<String> = emptyList(),
+    // 图片填充背景：已选图片引用列表
+    val selectedFillingImages: List<String> = emptyList(),
+    // 图片填充配置
+    val imageFillingRandomRotation: Boolean = false,
+    val imageFillingScaleMode: String = "scale"
 )
 
 data class StickerConfig(

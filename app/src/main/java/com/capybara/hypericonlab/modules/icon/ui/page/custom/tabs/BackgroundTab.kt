@@ -69,7 +69,7 @@ fun BackgroundTab(
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             StyleChip(
-                                label = "图片",
+                                label = "静态图片",
                                 selected = false,
                                 enabled = false,
                                 modifier = Modifier.weight(1f)

@@ -9,12 +9,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.color.AppColorSchemesLoader
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
+import com.capybara.hypericonlab.core.image.BgImageDir
+import com.capybara.hypericonlab.core.image.BgImageLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
+import com.capybara.hypericonlab.modules.icon.domain.model.ImageFillingUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.PresetUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerUiState
@@ -104,6 +107,10 @@ class IconViewModel(
     val wallpaperConfig = _config.map { it.wallpaper }.stateIn(
         viewModelScope, SharingStarted.Eagerly,
         WallpaperUiState()
+    )
+    val imageFilling = _config.map { it.imageFilling }.stateIn(
+        viewModelScope, SharingStarted.Eagerly,
+        ImageFillingUiState()
     )
 
     // UI Status State
@@ -260,6 +267,18 @@ class IconViewModel(
                 }
                 if (config.fgStyle == "hollow" && config.bgStyle == "none") {
                     updateConfig { it.copy(bgStyle = "solid", bgColorSource = "wallpaper") }
+                }
+                if (config.bgStyle == "static" && config.selectedStaticImages.isEmpty()) {
+                    val presets = BgImageLoader.listPresetAssets(context, BgImageDir.STATIC)
+                    if (presets.isNotEmpty()) {
+                        updateConfig { it.copy(selectedStaticImages = listOf(presets.first())) }
+                    }
+                }
+                if (config.bgStyle == "image" && config.selectedFillingImages.isEmpty()) {
+                    val presets = BgImageLoader.listPresetAssets(context, BgImageDir.FILLING)
+                    if (presets.isNotEmpty()) {
+                        updateConfig { it.copy(selectedFillingImages = listOf(presets.first())) }
+                    }
                 }
             }
         }
@@ -439,7 +458,11 @@ class IconViewModel(
                         glowIntensity = configValue.sticker.glowIntensity,
                         lineColor = configValue.sticker.lineColor,
                         fillColor = configValue.sticker.fillColor
-                    ) else null
+                    ) else null,
+                    selectedStaticImages = configValue.selectedStaticImages,
+                    selectedFillingImages = configValue.selectedFillingImages,
+                    imageFillingRandomRotation = configValue.imageFilling.randomRotation,
+                    imageFillingScaleMode = configValue.imageFilling.scaleMode
                 )
 
                 val out = File(filesDir, "${mapperName.removeSuffix(".xml")}.mtz")
