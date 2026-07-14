@@ -128,6 +128,25 @@ object BgImageLoader {
     }
 
     /**
+     * 枚举自选图片引用列表（扫描 filesDir 持久化目录），按文件名字母排序。
+     * 用于重建自选图片池——即使应用重启，只要文件未被长按删除即保留。
+     */
+    fun listCustomFiles(context: Context, dir: BgImageDir): List<String> {
+        val customDir = File(context.filesDir, dir.fileDir)
+        if (!customDir.exists()) return emptyList()
+        return customDir.listFiles()
+            ?.filter { it.isFile }
+            ?.filter {
+                it.name.endsWith(".png", ignoreCase = true) ||
+                        it.name.endsWith(".jpg", ignoreCase = true) ||
+                        it.name.endsWith(".jpeg", ignoreCase = true)
+            }
+            ?.sortedBy { it.name }
+            ?.map { "file:${dir.fileDir}/${it.name}" }
+            ?: emptyList()
+    }
+
+    /**
      * 从引用中提取展示名称：去扩展名 + 下划线转空格。
      * 如 "asset:img_static/fluffy_round_00.png" → "fluffy round 00"
      */

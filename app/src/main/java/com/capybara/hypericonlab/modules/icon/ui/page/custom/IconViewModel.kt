@@ -327,16 +327,9 @@ class IconViewModel(
     /**
      * 图片背景选择确认回调。
      * @param isStatic true=静态图片，false=图片填充
-     * @param images 新的图片引用列表
-     * @param deletedRefs 被删除的自选图片引用列表（用于清理磁盘文件）
+     * @param images 新的选中图片引用列表
      */
-    fun confirmImageSelection(isStatic: Boolean, images: List<String>, deletedRefs: List<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            // 清理被删除的自选图片磁盘文件
-            deletedRefs.forEach { ref ->
-                BgImageLoader.deleteCustomFile(context, ref)
-            }
-        }
+    fun confirmImageSelection(isStatic: Boolean, images: List<String>) {
         updateConfig {
             if (isStatic) it.copy(selectedStaticImages = images)
             else it.copy(selectedFillingImages = images)
