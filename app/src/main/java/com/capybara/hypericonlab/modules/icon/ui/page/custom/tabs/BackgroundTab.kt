@@ -91,14 +91,14 @@ fun BackgroundTab(
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             StyleChip(
                                 label = "静态图片",
-                                selected = style == "static",
-                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "static") } },
+                                selected = style == "img_static",
+                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "img_static") } },
                                 modifier = Modifier.weight(1f)
                             )
                             StyleChip(
                                 label = "图片填充",
-                                selected = style == "image",
-                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "image") } },
+                                selected = style == "img_filling",
+                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "img_filling") } },
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -108,7 +108,7 @@ fun BackgroundTab(
 
             // 形状选择行：纯色和图片填充时显示
             item(
-                animatedVisibility = style == "solid" || style == "image",
+                animatedVisibility = style == "solid" || style == "img_filling",
                 topPadding = ListItemDefaults.SegmentedGap,
             ) { shape ->
                 BaseItemContainer(shape = shape) {
@@ -140,7 +140,7 @@ fun BackgroundTab(
 
             // 静态图片选择卡片
             item(
-                animatedVisibility = style == "static",
+                animatedVisibility = style == "img_static",
                 topPadding = ListItemDefaults.SegmentedGap,
             ) { shape ->
                 BaseItemContainer(shape = shape) {
@@ -154,7 +154,7 @@ fun BackgroundTab(
 
             // 图片填充选择卡片
             item(
-                animatedVisibility = style == "image",
+                animatedVisibility = style == "img_filling",
                 topPadding = ListItemDefaults.SegmentedGap,
             ) { shape ->
                 BaseItemContainer(shape = shape) {
@@ -168,7 +168,7 @@ fun BackgroundTab(
 
             // 图片填充：随机旋转开关
             item(
-                animatedVisibility = style == "image",
+                animatedVisibility = style == "img_filling",
                 topPadding = ListItemDefaults.SegmentedGap,
             ) { shape ->
                 BaseItemContainer(shape = shape) {
@@ -190,9 +190,9 @@ fun BackgroundTab(
                 }
             }
 
-            // 图片填充：缩放方式（仅两个 chip，参考样式第一个卡片）
+            // 图片填充：缩放方式
             item(
-                animatedVisibility = style == "image",
+                animatedVisibility = style == "img_filling",
                 topPadding = ListItemDefaults.SegmentedGap,
             ) { shape ->
                 BaseItemContainer(shape = shape) {

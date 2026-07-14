@@ -204,7 +204,7 @@ class GeneratePreviewUseCase(private val context: Context) {
 
                     if (processedIcon != null) {
                         val bgBitmap = when (config.bgStyle) {
-                            "static" -> {
+                            "img_static" -> {
                                 val imgRef = config.selectedStaticImages.randomOrNull()
                                 if (imgRef != null) {
                                     BackgroundGenerator.createStaticImageBackground(
@@ -215,7 +215,7 @@ class GeneratePreviewUseCase(private val context: Context) {
                                 }
                             }
 
-                            "image" -> {
+                            "img_filling" -> {
                                 val imgRef = config.selectedFillingImages.randomOrNull()
                                 if (imgRef != null) {
                                     BackgroundGenerator.createImageFillingBackground(

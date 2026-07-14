@@ -274,13 +274,13 @@ class IconViewModel(
                 if (config.fgStyle == "hollow" && config.bgStyle == "none") {
                     updateConfig { it.copy(bgStyle = "solid", bgColorSource = "wallpaper") }
                 }
-                if (config.bgStyle == "static" && config.selectedStaticImages.isEmpty()) {
+                if (config.bgStyle == "img_static" && config.selectedStaticImages.isEmpty()) {
                     val presets = BgImageLoader.listPresetAssets(context, BgImageDir.STATIC)
                     if (presets.isNotEmpty()) {
                         updateConfig { it.copy(selectedStaticImages = listOf(presets.first())) }
                     }
                 }
-                if (config.bgStyle == "image" && config.selectedFillingImages.isEmpty()) {
+                if (config.bgStyle == "img_filling" && config.selectedFillingImages.isEmpty()) {
                     val presets = BgImageLoader.listPresetAssets(context, BgImageDir.FILLING)
                     if (presets.isNotEmpty()) {
                         updateConfig { it.copy(selectedFillingImages = listOf(presets.first())) }

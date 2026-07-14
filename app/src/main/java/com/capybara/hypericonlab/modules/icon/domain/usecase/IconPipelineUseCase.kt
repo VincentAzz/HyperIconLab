@@ -118,7 +118,7 @@ class IconPipelineUseCase(
                             val fallbackColor =
                                 if (config.bgStyle == "none") "#00000000" else currentBg
                             val bgBitmap = when (config.bgStyle) {
-                                "static" -> {
+                                "img_static" -> {
                                     val imgRef = config.selectedStaticImages.randomOrNull()
                                     if (imgRef != null) {
                                         BackgroundGenerator.createStaticImageBackground(
@@ -127,7 +127,7 @@ class IconPipelineUseCase(
                                     } else null
                                 }
 
-                                "image" -> {
+                                "img_filling" -> {
                                     val imgRef = config.selectedFillingImages.randomOrNull()
                                     if (imgRef != null) {
                                         BackgroundGenerator.createImageFillingBackground(
