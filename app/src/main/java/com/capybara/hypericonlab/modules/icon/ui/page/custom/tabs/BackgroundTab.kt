@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
+import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ImagePickerSheet
@@ -58,14 +59,63 @@ fun BackgroundTab(
     val selectedStaticImages by viewModel.selectedStaticImages.collectAsStateWithLifecycle()
     val selectedFillingImages by viewModel.selectedFillingImages.collectAsStateWithLifecycle()
     val imageFilling by viewModel.imageFilling.collectAsStateWithLifecycle()
+    // 双层背景相关状态
+    val dualLayerEnabled by viewModel.dualLayerEnabled.collectAsStateWithLifecycle()
+    val dualLayerSizeDiff by viewModel.dualLayerSizeDiff.collectAsStateWithLifecycle()
+    val bgLayer2 by viewModel.bgLayer2.collectAsStateWithLifecycle()
 
     var showMaskPicker by remember { mutableStateOf(false) }
     var showStaticImagePicker by remember { mutableStateOf(false) }
     var showFillingImagePicker by remember { mutableStateOf(false) }
+    // 下层背景独立弹窗状态
+    var showMaskPicker2 by remember { mutableStateOf(false) }
+    var showStaticImagePicker2 by remember { mutableStateOf(false) }
+    var showFillingImagePicker2 by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        // 双层背景开关卡片组
         SegmentedColumn(
-            title = "样式",
+            title = "双层背景",
+            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
+        ) {
+            item { shape ->
+                BaseItemContainer(shape = shape) {
+                    BaseWidget(
+                        icon = null,
+                        iconPlaceholder = false,
+                        title = "启用双层背景",
+                        trailingContent = {
+                            Switch(
+                                checked = dualLayerEnabled,
+                                onCheckedChange = { enabled ->
+                                    viewModel.updateConfig { it.copy(dualLayerEnabled = enabled) }
+                                }
+                            )
+                        }
+                    )
+                }
+            }
+            // 大小差异滑块：双层启用时显示
+            item(
+                animatedVisibility = dualLayerEnabled,
+                topPadding = ListItemDefaults.SegmentedGap
+            ) { shape ->
+                SliderWidget(
+                    title = "大小差异",
+                    value = dualLayerSizeDiff,
+                    onValueChange = { v ->
+                        viewModel.updateConfig { it.copy(dualLayerSizeDiff = v) }
+                    },
+                    valueRange = DualLayerUiConstants.SIZE_DIFF_MIN..DualLayerUiConstants.SIZE_DIFF_MAX,
+                    steps = DualLayerUiConstants.SIZE_DIFF_STEPS,
+                    valueDisplay = "${(dualLayerSizeDiff * 100).toInt()}%",
+                    shape = shape
+                )
+            }
+        }
+
+        SegmentedColumn(
+            title = "上层背景样式",
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
         ) {
             item { shape ->
@@ -79,6 +129,7 @@ fun BackgroundTab(
                                 label = "无背景",
                                 selected = style == "none",
                                 onClick = { viewModel.updateConfig { it.copy(bgStyle = "none") } },
+                                enabled = !dualLayerEnabled, // 双层启用时禁用
                                 modifier = Modifier.weight(1f)
                             )
                             StyleChip(
@@ -227,7 +278,7 @@ fun BackgroundTab(
             }
         }
 
-        // 颜色卡片组：纯色时显示，静态图片/图片填充不显示
+        // 上层背景颜色卡片组：纯色时显示，静态图片/图片填充不显示
         if (style == "solid") {
             ColorSourceSection(
                 viewModel = viewModel,
@@ -237,8 +288,23 @@ fun BackgroundTab(
                 liquidGlassBlurRadius = liquidGlassBlurRadius
             )
         }
+
+        // 下层背景卡片组：双层启用时显示
+        if (dualLayerEnabled) {
+            LowerLayerBackgroundSection(
+                viewModel = viewModel,
+                bgLayer2 = bgLayer2,
+                onPickMask = { showMaskPicker2 = true },
+                onPickStaticImage = { showStaticImagePicker2 = true },
+                onPickFillingImage = { showFillingImagePicker2 = true },
+                backdrop = backdrop,
+                useLiquidGlass = useLiquidGlass,
+                liquidGlassBlurRadius = liquidGlassBlurRadius
+            )
+        }
     }
 
+    // 上层弹窗
     if (showMaskPicker) {
         MaskPickerSheet(
             onDismiss = { showMaskPicker = false },
@@ -261,7 +327,8 @@ fun BackgroundTab(
             onImagesConfirmed = { images ->
                 viewModel.confirmImageSelection(
                     isStatic = true,
-                    images = images
+                    images = images,
+                    layerIndex = 0
                 )
                 showStaticImagePicker = false
             },
@@ -280,7 +347,8 @@ fun BackgroundTab(
             onImagesConfirmed = { images ->
                 viewModel.confirmImageSelection(
                     isStatic = false,
-                    images = images
+                    images = images,
+                    layerIndex = 0
                 )
                 showFillingImagePicker = false
             },
@@ -289,6 +357,292 @@ fun BackgroundTab(
             liquidGlassBlurRadius = liquidGlassBlurRadius
         )
     }
+
+    // 下层弹窗
+    if (showMaskPicker2) {
+        MaskPickerSheet(
+            onDismiss = { showMaskPicker2 = false },
+            selectedMasks = bgLayer2.selectedMasks,
+            onMasksConfirmed = {
+                viewModel.updateConfig { c ->
+                    c.copy(bgLayer2 = c.bgLayer2.copy(selectedMasks = it))
+                }
+                showMaskPicker2 = false
+            },
+            backdrop = backdrop,
+            useLiquidGlass = useLiquidGlass,
+            liquidGlassBlurRadius = liquidGlassBlurRadius
+        )
+    }
+
+    if (showStaticImagePicker2) {
+        ImagePickerSheet(
+            onDismiss = { showStaticImagePicker2 = false },
+            title = "选择下层静态图片",
+            bgImageDir = BgImageDir.STATIC,
+            selectedImages = bgLayer2.selectedStaticImages,
+            onImagesConfirmed = { images ->
+                viewModel.confirmImageSelection(
+                    isStatic = true,
+                    images = images,
+                    layerIndex = 1
+                )
+                showStaticImagePicker2 = false
+            },
+            backdrop = backdrop,
+            useLiquidGlass = useLiquidGlass,
+            liquidGlassBlurRadius = liquidGlassBlurRadius
+        )
+    }
+
+    if (showFillingImagePicker2) {
+        ImagePickerSheet(
+            onDismiss = { showFillingImagePicker2 = false },
+            title = "选择下层图片填充",
+            bgImageDir = BgImageDir.FILLING,
+            selectedImages = bgLayer2.selectedFillingImages,
+            onImagesConfirmed = { images ->
+                viewModel.confirmImageSelection(
+                    isStatic = false,
+                    images = images,
+                    layerIndex = 1
+                )
+                showFillingImagePicker2 = false
+            },
+            backdrop = backdrop,
+            useLiquidGlass = useLiquidGlass,
+            liquidGlassBlurRadius = liquidGlassBlurRadius
+        )
+    }
+}
+
+/**
+ * 下层背景卡片组：样式 SegmentedColumn + 颜色卡片组。
+ * 双层启用时显示，与上层卡片组结构一致，但读写 bgLayer2 字段。
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun LowerLayerBackgroundSection(
+    viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel,
+    bgLayer2: com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState,
+    onPickMask: () -> Unit,
+    onPickStaticImage: () -> Unit,
+    onPickFillingImage: () -> Unit,
+    backdrop: LayerBackdrop? = null,
+    useLiquidGlass: Boolean = false,
+    liquidGlassBlurRadius: Dp = 24.dp
+) {
+    val style2 = bgLayer2.style
+    val imageFilling2 = bgLayer2.imageFilling
+
+    SegmentedColumn(
+        title = "下层背景样式",
+        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
+    ) {
+        item { shape ->
+            BaseItemContainer(shape = shape) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        StyleChip(
+                            label = "无背景",
+                            selected = style2 == "none",
+                            onClick = {
+                                viewModel.updateConfig {
+                                    it.copy(bgLayer2 = it.bgLayer2.copy(style = "none"))
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        StyleChip(
+                            label = "纯色",
+                            selected = style2 == "solid",
+                            onClick = {
+                                viewModel.updateConfig {
+                                    it.copy(bgLayer2 = it.bgLayer2.copy(style = "solid"))
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        StyleChip(
+                            label = "静态图片",
+                            selected = style2 == "img_static",
+                            onClick = {
+                                viewModel.updateConfig {
+                                    it.copy(bgLayer2 = it.bgLayer2.copy(style = "img_static"))
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        StyleChip(
+                            label = "图片填充",
+                            selected = style2 == "img_filling",
+                            onClick = {
+                                viewModel.updateConfig {
+                                    it.copy(bgLayer2 = it.bgLayer2.copy(style = "img_filling"))
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+
+        // 形状选择行：纯色和图片填充时显示
+        item(
+            animatedVisibility = style2 == "solid" || style2 == "img_filling",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) { shape ->
+            BaseItemContainer(shape = shape) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Text(
+                        "形状",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(end = 12.dp)
+                    )
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        bgLayer2.selectedMasks.forEach { mask ->
+                            MaskThumbnail(mask = mask)
+                        }
+                    }
+                    TextButton(onClick = onPickMask) {
+                        Text("更改")
+                    }
+                }
+            }
+        }
+
+        // 静态图片选择卡片
+        item(
+            animatedVisibility = style2 == "img_static",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) { shape ->
+            BaseItemContainer(shape = shape) {
+                ImageSelectionRow(
+                    title = "静态图片",
+                    imageRefs = bgLayer2.selectedStaticImages,
+                    onPickClick = onPickStaticImage
+                )
+            }
+        }
+
+        // 图片填充选择卡片
+        item(
+            animatedVisibility = style2 == "img_filling",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) { shape ->
+            BaseItemContainer(shape = shape) {
+                ImageSelectionRow(
+                    title = "图片填充",
+                    imageRefs = bgLayer2.selectedFillingImages,
+                    onPickClick = onPickFillingImage
+                )
+            }
+        }
+
+        // 图片填充：随机旋转开关
+        item(
+            animatedVisibility = style2 == "img_filling",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) { shape ->
+            BaseItemContainer(shape = shape) {
+                BaseWidget(
+                    icon = null,
+                    iconPlaceholder = false,
+                    title = "随机旋转",
+                    trailingContent = {
+                        Switch(
+                            checked = imageFilling2.randomRotation,
+                            onCheckedChange = { enabled ->
+                                viewModel.updateConfig {
+                                    it.copy(
+                                        bgLayer2 = it.bgLayer2.copy(
+                                            imageFilling = it.bgLayer2.imageFilling.copy(
+                                                randomRotation = enabled
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        // 图片填充：缩放方式
+        item(
+            animatedVisibility = style2 == "img_filling",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) { shape ->
+            BaseItemContainer(shape = shape) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
+                ) {
+                    StyleChip(
+                        label = "缩放",
+                        selected = imageFilling2.scaleMode == "scale",
+                        onClick = {
+                            viewModel.updateConfig {
+                                it.copy(
+                                    bgLayer2 = it.bgLayer2.copy(
+                                        imageFilling = it.bgLayer2.imageFilling.copy(scaleMode = "scale")
+                                    )
+                                )
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    StyleChip(
+                        label = "裁切",
+                        selected = imageFilling2.scaleMode == "crop",
+                        onClick = {
+                            viewModel.updateConfig {
+                                it.copy(
+                                    bgLayer2 = it.bgLayer2.copy(
+                                        imageFilling = it.bgLayer2.imageFilling.copy(scaleMode = "crop")
+                                    )
+                                )
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    }
+
+    // 下层背景颜色卡片组：纯色时显示（步骤5 接入 ColorSourceSection layerIndex=1）
+    if (style2 == "solid") {
+        // TODO: 步骤5 改造 ColorSourceSection 后接入 layerIndex = 1
+    }
+}
+
+/**
+ * 双层背景 UI 常量（避免硬编码）。
+ */
+private object DualLayerUiConstants {
+    const val SIZE_DIFF_MIN = 0.0f
+    const val SIZE_DIFF_MAX = 0.3f
+
+    // 0.02 步进 → 15 档 → steps = 14
+    const val SIZE_DIFF_STEPS = 14
 }
 
 /**
