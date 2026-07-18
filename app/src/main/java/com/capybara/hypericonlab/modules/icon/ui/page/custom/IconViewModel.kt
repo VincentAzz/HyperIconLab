@@ -13,6 +13,7 @@ import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
+import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
@@ -118,6 +119,14 @@ class IconViewModel(
     val selectedFillingImages = _config.map { it.selectedFillingImages }.stateIn(
         viewModelScope, SharingStarted.Eagerly, emptyList()
     )
+
+    // 双层背景相关 StateFlow
+    val dualLayerEnabled = _config.map { it.dualLayerEnabled }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val dualLayerSizeDiff = _config.map { it.dualLayerSizeDiff }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, IconConfigState().dualLayerSizeDiff)
+    val bgLayer2 = _config.map { it.bgLayer2 }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, BgLayerUiState())
 
     // UI Status State
     private val _statusText = MutableStateFlow("就绪")
@@ -286,6 +295,40 @@ class IconViewModel(
                         updateConfig { it.copy(selectedFillingImages = listOf(presets.first())) }
                     }
                 }
+                // 双层启用时，上层背景不允许 none（强制切回 solid+wallpaper）
+                if (config.dualLayerEnabled && config.bgStyle == "none") {
+                    updateConfig { it.copy(bgStyle = "solid", bgColorSource = "wallpaper") }
+                }
+                // 下层 img_static 空列表自动填首个预设
+                if (config.dualLayerEnabled && config.bgLayer2.style == "img_static" &&
+                    config.bgLayer2.selectedStaticImages.isEmpty()
+                ) {
+                    val presets = BgImageLoader.listPresetAssets(context, BgImageDir.STATIC)
+                    if (presets.isNotEmpty()) {
+                        updateConfig {
+                            it.copy(
+                                bgLayer2 = it.bgLayer2.copy(
+                                    selectedStaticImages = listOf(presets.first())
+                                )
+                            )
+                        }
+                    }
+                }
+                // 下层 img_filling 空列表自动填首个预设
+                if (config.dualLayerEnabled && config.bgLayer2.style == "img_filling" &&
+                    config.bgLayer2.selectedFillingImages.isEmpty()
+                ) {
+                    val presets = BgImageLoader.listPresetAssets(context, BgImageDir.FILLING)
+                    if (presets.isNotEmpty()) {
+                        updateConfig {
+                            it.copy(
+                                bgLayer2 = it.bgLayer2.copy(
+                                    selectedFillingImages = listOf(presets.first())
+                                )
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -328,11 +371,23 @@ class IconViewModel(
      * 图片背景选择确认回调。
      * @param isStatic true=静态图片，false=图片填充
      * @param images 新的选中图片引用列表
+     * @param layerIndex 0=上层，1=下层（默认 0 保持向后兼容）
      */
-    fun confirmImageSelection(isStatic: Boolean, images: List<String>) {
+    fun confirmImageSelection(isStatic: Boolean, images: List<String>, layerIndex: Int = 0) {
         updateConfig {
-            if (isStatic) it.copy(selectedStaticImages = images)
-            else it.copy(selectedFillingImages = images)
+            if (layerIndex == 1) {
+                // 下层背景图片选择，写入 bgLayer2 嵌套字段
+                val layer2 = it.bgLayer2
+                val newLayer2 = if (isStatic) {
+                    layer2.copy(selectedStaticImages = images)
+                } else {
+                    layer2.copy(selectedFillingImages = images)
+                }
+                it.copy(bgLayer2 = newLayer2)
+            } else {
+                if (isStatic) it.copy(selectedStaticImages = images)
+                else it.copy(selectedFillingImages = images)
+            }
         }
     }
 
