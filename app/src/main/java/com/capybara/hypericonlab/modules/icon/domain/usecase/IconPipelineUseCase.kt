@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.core.graphics.toColorInt
+import com.capybara.hypericonlab.core.color.HslColorUtils
 import com.capybara.hypericonlab.core.image.BackgroundGenerator
 import com.capybara.hypericonlab.core.image.GlassProcessor
 import com.capybara.hypericonlab.core.image.LayerMerger
@@ -19,6 +20,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlin.math.ceil
 
 
 // 图标生成流水线
@@ -32,7 +34,8 @@ class IconPipelineUseCase(
         svgDir: File,
         maskBitmaps: List<Bitmap> = emptyList(),
         outputFile: File,
-        appColorSchemes: Map<String, Pair<String, String>> = emptyMap()
+        appColorSchemes: Map<String, Pair<String, String>> = emptyMap(),
+        maskBitmaps2: List<Bitmap> = emptyList()
     ): Flow<PipelineProgress> = flow {
         val total = iconMap.size
         var completed = 0
@@ -117,7 +120,7 @@ class IconPipelineUseCase(
                                 if (maskBitmaps.isNotEmpty()) maskBitmaps.random() else null
                             val fallbackColor =
                                 if (config.bgStyle == "none") "#00000000" else currentBg
-                            val bgBitmap = when (config.bgStyle) {
+                            val upperBg = when (config.bgStyle) {
                                 "img_static" -> {
                                     val imgRef = config.selectedStaticImages.randomOrNull()
                                     if (imgRef != null) {
@@ -147,6 +150,72 @@ class IconPipelineUseCase(
                                 colorHex = fallbackColor,
                                 maskBitmap = maskBmp
                             )
+
+                            // 双层背景合成：下层（较大、居中、带透明度）+ 上层（铺满）
+                            // 下层颜色解析：app 源按 packageName 实时解析（同源时应用 HSL 亮度互补），
+                            // 其余源（wallpaper/preset/ctc/custom/black_white）由 ViewModel 预解析到 config.bgColor2
+                            val bgBitmap =
+                                if (config.dualLayerEnabled && config.bgStyle != "none") {
+                                    val lowerSize =
+                                        ceil(config.iconSize * (1 + config.dualLayerSizeDiff)).toInt()
+                                    val maskBmp2 =
+                                        if (maskBitmaps2.isNotEmpty()) maskBitmaps2.random() else null
+                                    val currentBg2 = if (config.bgStyle2 == "none") {
+                                        "#00000000"
+                                    } else if (config.bgColorSource2 == "app") {
+                                        // app 源：每个图标颜色不同，按 packageName 实时解析
+                                        val appBg =
+                                            appColorSchemes[packageName]?.second ?: config.bgColor2
+                                        // 同源优化：上下层均为 app 时，对下层应用亮度互补
+                                        if (config.bgColorSource == "app") {
+                                            HslColorUtils.adjustLuminanceForContrast(appBg)
+                                        } else appBg
+                                    } else {
+                                        config.bgColor2
+                                    }
+                                    val lowerBg = when (config.bgStyle2) {
+                                        "img_static" -> {
+                                            val imgRef2 =
+                                                config.selectedStaticImages2.randomOrNull()
+                                            if (imgRef2 != null) {
+                                                BackgroundGenerator.createStaticImageBackground(
+                                                    context, imgRef2, lowerSize
+                                                )
+                                            } else null
+                                        }
+
+                                        "img_filling" -> {
+                                            val imgRef2 =
+                                                config.selectedFillingImages2.randomOrNull()
+                                            if (imgRef2 != null) {
+                                                BackgroundGenerator.createImageFillingBackground(
+                                                    context = context,
+                                                    imageRef = imgRef2,
+                                                    iconSize = lowerSize,
+                                                    maskBitmap = maskBmp2,
+                                                    randomRotation = config.imageFilling2RandomRotation,
+                                                    scaleMode = config.imageFilling2ScaleMode
+                                                )
+                                            } else null
+                                        }
+
+                                        else -> null
+                                    } ?: BackgroundGenerator.createBackground(
+                                        iconSize = lowerSize,
+                                        colorHex = currentBg2,
+                                        maskBitmap = maskBmp2
+                                    )
+                                    BackgroundGenerator.mergeDualLayerBackground(
+                                        lowerBg = lowerBg,
+                                        upperBg = upperBg,
+                                        iconSize = config.iconSize,
+                                        lowerAlpha = config.bgLayer2Alpha
+                                    ).also {
+                                        lowerBg.recycle()
+                                        upperBg.recycle()
+                                    }
+                                } else upperBg
+
                             val finalBitmap = LayerMerger.merge(
                                 background = bgBitmap,
                                 icon = processedIcon,

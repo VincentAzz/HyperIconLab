@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.toColorInt
+import com.capybara.hypericonlab.core.color.HslColorUtils
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
@@ -64,6 +65,21 @@ class GeneratePreviewUseCase(private val context: Context) {
             }
         }
 
+        // 下层背景独立 mask（双层启用时加载）
+        val maskBitmaps2 = if (config.dualLayerEnabled) {
+            withContext(Dispatchers.IO) {
+                config.bgLayer2.selectedMasks.mapNotNull { name ->
+                    try {
+                        context.assets.open("masks/mask_${name}_512.png").use {
+                            BitmapFactory.decodeStream(it)
+                        }
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
+            }
+        } else emptyList()
+
         val fullMap = IconMapperProcessor.parseIconMapper(mapperFile)
         val targets = listOf(
             "com.android.contacts.activities.TwelveKeyDialer",
@@ -84,6 +100,7 @@ class GeneratePreviewUseCase(private val context: Context) {
             previewIconMap,
             svgDir,
             maskBitmaps,
+            maskBitmaps2,
             config,
             wallpaperColorScheme,
             appColorSchemes
@@ -98,6 +115,7 @@ class GeneratePreviewUseCase(private val context: Context) {
             fullPreviewIconMap,
             svgDir,
             maskBitmaps,
+            maskBitmaps2,
             config,
             wallpaperColorScheme,
             appColorSchemes
@@ -107,6 +125,7 @@ class GeneratePreviewUseCase(private val context: Context) {
 
         fullPreviewIcons.forEach { it.recycle() }
         maskBitmaps.forEach { it.recycle() }
+        maskBitmaps2.forEach { it.recycle() }
 
         mainPreview
     }
@@ -115,6 +134,7 @@ class GeneratePreviewUseCase(private val context: Context) {
         iconMap: Map<String, String>,
         svgDir: File,
         maskBitmaps: List<Bitmap>,
+        maskBitmaps2: List<Bitmap>,
         config: IconConfigState,
         wallpaperColorScheme: MonetColorExtractor.WallpaperColorScheme?,
         appColorSchemes: Map<String, Pair<String, String>>
@@ -203,7 +223,7 @@ class GeneratePreviewUseCase(private val context: Context) {
                     }
 
                     if (processedIcon != null) {
-                        val bgBitmap = when (config.bgStyle) {
+                        val upperBg = when (config.bgStyle) {
                             "img_static" -> {
                                 val imgRef = config.selectedStaticImages.randomOrNull()
                                 if (imgRef != null) {
@@ -233,6 +253,65 @@ class GeneratePreviewUseCase(private val context: Context) {
 
                             else -> BackgroundGenerator.createBackground(512, finalBg, maskBmp)
                         } ?: BackgroundGenerator.createBackground(512, finalBg, maskBmp)
+
+                        // 双层背景合成：下层背景（较大）居中放置，上层背景铺满覆盖
+                        val bgBitmap = if (config.dualLayerEnabled && config.bgStyle != "none") {
+                            val bgLayer2 = config.bgLayer2
+                            // 下层背景尺寸 = iconSize × (1 + sizeDiff)
+                            val lowerSize =
+                                kotlin.math.ceil(512 * (1 + config.dualLayerSizeDiff)).toInt()
+                            val maskBmp2 =
+                                if (maskBitmaps2.isNotEmpty()) maskBitmaps2.random() else null
+                            val currentBg2 = resolveConfigColors(
+                                isFg = false,
+                                config = config,
+                                wallpaperColorScheme = wallpaperColorScheme,
+                                appColorSchemes = appColorSchemes,
+                                packageName = packageName,
+                                layerIndex = 1
+                            )
+                            val finalBg2 = if (bgLayer2.style == "none") "#00000000" else currentBg2
+                            val lowerBg = when (bgLayer2.style) {
+                                "img_static" -> {
+                                    val imgRef2 = bgLayer2.selectedStaticImages.randomOrNull()
+                                    if (imgRef2 != null) {
+                                        BackgroundGenerator.createStaticImageBackground(
+                                            context, imgRef2, lowerSize
+                                        )
+                                    } else null
+                                }
+
+                                "img_filling" -> {
+                                    val imgRef2 = bgLayer2.selectedFillingImages.randomOrNull()
+                                    if (imgRef2 != null) {
+                                        BackgroundGenerator.createImageFillingBackground(
+                                            context = context,
+                                            imageRef = imgRef2,
+                                            iconSize = lowerSize,
+                                            maskBitmap = maskBmp2,
+                                            randomRotation = bgLayer2.imageFilling.randomRotation,
+                                            scaleMode = bgLayer2.imageFilling.scaleMode
+                                        )
+                                    } else null
+                                }
+
+                                else -> BackgroundGenerator.createBackground(
+                                    lowerSize, finalBg2, maskBmp2
+                                )
+                            }
+                            if (lowerBg != null) {
+                                BackgroundGenerator.mergeDualLayerBackground(
+                                    lowerBg = lowerBg,
+                                    upperBg = upperBg,
+                                    iconSize = 512,
+                                    lowerAlpha = bgLayer2.alpha
+                                ).also {
+                                    lowerBg.recycle()
+                                    upperBg.recycle()
+                                }
+                            } else upperBg
+                        } else upperBg
+
                         val finalBitmap = LayerMerger.merge(
                             background = bgBitmap,
                             icon = processedIcon,
@@ -259,15 +338,29 @@ class GeneratePreviewUseCase(private val context: Context) {
         config: IconConfigState,
         wallpaperColorScheme: MonetColorExtractor.WallpaperColorScheme?,
         appColorSchemes: Map<String, Pair<String, String>>,
-        packageName: String? = null
+        packageName: String? = null,
+        layerIndex: Int = 0
     ): String {
-        val source = if (isFg) config.fgColorSource else config.bgColorSource
+        // layerIndex=0 读上层背景字段，layerIndex=1 读下层背景字段（bgLayer2）
+        val bgLayer2 = config.bgLayer2
+        val source = when {
+            isFg -> config.fgColorSource
+            layerIndex == 1 -> bgLayer2.colorSource
+            else -> config.bgColorSource
+        }
+        val customColor = when {
+            isFg -> config.fgColor
+            layerIndex == 1 -> bgLayer2.color
+            else -> config.bgColor
+        }
+        // 下层背景使用独立的 monet 变体，与上层分离
+        val themeMode = if (layerIndex == 1) bgLayer2.previewThemeMode else config.previewThemeMode
         val defaultColor = if (isFg) "#FFFFFFFF" else "#FF3F51B5"
 
         if (source == "preset" && config.fgStyle == "sticker") {
             val scheme = dynamicColorScheme(
                 keyColor = androidx.compose.ui.graphics.Color(config.preset.seedColor),
-                isDark = config.previewThemeMode == "dark",
+                isDark = themeMode == "dark",
                 style = config.preset.paletteStyle,
                 colorSpec = config.preset.colorSpec
             )
@@ -282,7 +375,7 @@ class GeneratePreviewUseCase(private val context: Context) {
                 // - neutral (中性, 反转亮色): fg=light.primaryContainer, bg=light.primary
                 // - dark (暗色): fg=dark.onPrimaryContainer, bg=dark.onPrimary
                 wallpaperColorScheme?.let { scheme ->
-                    when (config.previewThemeMode) {
+                    when (themeMode) {
                         "light" -> if (isFg) scheme.light.primary else scheme.light.primaryContainer
                         "neutral" -> if (isFg) scheme.light.primaryContainer else scheme.light.primary
                         "dark" -> if (isFg) scheme.dark.onPrimaryContainer else scheme.dark.onPrimary
@@ -302,12 +395,12 @@ class GeneratePreviewUseCase(private val context: Context) {
                 } ?: defaultColor
             }
 
-            "custom" -> if (isFg) config.fgColor else config.bgColor
+            "custom" -> customColor
             "black_white" -> if (isFg) "#FF000000" else "#FFFFFFFF"
             "preset" -> {
                 val scheme = dynamicColorScheme(
                     keyColor = androidx.compose.ui.graphics.Color(config.preset.seedColor),
-                    isDark = config.previewThemeMode == "dark",
+                    isDark = themeMode == "dark",
                     style = config.preset.paletteStyle,
                     colorSpec = config.preset.colorSpec
                 )
@@ -336,6 +429,17 @@ class GeneratePreviewUseCase(private val context: Context) {
             }
 
             else -> defaultColor
+        }.let { resolvedColor ->
+            // 下层背景（layerIndex=1）同源优化：
+            // 当上下层 colorSource 相同且为 app/ctc 单色源时，对下层应用亮度互补，
+            // 确保两层有可见对比度。wallpaper/preset 有完整 scheme 由用户选 monet 变体互补，不自动处理。
+            if (!isFg && layerIndex == 1 &&
+                source == config.bgColorSource && (source == "app" || source == "ctc")
+            ) {
+                HslColorUtils.adjustLuminanceForContrast(resolvedColor)
+            } else {
+                resolvedColor
+            }
         }
     }
 

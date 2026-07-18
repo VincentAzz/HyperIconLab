@@ -460,6 +460,29 @@ class IconViewModel(
                 }
 
                 val configValue = _config.value
+                // 下层 mask bitmaps（仅双层启用时加载）
+                val maskBitmaps2 = if (configValue.dualLayerEnabled) {
+                    configValue.bgLayer2.selectedMasks.mapNotNull { name ->
+                        try {
+                            context.assets.open("masks/mask_${name}_512.png")
+                                .use { BitmapFactory.decodeStream(it) }
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }
+                } else emptyList()
+                // 预解析下层颜色（app 源由 IconPipelineUseCase 按 packageName 实时解析，此处跳过）
+                val resolvedBgColor2 = if (configValue.dualLayerEnabled &&
+                    configValue.bgLayer2.colorSource != "app"
+                ) {
+                    generatePreviewUseCase.resolveConfigColors(
+                        isFg = false,
+                        config = configValue,
+                        wallpaperColorScheme = wallpaperColorScheme.value,
+                        appColorSchemes = appColorSchemes,
+                        layerIndex = 1
+                    )
+                } else configValue.bgLayer2.color
                 val buildConfig = IconBuildConfig(
                     fgColorHex = configValue.fgColor,
                     bgColorHex = configValue.bgColor,
@@ -470,6 +493,7 @@ class IconViewModel(
                     masks = configValue.selectedMasks,
                     fgStyle = configValue.fgStyle,
                     bgStyle = configValue.bgStyle,
+                    bgColorSource = configValue.bgColorSource,
                     stickerConfig = if (configValue.fgStyle == "sticker") StickerConfig(
                         fillStyle = configValue.sticker.fillStyle,
                         strokeWidth = configValue.sticker.strokeWidth,
@@ -480,7 +504,19 @@ class IconViewModel(
                     selectedStaticImages = configValue.selectedStaticImages,
                     selectedFillingImages = configValue.selectedFillingImages,
                     imageFillingRandomRotation = configValue.imageFilling.randomRotation,
-                    imageFillingScaleMode = configValue.imageFilling.scaleMode
+                    imageFillingScaleMode = configValue.imageFilling.scaleMode,
+                    dualLayerEnabled = configValue.dualLayerEnabled,
+                    dualLayerSizeDiff = configValue.dualLayerSizeDiff,
+                    bgStyle2 = configValue.bgLayer2.style,
+                    bgColor2 = resolvedBgColor2,
+                    bgColorSource2 = configValue.bgLayer2.colorSource,
+                    bgPreviewThemeMode2 = configValue.bgLayer2.previewThemeMode,
+                    bgLayer2Alpha = configValue.bgLayer2.alpha,
+                    selectedMasks2 = configValue.bgLayer2.selectedMasks,
+                    selectedStaticImages2 = configValue.bgLayer2.selectedStaticImages,
+                    selectedFillingImages2 = configValue.bgLayer2.selectedFillingImages,
+                    imageFilling2RandomRotation = configValue.bgLayer2.imageFilling.randomRotation,
+                    imageFilling2ScaleMode = configValue.bgLayer2.imageFilling.scaleMode
                 )
 
                 val out = File(filesDir, "${mapperName.removeSuffix(".xml")}.mtz")
@@ -490,7 +526,8 @@ class IconViewModel(
                     svgDir!!,
                     maskBitmaps,
                     out,
-                    appColorSchemes
+                    appColorSchemes,
+                    maskBitmaps2
                 )
                     .collect { state ->
                         when (state) {
@@ -506,6 +543,7 @@ class IconViewModel(
                                 _currentProgress.value = 1.0f
                                 _isRunning.value = false
                                 maskBitmaps.forEach { it.recycle() }
+                                maskBitmaps2.forEach { it.recycle() }
                                 addLog(
                                     "打包完成: ${out.name}，总耗时 ${duration}ms",
                                     LogType.SUCCESS
