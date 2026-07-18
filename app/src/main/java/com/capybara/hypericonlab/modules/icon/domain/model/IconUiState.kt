@@ -63,10 +63,40 @@ data class IconConfigState(
     // 图片填充背景：已选图片引用列表（最多5个），独立保存
     val selectedFillingImages: List<String> = emptyList(),
     // 图片填充配置
+    val imageFilling: ImageFillingUiState = ImageFillingUiState(),
+    // 双层背景总开关，默认关闭
+    val dualLayerEnabled: Boolean = false,
+    // 下层背景独立配置
+    val bgLayer2: BgLayerUiState = BgLayerUiState(),
+    // 下层背景相对上层的大小差异，0.0~0.3，步进 0.02（15 档）
+    val dualLayerSizeDiff: Float = 0.08f
+)
+
+/**
+ * 下层背景独立配置。
+ * 与上层背景字段一一对应但不共享，上下层颜色完全分离处理。
+ */
+data class BgLayerUiState(
+    // 背景样式：none/solid/img_static/img_filling
+    val style: String = "solid",
+    // 自定义颜色 hex
+    val color: String = "#FF3F51B5",
+    // 颜色来源：wallpaper/app/preset/ctc/custom/black_white
+    val colorSource: String = "wallpaper",
+    // 下层独立的 monet 变体，与上层分离
+    val previewThemeMode: String = "dark",
+    // 下层图层级透明度 0~255，默认不透明
+    val alpha: Int = 255,
+    // 形状遮罩
+    val selectedMasks: List<String> = listOf("m3_round"),
+    // 静态图片背景：已选图片引用列表
+    val selectedStaticImages: List<String> = emptyList(),
+    // 图片填充背景：已选图片引用列表
+    val selectedFillingImages: List<String> = emptyList(),
+    // 图片填充配置
     val imageFilling: ImageFillingUiState = ImageFillingUiState()
 )
 
-/** 图片填充配置 */
 data class ImageFillingUiState(
     // 是否随机旋转
     val randomRotation: Boolean = false,

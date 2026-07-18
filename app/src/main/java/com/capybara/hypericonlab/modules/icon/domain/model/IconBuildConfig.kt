@@ -22,7 +22,23 @@ data class IconBuildConfig(
     val selectedFillingImages: List<String> = emptyList(),
     // 图片填充配置
     val imageFillingRandomRotation: Boolean = false,
-    val imageFillingScaleMode: String = "scale"
+    val imageFillingScaleMode: String = "scale",
+    // 双层背景：总开关、大小差异
+    val dualLayerEnabled: Boolean = false,
+    val dualLayerSizeDiff: Float = 0.08f,
+    // 下层背景扁平化字段
+    val bgStyle2: String = "solid",
+    val bgColor2: String = "#FF3F51B5",
+    val bgColorSource2: String = "wallpaper",
+    // 下层独立的 monet 变体
+    val bgPreviewThemeMode2: String = "dark",
+    // 下层图层级透明度 0~255
+    val bgLayer2Alpha: Int = 255,
+    val selectedMasks2: List<String> = listOf("m3_round"),
+    val selectedStaticImages2: List<String> = emptyList(),
+    val selectedFillingImages2: List<String> = emptyList(),
+    val imageFilling2RandomRotation: Boolean = false,
+    val imageFilling2ScaleMode: String = "scale"
 )
 
 data class StickerConfig(

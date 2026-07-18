@@ -14,6 +14,13 @@ import kotlin.random.Random
 
 // 图标背景生成器
 object BackgroundGenerator {
+
+    // 双层背景
+    private object DualLayerDefaults {
+        // 下层背景透明度
+        const val LOWER_ALPHA_MAX = 255
+    }
+
     fun createBackground(
         iconSize: Int,
         colorHex: String,
@@ -150,6 +157,47 @@ object BackgroundGenerator {
             xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
         }
         canvas.drawBitmap(scaledMask, 0f, 0f, maskPaint)
+        return result
+    }
+
+    /**
+     * 合成双层背景。
+     *
+     * 绘制顺序（自下而上）：
+     *   透明画布 → 下层背景（居中，按 lowerAlpha 透明度）→ 上层背景（铺满）
+     *
+     * 下层背景尺寸通常大于 iconSize（由 dualLayerSizeDiff 决定），居中放置后四周露出的部分
+     * 与上层背景形成"描边"或"叠层"视觉效果。透明度作用于下层整个图层（含形状），
+     * 对 solid / img_static / img_filling 三种下层背景类型统一生效。
+     *
+     * @param lowerBg 下层背景 Bitmap，尺寸可能 ≠ iconSize，已应用 mask
+     * @param upperBg 上层背景 Bitmap，尺寸 = iconSize×iconSize，已应用 mask
+     * @param iconSize 最终图标尺寸
+     * @param lowerAlpha 下层背景图层级透明度 0~255
+     * @return iconSize×iconSize 的双层背景 Bitmap
+     */
+    fun mergeDualLayerBackground(
+        lowerBg: Bitmap,
+        upperBg: Bitmap,
+        iconSize: Int,
+        lowerAlpha: Int = DualLayerDefaults.LOWER_ALPHA_MAX
+    ): Bitmap {
+        val result = createBitmap(iconSize, iconSize)
+        val canvas = Canvas(result)
+
+        // 下层：居中绘制，应用图层透明度
+        val lowerLeft = ((iconSize - lowerBg.width) / 2f)
+        val lowerTop = ((iconSize - lowerBg.height) / 2f)
+        val lowerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            alpha = lowerAlpha.coerceIn(0, DualLayerDefaults.LOWER_ALPHA_MAX)
+            isFilterBitmap = true
+        }
+        canvas.drawBitmap(lowerBg, lowerLeft, lowerTop, lowerPaint)
+
+        // 上层：铺满画布，不应用透明度
+        val upperPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
+        canvas.drawBitmap(upperBg, 0f, 0f, upperPaint)
+
         return result
     }
 }
