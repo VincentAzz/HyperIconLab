@@ -50,6 +50,7 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarIt
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
 import com.capybara.hypericonlab.modules.icon.ui.page.home.HomePage
+import com.capybara.hypericonlab.modules.icon.ui.page.task.TaskPage
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsPage
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
@@ -258,11 +259,12 @@ private fun MainPagerContent(
             )
 
             2 -> {
-                // Task Page Placeholder
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(outerPadding)
+                TaskPage(
+                    outerPadding = outerPadding,
+                    onTaskClick = { taskId ->
+                        // 任务卡片点击回调，详情 sheet 将在步骤 8 实现
+                        // 此处暂不处理，留空实现
+                    }
                 )
             }
 
