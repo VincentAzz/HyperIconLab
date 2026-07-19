@@ -1,0 +1,1218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="PipePipe" package="InfinityLoop1309.NewPipeEnhanced" drawable="pipepipe"/>
+    <item name="Scientific calculator plus 991" package="advanced.scientific.calculator.calc991.plus" drawable="scientific_calculator_plus_991"/>
+    <item name="Character.AI" package="ai.character.app" drawable="character_ai"/>
+    <item name="Perplexity" package="ai.perplexity.app.android" drawable="perplexity"/>
+    <item name="Grok" package="ai.x.grok" drawable="grok"/>
+    <item name="Adobe Photoshop Touch" package="air.com.adobe.pstouchphone" drawable="adobe_photoshop_touch"/>
+    <item name="All-In-One Calculator" package="all.in.one.calculator" drawable="all_in_one_calculator"/>
+    <item name="Focust" package="allen.town.focus.twitter" drawable="focust"/>
+    <item name="Alook Browser" package="alook.browser" drawable="alook_browser"/>
+    <item name="OnePlus Documents" package="andes.oplus.documentsreader" drawable="oneplus_documents"/>
+    <item name="Immich" package="app.alextran.immich" drawable="immich"/>
+    <item name="1Gallery" package="app.galleryx" drawable="_1gallery"/>
+    <item name="Komiku" package="app.komikku" drawable="komiku"/>
+    <item name="LANDrop" package="app.landrop.landrop_flutter" drawable="landrop"/>
+    <item name="Lawnchair" package="app.lawnchair" drawable="lawnchair"/>
+    <item name="Lawnchair Debug" package="app.lawnchair.debug" drawable="lawnchair_debug"/>
+    <item name="MDGram" package="app.mdgram.android" drawable="mdgram"/>
+    <item name="Mihon" package="app.mihon" drawable="mihon"/>
+    <item name="小宇宙 ~~ Small Cosmos" package="app.podcast.cosmos" drawable="small_cosmos"/>
+    <item name="YouTube Music ReVanced" package="app.revanced.android.apps.youtube.music" drawable="youtube_music_revanced"/>
+    <item name="microG Settings" package="app.revanced.android.gms" drawable="microg_settings"/>
+    <item name="YouTube ReVanced" package="app.revanced.android.youtube" drawable="youtube_revanced"/>
+    <item name="Supershift Shift Work Calendar" package="app.supershift" drawable="supershift_shift_work_calendar"/>
+    <item name="Zenly" package="app.zenly.locator" drawable="zenly"/>
+    <item name="Widgeet" package="art.widgeet.android" drawable="widgeet"/>
+    <item name="IBKR" package="atws.app" drawable="ibkr"/>
+    <item name="Pocket Casts" package="au.com.shiftyjelly.pocketcasts" drawable="pocket_casts"/>
+    <item name="Audio Editor" package="audioeditor.musiceditor.soundeditor.songeditor" drawable="audio_editor"/>
+    <item name="Bambu Handy" package="bbl.intl.bambulab.com" drawable="bambu_handy"/>
+    <item name="remove.bg" package="bg.remove.android" drawable="remove_bg"/>
+    <item name="MT Manager" package="bin.mt.plus" drawable="mt_manager"/>
+    <item name="MT Manager Canary" package="bin.mt.plus.canary" drawable="mt_manager_canary"/>
+    <item name="Niagara Launcher" package="bitpit.launcher" drawable="niagara_launcher"/>
+    <item name="PPIICC" package="bos.consoar.imagestitch" drawable="ppiicc"/>
+    <item name="Walmart" package="ca.walmart.ecommerceapp" drawable="walmart"/>
+    <item name="Forest" package="cc.forestapp" drawable="forest"/>
+    <item name="Lawnchair" package="ch.deletescape.lawnchair" drawable="lawnchair"/>
+    <item name="Lawnchair" package="ch.deletescape.lawnchair.ci" drawable="lawnchair"/>
+    <item name="Lawnchair" package="ch.deletescape.lawnchair.plah" drawable="lawnchair"/>
+    <item name="Proton Mail" package="ch.protonmail.android" drawable="proton_mail"/>
+    <item name="Aptoide" package="cm.aptoide.pt" drawable="aptoide"/>
+    <item name="招商银行 ~~ China Merchants Bank" package="cmb.pb" drawable="china_merchants_bank"/>
+    <item name="AirPortal" package="cn.airportal" drawable="airportal"/>
+    <item name="Shokz" package="cn.com.aftershokz.app" drawable="shokz"/>
+    <item name="北京一卡通 ~~ Beijing Card" package="cn.com.bmac.nfc" drawable="beijing_card"/>
+    <item name="学信网 ~~ CHSI" package="cn.com.chsi.chsiapp" drawable="chsi"/>
+    <item name="不背单词 ~~ LangEasy" package="cn.com.langeasy.LangEasyLexis" drawable="langeasy"/>
+    <item name="WiFi Moho" package="cn.com.ruijie.magicbox" drawable="wifi_moho"/>
+    <item name="ClassIn" package="cn.eeo.classin" drawable="classin"/>
+    <item name="e-CNY" package="cn.gov.pbc.dcep" drawable="e_cny"/>
+    <item name="个人所得税 ~~ Income Tax" package="cn.gov.tax.its" drawable="income_tax"/>
+    <item name="DictTango" package="cn.jimex.dict" drawable="dicttango"/>
+    <item name="KOOK" package="cn.kaiheila" drawable="kook"/>
+    <item name="Segway Mobility" package="cn.ninebot.ninebot" drawable="segway_mobility"/>
+    <item name="Icon Pack Creator" package="cn.ommiao.iconpackcreator" drawable="icon_pack_creator"/>
+    <item name="TickTick" package="cn.ticktick.task" drawable="ticktick"/>
+    <item name="Dev Tools" package="cn.trinea.android.developertools" drawable="dev_tools"/>
+    <item name="WPS Office" package="cn.wps.moffice_eng" drawable="wps_office"/>
+    <item name="AndPods" package="cn.xiaolongonly.andpodsop" drawable="andpods"/>
+    <item name="学习强国 ~~ Xuexi Qiangguo" package="cn.xuexi.android" drawable="xuexi_qiangguo"/>
+    <item name="Monzo" package="co.uk.getmondo" drawable="monzo"/>
+    <item name="Retro Music" package="code.name.monkey.retromusic" drawable="retro_music"/>
+    <item name="Soul Knight" package="com.ChillyRoom.DungeonShooter" drawable="soul_knight"/>
+    <item name="绝区零 ~~ Zenless Zone Zero" package="com.HoYoverse.Nap" drawable="zenless_zone_zero"/>
+    <item name="崩坏：星穹铁道 ~~ Honkai: Star Rail" package="com.HoYoverse.hkrpgoversea" drawable="honkai_star_rail"/>
+    <item name="崩坏：星穹铁道 ~~ Honkai: Star Rail" package="com.HoYoverse.hkrpgsamsung" drawable="honkai_star_rail"/>
+    <item name="2 Player games : the Challenge" package="com.JindoBlu.TwoPlayerGamesChallenge" drawable="_2_player_games_the_challenge"/>
+    <item name="Fall Guys" package="com.Mediatonic.FallGuys_client" drawable="fall_guys"/>
+    <item name="铁路12306 ~~ Railway 12306" package="com.MobileTicket" drawable="railway_12306"/>
+    <item name="一个木函 ~~ Wooden Letter" package="com.One.WoodenLetter" drawable="wooden_letter"/>
+    <item name="Phigros" package="com.PigeonGames.Phigros" drawable="phigros"/>
+    <item name="蔚蓝档案 ~~ Blue Archive" package="com.RoamingStar.BlueArchive" drawable="blue_archive"/>
+    <item name="蔚蓝档案 ~~ Blue Archive" package="com.RoamingStar.BlueArchive.bilibili" drawable="blue_archive"/>
+    <item name="Slack" package="com.Slack" drawable="slack"/>
+    <item name="UC Browser" package="com.UCMobile.intl" drawable="uc_browser"/>
+    <item name="ブルーアーカイブ ~~ Blue Archive" package="com.YostarJP.BlueArchive" drawable="blue_archive"/>
+    <item name="ViPER4Android FX" package="com.aam.viper4android" drawable="viper4android"/>
+    <item name="Anywhere" package="com.absinthe.anywhere_" drawable="anywhere"/>
+    <item name="LibChecker" package="com.absinthe.libchecker" drawable="libchecker"/>
+    <item name="OldRoll" package="com.accordion.analogcam" drawable="oldroll"/>
+    <item name="EX File Manager" package="com.ace.ex.file.manager" drawable="ex_file_manager"/>
+    <item name="Call of Duty" package="com.activision.callofduty.shooter" drawable="call_of_duty"/>
+    <item name="Call of Duty: Warzone" package="com.activision.callofduty.warzone" drawable="call_of_duty_warzone"/>
+    <item name="Simeji" package="com.adamrocker.android.input.simeji" drawable="simeji"/>
+    <item name="AdGuard" package="com.adguard.android" drawable="adguard"/>
+    <item name="Lightroom" package="com.adobe.lrmobile" drawable="lightroom"/>
+    <item name="Photoshop Express" package="com.adobe.psmobile" drawable="photoshop_express"/>
+    <item name="Adobe Acrobat Reader" package="com.adobe.reader" drawable="adobe_acrobat_reader"/>
+    <item name="Sketchbook" package="com.adsk.sketchbook" drawable="sketchbook"/>
+    <item name="TouchRetouch" package="com.advasoft.touchretouch" drawable="touchretouch"/>
+    <item name="SAI" package="com.aefyr.sai" drawable="sai"/>
+    <item name="Camera" package="com.agc.cam" drawable="generic_camera"/>
+    <item name="Camera" package="com.agc.gcam84" drawable="generic_camera"/>
+    <item name="Camera" package="com.agc.gcam88" drawable="generic_camera"/>
+    <item name="Camera" package="com.agc.gcam91" drawable="generic_camera"/>
+    <item name="Camera" package="com.agc.gcam92" drawable="generic_camera"/>
+    <item name="AGC ToolKit Pro" package="com.agc.toolKit" drawable="agc_toolkit_pro"/>
+    <item name="1Password" package="com.agilebits.onepassword" drawable="_1password"/>
+    <item name="Agoda" package="com.agoda.mobile.consumer" drawable="agoda"/>
+    <item name="AIMP" package="com.aimp.player" drawable="aimp"/>
+    <item name="Airbnb" package="com.airbnb.android" drawable="airbnb"/>
+    <item name="Hail" package="com.aistra.hail" drawable="hail"/>
+    <item name="QuickPic" package="com.alensw.PicFolder" drawable="quickpic"/>
+    <item name="AliExpress" package="com.alibaba.aliexpresshd" drawable="aliexpress"/>
+    <item name="DingTalk" package="com.alibaba.android.rimet" drawable="dingtalk"/>
+    <item name="Alibaba.com" package="com.alibaba.intl.android.apps.poseidon" drawable="alibaba_com"/>
+    <item name="阿里巴巴1688 ~~ Alibaba 1688" package="com.alibaba.wireless" drawable="alibaba_1688"/>
+    <item name="阿里云盘 ~~ AliyunDrive" package="com.alicloud.databox" drawable="aliyundrive"/>
+    <item name="通义 ~~ Tongyi" package="com.aliyun.tongyi" drawable="tongyi"/>
+    <item name="Aloha Browser" package="com.aloha.browser" drawable="aloha_browser"/>
+    <item name="File Manager Plus" package="com.alphainventor.filemanager" drawable="file_manager_plus"/>
+    <item name="AmazFaces" package="com.amazfitwatchfaces.st" drawable="amazfaces"/>
+    <item name="Amazon Prime Video" package="com.amazon.avod.thirdpartyclient" drawable="amazon_prime_video"/>
+    <item name="Amazon Kindle" package="com.amazon.kindle" drawable="amazon_kindle"/>
+    <item name="Amazon Shopping" package="com.amazon.mShop.android.shopping" drawable="amazon_shopping"/>
+    <item name="Fire TV" package="com.amazon.storm.lightning.client.aosp" drawable="fire_tv"/>
+    <item name="Terraria" package="com.and.games505.TerrariaPaid" drawable="terraria"/>
+    <item name="Camera" package="com.android.MGC" drawable="generic_camera"/>
+    <item name="Camera" package="com.android.MGC_8_6_263" drawable="generic_camera"/>
+    <item name="农行掌上银行 ~~ Agricultural Bank of China" package="com.android.bankabc" drawable="agricultural_bank_of_china"/>
+    <item name="FOSS Browser" package="com.android.browser" drawable="generic_browser"/>
+    <item name="Calculator" package="com.android.calculator2" drawable="generic_calculator_minus_multi_plus_equal"/>
+    <item name="Vsmart Calendar" package="com.android.calendar" drawable="vsmart_calendar"/>
+    <item name="Camera" package="com.android.camera" drawable="generic_camera"/>
+    <item name="Google Chrome" package="com.android.chrome" drawable="google_chrome"/>
+    <item name="Phone" package="com.android.contacts" drawable="generic_dialer"/>
+    <item name="TwelveKeyDialer" package="com.android.contacts.activities.TwelveKeyDialer" drawable="google_phone"/>
+    <item name="Clock" package="com.android.deskclock" drawable="generic_clock"/>
+    <item name="Phone" package="com.android.dialer" drawable="generic_dialer"/>
+    <item name="Email" package="com.android.email" drawable="generic_email"/>
+    <item name="HyperOS Files" package="com.android.fileexplorer" drawable="generic_files"/>
+    <item name="Gallery" package="com.android.gallery3d" drawable="generic_gallery"/>
+    <item name="GPSTest" package="com.android.gpstest.osmdroid" drawable="gpstest"/>
+    <item name="Huawei Mirror" package="com.android.hwmirror" drawable="huawei_mirror"/>
+    <item name="Phone" package="com.android.incallui" drawable="generic_dialer"/>
+    <item name="Huawei Music" package="com.android.mediacenter" drawable="huawei_music"/>
+    <item name="Messages" package="com.android.mms" drawable="messages"/>
+    <item name="Music" package="com.android.music" drawable="generic_player"/>
+    <item name="Downloads" package="com.android.providers.downloads.ui" drawable="generic_download_arrow"/>
+    <item name="Settings" package="com.android.settings" drawable="settings"/>
+    <item name="LSPosed" package="com.android.shell" drawable="lspatch_lsposed"/>
+    <item name="Recorder" package="com.android.soundrecorder" drawable="generic_voice_recorder_waves"/>
+    <item name="SIM Toolkit" package="com.android.stk" drawable="sim_toolkit"/>
+    <item name="蓝牙遥控 ~~ Bluetooth control" package="com.android.superli.btremote" drawable="bluetooth_control"/>
+    <item name="Themes" package="com.android.thememanager" drawable="themes"/>
+    <item name="Updater" package="com.android.updater" drawable="updater"/>
+    <item name="Google Play Store" package="com.android.vending" drawable="google_play_store"/>
+    <item name="Fate/Grand Order" package="com.aniplex.fategrandorder" drawable="fate_grand_order"/>
+    <item name="App Watcher" package="com.anod.appwatcher" drawable="notificationlog"/>
+    <item name="Claude by Anthropic" package="com.anthropic.claude" drawable="claude_by_anthropic"/>
+    <item name="AnTuTu Benchmark" package="com.antutu.ABenchMark" drawable="antutu_benchmark"/>
+    <item name="AnTuTu Benchmark" package="com.antutu.benchmark.full" drawable="antutu_benchmark"/>
+    <item name="APKPure" package="com.apkpure.aegon" drawable="apkpure"/>
+    <item name="Too Good To Go" package="com.app.tgtg" drawable="too_good_to_go"/>
+    <item name="可话 ~~ Nothing to say" package="com.app.tideswing" drawable="nothing_to_say"/>
+    <item name="Apple Music" package="com.apple.android.music" drawable="apple_music"/>
+    <item name="Apple TV" package="com.apple.atve.androidtv.appletv" drawable="apple_tv"/>
+    <item name="Beats" package="com.apple.bnd" drawable="beats"/>
+    <item name="Oxygen Updater" package="com.arjanvlek.oxygenupdater" drawable="oxygen_updater"/>
+    <item name="ASUS Router" package="com.asus.aihome" drawable="asus_router"/>
+    <item name="Aurora Store" package="com.aurora.store" drawable="aurora_store"/>
+    <item name="Twilio Authy Authenticator" package="com.authy.authy" drawable="twilio_authy_authenticator"/>
+    <item name="Simplenote" package="com.automattic.simplenote" drawable="simplenote"/>
+    <item name="高德地圖 ~~ Amap" package="com.autonavi.minimap" drawable="amap"/>
+    <item name="Nyx Music Player" package="com.awedea.nyx" drawable="nyx_music_player"/>
+    <item name="Standoff 2" package="com.axlebolt.standoff2" drawable="standoff_2"/>
+    <item name="Microsoft Authenticator" package="com.azure.authenticator" drawable="microsoft_authenticator"/>
+    <item name="Backdrops" package="com.backdrops.wallpapers" drawable="backdrops"/>
+    <item name="百度地图 ~~ Baidu Maps" package="com.baidu.BaiduMap" drawable="baidu_maps"/>
+    <item name="作业帮 ~~ Zuoyebang" package="com.baidu.homework" drawable="zuoyebang"/>
+    <item name="百度输入法 ~~ Baidu IME" package="com.baidu.input" drawable="baidu_ime"/>
+    <item name="百度网盘 ~~ Baidu Netdisk" package="com.baidu.netdisk" drawable="baidu_netdisk"/>
+    <item name="百度网盘 ~~ Baidu Netdisk" package="com.baidu.netdisk.samsung" drawable="baidu_netdisk"/>
+    <item name="百度贴吧 ~~ Baidu Tieba" package="com.baidu.tieba" drawable="baidu_tieba"/>
+    <item name="ArtStation" package="com.ballistiq.artstation" drawable="artstation"/>
+    <item name="Infinity Loop" package="com.balysv.loop" drawable="infinity_loop"/>
+    <item name="BandLab" package="com.bandlab.bandlab" drawable="bandlab"/>
+    <item name="北京银行 ~~ Bank of Beijing" package="com.bankofbeijing.mobilebanking" drawable="bank_of_beijing"/>
+    <item name="倍思 ~~ Baseus" package="com.baseus.intelligent" drawable="baseus"/>
+    <item name="Aegis Authenticator" package="com.beemdevelopment.aegis" drawable="aegis_authenticator"/>
+    <item name="Best Buy" package="com.bestbuy.android" drawable="best_buy"/>
+    <item name="AdBlock for Samsung Internet" package="com.betafish.adblocksbrowser" drawable="adblock"/>
+    <item name="Remini" package="com.bigwinepot.nwdn.international" drawable="remini"/>
+    <item name="BiliBili" package="com.bilibili.app.blue" drawable="bilibili"/>
+    <item name="BiliBili" package="com.bilibili.app.in" drawable="bilibili"/>
+    <item name="BiliBili" package="com.bilibili.bilibililive" drawable="bilibili"/>
+    <item name="BiliBili" package="com.bilibili.comic" drawable="bilibili"/>
+    <item name="命运-冠位指定 ~~ Fate/Grand Order" package="com.bilibili.fatego" drawable="fate_grand_order"/>
+    <item name="Bilt Rewards" package="com.biltrewards.bilt" drawable="bilt_rewards"/>
+    <item name="Binance" package="com.binance.dev" drawable="binance"/>
+    <item name="OwnDroid" package="com.bintianqi.owndroid" drawable="netguard"/>
+    <item name="Bitget" package="com.bitget.exchange" drawable="bitget"/>
+    <item name="Battle.net Authenticator" package="com.blizzard.bma" drawable="battle_net_authenticator"/>
+    <item name="Hearthstone" package="com.blizzard.wtcg.hearthstone" drawable="hearthstone"/>
+    <item name="Reverse: 1999" package="com.bluepoch.m.en.reverse1999" drawable="reverse_1999"/>
+    <item name="BMO Bank" package="com.bmo.mobile" drawable="bmo_bank"/>
+    <item name="Booking" package="com.booking" drawable="booking"/>
+    <item name="Bose" package="com.bose.bosemusic" drawable="bose"/>
+    <item name="Bose Connect" package="com.bose.monet" drawable="bose_connect"/>
+    <item name="Infinite Painter" package="com.brakefield.painter" drawable="infinite_painter"/>
+    <item name="Brave" package="com.brave.browser" drawable="brave"/>
+    <item name="Bybit" package="com.bybit.app" drawable="bybit"/>
+    <item name="爱玩机工具箱 ~~ Byyoung" package="com.byyoung.setting" drawable="byyoung"/>
+    <item name="菜鸟 ~~ Cainiao" package="com.cainiao.wireless" drawable="cainiao"/>
+    <item name="YouCut" package="com.camerasideas.trimmer" drawable="youcut"/>
+    <item name="Canva" package="com.canva.editor" drawable="canva"/>
+    <item name="Ice Box" package="com.catchingnow.icebox" drawable="ice_box"/>
+    <item name="Rethink" package="com.celzero.bravedns" drawable="rethink"/>
+    <item name="学习通 ~~ Chaoxing" package="com.chaoxing.mobile" drawable="chaoxing"/>
+    <item name="春秋航空 ~~ Spring Airlines" package="com.china3s.android" drawable="spring_airlines"/>
+    <item name="中国银行 ~~ Bank of China" package="com.chinamworld.bocmbci" drawable="bank_of_china"/>
+    <item name="中国建设银行 ~~ China Construction Bank" package="com.chinamworld.main" drawable="china_construction_bank"/>
+    <item name="铁路12306 ~~ Railway 12306" package="com.chinarailway.globalticketing" drawable="railway_12306"/>
+    <item name="OKOK" package="com.chipsea.btcontrol.en" drawable="okok"/>
+    <item name="Stardew Valley" package="com.chucklefish.stardewvalley" drawable="stardew_valley"/>
+    <item name="Webex Meeting" package="com.cisco.webex.meetings" drawable="webex"/>
+    <item name="1.1.1.1" package="com.cloudflare.onedotonedotonedotone" drawable="_1111"/>
+    <item name="iBetter" package="com.clover.ibetter" drawable="ibetter"/>
+    <item name="天翼云 ~~ ecloud" package="com.cn21.ecloud" drawable="ecloud"/>
+    <item name="Coinbase" package="com.coinbase.android" drawable="coinbase"/>
+    <item name="One Jotter" package="com.colanotes.android" drawable="one_jotter"/>
+    <item name="OPPO Clone Phone" package="com.coloros.backuprestore" drawable="clone_phone"/>
+    <item name="O Relax" package="com.coloros.relax" drawable="o_relax"/>
+    <item name="Recorder" package="com.coloros.soundrecorder" drawable="generic_voice_recorder_waves"/>
+    <item name="ColorOS Translate" package="com.coloros.translate" drawable="coloros_translate"/>
+    <item name="Videos" package="com.coloros.video" drawable="generic_player"/>
+    <item name="酷安 ~~ CoolAPK" package="com.coolapk.market" drawable="coolapk"/>
+    <item name="Best Buy" package="com.coppi.bestbuy" drawable="best_buy"/>
+    <item name="拷貝漫畫 ~~ Copy Manga" package="com.copymanga.app" drawable="_k"/>
+    <item name="Notion Calendar" package="com.cron.calendar" drawable="notion_calendar"/>
+    <item name="Package Name Viewer" package="com.csdroid.pkg" drawable="package_name_viewer"/>
+    <item name="汉口银行 ~~ Hankou Bank" package="com.csii.hkb" drawable="hankou_bank"/>
+    <item name="中国电信 ~~ China Telecom" package="com.ct.client" drawable="china_telecom"/>
+    <item name="Cx File Explorer" package="com.cxinventor.file.explorer" drawable="cx_file_explorer"/>
+    <item name="Brightspace Pulse" package="com.d2l.brightspace.student.android" drawable="brightspace_pulse"/>
+    <item name="DeepL" package="com.deepl.mobiletranslator" drawable="deepl"/>
+    <item name="DeepSeek" package="com.deepseek.chat" drawable="deepseek"/>
+    <item name="Desmos" package="com.desmos.calculator" drawable="desmos"/>
+    <item name="Feedly" package="com.devhd.feedly" drawable="feedly"/>
+    <item name="CookieRun" package="com.devsisters.ck" drawable="cookierun"/>
+    <item name="大众点评 ~~ Dianping" package="com.dianping.v1" drawable="dianping"/>
+    <item name="嘀嗒出行 ~~ Dida Taxi" package="com.didapinche.booking" drawable="dida_taxi"/>
+    <item name="GIF Helper" package="com.didikee.gifparser" drawable="gif_helper"/>
+    <item name="AccuBattery" package="com.digibites.accubattery" drawable="accubattery"/>
+    <item name="Discogs" package="com.discogs.app" drawable="discogs"/>
+    <item name="Discord" package="com.discord" drawable="discord"/>
+    <item name="Disney+" package="com.disney.disneyplus" drawable="disney_plus"/>
+    <item name="DJI Ronin" package="com.dji.ronin" drawable="dji"/>
+    <item name="豆瓣 ~~ Douban" package="com.douban.frodo" drawable="douban"/>
+    <item name="番茄免费小说 ~~ Dragon Read" package="com.dragon.read" drawable="dragon_read"/>
+    <item name="Pure Writer" package="com.drakeet.purewriter" drawable="pure_writer"/>
+    <item name="Dropbox" package="com.dropbox.android" drawable="dropbox"/>
+    <item name="DraStic" package="com.dsemu.drastic" drawable="drastic"/>
+    <item name="TeraBox" package="com.dubox.drive" drawable="terabox"/>
+    <item name="DuckDuckGo" package="com.duckduckgo.mobile.android" drawable="duckduckgo"/>
+    <item name="Mi Remote" package="com.duokan.phone.remotecontroller" drawable="mi_remote"/>
+    <item name="多看阅读 ~~ Duokan" package="com.duokan.reader" drawable="duokan"/>
+    <item name="Duolingo" package="com.duolingo" drawable="duolingo"/>
+    <item name="Duo" package="com.duosecurity.duomobile" drawable="duo"/>
+    <item name="Advanced Download Manager (ADM)" package="com.dv.adm" drawable="advanced_download_manager_adm"/>
+    <item name="Plants vs Zombies 2" package="com.ea.game.pvz2_row" drawable="plants_vs_zombies_2"/>
+    <item name="Plants vs. Zombies" package="com.ea.game.pvzfree_row" drawable="plants_vs_zombies"/>
+    <item name="悠遊付 ~~ Easy Wallet" package="com.easycard.wallet" drawable="easy_wallet"/>
+    <item name="eBay" package="com.ebay.mobile" drawable="ebay"/>
+    <item name="Ecovacs Home" package="com.eco.global.app" drawable="ecovacs_home"/>
+    <item name="Alipay" package="com.eg.android.AlipayGphone" drawable="alipay"/>
+    <item name="Temu" package="com.einnovation.temu" drawable="temu"/>
+    <item name="Enya Music" package="com.enya.enyamusic" drawable="enya_music"/>
+    <item name="Epic Games" package="com.epicgames.portal" drawable="epic_games"/>
+    <item name="Epson Smart Panel" package="com.epson.epsonsmart" drawable="epson_smart_panel"/>
+    <item name="ES File Explorer" package="com.estrongs.android.pop" drawable="es_file_explorer"/>
+    <item name="Notepad" package="com.example.android.notepad" drawable="generic_notes"/>
+    <item name="中国移动浙江 ~~ China Mobile Zhejiang" package="com.example.businesshall" drawable="china_mobile"/>
+    <item name="NES.emu" package="com.explusalpha.NesEmu" drawable="nes_emu"/>
+    <item name="APK Extractor" package="com.ext.ui" drawable="apk_extractor"/>
+    <item name="USB Audio Player" package="com.extreamsd.usbaudioplayerpro" drawable="usb_audio_player"/>
+    <item name="Facebook" package="com.facebook.katana" drawable="facebook"/>
+    <item name="Messenger" package="com.facebook.orca" drawable="messenger"/>
+    <item name="清浊 ~~ Qingzhuo" package="com.farplace.qingzhuo" drawable="qingzhuo"/>
+    <item name="My Boy!" package="com.fastemulator.gba" drawable="my_boy"/>
+    <item name="Fastmail" package="com.fastmail.app" drawable="fastmail"/>
+    <item name="Lithium" package="com.faultexception.reader" drawable="lithium"/>
+    <item name="粉笔 ~~ Fenbi" package="com.fenbi.android.servant" drawable="fenbi"/>
+    <item name="小猿搜题 ~~ Small Monkey Search" package="com.fenbi.android.solar" drawable="small_monkey_search"/>
+    <item name="Figma" package="com.figma.mirror" drawable="figma"/>
+    <item name="FiiO Control" package="com.fiio.control" drawable="fiio_control"/>
+    <item name="AIDA64" package="com.finalwire.aida64" drawable="aida64"/>
+    <item name="500px" package="com.fivehundredpx.viewer" drawable="_500px"/>
+    <item name="Flightradar24" package="com.flightradar24free" drawable="flightradar24"/>
+    <item name="Moon+ Reader Pro" package="com.flyersoft.moonreaderp" drawable="moon_plus_reader_pro"/>
+    <item name="Librera PRO" package="com.foobnix.pro.pdf.reader" drawable="librera_pro"/>
+    <item name="fooView" package="com.fooview.android.fooview" drawable="fooview"/>
+    <item name="Foxit" package="com.foxit.mobile.pdf.lite" drawable="foxit"/>
+    <item name="K-9 Mail" package="com.fsck.k9" drawable="k_9_mail"/>
+    <item name="F-Stop Gallery" package="com.fstop.photo" drawable="f_stop_gallery"/>
+    <item name="FUJIFILM XApp" package="com.fujifilm.xapp" drawable="fujifilm_xapp"/>
+    <item name="3DMark" package="com.futuremark.dmandroid.application" drawable="_3dmark"/>
+    <item name="爱加速 ~~ Aijiasu" package="com.fvcorp.android.aijiasuclient" drawable="aijiasu"/>
+    <item name="勝利女神：妮姬 ~~ GODDESS OF VICTORY: NIKKE" package="com.gamamobi.nikke" drawable="goddess_of_victory_nikke"/>
+    <item name="Asphalt Legends Unite" package="com.gameloft.android.ANMP.GloftA9HM" drawable="asphalt_legends_unite"/>
+    <item name="Asphalt Legends Unite" package="com.gameloft.android.HUAW.GloftA9HW.HUAWEI" drawable="asphalt_legends_unite"/>
+    <item name="Xbox Game Pass" package="com.gamepass" drawable="xbox_game_pass"/>
+    <item name="Xbox Game Pass Beta" package="com.gamepass.beta" drawable="xbox_game_pass_beta"/>
+    <item name="Garmin Connect" package="com.garmin.android.apps.connectmobile" drawable="garmin_connect"/>
+    <item name="Connect IQ" package="com.garmin.connectiq" drawable="connect_iq"/>
+    <item name="Surfboard" package="com.getsurfboard" drawable="surfboard"/>
+    <item name="GIF Maker - GIF editor" package="com.gif.gifmaker" drawable="gif_maker_gif_editor"/>
+    <item name="GitHub" package="com.github.android" drawable="github"/>
+    <item name="Kernel Flasher" package="com.github.capntrips.kernelflasher" drawable="kernel_flasher"/>
+    <item name="TTS Server" package="com.github.jing332.tts_server_android" drawable="tts_server"/>
+    <item name="Clash for Android" package="com.github.kr328.clash" drawable="clash_for_android"/>
+    <item name="Clash for Android" package="com.github.kr328.clash.foss" drawable="clash_for_android"/>
+    <item name="LibreTube" package="com.github.libretube" drawable="libretube"/>
+    <item name="Clash Meta" package="com.github.metacubex.clash.meta" drawable="clash_meta"/>
+    <item name="DuckStation" package="com.github.stenzek.duckstation" drawable="duckstation"/>
+    <item name="CPU Monitor" package="com.glgjing.stark" drawable="cpu_monitor"/>
+    <item name="Google Camera" package="com.google.android.GoogleCamera" drawable="generic_camera"/>
+    <item name="Camera" package="com.google.android.GoogleCameraEng" drawable="generic_camera"/>
+    <item name="Camera" package="com.google.android.GoogleCameraGood" drawable="generic_camera"/>
+    <item name="Camera" package="com.google.android.GoogleCameraLMC" drawable="generic_camera"/>
+    <item name="Google Find Hub" package="com.google.android.apps.adm" drawable="google_find_hub"/>
+    <item name="Google Authenticator" package="com.google.android.apps.authenticator2" drawable="google_authenticator"/>
+    <item name="Google Gemini" package="com.google.android.apps.bard" drawable="google_gemini"/>
+    <item name="Blogger" package="com.google.android.apps.blogger" drawable="blogger"/>
+    <item name="Google Play Books" package="com.google.android.apps.books" drawable="google_play_books"/>
+    <item name="Google Home" package="com.google.android.apps.chromecast.app" drawable="google_home"/>
+    <item name="Google Classroom" package="com.google.android.apps.classroom" drawable="google_classroom"/>
+    <item name="Google Arts &amp; Culture" package="com.google.android.apps.cultural" drawable="google_arts_and_culture"/>
+    <item name="Google Drive" package="com.google.android.apps.docs" drawable="google_drive"/>
+    <item name="Google Docs" package="com.google.android.apps.docs.editors.docs" drawable="google_docs"/>
+    <item name="Google Sheets" package="com.google.android.apps.docs.editors.sheets" drawable="google_sheets"/>
+    <item name="Google Slides" package="com.google.android.apps.docs.editors.slides" drawable="google_slides"/>
+    <item name="Google Fit" package="com.google.android.apps.fitness" drawable="google_fit"/>
+    <item name="Google Assistant" package="com.google.android.apps.googleassistant" drawable="google_assistant"/>
+    <item name="Google Voice" package="com.google.android.apps.googlevoice" drawable="google_voice"/>
+    <item name="Google News" package="com.google.android.apps.magazines" drawable="google_news"/>
+    <item name="Google Maps" package="com.google.android.apps.maps" drawable="maps"/>
+    <item name="Google Meet" package="com.google.android.apps.meetings" drawable="google_meet"/>
+    <item name="Google Messages" package="com.google.android.apps.messaging" drawable="google_messages"/>
+    <item name="Files by Google" package="com.google.android.apps.nbu.files" drawable="files_by_google"/>
+    <item name="Google Pay" package="com.google.android.apps.nbu.paisa.user" drawable="google_pay"/>
+    <item name="Google Photos" package="com.google.android.apps.photos" drawable="google_photos"/>
+    <item name="PhotoScan" package="com.google.android.apps.photos.scanner" drawable="photoscan"/>
+    <item name="Google Gallery" package="com.google.android.apps.photosgo" drawable="google_gallery"/>
+    <item name="Google Podcasts" package="com.google.android.apps.podcasts" drawable="google_podcasts"/>
+    <item name="Recorder" package="com.google.android.apps.recorder" drawable="generic_voice_recorder_waves"/>
+    <item name="Google Go" package="com.google.android.apps.searchlite" drawable="google"/>
+    <item name="Google One" package="com.google.android.apps.subscriptions.red" drawable="google_one"/>
+    <item name="Google Meet" package="com.google.android.apps.tachyon" drawable="google_meet"/>
+    <item name="Google Tasks" package="com.google.android.apps.tasks" drawable="google_tasks"/>
+    <item name="Google Translate" package="com.google.android.apps.translate" drawable="google_translate"/>
+    <item name="Google Fi" package="com.google.android.apps.tycho" drawable="google_fi"/>
+    <item name="Google Wallet" package="com.google.android.apps.walletnfcrel" drawable="google_wallet"/>
+    <item name="Google Wallpapers" package="com.google.android.apps.wallpaper" drawable="google_wallpapers"/>
+    <item name="Digital Wellbeing" package="com.google.android.apps.wellbeing" drawable="digital_wellbeing"/>
+    <item name="YouTube Music" package="com.google.android.apps.youtube.music" drawable="youtube_music"/>
+    <item name="Calculator" package="com.google.android.calculator" drawable="generic_calculator_minus_multi_plus_equal"/>
+    <item name="Calendar" package="com.google.android.calendar" drawable="themed_icon_calendar_31"/>
+    <item name="Clock" package="com.google.android.deskclock" drawable="generic_clock"/>
+    <item name="Google Phone" package="com.google.android.dialer" drawable="google_phone"/>
+    <item name="Files" package="com.google.android.documentsui" drawable="generic_files"/>
+    <item name="Gmail" package="com.google.android.gm" drawable="gmail"/>
+    <item name="Google Gemini" package="com.google.android.googlequicksearchbox" drawable="google_gemini"/>
+    <item name="Gboard" package="com.google.android.inputmethod.latin" drawable="gboard"/>
+    <item name="Google Keep" package="com.google.android.keep" drawable="google_keep"/>
+    <item name="YouTube Music" package="com.google.android.music" drawable="youtube_music"/>
+    <item name="Google Play Games" package="com.google.android.play.games" drawable="google_play_games"/>
+    <item name="Android Auto" package="com.google.android.projection.gearhead" drawable="android_auto"/>
+    <item name="Android TV Remote Service" package="com.google.android.tv.remote" drawable="android_tv_remote_service"/>
+    <item name="Google TV" package="com.google.android.videos" drawable="google_tv"/>
+    <item name="Wear OS" package="com.google.android.wearable.app" drawable="wear_os"/>
+    <item name="Wear OS" package="com.google.android.wearable.app.cn" drawable="wear_os"/>
+    <item name="YouTube" package="com.google.android.youtube" drawable="youtube"/>
+    <item name="Google Lens" package="com.google.ar.lens" drawable="google_lens"/>
+    <item name="Sound Notifications" package="com.google.audio.hearing.visualization.accessibility.scribe" drawable="sound_notifications"/>
+    <item name="Google Earth" package="com.google.earth" drawable="google_earth"/>
+    <item name="Grab" package="com.grabtaxi.passenger" drawable="grab"/>
+    <item name="CARROT" package="com.grailr.carrotweather" drawable="carrot"/>
+    <item name="中国移动 ~~ China Mobile" package="com.greenpoint.android.mc10086.activity" drawable="china_mobile"/>
+    <item name="GSpace" package="com.gspace.android" drawable="manage_apps_shortcut"/>
+    <item name="DWG FastView" package="com.gstarmc.android" drawable="dwg_fastview"/>
+    <item name="国泰君安君弘 ~~ Guotai Junan" package="com.guotai.dazhihui" drawable="guotai_junan"/>
+    <item name="PiliPala" package="com.guozhigq.pilipala" drawable="pilipala"/>
+    <item name="Fruit Ninja Classic" package="com.halfbrick.fruitninja" drawable="fruit_ninja"/>
+    <item name="Fruit Ninja" package="com.halfbrick.fruitninjafree" drawable="fruit_ninja"/>
+    <item name="WiFi Master" package="com.halo.wifikey.wifilocating" drawable="wifi_master"/>
+    <item name="HappyMod" package="com.happymod.apk" drawable="happymod"/>
+    <item name="JBL Portable" package="com.harman.ble.jbllink" drawable="jbl_portable"/>
+    <item name="Share" package="com.hengye.share" drawable="share"/>
+    <item name="初音未来：缤纷舞台 ~~ HATSUNE MIKU: COLORFUL STAGE!" package="com.hermes.mk" drawable="hatsune_miku_colorful_stage"/>
+    <item name="初音未来：缤纷舞台 ~~ HATSUNE MIKU: COLORFUL STAGE!" package="com.hermes.mk.bilibili" drawable="hatsune_miku_colorful_stage"/>
+    <item name="Internet Browser" package="com.heytap.browser" drawable="internet_browser"/>
+    <item name="HeyMelody" package="com.heytap.headset" drawable="heymelody"/>
+    <item name="健康 ~~ OHealth" package="com.heytap.health" drawable="ohealth"/>
+    <item name="Smart Home" package="com.heytap.smarthome" drawable="smart_home"/>
+    <item name="My OnePlus" package="com.heytap.vip" drawable="my_oneplus"/>
+    <item name="Hiby Music" package="com.hiby.music" drawable="hiby_music"/>
+    <item name="Phone Clone" package="com.hicloud.android.clone" drawable="phone_clone"/>
+    <item name="Device Clone" package="com.hihonor.android.clone" drawable="device_clone"/>
+    <item name="Honor Themes" package="com.hihonor.android.thememanager" drawable="huawei_themes"/>
+    <item name="Honor Weather" package="com.hihonor.android.totemweather" drawable="kde_weather"/>
+    <item name="Honor App Market" package="com.hihonor.appmarket" drawable="huawei_appgallery"/>
+    <item name="Honor Calculator" package="com.hihonor.calculator" drawable="generic_calculator_plus_minus_multi_equal"/>
+    <item name="Calendar" package="com.hihonor.calendar" drawable="calendar"/>
+    <item name="Camera" package="com.hihonor.camera" drawable="generic_camera"/>
+    <item name="NetEase Music" package="com.hihonor.cloudmusic" drawable="netease_music"/>
+    <item name="Honor Compass" package="com.hihonor.compass" drawable="compass"/>
+    <item name="Honor Contacts" package="com.hihonor.contacts" drawable="generic_contacts"/>
+    <item name="Clock" package="com.hihonor.deskclock" drawable="generic_clock"/>
+    <item name="Honor Email" package="com.hihonor.email" drawable="honor_email"/>
+    <item name="Honor Game Center" package="com.hihonor.gamecenter" drawable="xiaomi_game_center"/>
+    <item name="HONOR Health" package="com.hihonor.health" drawable="honor_health"/>
+    <item name="Honor AI Space" package="com.hihonor.magichome" drawable="honor_ai_space"/>
+    <item name="Honor Mirror" package="com.hihonor.mirror" drawable="huawei_mirror"/>
+    <item name="Honor Notes" package="com.hihonor.notepad" drawable="generic_notes"/>
+    <item name="My HONOR" package="com.hihonor.phoneservice" drawable="my_honor"/>
+    <item name="Honor Gallery" package="com.hihonor.photos" drawable="generic_gallery"/>
+    <item name="Honor Recorder" package="com.hihonor.soundrecorder" drawable="generic_voice_recorder_waves"/>
+    <item name="System Manager" package="com.hihonor.systemmanager" drawable="system_manager"/>
+    <item name="Honor Tips" package="com.hihonor.tips" drawable="huawei_tips"/>
+    <item name="Hishoot2i" package="com.hishoot2i" drawable="hishoot2i"/>
+    <item name="HP Print Service" package="com.hp.android.printservice" drawable="hp_print_service"/>
+    <item name="HP Smart" package="com.hp.printercontrol" drawable="generic_printer"/>
+    <item name="华住会 ~~ Huazhuhui" package="com.htinns" drawable="huazhuhui"/>
+    <item name="Zepp" package="com.huami.watch.hmwatchmanager" drawable="zepp"/>
+    <item name="贴吧 Lite ~~ Tieba Lite" package="com.huanchengfly.tieba.post" drawable="tieba_lite"/>
+    <item name="Huawei FM Radio" package="com.huawei.android.FMRadio" drawable="huawei_fm_radio"/>
+    <item name="Huawei Find Device" package="com.huawei.android.findmyphone" drawable="vernet"/>
+    <item name="Huawei Themes" package="com.huawei.android.thememanager" drawable="huawei_themes"/>
+    <item name="Huawei Tips" package="com.huawei.android.tips" drawable="huawei_tips"/>
+    <item name="Huawei Weather" package="com.huawei.android.totemweather" drawable="huawei_weather"/>
+    <item name="Huawei Weather" package="com.huawei.android.totemweatherapp" drawable="huawei_weather"/>
+    <item name="Huawei AppGallery" package="com.huawei.appmarket" drawable="huawei_appgallery"/>
+    <item name="Huawei Browser" package="com.huawei.browser" drawable="huawei_browser"/>
+    <item name="Calculator" package="com.huawei.calculator" drawable="generic_calculator_minus_multi_plus_equal"/>
+    <item name="Calendar" package="com.huawei.calendar" drawable="themed_icon_calendar_31"/>
+    <item name="Camera" package="com.huawei.camera" drawable="generic_camera"/>
+    <item name="Huawei Compass" package="com.huawei.compass" drawable="compass"/>
+    <item name="Huawei Contacts" package="com.huawei.contacts" drawable="generic_contacts"/>
+    <item name="Huawei Clock" package="com.huawei.deskclock" drawable="generic_clock"/>
+    <item name="Huawei Email" package="com.huawei.email" drawable="yandex_mail"/>
+    <item name="Huawei Files" package="com.huawei.filemanager" drawable="huawei_files"/>
+    <item name="Huawei AppAssistant" package="com.huawei.gameassistant" drawable="huawei_appassistant"/>
+    <item name="Huawei GameCenter" package="com.huawei.gamebox" drawable="huawei_gamecenter"/>
+    <item name="Huawei Petal Speed" package="com.huawei.genexcloud.speedtest" drawable="huawei_petal_speed"/>
+    <item name="Huawei Health" package="com.huawei.health" drawable="huawei_health"/>
+    <item name="Files" package="com.huawei.hidisk" drawable="generic_files"/>
+    <item name="Huawei Video" package="com.huawei.himovie.overseas" drawable="huawei_video"/>
+    <item name="Huawei Books" package="com.huawei.hwread.dz" drawable="huawei_books"/>
+    <item name="Petal Maps" package="com.huawei.maps.app" drawable="petal_maps"/>
+    <item name="Huawei MeeTime" package="com.huawei.meetime" drawable="huawei_meetime"/>
+    <item name="Huawei Mirror" package="com.huawei.mirror" drawable="huawei_mirror"/>
+    <item name="Huawei Music" package="com.huawei.music" drawable="huawei_music"/>
+    <item name="Huawei Music Player" package="com.huawei.music.local" drawable="apple_music"/>
+    <item name="Huawei Member Center" package="com.huawei.mycenter" drawable="huawei_member_center"/>
+    <item name="Huawei Notepad" package="com.huawei.notepad" drawable="huawei_notepad"/>
+    <item name="Huawei Celia Keyboard" package="com.huawei.ohos.inputmethod" drawable="huawei_celia_keyboard"/>
+    <item name="My Huawei" package="com.huawei.phoneservice" drawable="my_huawei"/>
+    <item name="Gallery" package="com.huawei.photos" drawable="generic_gallery"/>
+    <item name="Huawei AI Life" package="com.huawei.smarthome" drawable="huawei_ai_life"/>
+    <item name="Huawei Sound Recorder" package="com.huawei.soundrecorder" drawable="generic_voice_recorder_waves"/>
+    <item name="Huawei Optimizer" package="com.huawei.systemmanager" drawable="huawei_optimizer"/>
+    <item name="Huawei Tips" package="com.huawei.tipsove" drawable="huawei_tips"/>
+    <item name="Huawei AI Voice" package="com.huawei.vassistant" drawable="huawei_ai_voice"/>
+    <item name="Huawei Wallet" package="com.huawei.wallet" drawable="huawei_wallet"/>
+    <item name="Slay the Spire" package="com.humble.SlayTheSpire" drawable="slay_the_spire"/>
+    <item name="明日方舟 ~~ Arknights" package="com.hypergryph.arknights" drawable="arknights"/>
+    <item name="明日方舟 ~~ Arknights" package="com.hypergryph.arknights.bilibili" drawable="arknights"/>
+    <item name="ICBC" package="com.icbc" drawable="icbc"/>
+    <item name="AnkiDroid" package="com.ichi2.anki" drawable="ankidroid"/>
+    <item name="CheckFirm" package="com.illusion.checkfirm" drawable="checkfirm"/>
+    <item name="Temple Run" package="com.imangi.templerun" drawable="temple_run"/>
+    <item name="Temple Run 2" package="com.imangi.templerun2" drawable="temple_run_2"/>
+    <item name="IMDb" package="com.imdb.mobile" drawable="imdb"/>
+    <item name="Zara" package="com.inditex.zara" drawable="zara"/>
+    <item name="Among Us" package="com.innersloth.spacemafia" drawable="among_us"/>
+    <item name="Instagram" package="com.instagram.android" drawable="instagram"/>
+    <item name="Threads" package="com.instagram.barcelona" drawable="threads"/>
+    <item name="Instapaper" package="com.instapaper.android" drawable="instapaper"/>
+    <item name="CamScanner" package="com.intsig.camscanner" drawable="camscanner"/>
+    <item name="iQIYI" package="com.iqiyi.i18n" drawable="iqiyi"/>
+    <item name="Photo Editor" package="com.iudesk.android.photo.editor" drawable="photo_editor"/>
+    <item name="Jabra Sound+" package="com.jabra.moments" drawable="jabra_sound_plus"/>
+    <item name="Styx Browser" package="com.jamal2367.styx" drawable="internet_browser"/>
+    <item name="dynamicSpot" package="com.jamworks.dynamicspot" drawable="dynamicspot"/>
+    <item name="Flat Equalizer" package="com.jazibkhan.equalizer" drawable="flat_equalizer"/>
+    <item name="AdGuard Home Manager" package="com.jgeek00.adguard_home_manager" drawable="adguard_home_manager"/>
+    <item name="JMComic2" package="com.jiaohua_browser" drawable="jmcomic2"/>
+    <item name="到梦空间 ~~ Dream" package="com.jingcai.apps.qualitydev" drawable="dream"/>
+    <item name="京东 ~~ JD" package="com.jingdong.app.mall" drawable="jd"/>
+    <item name="哈啰 ~~ Hello" package="com.jingyao.easybike" drawable="hello"/>
+    <item name="JioSaavn" package="com.jio.media.jiobeats" drawable="jiosaavn"/>
+    <item name="Seal" package="com.junkfood.seal" drawable="seal"/>
+    <item name="三星网上商城 ~~ Samsung Online Mall" package="com.jv.samsungeshop" drawable="galaxy_store"/>
+    <item name="Kaadas Smart" package="com.kaidishi.lock" drawable="kaadas_smart"/>
+    <item name="KakaoTalk" package="com.kakao.talk" drawable="kakaotalk"/>
+    <item name="Titanium Backup" package="com.keramidas.TitaniumBackup" drawable="titanium_backup"/>
+    <item name="KFC" package="com.kfcaus.ordering" drawable="kfc"/>
+    <item name="Subway Surfers" package="com.kiloo.subwaysurf" drawable="subway_surfers"/>
+    <item name="Screen Recorder" package="com.kimcy929.screenrecorder" drawable="kimcy_screen_recorder"/>
+    <item name="喜鹊儿 ~~ Xiqueer" package="com.kingosoft.activity_kb_common" drawable="xiqueer"/>
+    <item name="WPS Office" package="com.kingsoft.moffice_pro" drawable="wps_office"/>
+    <item name="Kiwi Browser" package="com.kiwibrowser.browser" drawable="kiwi_browser"/>
+    <item name="Klook" package="com.klook" drawable="klook"/>
+    <item name="KMPlayer" package="com.kmplayer" drawable="kmplayer"/>
+    <item name="KMPlayer Plus" package="com.kmplayer.d" drawable="kmplayer"/>
+    <item name="BlackPlayer EX" package="com.kodarkooperativet.blackplayerex" drawable="blackplayer"/>
+    <item name="遥控专家酷控 ~~ Kookong Smart Remote Control" package="com.kookong.app" drawable="kookong_smart_remote_control"/>
+    <item name="メルカリ ~~ Mercari" package="com.kouzoh.mercari" drawable="mercari_japan"/>
+    <item name="快对 ~~ Get it right" package="com.kuaiduizuoye.scan" drawable="get_it_right"/>
+    <item name="Kuaishou" package="com.kuaishou.nebula" drawable="kwai"/>
+    <item name="KeePassDX" package="com.kunzisoft.keepass.free" drawable="keepassdx"/>
+    <item name="鸣潮 ~~ Wuthering Waves" package="com.kurogame.mingchao" drawable="wuthering_waves"/>
+    <item name="鸣潮 ~~ Wuthering Waves" package="com.kurogame.mingchao.bilibili" drawable="wuthering_waves"/>
+    <item name="Wuthering Waves" package="com.kurogame.wutheringwaves.global" drawable="wuthering_waves"/>
+    <item name="倒带 ~~ Rewind" package="com.kuss.rewind" drawable="rewind"/>
+    <item name="Trail Sense" package="com.kylecorry.trail_sense.dev" drawable="trail_sense"/>
+    <item name="Lark" package="com.larksuite.suite" drawable="lark"/>
+    <item name="剪映 ~~ CapCut" package="com.lemon.lv" drawable="capcut"/>
+    <item name="CapCut" package="com.lemon.lvoverseas" drawable="capcut"/>
+    <item name="Fake Location" package="com.lerist.fakelocation" drawable="fake_location"/>
+    <item name="王者荣耀 ~~ Honor of Kings" package="com.levelinfinite.sgameGlobal" drawable="honor_of_kings"/>
+    <item name="王者荣耀 ~~ Honor of Kings" package="com.levelinfinite.sgameGlobal.midaspay" drawable="honor_of_kings"/>
+    <item name="Moonlight" package="com.limelight" drawable="moonlight"/>
+    <item name="岭南通 ~~ Lingnan Pass" package="com.lingnanpass" drawable="lingnan_pass"/>
+    <item name="Telebox" package="com.linkbox.plus.android" drawable="telebox"/>
+    <item name="LinkedIn" package="com.linkedin.android" drawable="linkedin"/>
+    <item name="Sam Helper" package="com.litebyte.samhelper" drawable="sam_helper"/>
+    <item name="Device Info LiuZho" package="com.liuzh.deviceinfo" drawable="device_info_liuzho"/>
+    <item name="LOFTER" package="com.lofter.android" drawable="lofter"/>
+    <item name="X-plore" package="com.lonelycatgames.Xplore" drawable="x_plore"/>
+    <item name="Droid-ify" package="com.looker.droidify" drawable="droid_ify"/>
+    <item name="BiliYou" package="com.lucinhu.bili_you" drawable="biliyou"/>
+    <item name="瑞幸咖啡 ~~ Luckin Coffee" package="com.lucky.luckyclient" drawable="luckin_coffe"/>
+    <item name="3D Scanner for ARCore" package="com.lvonasek.arcore3dscanner" drawable="_3d_scanner_for_arcore"/>
+    <item name="奇妙 ~~ Wonderful" package="com.magicalstory.AppStore" drawable="wonderful"/>
+    <item name="Magical Search" package="com.magicalstory.search" drawable="magical_search"/>
+    <item name="神奇磁力 ~~ Magic Magnet" package="com.magicmagnet" drawable="magic_magnet"/>
+    <item name="公考雷达 ~~ Gongkao Leida" package="com.maidu.gkld" drawable="gongkao_leida"/>
+    <item name="Files" package="com.marc.files" drawable="generic_files"/>
+    <item name="Marriott Bonvoy" package="com.marriott.mrt" drawable="marriott_bonvoy"/>
+    <item name="小黑盒 ~~ Xiaoheihe" package="com.max.xiaoheihe" drawable="xiaoheihe"/>
+    <item name="Poweramp Music Player" package="com.maxmpz.audioplayer" drawable="generic_player"/>
+    <item name="Poweramp Equalizer" package="com.maxmpz.equalizer" drawable="poweramp_equalizer"/>
+    <item name="Emby" package="com.mb.android" drawable="emby"/>
+    <item name="MyMacca's" package="com.mcdonalds.au.gma" drawable="mcdonalds"/>
+    <item name="McDonald's" package="com.mcdonalds.gma.cn" drawable="mcdonalds"/>
+    <item name="McDonald's" package="com.mcdonalds.mobileapp" drawable="mcdonalds"/>
+    <item name="GIF Maker-Editor" package="com.media.zatashima.studio" drawable="gif_maker_editor"/>
+    <item name="Medisafe" package="com.medisafe.android.client" drawable="medisafe"/>
+    <item name="BeautyCam" package="com.meitu.meiyancamera" drawable="beautycam"/>
+    <item name="Wink — Video Enhancing" package="com.meitu.wink" drawable="wink_video_enhancing"/>
+    <item name="Weather" package="com.meizu.flyme.weather" drawable="coloros_weather"/>
+    <item name="Meizu Music" package="com.meizu.media.music" drawable="meizu_music"/>
+    <item name="Meizu App Store" package="com.meizu.mstore" drawable="realme_store"/>
+    <item name="meross" package="com.meross.meross" drawable="meross"/>
+    <item name="123云盘 ~~ 123 Cloud Drive" package="com.mfcloudcalculate.networkdisk" drawable="_123_cloud_drive"/>
+    <item name="HyperOS File Manager" package="com.mi.android.globalFileexplorer" drawable="hyperos_file_manager"/>
+    <item name="Xiaomi Earbuds" package="com.mi.earphone" drawable="xiaomi_earbuds"/>
+    <item name="Mi Health" package="com.mi.health" drawable="mi_health"/>
+    <item name="Genshin Impact" package="com.miHoYo.GI.samsung" drawable="genshin_impact"/>
+    <item name="Genshin Impact" package="com.miHoYo.GenshinImpact" drawable="genshin_impact"/>
+    <item name="绝区零 ~~ Zenless Zone Zero" package="com.miHoYo.Nap" drawable="zenless_zone_zero"/>
+    <item name="绝区零 ~~ Zenless Zone Zero" package="com.miHoYo.Nap.bilibili" drawable="zenless_zone_zero"/>
+    <item name="Genshin Impact" package="com.miHoYo.Yuanshen" drawable="genshin_impact"/>
+    <item name="崩坏3 ~~ Honkai Impact 3rd" package="com.miHoYo.bh3.bilibili" drawable="honkai_impact_3"/>
+    <item name="崩壞3rd ~~ Honkai Impact 3rd" package="com.miHoYo.bh3tw" drawable="honkai_impact_3"/>
+    <item name="云·星穹铁道 ~~ Honkai: Star Rail · Cloud" package="com.miHoYo.cloudgames.hkrpg" drawable="honkai_star_rail_cloud"/>
+    <item name="Genshin Impact · Cloud" package="com.miHoYo.cloudgames.ys" drawable="genshin_impact_cloud"/>
+    <item name="崩坏3 ~~ Honkai Impact 3rd" package="com.miHoYo.enterprise.NGHSoD" drawable="honkai_impact_3"/>
+    <item name="崩坏：星穹铁道 ~~ Honkai: Star Rail" package="com.miHoYo.hkrpg" drawable="honkai_star_rail"/>
+    <item name="崩坏：星穹铁道 ~~ Honkai: Star Rail" package="com.miHoYo.hkrpg.bilibili" drawable="honkai_star_rail"/>
+    <item name="Genshin Impact" package="com.miHoYo.ys.bilibili" drawable="genshin_impact"/>
+    <item name="Photomath" package="com.microblink.photomath" drawable="photomath"/>
+    <item name="Microsoft Link to Windows" package="com.microsoft.appmanager" drawable="microsoft_link_to_windows"/>
+    <item name="Bing" package="com.microsoft.bing" drawable="bing"/>
+    <item name="Microsoft Copilot" package="com.microsoft.copilot" drawable="microsoft_copilot"/>
+    <item name="Microsoft Designer" package="com.microsoft.designer" drawable="microsoft_designer"/>
+    <item name="Microsoft Edge" package="com.microsoft.emmx" drawable="microsoft_edge"/>
+    <item name="Microsoft Edge Canary" package="com.microsoft.emmx.canary" drawable="microsoft_edge_canary"/>
+    <item name="Microsoft Launcher" package="com.microsoft.launcher" drawable="microsoft_launcher"/>
+    <item name="Microsoft Loop" package="com.microsoft.loop" drawable="microsoft_loop"/>
+    <item name="Microsoft Math Solver" package="com.microsoft.math" drawable="microsoft_math_solver"/>
+    <item name="Microsoft Solitaire" package="com.microsoft.microsoftsolitairecollection" drawable="microsoft_solitaire"/>
+    <item name="Microsoft Excel" package="com.microsoft.office.excel" drawable="microsoft_excel"/>
+    <item name="Skype for Business" package="com.microsoft.office.lync15" drawable="skype"/>
+    <item name="Microsoft 365 Copilot" package="com.microsoft.office.officehub" drawable="microsoft_365_copilot"/>
+    <item name="Microsoft 365 Copilot" package="com.microsoft.office.officehubrow" drawable="microsoft_365_copilot"/>
+    <item name="Microsoft Lens" package="com.microsoft.office.officelens" drawable="microsoft_lens"/>
+    <item name="Microsoft OneNote" package="com.microsoft.office.onenote" drawable="microsoft_onenote"/>
+    <item name="Microsoft Outlook" package="com.microsoft.office.outlook" drawable="microsoft_outlook"/>
+    <item name="Microsoft PowerPoint" package="com.microsoft.office.powerpoint" drawable="microsoft_powerpoint"/>
+    <item name="Microsoft Word" package="com.microsoft.office.word" drawable="microsoft_word"/>
+    <item name="Microsoft Outlook Lite" package="com.microsoft.outlooklite" drawable="microsoft_outlook"/>
+    <item name="Windows" package="com.microsoft.rdc.androidx" drawable="windows"/>
+    <item name="Microsoft OneDrive" package="com.microsoft.skydrive" drawable="microsoft_onedrive"/>
+    <item name="Microsoft Teams" package="com.microsoft.teams" drawable="microsoft_teams"/>
+    <item name="Microsoft To Do" package="com.microsoft.todos" drawable="microsoft_to_do"/>
+    <item name="Microsoft Translator" package="com.microsoft.translator" drawable="microsoft_translator"/>
+    <item name="Intune Company Portal" package="com.microsoft.windowsintune.companyportal" drawable="intune_company_portal"/>
+    <item name="Xbox" package="com.microsoft.xboxone.smartglass" drawable="xbox"/>
+    <item name="U净 ~~ U Jing" package="com.midea.vm.washer" drawable="u_jing"/>
+    <item name="N0va Desktop" package="com.mihoyo.desktopportal" drawable="n0va_desktop"/>
+    <item name="HoYoLAB" package="com.mihoyo.hoyolab" drawable="hoyolab"/>
+    <item name="米游社 ~~ miHoYo Community" package="com.mihoyo.hyperion" drawable="mihoyo_community"/>
+    <item name="HyperOS Feedback" package="com.miui.bugreport" drawable="hyperos_feedback"/>
+    <item name="MIUI Calculator" package="com.miui.calculator" drawable="miui_calculator"/>
+    <item name="Compass" package="com.miui.compass" drawable="compass"/>
+    <item name="Mi Canvas" package="com.miui.creation" drawable="mi_canvas"/>
+    <item name="FM Radio" package="com.miui.fm" drawable="generic_fm_radio"/>
+    <item name="Gallery" package="com.miui.gallery" drawable="generic_gallery"/>
+    <item name="Mi Mover" package="com.miui.huanji" drawable="mi_mover"/>
+    <item name="HyperOS Services and Feedback" package="com.miui.miservice" drawable="hyperos_services_and_feedback"/>
+    <item name="Mi Notes" package="com.miui.notes" drawable="generic_notes"/>
+    <item name="Mi Music" package="com.miui.player" drawable="mi_music"/>
+    <item name="HyperOS Screen Recorder" package="com.miui.screenrecorder" drawable="hyperos_screen_recorder"/>
+    <item name="HyperOS Security Manager" package="com.miui.securitycenter" drawable="hyperos_security_manager"/>
+    <item name="Mi Video" package="com.miui.video" drawable="mi_video"/>
+    <item name="Mi Video" package="com.miui.videoplayer" drawable="mi_video"/>
+    <item name="Mi AI" package="com.miui.voiceassist" drawable="mi_ai"/>
+    <item name="Xiaomi Weather" package="com.miui.weather2" drawable="xiaomi_weather"/>
+    <item name="MiXplorer" package="com.mixplorer" drawable="mixplorer"/>
+    <item name="MiXplorer Silver" package="com.mixplorer.silver" drawable="mixplorer_silver"/>
+    <item name="XBrowser" package="com.mmbox.xbrowser" drawable="xbrowser"/>
+    <item name="FotMob" package="com.mobilefootie.wc2010" drawable="fotmob"/>
+    <item name="MobiPDF" package="com.mobisystems.mobiscanner" drawable="mobipdf"/>
+    <item name="OfficeSuite" package="com.mobisystems.office" drawable="officesuite"/>
+    <item name="Minecraft" package="com.mojang.minecraftpe" drawable="minecraft"/>
+    <item name="KIMI" package="com.moonshot.kimichat" drawable="kimi"/>
+    <item name="Calendar" package="com.motorola.cn.calendar" drawable="calendar"/>
+    <item name="Moto Gallery" package="com.motorola.cn.gallery" drawable="generic_gallery"/>
+    <item name="Dolby Atmos Moto" package="com.motorola.dolby.dolbyui" drawable="dolby_atmos_moto"/>
+    <item name="Meitu" package="com.mt.mtxx.mtxx" drawable="meitu"/>
+    <item name="QianJi" package="com.mutangtech.qianji" drawable="qianji"/>
+    <item name="蜜雪冰城 ~~ Mixue Ice City" package="com.mxbc.mxsa" drawable="mixue_ice_city"/>
+    <item name="MX Player" package="com.mxtech.videoplayer.ad" drawable="generic_player"/>
+    <item name="MX Player Pro" package="com.mxtech.videoplayer.pro" drawable="generic_player_pro"/>
+    <item name="myMail" package="com.my.mail" drawable="mymail"/>
+    <item name="网商银行 ~~ MYBank" package="com.mybank.android.phone" drawable="mybank"/>
+    <item name="Soul" package="com.mycompany.app.soulbrowser" drawable="soul"/>
+    <item name="Nebo" package="com.myscript.nebo" drawable="nebo"/>
+    <item name="纯粹直播 ~~ PureLive" package="com.mystyle.purelive" drawable="purelive"/>
+    <item name="socmark" package="com.nasoft.socmark" drawable="socmark"/>
+    <item name="WEBTOON" package="com.naver.linewebtoon" drawable="webtoon"/>
+    <item name="BUFF" package="com.netease.buff" drawable="buff"/>
+    <item name="BUFF" package="com.netease.buff163" drawable="buff"/>
+    <item name="NetEase Music" package="com.netease.cloudmusic" drawable="netease_music"/>
+    <item name="慕课 ~~ MOOC" package="com.netease.edu.ucmooc" drawable="mooc"/>
+    <item name="Sky: Children of the Light" package="com.netease.sky" drawable="sky_children_of_the_light"/>
+    <item name="UU Game Booster" package="com.netease.uu" drawable="uu_game_booster"/>
+    <item name="Netflix" package="com.netflix.mediaclient" drawable="netflix"/>
+    <item name="ブルーアーカイブ ~~ Blue Archive" package="com.nexon.bluearchive" drawable="blue_archive"/>
+    <item name="Nextcloud" package="com.nextcloud.client" drawable="nextcloud"/>
+    <item name="BAND" package="com.nhn.android.band" drawable="band"/>
+    <item name="NAVER Dictionary" package="com.nhn.android.naverdic" drawable="naver_dictionary"/>
+    <item name="네이버 ~~ NAVER" package="com.nhn.android.search" drawable="naver"/>
+    <item name="Pokémon GO" package="com.nianticlabs.pokemongo" drawable="pokemon_go"/>
+    <item name="Nike" package="com.nike.omega" drawable="nike"/>
+    <item name="Snapseed" package="com.niksoftware.snapseed" drawable="snapseed"/>
+    <item name="Bloons TD 6" package="com.ninjakiwi.bloonstd6epic" drawable="bloons_td_6"/>
+    <item name="Nintendo Switch" package="com.nintendo.znca" drawable="nintendo_switch"/>
+    <item name="マイニンテンドー ~~ My Nintendo" package="com.nintendo.znej" drawable="my_nintendo"/>
+    <item name="Nintendo Switch Parental Control" package="com.nintendo.znma" drawable="nintendo_switch_parental_control"/>
+    <item name="Tiny Decisions" package="com.nixwang.tinydecisions" drawable="tiny_decisions"/>
+    <item name="Stellarium Plus" package="com.noctuasoftware.stellarium_plus" drawable="stellarium_plus"/>
+    <item name="Feeder" package="com.nononsenseapps.feeder.play" drawable="feeder"/>
+    <item name="Alto's Adventure" package="com.noodlecake.altosadventure" drawable="altos_adventure"/>
+    <item name="Alto's Odyssey" package="com.noodlecake.altosodyssey" drawable="altos_odyssey"/>
+    <item name="Nothing X" package="com.nothing.smartcenter" drawable="nothing_x"/>
+    <item name="Syncthing" package="com.nutomic.syncthingandroid" drawable="syncthing"/>
+    <item name="Greenify" package="com.oasisfeng.greenify" drawable="greenify"/>
+    <item name="Soundcore" package="com.oceanwing.soundcore" drawable="soundcore"/>
+    <item name="Octopus" package="com.octopuscards.nfc_reader" drawable="octopus"/>
+    <item name="Odysee" package="com.odysee.app" drawable="odysee"/>
+    <item name="OKX" package="com.okinc.okex.gp" drawable="okx"/>
+    <item name="Scene5" package="com.omarea.vtools" drawable="scene5"/>
+    <item name="1MORE MUSIC" package="com.onemore.life" drawable="_1more_music"/>
+    <item name="1Password" package="com.onepassword.android" drawable="_1password"/>
+    <item name="OnePlus Clone Phone" package="com.oneplus.backuprestore" drawable="oneplus_clone_phone"/>
+    <item name="Zen Space" package="com.oneplus.brickmode" drawable="zen_space"/>
+    <item name="Camera" package="com.oneplus.camera" drawable="generic_camera"/>
+    <item name="OnePlus Games" package="com.oneplus.gamespace" drawable="generic_games"/>
+    <item name="OnePlus Health" package="com.oneplus.health.international" drawable="oneplus_health"/>
+    <item name="OnePlus Notes" package="com.oneplus.note" drawable="generic_notes"/>
+    <item name="OnePlus Recorder" package="com.oneplus.soundrecorder" drawable="generic_voice_recorder_waves"/>
+    <item name="Only One" package="com.onlyone.onlyonestarter" drawable="only_one"/>
+    <item name="ChatGPT" package="com.openai.chatgpt" drawable="chatgpt"/>
+    <item name="Opera" package="com.opera.browser" drawable="opera"/>
+    <item name="Samsung Max" package="com.opera.max.global" drawable="samsung_max"/>
+    <item name="Samsung Max" package="com.opera.max.oem" drawable="samsung_max"/>
+    <item name="Camera" package="com.oplus.camera" drawable="generic_camera"/>
+    <item name="IR Remote OnePlus" package="com.oplus.consumerIRApp" drawable="ir_remote_oneplus"/>
+    <item name="HeyTap Games" package="com.oplus.games" drawable="generic_games"/>
+    <item name="My OPPO" package="com.oplus.member" drawable="my_oppo"/>
+    <item name="Theme Store" package="com.oplus.themestore" drawable="theme_store"/>
+    <item name="My OPPO" package="com.oplus.vip" drawable="my_oppo"/>
+    <item name="OPPO Store" package="com.oppo.store" drawable="oppo_store"/>
+    <item name="Sunlogin" package="com.oray.sunlogin" drawable="sunlogin"/>
+    <item name="GuitarTuna" package="com.ovelin.guitartuna" drawable="guitartuna"/>
+    <item name="TanTan" package="com.p1.mobile.putong" drawable="tantan"/>
+    <item name="Battery Guru" package="com.paget96.batteryguru" drawable="battery_guru"/>
+    <item name="YPT" package="com.pallo.passiontimerscoped" drawable="ypt"/>
+    <item name="Live2DViewerEX" package="com.pavostudio.live2dviewerex" drawable="live2dviewerex"/>
+    <item name="PayPal" package="com.paypal.android.p2pmobile" drawable="paypal"/>
+    <item name="PixEz" package="com.perol.pixez" drawable="pixez"/>
+    <item name="PixEz" package="com.perol.play.pixez" drawable="pixez"/>
+    <item name="PhoneWalls" package="com.phonewalls.stockwallpapers" drawable="phonewalls"/>
+    <item name="HD Camera" package="com.photo.android.camera" drawable="hd_camera"/>
+    <item name="Photoroom" package="com.photoroom.app" drawable="photoroom"/>
+    <item name="Picsart" package="com.picsart.studio" drawable="picsart"/>
+    <item name="PikPak" package="com.pikcloud.pikpak" drawable="pikpak"/>
+    <item name="Pinterest" package="com.pinterest" drawable="pinterest"/>
+    <item name="Pionex" package="com.pionex.client" drawable="pionex"/>
+    <item name="Wavelet" package="com.pittvandewitt.wavelet" drawable="wavelet"/>
+    <item name="Oto Music" package="com.piyush.music" drawable="oto_music"/>
+    <item name="Dead Cells" package="com.playdigious.deadcells.mobile" drawable="dead_cells"/>
+    <item name="PlayStation (PS) Remote Play" package="com.playstation.remoteplay" drawable="playstation_ps_remote_play"/>
+    <item name="Plex" package="com.plexapp.android" drawable="plex"/>
+    <item name="Poe" package="com.poe.android" drawable="poe"/>
+    <item name="Zlib" package="com.positron_it.zlib" drawable="zlib"/>
+    <item name="Geekbench" package="com.primatelabs.geekbench5" drawable="geekbench"/>
+    <item name="Geekbench" package="com.primatelabs.geekbench6" drawable="geekbench"/>
+    <item name="Arena Breakout" package="com.proximabeta.mf.uamo" drawable="arena_breakout"/>
+    <item name="GODDESS OF VICTORY: NIKKE" package="com.proximabeta.nikke" drawable="goddess_of_victory_nikke"/>
+    <item name="NEW STATE" package="com.pubg.newstate" drawable="pubg"/>
+    <item name="QCY" package="com.qcymall.earphonesetup" drawable="qcy"/>
+    <item name="QCY" package="com.qcymall.googleearphonesetup" drawable="qcy"/>
+    <item name="爱奇艺 ~~ iQIYI" package="com.qiyi.video" drawable="iqiyi"/>
+    <item name="Qobuz" package="com.qobuz.music" drawable="qobuz"/>
+    <item name="QooApp" package="com.qooapp.qoohelper" drawable="qooapp"/>
+    <item name="Quark" package="com.quark.browser" drawable="quark"/>
+    <item name="Quizlet" package="com.quizlet.quizletandroid" drawable="quizlet"/>
+    <item name="Quora" package="com.quora.android" drawable="quora"/>
+    <item name="Bluecoins" package="com.rammigsoftware.bluecoins" drawable="bluecoins"/>
+    <item name="RAR" package="com.rarlab.rar" drawable="rar"/>
+    <item name="Razer Audio" package="com.razer.audiocompanion" drawable="razer_audio"/>
+    <item name="Spark Mail" package="com.readdle.spark" drawable="spark_mail"/>
+    <item name="eBoox" package="com.reader.books" drawable="eboox"/>
+    <item name="Readwise" package="com.readermobile" drawable="readwise"/>
+    <item name="realme Store" package="com.realme.storecn" drawable="realme_store"/>
+    <item name="realme Community" package="com.realmecomm.app" drawable="realme_community"/>
+    <item name="Reddit" package="com.reddit.frontpage" drawable="reddit"/>
+    <item name="ORoaming" package="com.redteamobile.roaming" drawable="oroaming"/>
+    <item name="RetroArch Plus" package="com.retroarch.aarch64" drawable="retroarch"/>
+    <item name="KernelSU Next" package="com.rifsxd.ksunext" drawable="kernelsu_next"/>
+    <item name="League of Legends: Wild Rift" package="com.riotgames.league.wildrift" drawable="league_of_legends_wild_rift"/>
+    <item name="Auto Clicker : Click Assistant" package="com.rise.automatic.autoclicker.clicker" drawable="auto_clicker_click_assistant"/>
+    <item name="Roblox" package="com.roblox.client" drawable="roblox"/>
+    <item name="Roborock" package="com.roborock.smart" drawable="roborock"/>
+    <item name="Grand Theft Auto: San Andreas" package="com.rockstargames.gtasa.de" drawable="grand_theft_auto_san_andreas"/>
+    <item name="Dhizuku" package="com.rosan.dhizuku" drawable="dhizuku"/>
+    <item name="InstallerX" package="com.rosan.installer.x" drawable="installerx"/>
+    <item name="Smart Tutor" package="com.rsupport.rs.activity.rsupport.aas2" drawable="smart_tutor"/>
+    <item name="IT之家 ~~ ITHome" package="com.ruanmei.ithome" drawable="ithome"/>
+    <item name="AirChina" package="com.rytong.airchina" drawable="airchina"/>
+    <item name="SafeInCloud" package="com.safeincloud" drawable="safeincloud"/>
+    <item name="SafeInCloud" package="com.safeincloud.free" drawable="safeincloud"/>
+    <item name="Salt Player" package="com.salt.music" drawable="salt_player"/>
+    <item name="Camera" package="com.samsung.agc.gcam84" drawable="generic_camera"/>
+    <item name="Gcam" package="com.samsung.agc.gcam92" drawable="generic_camera"/>
+    <item name="Camera Assistant" package="com.samsung.android.app.cameraassistant" drawable="camera_assistant"/>
+    <item name="Samsung Expert RAW" package="com.samsung.android.app.galaxyraw" drawable="samsung_expert_raw"/>
+    <item name="Samsung Interpreter" package="com.samsung.android.app.interpreter" drawable="samsung_interpreter"/>
+    <item name="Samsung Smart Search" package="com.samsung.android.app.searchwidget" drawable="pixel_search"/>
+    <item name="Samsung O" package="com.samsung.android.app.spage" drawable="samsung_o"/>
+    <item name="Samsung Assistant" package="com.samsung.android.app.sreminder" drawable="samsung_assistant"/>
+    <item name="Samsung Wear" package="com.samsung.android.app.watchmanager" drawable="wear"/>
+    <item name="Samsung AR Doodle" package="com.samsung.android.ardrawing" drawable="samsung_ar_doodle"/>
+    <item name="Samsung AR Emoji Camera" package="com.samsung.android.aremoji" drawable="samsung_ar_emoji_camera"/>
+    <item name="Samsung Digital Wellbeing" package="com.samsung.android.forest" drawable="samsung_digital_wellbeing"/>
+    <item name="Samsung Game Launcher" package="com.samsung.android.game.gamehome" drawable="samsung_game_launcher"/>
+    <item name="Samsung Game Plugins" package="com.samsung.android.game.gamelab" drawable="samsung_game_plugins"/>
+    <item name="Galaxy Enhance-X" package="com.samsung.android.imageenhancer" drawable="galaxy_enhance_x"/>
+    <item name="Samsung Keys Cafe" package="com.samsung.android.keyscafe" drawable="samsung_keys_cafe"/>
+    <item name="Samsung Device Care" package="com.samsung.android.lool" drawable="samsung_device_care"/>
+    <item name="Samsung Media and Devices" package="com.samsung.android.mdx" drawable="samsung_media_and_devices"/>
+    <item name="Samsung SmartThings" package="com.samsung.android.oneconnect" drawable="samsung_smartthings"/>
+    <item name="Samsung Pentastic" package="com.samsung.android.pentastic" drawable="samsung_pentastic"/>
+    <item name="Quick Measure" package="com.samsung.android.ruler" drawable="quick_measure"/>
+    <item name="Samsung Pass" package="com.samsung.android.samsungpass" drawable="samsung_pass"/>
+    <item name="Camera" package="com.samsung.android.scan3d" drawable="generic_camera"/>
+    <item name="Samsung Health Monitor" package="com.samsung.android.shealthmonitor" drawable="samsung_health_monitor"/>
+    <item name="Samsung Health Monitor" package="com.samsung.android.shealthmonitors" drawable="samsung_health_monitor"/>
+    <item name="Samsung Write on PDF" package="com.samsung.android.spdfnote" drawable="generic_pdf_square"/>
+    <item name="Samsung Members" package="com.samsung.android.voc" drawable="samsung_members"/>
+    <item name="Samsung Wonderland" package="com.samsung.android.wonderland.wallpaper" drawable="samsung_wonderland"/>
+    <item name="Samsung Global Goals" package="com.samsung.sree" drawable="samsung_global_goals"/>
+    <item name="Samsung NotiStar" package="com.samsung.systemui.notilus" drawable="samsung_notistar"/>
+    <item name="美团 ~~ Meituan" package="com.sankuai.meituan" drawable="meituan"/>
+    <item name="美团外卖 ~~ Meituan Takeaway" package="com.sankuai.meituan.takeoutnew" drawable="meituan_takeaway"/>
+    <item name="PlayStation (PS)" package="com.scee.psxandroid" drawable="playstation_ps"/>
+    <item name="DiDi" package="com.sdu.didi.psnger" drawable="didi"/>
+    <item name="FeedMe" package="com.seazon.feedme" drawable="feedme"/>
+    <item name="Samsung Kids" package="com.sec.android.app.kidshome" drawable="samsung_kids"/>
+    <item name="Samsung Internet Browser" package="com.sec.android.app.sbrowser" drawable="samsung_internet"/>
+    <item name="Samsung Internet Browser Beta" package="com.sec.android.app.sbrowser.beta" drawable="samsung_internet_beta"/>
+    <item name="Samsung Health" package="com.sec.android.app.shealth" drawable="samsung_health"/>
+    <item name="Samsung Studio" package="com.sec.android.app.vepreload" drawable="samsung_studio"/>
+    <item name="Samsung Smart Switch" package="com.sec.android.easyMover" drawable="samsung_smart_switch"/>
+    <item name="Samsung Print Service Plugin" package="com.sec.app.samsungprintservice" drawable="generic_printer"/>
+    <item name="PENUP" package="com.sec.penup" drawable="penup"/>
+    <item name="プロジェクトセカイ カラフルステージ！ feat. 初音ミク ~~ HATSUNE MIKU: COLORFUL STAGE!" package="com.sega.pjsekai" drawable="hatsune_miku_colorful_stage"/>
+    <item name="Sennheiser Smart Control" package="com.sennheiser.control" drawable="sennheiser_smart_control"/>
+    <item name="Termius" package="com.server.auditor.ssh.client" drawable="termius"/>
+    <item name="菠萝包轻小说 ~~ SFAcg" package="com.sfacg" drawable="sfacg"/>
+    <item name="Node Video" package="com.shallwaystudio.nodevideo" drawable="node_video"/>
+    <item name="Walli 4K" package="com.shanga.walli" drawable="walli_4k"/>
+    <item name="Shazam" package="com.shazam.android" drawable="shazam"/>
+    <item name="重返未来：1999 ~~ Reverse: 1999" package="com.shenlan.m.reverse1999" drawable="reverse_1999"/>
+    <item name="重返未来：1999 ~~ Reverse: 1999" package="com.shenlan.m.reverse1999.bilibili" drawable="reverse_1999"/>
+    <item name="蝦皮購物 ~~ Shopee" package="com.shopee.tw" drawable="shopee"/>
+    <item name="Simple Gallery Pro" package="com.simplemobiletools.gallery.pro" drawable="simple_gallery_pro"/>
+    <item name="微博 ~~ Weibo" package="com.sina.weibo" drawable="weibo"/>
+    <item name="微博极速版 ~~ Weibo Lite" package="com.sina.weibolite" drawable="weibo"/>
+    <item name="中国联通 ~~ China Unicom" package="com.sinovatech.unicom.ui" drawable="china_unicom"/>
+    <item name="Slowly" package="com.slowlyapp" drawable="slowly"/>
+    <item name="Kwai" package="com.smile.gifmaker" drawable="kwai"/>
+    <item name="Music Speed Changer" package="com.smp.musicspeed" drawable="music_speed_changer"/>
+    <item name="什么值得买 ~~ What to buy" package="com.smzdm.client.android" drawable="what_to_buy"/>
+    <item name="Snapchat" package="com.snapchat.android" drawable="snapchat"/>
+    <item name="Snaptube" package="com.snaptube.premium" drawable="snaptube"/>
+    <item name="WiFi万能钥匙 ~~ WiFi Master" package="com.snda.wifilocating" drawable="wifi_master"/>
+    <item name="Sofascore" package="com.sofascore.results" drawable="sofascore"/>
+    <item name="Formula 1" package="com.softpauer.f1timingapp2014.basic" drawable="formula_1"/>
+    <item name="JuiceSSH" package="com.sonelli.juicessh" drawable="juicessh"/>
+    <item name="Sonos" package="com.sonos.acr2" drawable="sonos"/>
+    <item name="Imaging Edge Mobile" package="com.sony.playmemories.mobile" drawable="imaging_edge_mobile"/>
+    <item name="Sony Sound Connect" package="com.sony.songpal.mdr" drawable="sony_sound_connect"/>
+    <item name="Video &amp; TV SideView" package="com.sony.tvsideview.phone" drawable="video_and_tv_sideview"/>
+    <item name="Sony Cinema Pro" package="com.sonymobile.cinemapro" drawable="sony_cinema_pro"/>
+    <item name="Sony Game Enhancer" package="com.sonymobile.gameenhancer" drawable="sony_game_enhancer"/>
+    <item name="Sony Photography Pro" package="com.sonymobile.photopro" drawable="sony_photography_pro"/>
+    <item name="Sony Support" package="com.sonymobile.support" drawable="sony_support"/>
+    <item name="SoundCloud" package="com.soundcloud.android" drawable="soundcloud"/>
+    <item name="Muviz Edge" package="com.sparkine.muvizedge" drawable="muviz_edge"/>
+    <item name="Root Explorer" package="com.speedsoftware.rootexplorer" drawable="root_explorer"/>
+    <item name="Spotify Lite" package="com.spotify.lite" drawable="spotify"/>
+    <item name="Spotify" package="com.spotify.music" drawable="spotify"/>
+    <item name="记事本 ~~ Notepad" package="com.sprd.sprdnote" drawable="generic_notes"/>
+    <item name="飞书 ~~ Feishu" package="com.ss.android.lark" drawable="feishu"/>
+    <item name="Lark" package="com.ss.android.lark.kami" drawable="lark"/>
+    <item name="TikTok" package="com.ss.android.ugc.aweme" drawable="tiktok"/>
+    <item name="TikTok" package="com.ss.android.ugc.aweme.mobile" drawable="tiktok"/>
+    <item name="TikTok" package="com.ss.android.ugc.trill" drawable="tiktok"/>
+    <item name="Cuto Wallpaper" package="com.sspai.cuto.android" drawable="cuto_wallpaper"/>
+    <item name="少数派 ~~ Minority" package="com.sspai.sspaiandroid" drawable="minority"/>
+    <item name="Starbucks" package="com.starbucks.cn" drawable="starbucks"/>
+    <item name="Squid" package="com.steadfastinnovation.android.projectpapyrus" drawable="squid"/>
+    <item name="Strava" package="com.strava" drawable="strava"/>
+    <item name="360 Reality Audio Live" package="com.streamsoftinc.sony360ramobile" drawable="_360_reality_audio_live"/>
+    <item name="WakeUp Schedule" package="com.suda.yzune.wakeupschedule" drawable="wakeup_schedule"/>
+    <item name="SukiSU Ultra" package="com.sukisu.ultra" drawable="kernelsu"/>
+    <item name="Mi Freeform" package="com.sunshine.freeform" drawable="mi_freeform"/>
+    <item name="Boom Beach" package="com.supercell.boombeach" drawable="boom_beach"/>
+    <item name="Brawl Stars" package="com.supercell.brawlstars" drawable="brawl_stars"/>
+    <item name="Clash Of Clans" package="com.supercell.clashofclans" drawable="clash_of_clans"/>
+    <item name="Clash Royale" package="com.supercell.clashroyale" drawable="clash_royale"/>
+    <item name="Squad Busters" package="com.supercell.squad" drawable="squad_busters"/>
+    <item name="Companion for GLTools" package="com.superpaninbros.glng" drawable="companion_for_gltools"/>
+    <item name="SVPlayer" package="com.svpteam.svp" drawable="svplayer"/>
+    <item name="DS finder" package="com.synology.DSfinder" drawable="ds_finder"/>
+    <item name="Synology Drive" package="com.synology.dsdrive" drawable="synology_drive"/>
+    <item name="Synology Secure SignIn" package="com.synology.securesignin" drawable="synology_secure_signin"/>
+    <item name="Tailscale" package="com.tailscale.ipn" drawable="tailscale"/>
+    <item name="闲鱼 ~~ Idle Fish" package="com.taobao.idlefish" drawable="idle_fish"/>
+    <item name="淘票票 ~~ Taopiaopiao" package="com.taobao.movie.android" drawable="taopiaopiao"/>
+    <item name="淘宝 ~~ Taobao" package="com.taobao.taobao" drawable="taobao"/>
+    <item name="飞猪 ~~ Fliggy" package="com.taobao.trip" drawable="fliggy"/>
+    <item name="TapTap" package="com.taptap" drawable="taptap"/>
+    <item name="TapTap" package="com.taptap.global" drawable="taptap"/>
+    <item name="QQmail" package="com.tencent.androidqqmail" drawable="qqmail"/>
+    <item name="PUBG" package="com.tencent.ig" drawable="pubg"/>
+    <item name="WeChat" package="com.tencent.mm" drawable="wechat"/>
+    <item name="QQ" package="com.tencent.mobileqq" drawable="qq"/>
+    <item name="胜利女神：新的希望 ~~ GODDESS OF VICTORY: NIKKE" package="com.tencent.nikke" drawable="goddess_of_victory_nikke"/>
+    <item name="腾讯视频 ~~ Tencent Video ~~ WeTV" package="com.tencent.qqlive" drawable="tencent_video"/>
+    <item name="腾讯视频 ~~ Tencent Video ~~ WeTV" package="com.tencent.qqlivei18n.us" drawable="tencent_video"/>
+    <item name="QQ音乐 ~~ QQMusic" package="com.tencent.qqmusic" drawable="qqmusic"/>
+    <item name="TIM (QQ)" package="com.tencent.tim" drawable="tim_qq"/>
+    <item name="崩坏3 ~~ Honkai Impact 3rd" package="com.tencent.tmgp.bh3" drawable="honkai_impact_3"/>
+    <item name="PUBG" package="com.tencent.tmgp.pubgmhd" drawable="pubg"/>
+    <item name="王者荣耀 ~~ Honor of Kings" package="com.tencent.tmgp.sgame" drawable="honor_of_kings"/>
+    <item name="Brawl Stars" package="com.tencent.tmgp.supercell.brawlstars" drawable="brawl_stars"/>
+    <item name="VooV Meeting" package="com.tencent.voov" drawable="voov_meeting"/>
+    <item name="腾讯会议 ~~ Tencent Meeting" package="com.tencent.wemeet.app" drawable="tencent_meeting"/>
+    <item name="微信读书 ~~ WeRead" package="com.tencent.weread" drawable="weread"/>
+    <item name="微信输入法 ~~ WeType" package="com.tencent.wetype" drawable="wetype"/>
+    <item name="WeCom" package="com.tencent.wework" drawable="wecom"/>
+    <item name="Tenda WiFi" package="com.tenda.router.app" drawable="tenda_wifi"/>
+    <item name="Termux" package="com.termux" drawable="termux"/>
+    <item name="Nova Launcher" package="com.teslacoilsw.launcher" drawable="nova_launcher"/>
+    <item name="Nova Launcher Prime" package="com.teslacoilsw.launcher.prime" drawable="nova_launcher"/>
+    <item name="Tesla" package="com.teslamotors.tesla" drawable="tesla"/>
+    <item name="Sky: Children of the Light" package="com.tgc.sky.android" drawable="sky_children_of_the_light"/>
+    <item name="Carousell" package="com.thecarousell.Carousell" drawable="carousell"/>
+    <item name="SoundPeats" package="com.thirtydays.headset" drawable="soundpeats"/>
+    <item name="Reuters" package="com.thomsonreuters.reuters" drawable="reuters"/>
+    <item name="TickTick" package="com.ticktick.task" drawable="ticktick"/>
+    <item name="Tiger Trade" package="com.tigerbrokers.stock" drawable="tiger_trade"/>
+    <item name="Tinder" package="com.tinder" drawable="tinder"/>
+    <item name="T-Mobile Visual Voicemail" package="com.tmobile.vvm.application" drawable="t_mobile_visual_voicemail"/>
+    <item name="12123" package="com.tmri.app.main" drawable="_12123"/>
+    <item name="Todoist" package="com.todoist" drawable="todoist"/>
+    <item name="Concepts" package="com.tophatch.concepts" drawable="concepts"/>
+    <item name="Magisk" package="com.topjohnwu.magisk" drawable="magisk"/>
+    <item name="TorrSE" package="com.torrentsearch.magnetsearch" drawable="torrse"/>
+    <item name="Microsoft SwiftKey" package="com.touchtype.swiftkey" drawable="microsoft_swiftkey"/>
+    <item name="2048" package="com.tpcstld.twozerogame" drawable="_2048"/>
+    <item name="TradingView" package="com.tradingview.tradingviewapp" drawable="tradingview"/>
+    <item name="Wise" package="com.transferwise.android" drawable="wise"/>
+    <item name="Hide My Applist" package="com.tsng.hidemyapplist" drawable="hide_my_applist"/>
+    <item name="Autosync" package="com.ttxapps.autosync" drawable="autosync"/>
+    <item name="OneSync" package="com.ttxapps.onesyncv2" drawable="onesync"/>
+    <item name="Tubi" package="com.tubitv" drawable="tubi"/>
+    <item name="RealSR" package="com.tumuyan.ncnn.realsr" drawable="realsr"/>
+    <item name="Tureng Dictionary" package="com.tureng.sozluk" drawable="tureng_dictionary"/>
+    <item name="BiP" package="com.turkcell.bip" drawable="bip"/>
+    <item name="X" package="com.twitter.android" drawable="x"/>
+    <item name="2FA Authenticator (2FAS)" package="com.twofasapp" drawable="_2fa_authenticator_2fas"/>
+    <item name="Uber" package="com.ubercab" drawable="uber"/>
+    <item name="Uber Eats" package="com.ubercab.eats" drawable="uber_eats"/>
+    <item name="WiFiman" package="com.ubnt.usurvey" drawable="wifiman"/>
+    <item name="Udemy" package="com.udemy.android" drawable="udemy"/>
+    <item name="航旅纵横 ~~ Umetrip" package="com.umetrip.android.msky.app" drawable="umetrip"/>
+    <item name="Unciv" package="com.unciv.app" drawable="uniciv"/>
+    <item name="UnionPay" package="com.unionpay" drawable="unionpay"/>
+    <item name="KineStop" package="com.urbandroid.kinestop" drawable="kinestop"/>
+    <item name="白描 ~~ Baimiao" package="com.uzero.baimiao" drawable="baimiao"/>
+    <item name="白描证件照 ~~ Photo ID" package="com.uzero.cn.zhengjianzhao" drawable="photo_id"/>
+    <item name="v2rayNG" package="com.v2ray.ang" drawable="v2rayng"/>
+    <item name="Steam" package="com.valvesoftware.android.steam.community" drawable="steam"/>
+    <item name="Steam Chat" package="com.valvesoftware.android.steam.friendsui" drawable="steam_chat"/>
+    <item name="Steam Link" package="com.valvesoftware.steamlink" drawable="steam_link"/>
+    <item name="Vanced YouTube Music" package="com.vanced.android.apps.youtube.music" drawable="vanced_youtube_music"/>
+    <item name="YouTube Vanced" package="com.vanced.android.youtube" drawable="youtube_vanced"/>
+    <item name="FlipaClip" package="com.vblast.flipaclip" drawable="flipaclip"/>
+    <item name="Viber" package="com.viber.voip" drawable="viber"/>
+    <item name="VivaCut" package="com.videoeditorpro.android" drawable="vivacut"/>
+    <item name="ComicScreen" package="com.viewer.comicscreen" drawable="comicscreen"/>
+    <item name="Star Walk 2" package="com.vitotechnology.StarWalk2Free" drawable="star_walk_2"/>
+    <item name="Vivaldi" package="com.vivaldi.browser" drawable="vivaldi"/>
+    <item name="vivo Jovi Voice" package="com.vivo.agent" drawable="vivo_jovi_voice"/>
+    <item name="vivo Kids Mode" package="com.vivo.childrenmode" drawable="vivo_kids_mode"/>
+    <item name="EasyShare" package="com.vivo.easyshare" drawable="easyshare"/>
+    <item name="vivo Health" package="com.vivo.health" drawable="vivo_health"/>
+    <item name="vivo.com" package="com.vivo.space" drawable="vivo_com"/>
+    <item name="vivo Translator" package="com.vivo.translator" drawable="vivo_translator"/>
+    <item name="vivo Console" package="com.vivo.vivoconsole" drawable="vivo_console"/>
+    <item name="vivo Jovi Scan" package="com.vivo.vtouch" drawable="vivo_jovi_scan"/>
+    <item name="VMOS" package="com.vmos.pro" drawable="vmos"/>
+    <item name="VSCO" package="com.vsco.cam" drawable="vsco"/>
+    <item name="Max: Stream HBO" package="com.wbd.stream" drawable="max_stream_hbo"/>
+    <item name="Weawow" package="com.weawow" drawable="weawow"/>
+    <item name="WeMoney" package="com.webank.wemoney" drawable="wemoney"/>
+    <item name="微博 ~~ Weibo" package="com.weico.international" drawable="weibo"/>
+    <item name="WhatsApp" package="com.whatsapp" drawable="whatsapp"/>
+    <item name="Windscribe" package="com.windscribe.vpn" drawable="windscribe"/>
+    <item name="Windy" package="com.windyty.android" drawable="windy"/>
+    <item name="Wireguard" package="com.wireguard.android" drawable="wireguard"/>
+    <item name="NP Manager" package="com.wn.app.np" drawable="np_manager"/>
+    <item name="WolframAlpha Classic" package="com.wolfram.android.alpha" drawable="wolframalpha_classic"/>
+    <item name="安徽掌上10000 ~~ Anhui Palm 10000" package="com.wondertek.ahPalm10000" drawable="anhui_palm_10000"/>
+    <item name="Workday" package="com.workday.workdroidapp" drawable="workday"/>
+    <item name="轻启动 ~~ Light Start" package="com.wpengapp.lightstart" drawable="light_start"/>
+    <item name="ViPER4Android FX" package="com.wstxda.viper4android" drawable="viper4android"/>
+    <item name="隐秘参数 ~~ Secret Settings" package="com.x1y9.probe" drawable="secret_settings"/>
+    <item name="创建快捷方式 ~~ Shortcut Creator" package="com.x7890.shortcutcreator" drawable="shortcut_creator"/>
+    <item name="Bitwarden" package="com.x8bit.bitwarden" drawable="bitwarden"/>
+    <item name="数据备份 ~~ DataBackup" package="com.xayah.databackup" drawable="databackup"/>
+    <item name="数据备份 ~~ DataBackup" package="com.xayah.databackup.premium" drawable="databackup"/>
+    <item name="XBrowser" package="com.xbrowser.play" drawable="xbrowser"/>
+    <item name="XDA" package="com.xda.labs.play" drawable="xda"/>
+    <item name="下厨房 ~~ Xiachufang" package="com.xiachufang" drawable="xiachufang"/>
+    <item name="智慧笑联 ~~ Zhihui Xiaolian" package="com.xiaolian.prometheus" drawable="zhihui_xiaolian"/>
+    <item name="Fate/Grand Order" package="com.xiaomeng.fategrandorder" drawable="fate_grand_order"/>
+    <item name="HyperOS Games" package="com.xiaomi.gamecenter" drawable="xiaomi_game_center"/>
+    <item name="Mi Fitness" package="com.xiaomi.health" drawable="mi_fitness"/>
+    <item name="Zepp Life" package="com.xiaomi.hm.health" drawable="zepp_life"/>
+    <item name="GetApps" package="com.xiaomi.market" drawable="getapps"/>
+    <item name="小爱音箱 ~~ Xiaomi Speaker" package="com.xiaomi.mico" drawable="xiaomi_speaker"/>
+    <item name="小米通话 ~~ Mi Time" package="com.xiaomi.mitime" drawable="mi_time"/>
+    <item name="Mi Wi-Fi" package="com.xiaomi.router" drawable="mi_wi_fi"/>
+    <item name="Mi Scanner" package="com.xiaomi.scanner" drawable="scanner"/>
+    <item name="Mi Store" package="com.xiaomi.shop" drawable="mi_store"/>
+    <item name="Mi Home" package="com.xiaomi.smarthome" drawable="mi_home"/>
+    <item name="Xiaomi Community" package="com.xiaomi.vipaccount" drawable="xiaomi_community"/>
+    <item name="Mi Fitness" package="com.xiaomi.wearable" drawable="mi_fitness"/>
+    <item name="Xiaomi Service Framework" package="com.xiaomi.xmsf" drawable="xiaomi_service_framework"/>
+    <item name="小红书 ~~ Xiaohongshu" package="com.xingin.xhs" drawable="xiaohongshu"/>
+    <item name="PeatsAudio" package="com.xingkeqi.peats" drawable="soundpeats"/>
+    <item name="音乐标签 ~~ Music Tag" package="com.xjcheng.musictageditor" drawable="music_tag"/>
+    <item name="iCSee" package="com.xm.csee" drawable="icsee"/>
+    <item name="Xodo" package="com.xodo.pdf.reader" drawable="xodo"/>
+    <item name="醒图 ~~ Xingtu" package="com.xt.retouch" drawable="xingtu"/>
+    <item name="Hypic" package="com.xt.retouchoversea" drawable="hypic"/>
+    <item name="学小易 ~~ Xuexiaoyi" package="com.xuexiaoyi.xxy" drawable="xuexiaoyi"/>
+    <item name="迅雷 ~~ Lixian Xunlei" package="com.xunlei.downloadprovider" drawable="lixian_xunlei"/>
+    <item name="拼多多 ~~ Pinduoduo" package="com.xunmeng.pinduoduo" drawable="pinduoduo"/>
+    <item name="中国移动 ~~ China Mobile" package="com.xwtec.sd.mobileclient" drawable="china_mobile"/>
+    <item name="BBLL" package="com.xx.blbl" drawable="bbll"/>
+    <item name="Simple Live" package="com.xycz.simple_live" drawable="neutron_music_player"/>
+    <item name="PU" package="com.xyhui" drawable="pu"/>
+    <item name="雅迪 ~~ Yadea" package="com.yadea.smartmoto" drawable="yadea"/>
+    <item name="Yahoo! Weather" package="com.yahoo.mobile.client.android.weather" drawable="yahoo_weather"/>
+    <item name="Яндекс Браузер ~~ Yandex Browser" package="com.yandex.browser" drawable="yandex_browser"/>
+    <item name="KFC" package="com.yek.android.kfc.activitys" drawable="kfc"/>
+    <item name="Yelp" package="com.yelp.android" drawable="yelp"/>
+    <item name="kito" package="com.yjllq.kito" drawable="kito"/>
+    <item name="优酷 ~~ Youku" package="com.youku.international.phone" drawable="youku"/>
+    <item name="优酷 ~~ Youku" package="com.youku.phone" drawable="youku"/>
+    <item name="Device Info" package="com.ytheekshana.deviceinfo" drawable="device_info"/>
+    <item name="NFC Card Emulator Pro" package="com.yuanwofei.cardemulator.pro" drawable="nfc_card_emulator_pro"/>
+    <item name="好分数 ~~ Haofenshu" package="com.yunxiao.haofenshu" drawable="haofenshu"/>
+    <item name="Notewise" package="com.yygg.note.app" drawable="notewise"/>
+    <item name="SystemUI Tuner" package="com.zacharee1.systemuituner" drawable="systemui_tuner"/>
+    <item name="知乎 ~~ Zhihu" package="com.zhihu.android" drawable="zhihu"/>
+    <item name="TikTok" package="com.zhiliaoapp.musically" drawable="tiktok"/>
+    <item name="大学搜题酱 ~~ College Search" package="com.zmzx.college.search" drawable="college_search"/>
+    <item name="Zoho OneAuth" package="com.zoho.accounts.oneauth" drawable="zoho_oneauth"/>
+    <item name="Zoho Mail" package="com.zoho.mail" drawable="zoho_mail"/>
+    <item name="SHEIN" package="com.zzkko" drawable="shein"/>
+    <item name="携程旅行 ~~ Ctrip" package="ctrip.android.view" drawable="ctrip"/>
+    <item name="Trip.com" package="ctrip.english" drawable="trip_com"/>
+    <item name="HiPER Calc Pro" package="cz.hipercalc.pro" drawable="hiper_calc_pro"/>
+    <item name="AntennaPod" package="de.danoeh.antennapod" drawable="antennapod"/>
+    <item name="Wallpaper Changer" package="de.j4velin.wallpaperChanger" drawable="wallpaper_changer"/>
+    <item name="MIFARE Classic Tool" package="de.syss.MifareClassicTool" drawable="mifare_classic_tool"/>
+    <item name="Aves Gallery" package="deckers.thibault.aves" drawable="aves"/>
+    <item name="Aves Libre" package="deckers.thibault.aves.libre" drawable="aves"/>
+    <item name="Pixel IMS" package="dev.bluehouse.enablevolte" drawable="pixel_ims"/>
+    <item name="Findroid" package="dev.jdtech.jellyfin" drawable="findroid"/>
+    <item name="stats.fm" package="dev.netlob.spotistats" drawable="stats_fm"/>
+    <item name="PI" package="dev.sanmer.pi" drawable="generic_pi"/>
+    <item name="DJI Go" package="dji.go.v4" drawable="dji"/>
+    <item name="DJI Fly" package="dji.go.v5" drawable="dji"/>
+    <item name="DJI Mimo" package="dji.mimo" drawable="dji"/>
+    <item name="FolderSync Pro" package="dk.tacit.android.foldersync.full" drawable="foldersync_pro"/>
+    <item name="Alarmy" package="droom.sleepIfUCan" drawable="alarmy"/>
+    <item name="TurboTel" package="ellipi.messenger" drawable="turbotel"/>
+    <item name="SD Maid 2/SE" package="eu.darken.sdmse" drawable="sd_maid_2_se"/>
+    <item name="Yōkai" package="eu.kanade.tachiyomi.yokai" drawable="yokai"/>
+    <item name="SD Maid" package="eu.thedarken.sdm" drawable="sd_maid"/>
+    <item name="SD Maid 1 Pro" package="eu.thedarken.sdm.unlocker" drawable="sd_maid_1_pro"/>
+    <item name="DevCheck" package="flar2.devcheck" drawable="devcheck"/>
+    <item name="Pure Tuber" package="free.tube.premium.advanced.tuber" drawable="pure_tuber"/>
+    <item name="Turbo VPN" package="free.vpn.unblock.proxy.turbovpn" drawable="turbo_vpn"/>
+    <item name="Smart Launcher" package="ginlemon.flowerfree" drawable="smart_launcher"/>
+    <item name="Thanox" package="github.tornaco.android.thanos" drawable="thanox"/>
+    <item name="Thanox Pro" package="github.tornaco.android.thanos.pro" drawable="thanox_pro"/>
+    <item name="NGA" package="gov.pianzong.androidnga" drawable="nga"/>
+    <item name="李跳跳是 ~~ Li Tiaotiao" package="hello.litiaotiao.app" drawable="li_tiaotiao"/>
+    <item name="AlipayHK" package="hk.alipay.wallet" drawable="alipay"/>
+    <item name="HSBC" package="hk.com.hsbc.hsbchkmobilebanking" drawable="hsbc"/>
+    <item name="1dm+" package="idm.internet.download.manager.plus" drawable="_1dm_plus"/>
+    <item name="Musicolet Music Player" package="in.krosbits.musicolet" drawable="musicolet_music_player"/>
+    <item name="NMM File Manager" package="in.mfile" drawable="nmm_file_manager"/>
+    <item name="App分享 ~~ AppShare" package="info.muge.appshare" drawable="appshare"/>
+    <item name="Devialet Gemini" package="io.dvlt.tap" drawable="devialet_gemini"/>
+    <item name="Enpass" package="io.enpass.app" drawable="enpass"/>
+    <item name="Iceraven" package="io.github.forkmaintainers.iceraven" drawable="iceraven"/>
+    <item name="Magisk Delta" package="io.github.huskydg.magisk" drawable="magisk"/>
+    <item name="QAuxiliary" package="io.github.qauxv" drawable="qauxiliary"/>
+    <item name="Magisk Alpha" package="io.github.vvb2060.magisk" drawable="magisk"/>
+    <item name="Momo Test" package="io.github.vvb2060.mahoshojo" drawable="momo_test"/>
+    <item name="Legado" package="io.legado.app.release" drawable="legado"/>
+    <item name="Legado" package="io.legado.play.release" drawable="legado"/>
+    <item name="Structured" package="io.unorderly.structured" drawable="structured"/>
+    <item name="Wallpaper Engine" package="io.wallpaperengine.weclient" drawable="wallpaper_engine"/>
+    <item name="BetterSleep" package="ipnossoft.rma.free" drawable="bettersleep"/>
+    <item name="Graph Messenger" package="ir.ilmili.telegraph" drawable="graph_messenger"/>
+    <item name="JBL Headphones" package="jbl.stc.com" drawable="jbl_headphones"/>
+    <item name="Canon PRINT" package="jp.co.canon.bsd.ad.pixmaprint" drawable="generic_printer"/>
+    <item name="Canon Camera Connect" package="jp.co.canon.ic.cameraconnect" drawable="canon_camera_connect"/>
+    <item name="Clip Studio Paint" package="jp.co.celsys.clipstudiopaint.galaxystore" drawable="clip_studio_paint"/>
+    <item name="Clip Studio Paint" package="jp.co.celsys.clipstudiopaint.googleplay" drawable="clip_studio_paint"/>
+    <item name="Sony | Creators'" package="jp.co.sony.ips.portalapp" drawable="sony_creators"/>
+    <item name="Sony Music Pro" package="jp.co.sony.mc.musicpro" drawable="sony_music_pro"/>
+    <item name="Sony Videography Pro" package="jp.co.sony.mc.videopro" drawable="sony_videography_pro"/>
+    <item name="LINE" package="jp.naver.line.android" drawable="line"/>
+    <item name="ニコニコ動画 ~~ Niconico Video" package="jp.nicovideo.android" drawable="niconico_video"/>
+    <item name="Pokémon TCG Pocket" package="jp.pokemon.pokemontcgp" drawable="pokemon_tcg_pocket"/>
+    <item name="Pokémon UNITE" package="jp.pokemon.pokemonunite" drawable="pokemon_unite"/>
+    <item name="pixiv ~~ ピクシブ" package="jp.pxv.android" drawable="pixiv"/>
+    <item name="Keepass2Android" package="keepass2android.keepass2android" drawable="keepass2android"/>
+    <item name="Keepass2Android Offline" package="keepass2android.keepass2android_nonet" drawable="keepass2android"/>
+    <item name="GKD" package="li.songe.gkd" drawable="gkd"/>
+    <item name="Via Browser" package="mark.via" drawable="via_browser"/>
+    <item name="Via Browser" package="mark.via.gp" drawable="via_browser"/>
+    <item name="Obsidian" package="md.obsidian" drawable="obsidian"/>
+    <item name="Read You" package="me.ash.reader" drawable="read_you"/>
+    <item name="APatch" package="me.bmax.apatch" drawable="apatch"/>
+    <item name="ele.me" package="me.ele" drawable="ele_me"/>
+    <item name="qBittorrent Remote" package="me.fengmlo.qbRemoteFree" drawable="qbittorrent_remote"/>
+    <item name="白马地图 ~~ Bmap" package="me.gfuil.bmap" drawable="bmap"/>
+    <item name="My Gesture Navigation" package="me.hisn.mygesture" drawable="my_gesture_navigation"/>
+    <item name="哔哩漫游 ~~ BiliRoaming" package="me.iacn.biliroaming" drawable="bilibili_helper"/>
+    <item name="Authenticator Pro" package="me.jmh.authenticatorpro" drawable="authenticator_pro"/>
+    <item name="Brevent" package="me.piebridge.brevent" drawable="brevent"/>
+    <item name="Easy Watermark" package="me.rosuh.easywatermark" drawable="easy_watermark"/>
+    <item name="TaiChi" package="me.weishu.exp" drawable="taichi"/>
+    <item name="KernelSU" package="me.weishu.kernelsu" drawable="kernelsu"/>
+    <item name="Material Files" package="me.zhanghai.android.files" drawable="generic_files"/>
+    <item name="MEGA" package="mega.privacy.android.app" drawable="mega"/>
+    <item name="Sprouts" package="melandru.lonicera" drawable="sprouts"/>
+    <item name="Arcaea" package="moe.low.arc" drawable="arcaea"/>
+    <item name="NekoBox" package="moe.nb4a" drawable="nekobox"/>
+    <item name="Shizuku" package="moe.shizuku.privileged.api" drawable="shizuku"/>
+    <item name="Storage Isolation" package="moe.shizuku.redirectstorage" drawable="storage_isolation"/>
+    <item name="EhViewer" package="moe.tarsin.ehviewer" drawable="ehviewer"/>
+    <item name="Nekogram" package="nekox.messenger" drawable="nekogram"/>
+    <item name="Joplin" package="net.cozic.joplin" drawable="joplin"/>
+    <item name="Tasker" package="net.dinglisch.android.taskerm" drawable="tasker"/>
+    <item name="OpenVPN Connect" package="net.openvpn.openvpn" drawable="openvpn"/>
+    <item name="Quetta" package="net.quetta.browser" drawable="quetta"/>
+    <item name="Skyscanner" package="net.skyscanner.android.main" drawable="skyscanner"/>
+    <item name="Tandem" package="net.tandem" drawable="tandem"/>
+    <item name="Thunderbird" package="net.thunderbird.android" drawable="thunderbird"/>
+    <item name="Thunderbird Beta" package="net.thunderbird.android.beta" drawable="thunderbird_beta"/>
+    <item name="XMind" package="net.xmind.doughnut" drawable="xmind"/>
+    <item name="Notion" package="notion.id" drawable="notion"/>
+    <item name="ABP for Samsung Internet" package="org.adblockplus.adblockplussbrowser" drawable="abp_for_samsung_internet"/>
+    <item name="Breezy Weather" package="org.breezyweather" drawable="breezy_weather"/>
+    <item name="Bromite" package="org.bromite.bromite" drawable="bromite"/>
+    <item name="Citra" package="org.citra.citra_emu" drawable="citra"/>
+    <item name="Citra" package="org.citra.emu" drawable="citra"/>
+    <item name="Camera" package="org.codeaurora.snapcam" drawable="generic_camera"/>
+    <item name="Coursera" package="org.coursera.android" drawable="coursera"/>
+    <item name="NOVA Video Player" package="org.courville.nova" drawable="nova_video_player"/>
+    <item name="Cromite" package="org.cromite.cromite" drawable="cromite"/>
+    <item name="ZzzFun" package="org.daimhim.zzzfun" drawable="zzzfun"/>
+    <item name="Fcitx5 for Android" package="org.fcitx.fcitx5.android" drawable="fcitx5_for_android"/>
+    <item name="F-Droid" package="org.fdroid.fdroid" drawable="f_droid"/>
+    <item name="Fossify Gallery" package="org.fossify.gallery" drawable="fossify_gallery"/>
+    <item name="GeoGebra Calculator Suite" package="org.geogebra.android.calculator.suite" drawable="geogebra_calculator_suite"/>
+    <item name="GeoGebra 3D Calculator" package="org.geogebra.android.g3d" drawable="geogebra_3d_calculator"/>
+    <item name="GeoGebra" package="org.geogebra.android.geometry" drawable="geogebra"/>
+    <item name="Jellyfin" package="org.jellyfin.mobile" drawable="jellyfin"/>
+    <item name="KDE Connect" package="org.kde.kdeconnect_tp" drawable="kde_connect"/>
+    <item name="Krita" package="org.krita" drawable="krita"/>
+    <item name="KLWP" package="org.kustom.wallpaper" drawable="klwp"/>
+    <item name="KWGT" package="org.kustom.widget" drawable="kwgt"/>
+    <item name="KWGT Pro" package="org.kustom.widget.pro" drawable="kwgt_pro"/>
+    <item name="Yatse" package="org.leetzone.android.yatsewidgetfree" drawable="yatse"/>
+    <item name="Camera" package="org.lineageos.aperture" drawable="generic_camera"/>
+    <item name="Camera" package="org.lineageos.snap" drawable="generic_camera"/>
+    <item name="LocalSend" package="org.localsend.localsend_app" drawable="localsend"/>
+    <item name="LSPatch" package="org.lsposed.lspatch" drawable="lspatch_lsposed"/>
+    <item name="LSPosed" package="org.lsposed.manager" drawable="lspatch_lsposed"/>
+    <item name="轻小说文库 ~~ Light Novel Library" package="org.mewx.wenku8" drawable="generic_book"/>
+    <item name="Firefox Nightly" package="org.mozilla.fenix" drawable="firefox_nightly"/>
+    <item name="Firefox" package="org.mozilla.firefox" drawable="firefox"/>
+    <item name="Firefox Beta" package="org.mozilla.firefox_beta" drawable="firefox_beta"/>
+    <item name="Firefox Focus" package="org.mozilla.focus" drawable="firefox_focus"/>
+    <item name="Outline" package="org.outline.android.client" drawable="outline"/>
+    <item name="PPSSPP" package="org.ppsspp.ppsspp" drawable="ppsspp"/>
+    <item name="PPSSPP Gold" package="org.ppsspp.ppssppgold" drawable="ppsspp_gold"/>
+    <item name="ReadEra" package="org.readera" drawable="read_era"/>
+    <item name="NewPipe" package="org.schabi.newpipe" drawable="newpipe"/>
+    <item name="Sudachi" package="org.sudachi.sudachi_emu" drawable="yuzu"/>
+    <item name="OpenKeychain" package="org.sufficientlysecure.keychain" drawable="openkeychain"/>
+    <item name="Swift Backup" package="org.swiftapps.swiftbackup" drawable="swift_backup"/>
+    <item name="Turrit" package="org.telegram.group" drawable="turrit"/>
+    <item name="Telegram" package="org.telegram.messenger" drawable="telegram"/>
+    <item name="Telegram" package="org.telegram.messenger.web" drawable="telegram"/>
+    <item name="Plus Messenger" package="org.telegram.plus" drawable="plus_messenger"/>
+    <item name="Telegram X" package="org.thunderdog.challegram" drawable="telegram"/>
+    <item name="Tor Browser" package="org.torproject.torbrowser" drawable="tor_browser"/>
+    <item name="VLC" package="org.videolan.vlc" drawable="vlc"/>
+    <item name="随身WiFi小助手 ~~ Portable WiFi Assistant" package="org.wifi.zic" drawable="bell_wi_fi"/>
+    <item name="Wikipedia" package="org.wikipedia" drawable="wikipedia"/>
+    <item name="Kodi" package="org.xbmc.kodi" drawable="kodi"/>
+    <item name="yuzu" package="org.yuzu.yuzu_emu" drawable="yuzu"/>
+    <item name="Speedtest by Ookla" package="org.zwanoo.android.speedtest" drawable="speedtest_by_ookla"/>
+    <item name="Diarium" package="partl.Diarium" drawable="diarium"/>
+    <item name="PDF Reader" package="pdf.reader.pdfviewer.pdfeditor" drawable="generic_pdf_file"/>
+    <item name="spacedesk" package="ph.spacedesk.beta" drawable="spacedesk"/>
+    <item name="Polarr" package="photo.editor.polarr" drawable="polarr"/>
+    <item name="Solid Explorer" package="pl.solidexplorer2" drawable="solid_explorer"/>
+    <item name="Waifu2x ncnn" package="pro.archiemeng.waifu2x" drawable="waifu2x_ncnn"/>
+    <item name="Hex Installer" package="project.vivid.hex.bodhi" drawable="hex_installer"/>
+    <item name="Folder Widget" package="pub.hanks.appfolderwidget" drawable="folder_widget"/>
+    <item name="APlayer" package="remix.myplayer" drawable="aplayer"/>
+    <item name="App Ops" package="rikka.appops" drawable="app_ops"/>
+    <item name="Shortcut Maker" package="rk.android.app.shortcutmaker" drawable="shortcut_maker"/>
+    <item name="Device Info HW" package="ru.andr7e.deviceinfohw" drawable="device_info_hw"/>
+    <item name="Apktool M" package="ru.maximoff.apktool" drawable="apktool_m"/>
+    <item name="J2ME Loader" package="ru.playsoftware.j2meloader" drawable="j2me_loader"/>
+    <item name="Lucky Patcher" package="ru.sxbuIDfx.pFSOyagrF" drawable="lucky_patcher"/>
+    <item name="Image Toolbox" package="ru.tech.imageresizershrinker" drawable="image_toolbox"/>
+    <item name="Яндекс Переводчик ~~ Yandex Translate" package="ru.yandex.translate" drawable="yandex_translate"/>
+    <item name="ZArchiver" package="ru.zdevs.zarchiver" drawable="zarchiver"/>
+    <item name="ZArchiver" package="ru.zdevs.zarchiver.pro" drawable="zarchiver"/>
+    <item name="Bigo Live" package="sg.bigo.live" drawable="bigo_live"/>
+    <item name="SYS_Shortcut_Lock_Screen" package="status_bar_toggle_lock" drawable="generic_lock"/>
+    <item name="ShortX+" package="tornaco.apps.shortx" drawable="shortx_plus"/>
+    <item name="アベマ ~~ ABEMA" package="tv.abema" drawable="abema"/>
+    <item name="BiliBili" package="tv.danmaku.bili" drawable="bilibili"/>
+    <item name="BiliBili" package="tv.danmaku.bilibilihd" drawable="bilibili"/>
+    <item name="Trakt" package="tv.trakt.trakt" drawable="trakt"/>
+    <item name="Twitch" package="tv.twitch.android.app" drawable="twitch"/>
+    <item name="動畫瘋 ~~ Animation Crazy" package="tw.com.gamer.android.animad" drawable="animation_crazy"/>
+    <item name="Nekogram" package="tw.nekomimi.nekogram" drawable="nekogram"/>
+    <item name="PingTools Pro" package="ua.com.streamsoft.pingtoolspro" drawable="pingtools_pro"/>
+    <item name="Mull" package="us.spotco.fennec_dos" drawable="mull"/>
+    <item name="Zoom" package="us.zoom.videomeetings" drawable="zoom"/>
+    <item name="XPlayer" package="video.player.videoplayer" drawable="generic_player"/>
+    <item name="飞常准 ~~ Feichangzhun" package="vz.com" drawable="feichangzhun"/>
+    <item name="Geometric Weather" package="wangdaye.com.geometricweather" drawable="geometric_weather"/>
+    <item name="小黑屋 ~~ Black House" package="web1n.stopapp" drawable="black_house"/>
+    <item name="Overdrop" package="widget.dd.com.overdrop.free" drawable="overdrop"/>
+    <item name="AetherSX2" package="xyz.aethersx2.android" drawable="aethersx2"/>
+    <item name="Bluesky" package="xyz.blueskyweb.app" drawable="bluesky"/>
+    <item name="Nagram" package="xyz.nextalone.nagram" drawable="nagram"/>
+    <item name="QuickSwitch" package="xyz.paphonb.quickstepswitcher" drawable="quickswitch"/>
+    <item name="ToDesk" package="youqu.android.todesk" drawable="todesk"/>
+</resources>

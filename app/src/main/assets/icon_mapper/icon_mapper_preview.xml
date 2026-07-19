@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 预览图的图标集 -->
+<resources>
+    <!-- <item name="ODialer" package="com.oplus.dialer" drawable="google_phone" /> -->
+    <item name="TwelveKeyDialer" package="com.android.contacts.activities.TwelveKeyDialer"
+        drawable="google_phone" />
+    <item name="Google Messages" package="com.google.android.apps.messaging"
+        drawable="google_messages" />
+    <item name="Google Photos" package="com.google.android.apps.photos" drawable="google_photos" />
+    <item name="Google Chrome" package="com.android.chrome" drawable="google_chrome" />
+    <item name="Google Play Store" package="com.android.vending" drawable="google_play_store" />
+    <item name="WeChat" package="com.tencent.mm" drawable="wechat" />
+    <item name="BiliBili" package="tv.danmaku.bili" drawable="bilibili" />
+    <item name="酷安 ~~ CoolAPK" package="com.coolapk.market" drawable="coolapk" />
+    <item name="小红书 ~~ Xiaohongshu" package="com.xingin.xhs" drawable="xiaohongshu" />
+    <item name="知乎 ~~ Zhihu" package="com.zhihu.android" drawable="zhihu" />
+    <item name="NetEase Music" package="com.netease.cloudmusic" drawable="netease_music" />
+    <item name="Alipay" package="com.eg.android.AlipayGphone" drawable="alipay" />
+    <item name="Notion" package="notion.id" drawable="notion" />
+    <!-- ============================================================================== -->
+    <item name="Aliucord" package="com.discord" drawable="discord" />
+    <item name="Gmail" package="com.google.android.gm" drawable="gmail" />
+    <item name="Microsoft Edge" package="com.microsoft.emmx" drawable="microsoft_edge" />
+    <item name="PipePipe" package="InfinityLoop1309.NewPipeEnhanced" drawable="pipepipe" />
+    <item name="Character.AI" package="ai.character.app" drawable="character_ai" />
+    <item name="Perplexity" package="ai.perplexity.app.android" drawable="perplexity" />
+    <item name="Grok" package="ai.x.grok" drawable="grok" />
+    <item name="Adobe Photoshop Touch" package="air.com.adobe.pstouchphone"
+        drawable="adobe_photoshop_touch" />
+    <item name="OnePlus Documents" package="andes.oplus.documentsreader"
+        drawable="oneplus_documents" />
+    <item name="Immich" package="app.alextran.immich" drawable="immich" />
+    <item name="LANDrop" package="app.landrop.landrop_flutter" drawable="landrop" />
+    <item name="Lawnchair" package="app.lawnchair" drawable="lawnchair" />
+    <item name="Google Gemini" package="com.google.android.googlequicksearchbox"
+        drawable="google_gemini" />
+    <item name="Gboard" package="com.google.android.inputmethod.latin" drawable="gboard" />
+    <item name="Google Keep" package="com.google.android.keep" drawable="google_keep" />
+    <item name="YouTube Music" package="com.google.android.music" drawable="youtube_music" />
+    <item name="Google Play Games" package="com.google.android.play.games"
+        drawable="google_play_games" />
+    <item name="Android Auto" package="com.google.android.projection.gearhead"
+        drawable="android_auto" />
+    <!-- 系统快捷方式 -->
+    <item name="SYS_Shortcut_Lock_Screen" package="status_bar_toggle_lock" drawable="generic_lock" />
+
+    <item name="Google TV" package="com.google.android.videos" drawable="google_tv" />
+    <item name="Wear OS" package="com.google.android.wearable.app" drawable="wear_os" />
+    <item name="YouTube" package="com.google.android.youtube" drawable="youtube" />
+    <item name="Google Lens" package="com.google.ar.lens" drawable="google_lens" />
+    <item name="Google Earth" package="com.google.earth" drawable="google_earth" />
+    <item name="Microsoft To Do" package="com.microsoft.todos" drawable="microsoft_todo" />
+</resources>
