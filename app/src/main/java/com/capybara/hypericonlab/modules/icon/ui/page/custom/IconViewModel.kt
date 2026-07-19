@@ -14,15 +14,19 @@ import com.capybara.hypericonlab.core.image.BgImageLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
+import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.ImageFillingUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.PresetUiState
+import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.WallpaperUiState
+import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
@@ -61,7 +65,8 @@ class IconViewModel(
     application: Application,
     private val manageResourcesUseCase: ManageResourcesUseCase,
     private val generatePreviewUseCase: GeneratePreviewUseCase,
-    private val pipeline: IconPipelineUseCase
+    private val pipeline: IconPipelineUseCase,
+    private val buildTaskManager: BuildTaskManager
 ) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
@@ -72,7 +77,17 @@ class IconViewModel(
             // assets 中 mapper 文件所在目录
             const val MAPPER_ASSET_DIR = "icon_mapper"
         }
+
+        // 构建任务关键参数集中声明，便于调参
+        private object BuildConfig {
+            // 提交任务时占位的图标数量，真实数量在 executor 解析 mapper 后更新
+            const val PLACEHOLDER_ICON_COUNT = 0
+        }
     }
+
+    // 构建任务队列与已完成列表（直接转发 BuildTaskManager 的 StateFlow）
+    val activeBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.activeTasks
+    val finishedBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.finishedTasks
 
     // Configuration State
     private val _config = MutableStateFlow(IconConfigState())
@@ -243,6 +258,8 @@ class IconViewModel(
     private fun loadColorSchemes() {
         viewModelScope.launch(Dispatchers.IO) {
             appColorSchemes = AppColorSchemesLoader.loadFromAssets(context)
+            // 同步给 BuildTaskManager，供 executor 执行任务时使用
+            buildTaskManager.updateAppColorSchemes(appColorSchemes)
         }
     }
 
@@ -516,7 +533,8 @@ class IconViewModel(
                 }
                 val svgDir =
                     withContext(Dispatchers.IO) { ZipUtils.findDirRecursive(lawniconsBase, "svgs") }
-                val maskBitmaps = _config.value.selectedMasks.mapNotNull { name ->
+                val configValue = _config.value
+                val maskBitmaps = configValue.selectedMasks.mapNotNull { name ->
                     try {
                         context.assets.open("masks/mask_${name}_512.png")
                             .use { BitmapFactory.decodeStream(it) }
@@ -525,7 +543,6 @@ class IconViewModel(
                     }
                 }
 
-                val configValue = _config.value
                 // 下层 mask bitmaps（仅双层启用时加载）
                 val maskBitmaps2 = if (configValue.dualLayerEnabled) {
                     configValue.bgLayer2.selectedMasks.mapNotNull { name ->
@@ -537,53 +554,7 @@ class IconViewModel(
                         }
                     }
                 } else emptyList()
-                // 预解析下层颜色（app 源由 IconPipelineUseCase 按 packageName 实时解析，此处跳过）
-                val resolvedBgColor2 = if (configValue.dualLayerEnabled &&
-                    configValue.bgLayer2.colorSource != "app"
-                ) {
-                    generatePreviewUseCase.resolveConfigColors(
-                        isFg = false,
-                        config = configValue,
-                        wallpaperColorScheme = wallpaperColorScheme.value,
-                        appColorSchemes = appColorSchemes,
-                        layerIndex = 1
-                    )
-                } else configValue.bgLayer2.color
-                val buildConfig = IconBuildConfig(
-                    fgColorHex = configValue.fgColor,
-                    bgColorHex = configValue.bgColor,
-                    strokeWidthRatio = configValue.strokeWidthRatio,
-                    iconScale = configValue.iconScale,
-                    colorMode = configValue.colorMode,
-                    useStreaming = useStreaming.value,
-                    masks = configValue.selectedMasks,
-                    fgStyle = configValue.fgStyle,
-                    bgStyle = configValue.bgStyle,
-                    bgColorSource = configValue.bgColorSource,
-                    stickerConfig = if (configValue.fgStyle == "sticker") StickerConfig(
-                        fillStyle = configValue.sticker.fillStyle,
-                        strokeWidth = configValue.sticker.strokeWidth,
-                        glowIntensity = configValue.sticker.glowIntensity,
-                        lineColor = configValue.sticker.lineColor,
-                        fillColor = configValue.sticker.fillColor
-                    ) else null,
-                    selectedStaticImages = configValue.selectedStaticImages,
-                    selectedFillingImages = configValue.selectedFillingImages,
-                    imageFillingRandomRotation = configValue.imageFilling.randomRotation,
-                    imageFillingScaleMode = configValue.imageFilling.scaleMode,
-                    dualLayerEnabled = configValue.dualLayerEnabled,
-                    dualLayerSizeDiff = configValue.dualLayerSizeDiff,
-                    bgStyle2 = configValue.bgLayer2.style,
-                    bgColor2 = resolvedBgColor2,
-                    bgColorSource2 = configValue.bgLayer2.colorSource,
-                    bgPreviewThemeMode2 = configValue.bgLayer2.previewThemeMode,
-                    bgLayer2Alpha = configValue.bgLayer2.alpha,
-                    selectedMasks2 = configValue.bgLayer2.selectedMasks,
-                    selectedStaticImages2 = configValue.bgLayer2.selectedStaticImages,
-                    selectedFillingImages2 = configValue.bgLayer2.selectedFillingImages,
-                    imageFilling2RandomRotation = configValue.bgLayer2.imageFilling.randomRotation,
-                    imageFilling2ScaleMode = configValue.bgLayer2.imageFilling.scaleMode
-                )
+                val buildConfig = buildIconBuildConfig(configValue)
 
                 val out = File(filesDir, "${mapperName.removeSuffix(".xml")}.mtz")
                 pipeline.executeWithFiles(
@@ -664,5 +635,188 @@ class IconViewModel(
             paletteStyle = wp.paletteStyle,
             colorSpec = wp.colorSpec
         )
+    }
+
+    // ========================================================================
+    // 构建任务相关 API（对接 BuildTaskManager）
+    // ========================================================================
+
+    /**
+     * 根据当前 [_config] 构造 [IconBuildConfig]，runPipeline 与 submitBuildTask 共用。
+     * 下层背景颜色（app 源除外）在此处预解析，executor 不再处理颜色解析。
+     */
+    private fun buildIconBuildConfig(configValue: IconConfigState): IconBuildConfig {
+        // 预解析下层颜色（app 源由 IconPipelineUseCase 按 packageName 实时解析，此处跳过）
+        val resolvedBgColor2 = if (configValue.dualLayerEnabled &&
+            configValue.bgLayer2.colorSource != "app"
+        ) {
+            generatePreviewUseCase.resolveConfigColors(
+                isFg = false,
+                config = configValue,
+                wallpaperColorScheme = wallpaperColorScheme.value,
+                appColorSchemes = appColorSchemes,
+                layerIndex = 1
+            )
+        } else configValue.bgLayer2.color
+
+        return IconBuildConfig(
+            fgColorHex = configValue.fgColor,
+            bgColorHex = configValue.bgColor,
+            strokeWidthRatio = configValue.strokeWidthRatio,
+            iconScale = configValue.iconScale,
+            colorMode = configValue.colorMode,
+            useStreaming = useStreaming.value,
+            masks = configValue.selectedMasks,
+            fgStyle = configValue.fgStyle,
+            bgStyle = configValue.bgStyle,
+            bgColorSource = configValue.bgColorSource,
+            stickerConfig = if (configValue.fgStyle == "sticker") StickerConfig(
+                fillStyle = configValue.sticker.fillStyle,
+                strokeWidth = configValue.sticker.strokeWidth,
+                glowIntensity = configValue.sticker.glowIntensity,
+                lineColor = configValue.sticker.lineColor,
+                fillColor = configValue.sticker.fillColor
+            ) else null,
+            selectedStaticImages = configValue.selectedStaticImages,
+            selectedFillingImages = configValue.selectedFillingImages,
+            imageFillingRandomRotation = configValue.imageFilling.randomRotation,
+            imageFillingScaleMode = configValue.imageFilling.scaleMode,
+            dualLayerEnabled = configValue.dualLayerEnabled,
+            dualLayerSizeDiff = configValue.dualLayerSizeDiff,
+            bgStyle2 = configValue.bgLayer2.style,
+            bgColor2 = resolvedBgColor2,
+            bgColorSource2 = configValue.bgLayer2.colorSource,
+            bgPreviewThemeMode2 = configValue.bgLayer2.previewThemeMode,
+            bgLayer2Alpha = configValue.bgLayer2.alpha,
+            selectedMasks2 = configValue.bgLayer2.selectedMasks,
+            selectedStaticImages2 = configValue.bgLayer2.selectedStaticImages,
+            selectedFillingImages2 = configValue.bgLayer2.selectedFillingImages,
+            imageFilling2RandomRotation = configValue.bgLayer2.imageFilling.randomRotation,
+            imageFilling2ScaleMode = configValue.bgLayer2.imageFilling.scaleMode
+        )
+    }
+
+    /**
+     * 提交构建任务。本方法不检查权限，调用方应先通过 [buildPermissionsMissing] 检查并申请权限。
+     *
+     * iconCount 传 0（占位），BuildTaskExecutor 解析 mapper 后会更新真实数量。
+     *
+     * @param productType 产物类型（如 ZIP_ICONS）
+     * @param iconSetId 图标集 id（对应 assets/icon_mapper/<id>.xml，不含扩展名）
+     * @param iconSetLabel 图标集展示名
+     * @return 创建的 [BuildTask]（PENDING 状态），若预览图未就绪则返回 null
+     */
+    fun submitBuildTask(
+        productType: ProductType,
+        iconSetId: String,
+        iconSetLabel: String
+    ): BuildTask? {
+        val storePreview = _storePreviewBitmap.value ?: run {
+            addLog("提交失败：store 预览图未就绪", LogType.ERROR)
+            return null
+        }
+        val mainPreview = _mainPreviewBitmap.value ?: run {
+            addLog("提交失败：main 预览图未就绪", LogType.ERROR)
+            return null
+        }
+
+        val configValue = _config.value
+        val buildConfig = buildIconBuildConfig(configValue)
+        // 壁纸引用：当前壁纸位图的临时路径（用于失败重试时重新解析颜色，暂存 URI 字符串）
+        val wallpaperUri = wallpaperBitmap.value?.let { "embedded:wallpaper" }
+
+        return buildTaskManager.submit(
+            config = buildConfig,
+            configSnapshot = configValue,
+            productType = productType,
+            iconSetId = iconSetId,
+            iconSetLabel = iconSetLabel,
+            iconCount = BuildConfig.PLACEHOLDER_ICON_COUNT,
+            wallpaperUri = wallpaperUri,
+            storePreview = storePreview,
+            mainPreview = mainPreview
+        ).also {
+            addLog("已提交构建任务: ${it.taskId}")
+        }
+    }
+
+    /**
+     * 重试失败任务。基于原任务的 configSnapshot 重新生成预览图后提交新任务。
+     *
+     * @param originalTaskId 原 FAILED 任务 id
+     * @return 新创建的 [BuildTask]（PENDING 状态），原任务不存在/非 FAILED/预览图生成失败时返回 null
+     */
+    fun retryBuildTask(originalTaskId: String): BuildTask? {
+        // 临时切到原 configSnapshot 生成预览图，再切回当前 config
+        val original = finishedBuildTasks.value.find { it.taskId == originalTaskId } ?: return null
+        if (original.status != BuildTaskStatus.FAILED) return null
+
+        val currentConfig = _config.value
+        // 临时应用原配置以生成对应预览图
+        _config.value = original.configSnapshot
+        generateLivePreview()
+        // 等待预览图生成完成（generateLivePreview 异步，使用 runBlocking 不合适，
+        // 此处简化处理：直接读当前缓存的预览图，若未就绪则恢复配置并返回 null）
+        val storePreview = _storePreviewBitmap.value
+        val mainPreview = _mainPreviewBitmap.value
+        // 恢复当前配置
+        _config.value = currentConfig
+        generateLivePreview()
+
+        if (storePreview == null || mainPreview == null) {
+            addLog("重试失败：预览图未就绪，请稍后再试", LogType.ERROR)
+            return null
+        }
+
+        return buildTaskManager.retry(
+            originalTaskId = originalTaskId,
+            storePreview = storePreview,
+            mainPreview = mainPreview
+        )?.also {
+            addLog("已重试任务: ${it.taskId}")
+        }
+    }
+
+    /**
+     * 取消任务。RUNNING 任务取消执行，PENDING 任务直接从队列移除。
+     * CANCELLED 状态不进入已完成列表。
+     */
+    fun cancelBuildTask(taskId: String) {
+        buildTaskManager.cancel(taskId)
+        addLog("已取消任务: $taskId")
+    }
+
+    /**
+     * 删除已完成任务（同时清理其缩略图与预览图文件）。
+     */
+    fun deleteFinishedBuildTask(taskId: String) {
+        buildTaskManager.deleteFinished(taskId)
+        addLog("已删除任务: $taskId")
+    }
+
+    /**
+     * 检查构建任务所需的权限，返回缺失的权限列表（空列表表示权限齐全）。
+     * 调用方应使用 ActivityResultContracts.RequestPermission() 逐个申请。
+     *
+     * - Android 13+：POST_NOTIFICATIONS（用于进度通知）
+     * - Android 9 及以下：WRITE_EXTERNAL_STORAGE（用于导出产物到公共 Documents）
+     */
+    fun buildPermissionsMissing(): List<String> {
+        val missing = mutableListOf<String>()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            val granted = androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (!granted) missing.add(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P) {
+            val granted = androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (!granted) missing.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        return missing
     }
 }

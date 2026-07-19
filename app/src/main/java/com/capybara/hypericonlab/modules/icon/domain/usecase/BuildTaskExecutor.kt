@@ -68,6 +68,12 @@ class BuildTaskExecutor(
                 .open("${ExecutorConfig.MAPPER_ASSET_DIR}/${task.iconSetId}.xml")
                 .use { stream -> IconMapperProcessor.parseIconMapper(stream) }
 
+            // 解析得到真实图标数量后，立即更新 current（任务卡片可显示真实数量）
+            if (current.iconCount != mapperMap.size) {
+                current = current.copy(iconCount = mapperMap.size)
+                onUpdate(current)
+            }
+
             // 2. 查找 svgs 目录
             val lawniconsBase = File(context.filesDir, ExecutorConfig.LAWNICONS_DIRNAME)
             val svgDir = ZipUtils.findDirRecursive(lawniconsBase, ExecutorConfig.SVGS_DIRNAME)
