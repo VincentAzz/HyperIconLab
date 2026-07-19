@@ -127,6 +127,8 @@ class IconViewModel(
         .stateIn(viewModelScope, SharingStarted.Eagerly, IconConfigState().dualLayerSizeDiff)
     val bgLayer2 = _config.map { it.bgLayer2 }
         .stateIn(viewModelScope, SharingStarted.Eagerly, BgLayerUiState())
+    val syncDualLayerColorSource = _config.map { it.syncDualLayerColorSource }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     // UI Status State
     private val _statusText = MutableStateFlow("就绪")

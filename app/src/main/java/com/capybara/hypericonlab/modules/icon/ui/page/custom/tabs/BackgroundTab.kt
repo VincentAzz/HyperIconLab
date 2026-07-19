@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -115,7 +116,7 @@ fun BackgroundTab(
         }
 
         SegmentedColumn(
-            title = "上层背景样式",
+            title = if (dualLayerEnabled) "上层背景样式" else "样式",
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
         ) {
             item { shape ->
@@ -125,33 +126,59 @@ fun BackgroundTab(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            StyleChip(
-                                label = "无背景",
-                                selected = style == "none",
-                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "none") } },
-                                enabled = !dualLayerEnabled, // 双层启用时禁用
-                                modifier = Modifier.weight(1f)
-                            )
-                            StyleChip(
-                                label = "纯色",
-                                selected = style == "solid",
-                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "solid") } },
-                                modifier = Modifier.weight(1f)
-                            )
+                            // 双层启用时不显示"无背景"chip（联动规则 3.3 已强制切回 solid），静态图片前移填补
+                            if (!dualLayerEnabled) {
+                                StyleChip(
+                                    label = "无背景",
+                                    selected = style == "none",
+                                    onClick = { viewModel.updateConfig { it.copy(bgStyle = "none") } },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                StyleChip(
+                                    label = "纯色",
+                                    selected = style == "solid",
+                                    onClick = { viewModel.updateConfig { it.copy(bgStyle = "solid") } },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            } else {
+                                StyleChip(
+                                    label = "纯色",
+                                    selected = style == "solid",
+                                    onClick = { viewModel.updateConfig { it.copy(bgStyle = "solid") } },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                StyleChip(
+                                    label = "静态图片",
+                                    selected = style == "img_static",
+                                    onClick = { viewModel.updateConfig { it.copy(bgStyle = "img_static") } },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            StyleChip(
-                                label = "静态图片",
-                                selected = style == "img_static",
-                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "img_static") } },
-                                modifier = Modifier.weight(1f)
-                            )
-                            StyleChip(
-                                label = "图片填充",
-                                selected = style == "img_filling",
-                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "img_filling") } },
-                                modifier = Modifier.weight(1f)
-                            )
+                            if (!dualLayerEnabled) {
+                                StyleChip(
+                                    label = "静态图片",
+                                    selected = style == "img_static",
+                                    onClick = { viewModel.updateConfig { it.copy(bgStyle = "img_static") } },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                StyleChip(
+                                    label = "图片填充",
+                                    selected = style == "img_filling",
+                                    onClick = { viewModel.updateConfig { it.copy(bgStyle = "img_filling") } },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            } else {
+                                StyleChip(
+                                    label = "图片填充",
+                                    selected = style == "img_filling",
+                                    onClick = { viewModel.updateConfig { it.copy(bgStyle = "img_filling") } },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                // 末位空缺用 Spacer 占位，保持两列对齐
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
                         }
                     }
                 }
@@ -446,16 +473,7 @@ private fun LowerLayerBackgroundSection(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        StyleChip(
-                            label = "无背景",
-                            selected = style2 == "none",
-                            onClick = {
-                                viewModel.updateConfig {
-                                    it.copy(bgLayer2 = it.bgLayer2.copy(style = "none"))
-                                }
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
+                        // 下层不显示"无背景"chip（下层无背景无意义），静态图片前移填补
                         StyleChip(
                             label = "纯色",
                             selected = style2 == "solid",
@@ -466,8 +484,6 @@ private fun LowerLayerBackgroundSection(
                             },
                             modifier = Modifier.weight(1f)
                         )
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         StyleChip(
                             label = "静态图片",
                             selected = style2 == "img_static",
@@ -478,6 +494,8 @@ private fun LowerLayerBackgroundSection(
                             },
                             modifier = Modifier.weight(1f)
                         )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         StyleChip(
                             label = "图片填充",
                             selected = style2 == "img_filling",
@@ -488,6 +506,8 @@ private fun LowerLayerBackgroundSection(
                             },
                             modifier = Modifier.weight(1f)
                         )
+                        // 末位空缺用 Spacer 占位，保持两列对齐
+                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }

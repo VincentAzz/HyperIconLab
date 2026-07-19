@@ -69,7 +69,9 @@ data class IconConfigState(
     // 下层背景独立配置
     val bgLayer2: BgLayerUiState = BgLayerUiState(),
     // 下层背景相对上层的大小差异，0.0~0.3，步进 0.02（15 档）
-    val dualLayerSizeDiff: Float = 0.08f
+    val dualLayerSizeDiff: Float = 0.08f,
+    // 双层启用时，上层颜色来源变更是否同步应用到下层（仅同步 colorSource，下层 monet 变体保持独立）
+    val syncDualLayerColorSource: Boolean = false
 )
 
 /**
@@ -83,8 +85,8 @@ data class BgLayerUiState(
     val color: String = "#FF3F51B5",
     // 颜色来源：wallpaper/app/preset/ctc/custom/black_white
     val colorSource: String = "wallpaper",
-    // 下层独立的 monet 变体，与上层分离
-    val previewThemeMode: String = "dark",
+    // 下层独立的 monet 变体，与上层分离；默认中性，与上层默认暗色形成可见差异
+    val previewThemeMode: String = "neutral",
     // 下层图层级透明度 0~255，默认不透明
     val alpha: Int = 255,
     // 形状遮罩

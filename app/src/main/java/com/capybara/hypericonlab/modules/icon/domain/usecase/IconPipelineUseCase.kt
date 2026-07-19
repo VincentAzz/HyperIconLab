@@ -29,6 +29,14 @@ import kotlin.math.ceil
 class IconPipelineUseCase(
     private val context: Context
 ) {
+
+    /**
+     * 双层背景图片类下层透明度策略。
+     * 图片类下层（img_static / img_filling）始终保持完全不透明，不应用 alpha。
+     */
+    private object DualLayerImgAlphaPolicy {
+        const val FORCED_ALPHA = 255
+    }
     fun executeWithFiles(
         config: IconBuildConfig,
         iconMap: Map<String, String>,
@@ -224,11 +232,16 @@ class IconPipelineUseCase(
                                     // 上层合成图缩放到 upperRenderSize（居中放置到下层之上）
                                     val upperScaled =
                                         upperComposite.scale(upperRenderSize, upperRenderSize)
+                                    // 图片类下层背景始终保持完全不透明，不应用 alpha
+                                    val effectiveLowerAlpha = when (config.bgStyle2) {
+                                        "img_static", "img_filling" -> DualLayerImgAlphaPolicy.FORCED_ALPHA
+                                        else -> config.bgLayer2Alpha
+                                    }
                                     BackgroundGenerator.mergeDualLayerBackground(
                                         lowerBg = lowerBg,
                                         upperBg = upperScaled,
                                         iconSize = config.iconSize,
-                                        lowerAlpha = config.bgLayer2Alpha
+                                        lowerAlpha = effectiveLowerAlpha
                                     ).also {
                                         lowerBg.recycle()
                                         upperScaled.recycle()

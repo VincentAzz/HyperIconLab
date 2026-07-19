@@ -40,7 +40,6 @@ import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.symbol.design_services
 import com.capybara.hypericonlab.core.designsystem.symbol.style
-import com.capybara.hypericonlab.core.designsystem.symbol.sync
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
@@ -86,19 +85,47 @@ fun ColorSourceSection(
     val wallpaperPaletteStyle = config.wallpaper.paletteStyle
     val wallpaperColorSpec = config.wallpaper.colorSpec
     val syncColorSource = config.syncColorSource
+    val syncDualLayerColorSource = config.syncDualLayerColorSource
+    val dualLayerEnabled = config.dualLayerEnabled
     // 下层背景透明度（0~255），仅下层使用
     val lowerAlpha = if (layerIndex == 1) bgLayer2.alpha else 255
 
-    // 写入颜色来源：下层写入 bgLayer2.colorSource，上层按原逻辑（含同步联动）
+    // 标题前缀：双层启用时上层/下层加前缀，未启用时无前缀
+    val layerPrefix = when {
+        layerIndex == 1 -> "下层"
+        dualLayerEnabled -> "上层"
+        else -> ""
+    }
+    val colorSectionTitle = if (layerPrefix.isEmpty()) "颜色" else "${layerPrefix}背景颜色"
+    val wallpaperConfigTitle =
+        if (layerPrefix.isEmpty()) "基于壁纸色彩配置" else "${layerPrefix}基于壁纸色彩配置"
+    val presetConfigTitle =
+        if (layerPrefix.isEmpty()) "Material 3 预设配置" else "${layerPrefix}Material 3 预设配置"
+    val ctcConfigTitle =
+        if (layerPrefix.isEmpty()) "中国传统色预设配置" else "${layerPrefix}中国传统色预设配置"
+
+    // 写入颜色来源：
+    // - 下层（layerIndex==1）：写入 bgLayer2.colorSource
+    // - 上层背景（layerIndex==0 && !isForeground）：上层字段；若 syncColorSource 启用则同时同步前景；
+    //   若 syncDualLayerColorSource 启用则同时同步下层（仅 colorSource，下层 monet 变体保持独立）
+    // - 前景（isForeground）：上层字段；若 syncColorSource 启用则同时同步背景
     fun applyColorSource(source: String) {
         viewModel.updateConfig {
             if (layerIndex == 1) {
                 it.copy(bgLayer2 = it.bgLayer2.copy(colorSource = source))
-            } else if (syncColorSource) {
-                it.copy(fgColorSource = source, bgColorSource = source)
             } else {
-                if (isForeground) it.copy(fgColorSource = source)
-                else it.copy(bgColorSource = source)
+                val withFgSync = if (syncColorSource) {
+                    it.copy(fgColorSource = source, bgColorSource = source)
+                } else {
+                    if (isForeground) it.copy(fgColorSource = source)
+                    else it.copy(bgColorSource = source)
+                }
+                // 双层启用且开启同步上下层时，上层背景变更同步到下层 colorSource（不动 monet 变体）
+                if (dualLayerEnabled && syncDualLayerColorSource && !isForeground) {
+                    withFgSync.copy(bgLayer2 = withFgSync.bgLayer2.copy(colorSource = source))
+                } else {
+                    withFgSync
+                }
             }
         }
     }
@@ -188,7 +215,7 @@ fun ColorSourceSection(
     }
 
     SegmentedColumn(
-        title = if (layerIndex == 1) "下层背景颜色" else "颜色",
+        title = colorSectionTitle,
         contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
     ) {
         item { shape ->
@@ -303,18 +330,35 @@ fun ColorSourceSection(
             )
         }
 
-        // 同步前景与背景开关：仅上层显示（下层独立配置，不参与同步联动）
+        // 同步前景与背景开关：仅上层显示（下层独立配置，不参与同步联动）。精简样式：无 icon、无 description、无 iconPlaceholder
         item(
             animatedVisibility = layerIndex == 0 && colorSource != "custom" && colorSource != "black_white",
             topPadding = ListItemDefaults.SegmentedGap,
         ) {
             SwitchWidget(
-                icon = AppMaterialSymbols.sync,
+                icon = null,
+                iconPlaceholder = false,
                 title = "同步前景与背景",
-                description = if (syncColorSource) "启用" else "禁用",
                 checked = syncColorSource,
                 onCheckedChange = { enabled ->
                     viewModel.updateConfig { it.copy(syncColorSource = enabled) }
+                }
+            )
+        }
+
+        // 同步上层与下层背景颜色开关：双层启用且上层背景（非前景）时显示。
+        // 启用后上层背景 colorSource 变更同步到下层（下层 monet 变体保持独立）。
+        item(
+            animatedVisibility = layerIndex == 0 && !isForeground && dualLayerEnabled && colorSource != "custom" && colorSource != "black_white",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) {
+            SwitchWidget(
+                icon = null,
+                iconPlaceholder = false,
+                title = "同步上层与下层",
+                checked = syncDualLayerColorSource,
+                onCheckedChange = { enabled ->
+                    viewModel.updateConfig { it.copy(syncDualLayerColorSource = enabled) }
                 }
             )
         }
@@ -322,7 +366,7 @@ fun ColorSourceSection(
 
     if (colorSource == "wallpaper") {
         SegmentedColumn(
-            title = if (layerIndex == 1) "下层基于壁纸色彩配置" else "基于壁纸色彩配置",
+            title = wallpaperConfigTitle,
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
         ) {
             item {
@@ -384,7 +428,7 @@ fun ColorSourceSection(
 
     if (colorSource == "ctc") {
         SegmentedColumn(
-            title = if (layerIndex == 1) "下层中国传统色预设配置" else "中国传统色预设配置",
+            title = ctcConfigTitle,
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
         ) {
             item {
@@ -397,7 +441,7 @@ fun ColorSourceSection(
 
     if (colorSource == "preset") {
         SegmentedColumn(
-            title = if (layerIndex == 1) "下层 Material 3 预设配置" else "Material 3 预设配置",
+            title = presetConfigTitle,
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
         ) {
             item {
