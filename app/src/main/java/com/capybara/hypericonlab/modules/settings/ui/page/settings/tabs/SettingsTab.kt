@@ -71,6 +71,8 @@ fun SettingsTab(
     onShowThemeModeSheet: () -> Unit,
     onShowPaletteSheet: () -> Unit,
     onShowColorSpecSheet: () -> Unit,
+    // 点击"查看运行日志"按钮回调，由 SettingsPage 提供以弹出 LogSheet
+    onViewLog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val layoutDirection = LocalLayoutDirection.current
@@ -493,6 +495,11 @@ fun SettingsTab(
             StickerCacheSettings()
         }
 
+        item {
+            // 运行日志入口卡片：点击"查看"按钮弹出 LogSheet；日志较少查看，置于设置页底部
+            RunLogSettings(onViewLog = onViewLog)
+        }
+
         item { Spacer(Modifier.navigationBarsPadding()) }
     }
 }
@@ -538,6 +545,30 @@ fun StickerCacheSettings() {
                         }
                     }) {
                         Text("清除")
+                    }
+                }
+            )
+        }
+    }
+}
+
+/**
+ * 运行日志入口卡片：与"清除贴纸缓存"风格一致，点击"查看"按钮弹出 LogSheet。
+ * 日志较少查看，置于设置页底部。
+ *
+ * @param onViewLog 点击"查看"按钮回调
+ */
+@Composable
+fun RunLogSettings(onViewLog: () -> Unit) {
+    SegmentedColumn(title = "日志") {
+        item {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = "运行日志",
+                description = "查看图标生成与构建过程的运行日志",
+                trailingContent = {
+                    TextButton(onClick = onViewLog) {
+                        Text("查看")
                     }
                 }
             )

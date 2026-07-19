@@ -135,23 +135,23 @@ fun TaskPage(
         // 根据当前 tab 决定展示的列表
         val displayTasks =
             if (selectedTab == TaskPageConfig.TAB_INDEX_ACTIVE) activeTasks else finishedTasks
+        // 关键：参照设置页实现，layerBackdrop 必须放在最外层（不带 padding），
+        // 让 backdrop 捕获区域覆盖整个 Scaffold content（含 TopAppBar 下方位置），
+        // TopAppBar 通过 appBarBlurEffect 采样 backdrop 时才能取到内容；
+        // 所有 padding 通过 contentPadding 实现，不挤占 backdrop 捕获区域。
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .then(backdrop?.let { Modifier.layerBackdrop(it) } ?: Modifier)
-                .padding(
-                    start = paddingValues.calculateStartPadding(layoutDirection) + outerPadding.calculateStartPadding(
-                        layoutDirection
-                    ),
-                    top = paddingValues.calculateTopPadding(),
-                    end = paddingValues.calculateEndPadding(layoutDirection) + outerPadding.calculateEndPadding(
-                        layoutDirection
-                    ),
-                    bottom = outerPadding.calculateBottomPadding()
-                ),
+                .then(backdrop?.let { Modifier.layerBackdrop(it) } ?: Modifier),
             contentPadding = PaddingValues(
-                horizontal = TaskPageConfig.HORIZONTAL_PADDING,
-                vertical = TaskPageConfig.VERTICAL_PADDING
+                start = paddingValues.calculateStartPadding(layoutDirection) +
+                        outerPadding.calculateStartPadding(layoutDirection) +
+                        TaskPageConfig.HORIZONTAL_PADDING,
+                top = paddingValues.calculateTopPadding() + TaskPageConfig.VERTICAL_PADDING,
+                end = paddingValues.calculateEndPadding(layoutDirection) +
+                        outerPadding.calculateEndPadding(layoutDirection) +
+                        TaskPageConfig.HORIZONTAL_PADDING,
+                bottom = TaskPageConfig.VERTICAL_PADDING + outerPadding.calculateBottomPadding()
             ),
             verticalArrangement = Arrangement.spacedBy(TaskPageConfig.CARD_SPACING)
         ) {

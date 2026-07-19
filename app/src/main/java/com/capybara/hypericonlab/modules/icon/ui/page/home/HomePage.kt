@@ -77,20 +77,29 @@ fun HomePage(
         }
     ) { paddingValues ->
         // 空白内容区，后续接入预设卡片
+        // 关键：参照设置页实现，layerBackdrop 放在最外层（不带 padding），
+        // 让 backdrop 捕获区域覆盖整个 Scaffold content（含 TopAppBar 下方位置），
+        // TopAppBar 通过 appBarBlurEffect 采样 backdrop 时才能取到内容；
+        // padding 放到内层 Box，不挤占 backdrop 捕获区域。
         Box(
             modifier = modifier
                 .fillMaxSize()
                 .then(backdrop?.let { Modifier.layerBackdrop(it) } ?: Modifier)
-                .padding(
-                    start = paddingValues.calculateStartPadding(LocalLayoutDirection.current) + outerPadding.calculateStartPadding(
-                        LocalLayoutDirection.current
-                    ),
-                    top = paddingValues.calculateTopPadding(),
-                    end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + outerPadding.calculateEndPadding(
-                        LocalLayoutDirection.current
-                    ),
-                    bottom = outerPadding.calculateBottomPadding()
-                )
-        )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        start = paddingValues.calculateStartPadding(LocalLayoutDirection.current) + outerPadding.calculateStartPadding(
+                            LocalLayoutDirection.current
+                        ),
+                        top = paddingValues.calculateTopPadding(),
+                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + outerPadding.calculateEndPadding(
+                            LocalLayoutDirection.current
+                        ),
+                        bottom = outerPadding.calculateBottomPadding()
+                    )
+            )
+        }
     }
 }

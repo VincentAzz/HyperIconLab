@@ -48,6 +48,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
+import com.capybara.hypericonlab.modules.icon.ui.page.home.component.LogSheet
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AboutTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.SettingsTab
@@ -58,6 +60,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SettingsPage(
     viewModel: SettingsViewModel = koinViewModel(),
+    // IconViewModel 供运行日志 sheet 使用（LogSheet 直接读取其 logs 状态）
+    iconViewModel: IconViewModel = koinViewModel(),
     outerPadding: PaddingValues = PaddingValues(0.dp),
     windowInsetsSides: WindowInsetsSides? = null
 ) {
@@ -76,6 +80,8 @@ fun SettingsPage(
     var showPaletteSheet by remember { mutableStateOf(false) }
     var showThemeModeSheet by remember { mutableStateOf(false) }
     var showColorSpecSheet by remember { mutableStateOf(false) }
+    // 运行日志 sheet 显示状态：由设置页底部"运行日志"卡片触发
+    var showLogSheet by remember { mutableStateOf(false) }
 
     val backdrop = rememberMaterial3BlurBackdrop(uiState.useBlur)
 
@@ -131,6 +137,17 @@ fun SettingsPage(
                 viewModel.dispatch(ThemeSettingsAction.SetColorSpec(spec))
             },
             itemLabel = { spec: ThemeColorSpec -> spec.displayName },
+            backdrop = backdrop,
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
+            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+        )
+    }
+
+    // 运行日志 sheet：由设置页底部"运行日志"卡片触发，复用主页原 LogSheet 组件
+    if (showLogSheet) {
+        LogSheet(
+            viewModel = iconViewModel,
+            onDismiss = { showLogSheet = false },
             backdrop = backdrop,
             useLiquidGlass = uiState.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
@@ -210,7 +227,8 @@ fun SettingsPage(
                         backdrop = backdrop,
                         onShowThemeModeSheet = { showThemeModeSheet = true },
                         onShowPaletteSheet = { showPaletteSheet = true },
-                        onShowColorSpecSheet = { showColorSpecSheet = true }
+                        onShowColorSpecSheet = { showColorSpecSheet = true },
+                        onViewLog = { showLogSheet = true }
                     )
                 }
 
