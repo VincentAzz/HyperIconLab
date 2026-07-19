@@ -36,6 +36,7 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
+import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.symbol.design_services
 import com.capybara.hypericonlab.core.designsystem.symbol.style
@@ -56,32 +57,63 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
 fun ColorSourceSection(
     viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel,
     isForeground: Boolean,
+    layerIndex: Int = 0,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
     liquidGlassBlurRadius: Dp = 24.dp
 ) {
     val config by viewModel.config.collectAsStateWithLifecycle()
+    // 下层背景读写 bgLayer2 字段；上层/前景保持原逻辑
+    val bgLayer2 = config.bgLayer2
     val style = if (isForeground) config.fgStyle else config.bgStyle
-    val colorSource = if (isForeground) config.fgColorSource else config.bgColorSource
-    val configColor = if (isForeground) config.fgColor else config.bgColor
-
-    val previewThemeMode = config.previewThemeMode
+    val colorSource = when {
+        isForeground -> config.fgColorSource
+        layerIndex == 1 -> bgLayer2.colorSource
+        else -> config.bgColorSource
+    }
+    val configColor = when {
+        isForeground -> config.fgColor
+        layerIndex == 1 -> bgLayer2.color
+        else -> config.bgColor
+    }
+    // 下层使用独立的 previewThemeMode；上层/前景保持原字段
+    val previewThemeMode =
+        if (layerIndex == 1) bgLayer2.previewThemeMode else config.previewThemeMode
+    // preset/wallpaper/ctc 是颜色生成器配置，上下层共享（仅 monet 变体由 previewThemeMode 区分）
     val presetSeedColor = config.preset.seedColor
     val presetPaletteStyle = config.preset.paletteStyle
     val presetColorSpec = config.preset.colorSpec
     val wallpaperPaletteStyle = config.wallpaper.paletteStyle
     val wallpaperColorSpec = config.wallpaper.colorSpec
     val syncColorSource = config.syncColorSource
+    // 下层背景透明度（0~255），仅下层使用
+    val lowerAlpha = if (layerIndex == 1) bgLayer2.alpha else 255
 
-    // 同步联动设置颜色来源，同时修改前景和背景
+    // 写入颜色来源：下层写入 bgLayer2.colorSource，上层按原逻辑（含同步联动）
     fun applyColorSource(source: String) {
         viewModel.updateConfig {
-            if (syncColorSource) {
+            if (layerIndex == 1) {
+                it.copy(bgLayer2 = it.bgLayer2.copy(colorSource = source))
+            } else if (syncColorSource) {
                 it.copy(fgColorSource = source, bgColorSource = source)
             } else {
                 if (isForeground) it.copy(fgColorSource = source)
                 else it.copy(bgColorSource = source)
             }
+        }
+    }
+
+    // 写入下层 monet 变体（仅下层用）
+    fun updateLowerThemeMode(mode: String) {
+        viewModel.updateConfig {
+            it.copy(bgLayer2 = it.bgLayer2.copy(previewThemeMode = mode))
+        }
+    }
+
+    // 写入下层透明度
+    fun updateLowerAlpha(alpha: Int) {
+        viewModel.updateConfig {
+            it.copy(bgLayer2 = it.bgLayer2.copy(alpha = alpha))
         }
     }
 
@@ -156,7 +188,7 @@ fun ColorSourceSection(
     }
 
     SegmentedColumn(
-        title = "颜色",
+        title = if (layerIndex == 1) "下层背景颜色" else "颜色",
         contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
     ) {
         item { shape ->
@@ -200,10 +232,11 @@ fun ColorSourceSection(
                             label = "自定义",
                             selected = colorSource == "custom",
                             onClick = {
-                                viewModel.switchToCustomColor(isForeground)
+                                viewModel.switchToCustomColor(isForeground, layerIndex)
                             },
                             modifier = Modifier.weight(1f)
                         )
+                        // 黑白 chip 仅前景 sticker 显示；下层背景不显示
                         if (isForeground && style == "sticker") {
                             StyleChip(
                                 label = "黑白",
@@ -249,8 +282,30 @@ fun ColorSourceSection(
             )
         }
 
+        // 下层透明度滑块：layerIndex==1 且非自定义时显示（custom 已通过 ColorPickerSheet alpha 通道控制）
         item(
-            animatedVisibility = colorSource != "custom" && colorSource != "black_white",
+            animatedVisibility = layerIndex == 1 && colorSource != "custom",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) { shape ->
+            SliderWidget(
+                title = "透明度",
+                value = lowerAlpha.toFloat(),
+                onValueChange = { v ->
+                    updateLowerAlpha(
+                        v.toInt()
+                            .coerceIn(LowerLayerAlphaConstants.MIN, LowerLayerAlphaConstants.MAX)
+                    )
+                },
+                valueRange = LowerLayerAlphaConstants.MIN.toFloat()..LowerLayerAlphaConstants.MAX.toFloat(),
+                steps = LowerLayerAlphaConstants.STEPS,
+                valueDisplay = "${(lowerAlpha / LowerLayerAlphaConstants.MAX.toFloat() * 100).toInt()}%",
+                shape = shape
+            )
+        }
+
+        // 同步前景与背景开关：仅上层显示（下层独立配置，不参与同步联动）
+        item(
+            animatedVisibility = layerIndex == 0 && colorSource != "custom" && colorSource != "black_white",
             topPadding = ListItemDefaults.SegmentedGap,
         ) {
             SwitchWidget(
@@ -267,7 +322,7 @@ fun ColorSourceSection(
 
     if (colorSource == "wallpaper") {
         SegmentedColumn(
-            title = "基于壁纸色彩配置",
+            title = if (layerIndex == 1) "下层基于壁纸色彩配置" else "基于壁纸色彩配置",
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
         ) {
             item {
@@ -281,19 +336,28 @@ fun ColorSourceSection(
                         StyleChip(
                             label = "浅色",
                             selected = previewThemeMode == "light",
-                            onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "light") } },
+                            onClick = {
+                                if (layerIndex == 1) updateLowerThemeMode("light")
+                                else viewModel.updateConfig { it.copy(previewThemeMode = "light") }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                         StyleChip(
                             label = "中性",
                             selected = previewThemeMode == "neutral",
-                            onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "neutral") } },
+                            onClick = {
+                                if (layerIndex == 1) updateLowerThemeMode("neutral")
+                                else viewModel.updateConfig { it.copy(previewThemeMode = "neutral") }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                         StyleChip(
                             label = "暗色",
                             selected = previewThemeMode == "dark",
-                            onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "dark") } },
+                            onClick = {
+                                if (layerIndex == 1) updateLowerThemeMode("dark")
+                                else viewModel.updateConfig { it.copy(previewThemeMode = "dark") }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -320,7 +384,7 @@ fun ColorSourceSection(
 
     if (colorSource == "ctc") {
         SegmentedColumn(
-            title = "中国传统色预设配置",
+            title = if (layerIndex == 1) "下层中国传统色预设配置" else "中国传统色预设配置",
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
         ) {
             item {
@@ -333,7 +397,7 @@ fun ColorSourceSection(
 
     if (colorSource == "preset") {
         SegmentedColumn(
-            title = "Material 3 预设配置",
+            title = if (layerIndex == 1) "下层 Material 3 预设配置" else "Material 3 预设配置",
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
         ) {
             item {
@@ -347,13 +411,19 @@ fun ColorSourceSection(
                         StyleChip(
                             label = "浅色",
                             selected = previewThemeMode == "light",
-                            onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "light") } },
+                            onClick = {
+                                if (layerIndex == 1) updateLowerThemeMode("light")
+                                else viewModel.updateConfig { it.copy(previewThemeMode = "light") }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                         StyleChip(
                             label = "暗色",
                             selected = previewThemeMode == "dark",
-                            onClick = { viewModel.updateConfig { it.copy(previewThemeMode = "dark") } },
+                            onClick = {
+                                if (layerIndex == 1) updateLowerThemeMode("dark")
+                                else viewModel.updateConfig { it.copy(previewThemeMode = "dark") }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -442,6 +512,9 @@ fun ColorSourceSection(
                     if (isForeground) {
                         val newConfig = config.copy(fgColor = color)
                         if (color == "#00000000") newConfig.copy(fgStyle = "hollow") else newConfig
+                    } else if (layerIndex == 1) {
+                        // 下层背景自定义颜色写入 bgLayer2.color
+                        config.copy(bgLayer2 = config.bgLayer2.copy(color = color))
                     } else {
                         config.copy(bgColor = color)
                     }
@@ -453,4 +526,16 @@ fun ColorSourceSection(
             liquidGlassBlurRadius = liquidGlassBlurRadius
         )
     }
+}
+
+/**
+ * 下层背景透明度常量（避免硬编码）。
+ * 范围 0~255，步进 5%（即 13），共 20 档（含端点 0/255 由 coerce 保证）。
+ */
+private object LowerLayerAlphaConstants {
+    const val MIN = 0
+    const val MAX = 255
+
+    // 0~255 共 256 个值，按 5% 步进（即每 12.75 ≈ 13），实际取 13 档步进
+    const val STEPS = 13
 }

@@ -3,6 +3,7 @@ package com.capybara.hypericonlab.modules.icon.domain.usecase
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.color.HslColorUtils
 import com.capybara.hypericonlab.core.image.BackgroundGenerator
@@ -120,6 +121,12 @@ class IconPipelineUseCase(
                                 if (maskBitmaps.isNotEmpty()) maskBitmaps.random() else null
                             val fallbackColor =
                                 if (config.bgStyle == "none") "#00000000" else currentBg
+                            // 上层背景渲染尺寸（双层启用时缩小，否则为最终尺寸）
+                            val upperRenderSize =
+                                if (config.dualLayerEnabled && config.bgStyle != "none") {
+                                    ceil(config.iconSize * (1 - config.dualLayerSizeDiff)).toInt()
+                                        .coerceAtLeast(1)
+                                } else config.iconSize
                             val upperBg = when (config.bgStyle) {
                                 "img_static" -> {
                                     val imgRef = config.selectedStaticImages.randomOrNull()
@@ -151,13 +158,22 @@ class IconPipelineUseCase(
                                 maskBitmap = maskBmp
                             )
 
-                            // 双层背景合成：下层（较大、居中、带透明度）+ 上层（铺满）
+                            // 先合成上层背景 + 图标 → upperComposite（iconSize×iconSize）
+                            val upperComposite = LayerMerger.merge(
+                                background = upperBg,
+                                icon = processedIcon,
+                                subtractIcon = config.fgStyle == "hollow",
+                                fgAlpha = if (config.fgStyle == "glass") 1.0f else resolveAlpha(
+                                    currentFg
+                                )
+                            )
+                            upperBg.recycle()
+
+                            // 双层合成：上层（含图标）缩放后居中绘制到下层（铺满 iconSize）之上
                             // 下层颜色解析：app 源按 packageName 实时解析（同源时应用 HSL 亮度互补），
                             // 其余源（wallpaper/preset/ctc/custom/black_white）由 ViewModel 预解析到 config.bgColor2
-                            val bgBitmap =
+                            val finalBitmap =
                                 if (config.dualLayerEnabled && config.bgStyle != "none") {
-                                    val lowerSize =
-                                        ceil(config.iconSize * (1 + config.dualLayerSizeDiff)).toInt()
                                     val maskBmp2 =
                                         if (maskBitmaps2.isNotEmpty()) maskBitmaps2.random() else null
                                     val currentBg2 = if (config.bgStyle2 == "none") {
@@ -179,7 +195,7 @@ class IconPipelineUseCase(
                                                 config.selectedStaticImages2.randomOrNull()
                                             if (imgRef2 != null) {
                                                 BackgroundGenerator.createStaticImageBackground(
-                                                    context, imgRef2, lowerSize
+                                                    context, imgRef2, config.iconSize
                                                 )
                                             } else null
                                         }
@@ -191,7 +207,7 @@ class IconPipelineUseCase(
                                                 BackgroundGenerator.createImageFillingBackground(
                                                     context = context,
                                                     imageRef = imgRef2,
-                                                    iconSize = lowerSize,
+                                                    iconSize = config.iconSize,
                                                     maskBitmap = maskBmp2,
                                                     randomRotation = config.imageFilling2RandomRotation,
                                                     scaleMode = config.imageFilling2ScaleMode
@@ -201,29 +217,24 @@ class IconPipelineUseCase(
 
                                         else -> null
                                     } ?: BackgroundGenerator.createBackground(
-                                        iconSize = lowerSize,
+                                        iconSize = config.iconSize,
                                         colorHex = currentBg2,
                                         maskBitmap = maskBmp2
                                     )
+                                    // 上层合成图缩放到 upperRenderSize（居中放置到下层之上）
+                                    val upperScaled =
+                                        upperComposite.scale(upperRenderSize, upperRenderSize)
                                     BackgroundGenerator.mergeDualLayerBackground(
                                         lowerBg = lowerBg,
-                                        upperBg = upperBg,
+                                        upperBg = upperScaled,
                                         iconSize = config.iconSize,
                                         lowerAlpha = config.bgLayer2Alpha
                                     ).also {
                                         lowerBg.recycle()
-                                        upperBg.recycle()
+                                        upperScaled.recycle()
+                                        upperComposite.recycle()
                                     }
-                                } else upperBg
-
-                            val finalBitmap = LayerMerger.merge(
-                                background = bgBitmap,
-                                icon = processedIcon,
-                                subtractIcon = config.fgStyle == "hollow",
-                                fgAlpha = if (config.fgStyle == "glass") 1.0f else resolveAlpha(
-                                    currentFg
-                                )
-                            )
+                                } else upperComposite
 
                             val entry = ZipEntry("icons/$packageName.png")
                             zipOut.putNextEntry(entry)
@@ -231,7 +242,6 @@ class IconPipelineUseCase(
                             zipOut.closeEntry()
 
                             if (processedIcon !== iconBitmap) processedIcon.recycle()
-                            bgBitmap.recycle()
                             finalBitmap.recycle()
                         }
                     }

@@ -628,9 +628,16 @@ private fun LowerLayerBackgroundSection(
         }
     }
 
-    // 下层背景颜色卡片组：纯色时显示（步骤5 接入 ColorSourceSection layerIndex=1）
+    // 下层背景颜色卡片组：纯色时显示
     if (style2 == "solid") {
-        // TODO: 步骤5 改造 ColorSourceSection 后接入 layerIndex = 1
+        ColorSourceSection(
+            viewModel = viewModel,
+            isForeground = false,
+            layerIndex = 1,
+            backdrop = backdrop,
+            useLiquidGlass = useLiquidGlass,
+            liquidGlassBlurRadius = liquidGlassBlurRadius
+        )
     }
 }
 

@@ -351,18 +351,31 @@ class IconViewModel(
         _config.value = update(_config.value)
     }
 
-    // 切换到自定义颜色时，继承当前实际使用的颜色作为初始值
-    fun switchToCustomColor(isFg: Boolean) {
+    /**
+     * 切换到自定义颜色时，继承当前实际使用的颜色作为初始值。
+     * @param isFg true=前景，false=背景
+     * @param layerIndex 0=上层/前景（默认），1=下层背景
+     */
+    fun switchToCustomColor(isFg: Boolean, layerIndex: Int = 0) {
         val config = _config.value
         val resolvedColor = generatePreviewUseCase.resolveConfigColors(
             isFg = isFg,
             config = config,
             wallpaperColorScheme = wallpaperColorScheme.value,
-            appColorSchemes = appColorSchemes
+            appColorSchemes = appColorSchemes,
+            layerIndex = layerIndex
         )
         updateConfig {
             if (isFg) it.copy(fgColorSource = "custom", fgColor = resolvedColor)
-            else it.copy(bgColorSource = "custom", bgColor = resolvedColor)
+            else if (layerIndex == 1) {
+                // 下层背景切自定义颜色：继承下层当前解析色
+                it.copy(
+                    bgLayer2 = it.bgLayer2.copy(
+                        colorSource = "custom",
+                        color = resolvedColor
+                    )
+                )
+            } else it.copy(bgColorSource = "custom", bgColor = resolvedColor)
         }
     }
 

@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.color.HslColorUtils
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
@@ -223,15 +224,28 @@ class GeneratePreviewUseCase(private val context: Context) {
                     }
 
                     if (processedIcon != null) {
+                        // 上层背景渲染尺寸（双层启用时缩小，否则为最终尺寸）
+                        val finalIconSize = 512
+                        val upperRenderSize =
+                            if (config.dualLayerEnabled && config.bgStyle != "none") {
+                                kotlin.math.ceil(finalIconSize * (1 - config.dualLayerSizeDiff))
+                                    .toInt()
+                                    .coerceAtLeast(1)
+                            } else finalIconSize
+
                         val upperBg = when (config.bgStyle) {
                             "img_static" -> {
                                 val imgRef = config.selectedStaticImages.randomOrNull()
                                 if (imgRef != null) {
                                     BackgroundGenerator.createStaticImageBackground(
-                                        context, imgRef, 512
+                                        context, imgRef, finalIconSize
                                     )
                                 } else {
-                                    BackgroundGenerator.createBackground(512, finalBg, maskBmp)
+                                    BackgroundGenerator.createBackground(
+                                        finalIconSize,
+                                        finalBg,
+                                        maskBmp
+                                    )
                                 }
                             }
 
@@ -241,25 +255,44 @@ class GeneratePreviewUseCase(private val context: Context) {
                                     BackgroundGenerator.createImageFillingBackground(
                                         context = context,
                                         imageRef = imgRef,
-                                        iconSize = 512,
+                                        iconSize = finalIconSize,
                                         maskBitmap = maskBmp,
                                         randomRotation = config.imageFilling.randomRotation,
                                         scaleMode = config.imageFilling.scaleMode
                                     )
                                 } else {
-                                    BackgroundGenerator.createBackground(512, finalBg, maskBmp)
+                                    BackgroundGenerator.createBackground(
+                                        finalIconSize,
+                                        finalBg,
+                                        maskBmp
+                                    )
                                 }
                             }
 
-                            else -> BackgroundGenerator.createBackground(512, finalBg, maskBmp)
-                        } ?: BackgroundGenerator.createBackground(512, finalBg, maskBmp)
+                            else -> BackgroundGenerator.createBackground(
+                                finalIconSize,
+                                finalBg,
+                                maskBmp
+                            )
+                        } ?: BackgroundGenerator.createBackground(finalIconSize, finalBg, maskBmp)
 
-                        // 双层背景合成：下层背景（较大）居中放置，上层背景铺满覆盖
-                        val bgBitmap = if (config.dualLayerEnabled && config.bgStyle != "none") {
+                        // 先合成上层背景 + 图标 → upperComposite（finalIconSize×finalIconSize）
+                        val upperComposite = LayerMerger.merge(
+                            background = upperBg,
+                            icon = processedIcon,
+                            subtractIcon = config.fgStyle == "hollow",
+                            fgAlpha = if (config.fgStyle == "glass") 1.0f else try {
+                                Color.alpha(finalFg.toColorInt()) / 255f
+                            } catch (_: Exception) {
+                                1.0f
+                            }
+                        )
+                        upperBg.recycle()
+
+                        // 双层合成：上层（含图标）缩放后居中绘制到下层（铺满 finalIconSize）之上
+                        val finalBitmap = if (config.dualLayerEnabled && config.bgStyle != "none") {
                             val bgLayer2 = config.bgLayer2
-                            // 下层背景尺寸 = iconSize × (1 + sizeDiff)
-                            val lowerSize =
-                                kotlin.math.ceil(512 * (1 + config.dualLayerSizeDiff)).toInt()
+                            // 下层背景尺寸 = 最终图标尺寸（铺满画布）
                             val maskBmp2 =
                                 if (maskBitmaps2.isNotEmpty()) maskBitmaps2.random() else null
                             val currentBg2 = resolveConfigColors(
@@ -276,7 +309,7 @@ class GeneratePreviewUseCase(private val context: Context) {
                                     val imgRef2 = bgLayer2.selectedStaticImages.randomOrNull()
                                     if (imgRef2 != null) {
                                         BackgroundGenerator.createStaticImageBackground(
-                                            context, imgRef2, lowerSize
+                                            context, imgRef2, finalIconSize
                                         )
                                     } else null
                                 }
@@ -287,7 +320,7 @@ class GeneratePreviewUseCase(private val context: Context) {
                                         BackgroundGenerator.createImageFillingBackground(
                                             context = context,
                                             imageRef = imgRef2,
-                                            iconSize = lowerSize,
+                                            iconSize = finalIconSize,
                                             maskBitmap = maskBmp2,
                                             randomRotation = bgLayer2.imageFilling.randomRotation,
                                             scaleMode = bgLayer2.imageFilling.scaleMode
@@ -296,35 +329,32 @@ class GeneratePreviewUseCase(private val context: Context) {
                                 }
 
                                 else -> BackgroundGenerator.createBackground(
-                                    lowerSize, finalBg2, maskBmp2
+                                    finalIconSize, finalBg2, maskBmp2
                                 )
                             }
                             if (lowerBg != null) {
+                                // 上层合成图缩放到 upperRenderSize（居中放置到下层之上）
+                                val upperScaled =
+                                    upperComposite.scale(upperRenderSize, upperRenderSize)
                                 BackgroundGenerator.mergeDualLayerBackground(
                                     lowerBg = lowerBg,
-                                    upperBg = upperBg,
-                                    iconSize = 512,
+                                    upperBg = upperScaled,
+                                    iconSize = finalIconSize,
                                     lowerAlpha = bgLayer2.alpha
                                 ).also {
                                     lowerBg.recycle()
-                                    upperBg.recycle()
+                                    upperScaled.recycle()
+                                    upperComposite.recycle()
                                 }
-                            } else upperBg
-                        } else upperBg
-
-                        val finalBitmap = LayerMerger.merge(
-                            background = bgBitmap,
-                            icon = processedIcon,
-                            subtractIcon = config.fgStyle == "hollow",
-                            fgAlpha = if (config.fgStyle == "glass") 1.0f else try {
-                                Color.alpha(finalFg.toColorInt()) / 255f
-                            } catch (_: Exception) {
-                                1.0f
+                            } else {
+                                upperComposite // 下层生成失败，回退到上层
                             }
-                        )
+                        } else {
+                            upperComposite
+                        }
+
                         results.add(finalBitmap)
                         if (processedIcon !== iconBitmap) processedIcon.recycle()
-                        bgBitmap.recycle()
                     }
                     if (config.fgStyle != "glass") iconBitmap.recycle()
                 }
