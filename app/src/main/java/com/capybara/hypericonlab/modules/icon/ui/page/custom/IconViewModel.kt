@@ -60,6 +60,19 @@ data class LogEntry(
         )
 }
 
+/**
+ * 图标集信息（用于 BuildOptionSheet 展示）。
+ *
+ * @param id 图标集 id，对应 assets/icon_mapper/<id>.xml（不含扩展名）
+ * @param label 展示名（当前与 id 相同，预留后续国际化或自定义命名）
+ * @param iconCount 图标数量（解析 mapper 得到，0 表示解析失败或未就绪）
+ */
+data class IconSetInfo(
+    val id: String,
+    val label: String,
+    val iconCount: Int
+)
+
 @SuppressLint("MissingPermission")
 class IconViewModel(
     application: Application,
@@ -88,6 +101,10 @@ class IconViewModel(
     // 构建任务队列与已完成列表（直接转发 BuildTaskManager 的 StateFlow）
     val activeBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.activeTasks
     val finishedBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.finishedTasks
+
+    // 可用图标集列表（assets/icon_mapper/<id>.xml，去扩展名作为 id 与展示名）
+    private val _availableIconSets = MutableStateFlow<List<IconSetInfo>>(emptyList())
+    val availableIconSets: StateFlow<List<IconSetInfo>> = _availableIconSets.asStateFlow()
 
     // Configuration State
     private val _config = MutableStateFlow(IconConfigState())
@@ -206,6 +223,39 @@ class IconViewModel(
         observeRunningState()
         observeConfigChanges()
         loadDefaultWallpaper()
+        loadAvailableIconSets()
+    }
+
+    /**
+     * 异步加载 assets/icon_mapper/ 下的图标集列表。
+     * 同时解析每个 mapper 的图标数量，供 BuildOptionSheet 展示。
+     */
+    private fun loadAvailableIconSets() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = try {
+                context.assets.list(PipelineAssets.MAPPER_ASSET_DIR)
+                    ?.asSequence()
+                    ?.filter { it.endsWith(".xml") }
+                    ?.map { it.removeSuffix(".xml") }
+                    ?.sorted()
+                    ?.map { id ->
+                        // 解析图标数量，失败时返回 0
+                        val count = try {
+                            context.assets
+                                .open("${PipelineAssets.MAPPER_ASSET_DIR}/$id.xml")
+                                .use { IconMapperProcessor.parseIconMapper(it).size }
+                        } catch (_: Exception) {
+                            0
+                        }
+                        IconSetInfo(id = id, label = id, iconCount = count)
+                    }
+                    ?.toList()
+                    ?: emptyList()
+            } catch (_: Exception) {
+                emptyList()
+            }
+            _availableIconSets.value = list
+        }
     }
 
     private fun addLog(message: String, type: LogType = LogType.INFO) {

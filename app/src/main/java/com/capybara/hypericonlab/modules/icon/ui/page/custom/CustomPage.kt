@@ -8,22 +8,28 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.TopAppBar
@@ -45,11 +51,12 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidth
 import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.BuildOptionSheet
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.FullScreenPreview
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.PreviewSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.ForegroundTab
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.FullScreenPreview
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.PreviewSection
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.layerBackdrop
@@ -67,8 +74,10 @@ fun CustomPage(
     val mainPreviewBitmap by viewModel.mainPreviewBitmap.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val themeState by themeViewModel.state.collectAsStateWithLifecycle()
+    val availableIconSets by viewModel.availableIconSets.collectAsStateWithLifecycle()
 
     var showFullScreenPreview by remember { mutableStateOf(false) }
+    var showBuildSheet by remember { mutableStateOf(false) }
 
     val wallpaperLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -78,6 +87,39 @@ fun CustomPage(
             }
         }
     )
+
+    // 权限申请 launcher（方案 C：首次提交任务兜底申请）
+    // 每次申请一个权限，系统会保持已授予状态；多权限按 missing 列表顺序逐个申请
+    var pendingPermissionQueue by remember { mutableStateOf<List<String>>(emptyList()) }
+    var pendingBuildArgs by remember {
+        mutableStateOf<Pair<com.capybara.hypericonlab.modules.icon.domain.model.ProductType, IconSetInfo>?>(
+            null
+        )
+    }
+
+    // 用于在 launcher 回调内引用自身（递归申请下一个权限）
+    val permissionLauncherRef =
+        remember { mutableStateOf<androidx.activity.result.ActivityResultLauncher<String>?>(null) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        // 申请完成后尝试消费队列中的下一个权限
+        val next = pendingPermissionQueue.drop(1)
+        pendingPermissionQueue = next
+        if (next.isNotEmpty()) {
+            permissionLauncherRef.value?.launch(next.first())
+        } else {
+            // 全部权限处理完成，提交缓存的构建任务
+            pendingBuildArgs?.let { (productType, iconSet) ->
+                viewModel.submitBuildTask(productType, iconSet.id, iconSet.label)
+            }
+            pendingBuildArgs = null
+        }
+    }
+    // 启动时绑定引用
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        permissionLauncherRef.value = permissionLauncher
+    }
 
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -163,6 +205,40 @@ fun CustomPage(
                 }
             )
 
+            // 构建与保存到预设按钮组
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // 主按钮：构建（点击弹出 BuildOptionSheet）
+                Button(
+                    onClick = { showBuildSheet = true },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    androidx.compose.material3.Text(
+                        text = "构建",
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+                // 次按钮：保存到预设（暂 disable，待预设功能落地后启用）
+                OutlinedButton(
+                    onClick = { /* TODO 预设功能 */ },
+                    enabled = false,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    androidx.compose.material3.Text(
+                        text = "保存到预设",
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             // 可滚动内容
@@ -215,4 +291,27 @@ fun CustomPage(
         bitmap = mainPreviewBitmap,
         onDismiss = { showFullScreenPreview = false }
     )
+
+    // 构建选项 Sheet
+    if (showBuildSheet) {
+        BuildOptionSheet(
+            onDismiss = { showBuildSheet = false },
+            iconSets = availableIconSets,
+            onConfirm = { productType, iconSet ->
+                showBuildSheet = false
+                // 方案 C：提交前检查权限，缺失则先逐个申请再提交
+                val missing = viewModel.buildPermissionsMissing()
+                if (missing.isEmpty()) {
+                    viewModel.submitBuildTask(productType, iconSet.id, iconSet.label)
+                } else {
+                    pendingBuildArgs = productType to iconSet
+                    pendingPermissionQueue = missing
+                    permissionLauncher.launch(missing.first())
+                }
+            },
+            backdrop = backdrop,
+            useLiquidGlass = themeState.useLiquidGlassBottomSheet,
+            liquidGlassBlurRadius = themeState.liquidGlassBlurRadius.dp
+        )
+    }
 }
