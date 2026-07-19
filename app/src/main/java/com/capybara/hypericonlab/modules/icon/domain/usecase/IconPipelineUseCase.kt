@@ -272,17 +272,24 @@ class IconPipelineUseCase(
         packageName: String,
         schemes: Map<String, Pair<String, String>>
     ): Pair<String, String> {
-        return when (config.colorMode) {
-            ColorMode.COLORFUL -> {
-                schemes[packageName] ?: Pair(config.fgColorHex, config.bgColorHex)
-            }
-
-            ColorMode.BLACK_WHITE -> {
-                Pair("#FF000000", "#FFFFFFFF")
-            }
-
-            else -> Pair(config.fgColorHex, config.bgColorHex)
+        // BLACK_WHITE 模式固定黑白，忽略 colorSource
+        if (config.colorMode == ColorMode.BLACK_WHITE) {
+            return Pair("#FF000000", "#FFFFFFFF")
         }
+        // COLORFUL 模式优先用 appColorSchemes（每个图标颜色不同），回退到按 source 解析
+        if (config.colorMode == ColorMode.COLORFUL) {
+            schemes[packageName]?.let { return it }
+        }
+        // CUSTOM 与 COLORFUL 回退分支：按 colorSource 决定颜色
+        // - "app" 源：用 appColorSchemes[packageName]（每个图标颜色不同），缺失则回退到预填色
+        // - 其他源（wallpaper/preset/ctc/custom/black_white）：使用 ViewModel 预解析后填入的 fgColorHex/bgColorHex
+        val currentFg = if (config.fgColorSource == "app") {
+            schemes[packageName]?.first ?: config.fgColorHex
+        } else config.fgColorHex
+        val currentBg = if (config.bgColorSource == "app") {
+            schemes[packageName]?.second ?: config.bgColorHex
+        } else config.bgColorHex
+        return Pair(currentFg, currentBg)
     }
 
     private fun resolveAlpha(hex: String): Float {

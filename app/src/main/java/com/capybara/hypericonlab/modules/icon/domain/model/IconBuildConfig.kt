@@ -29,7 +29,9 @@ data class IconBuildConfig(
     // 双层背景：总开关、大小差异
     val dualLayerEnabled: Boolean = false,
     val dualLayerSizeDiff: Float = 0.08f,
-    // 上层背景颜色来源（用于 IconPipelineUseCase 判断同源优化）
+    // 前景颜色来源（用于 IconPipelineUseCase 按 packageName 解析 app 源）
+    val fgColorSource: String = "custom",
+    // 上层背景颜色来源（用于 IconPipelineUseCase 判断同源优化 + app 源解析）
     val bgColorSource: String = "custom",
     // 下层背景扁平化字段
     val bgStyle2: String = "solid",

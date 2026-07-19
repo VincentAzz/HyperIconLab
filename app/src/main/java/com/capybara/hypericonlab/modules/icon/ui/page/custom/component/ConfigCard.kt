@@ -61,6 +61,8 @@ import kotlinx.coroutines.withContext
 fun ConfigCard(
     title: String,
     valueDisplay: String? = null,
+    // 可选卡片容器色，默认 null 时使用 surfaceBright；调用方可覆盖（如 sheet 场景传 surfaceBright.copy(alpha = 0.8f) 跟随 LogSheet 风格）
+    containerColor: Color? = null,
     content: @Composable () -> Unit
 ) {
     Column(
@@ -92,7 +94,7 @@ fun ConfigCard(
             modifier = Modifier.fillMaxWidth(),
             shape = rememberKyantRoundedRectangleShape(CardCornerRadius),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
+                containerColor = containerColor ?: MaterialTheme.colorScheme.surfaceBright
             )
         ) {
             Box(modifier = Modifier.padding(12.dp)) {

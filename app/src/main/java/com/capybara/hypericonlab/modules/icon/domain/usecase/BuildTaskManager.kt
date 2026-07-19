@@ -132,6 +132,9 @@ class BuildTaskManager(
     /**
      * 提交构建任务。
      *
+     * 提交时立即持久化预览图与缩略图（裁切自 storePreview），任务卡片在 PENDING 状态即可显示。
+     * 任务执行时 [BuildTaskExecutor] 不再重复保存图片。
+     *
      * @return 创建的 [BuildTask]（PENDING 状态），用于 UI 反馈
      */
     fun submit(
@@ -159,6 +162,13 @@ class BuildTaskManager(
         )
         // 缓存预览图，供执行时使用
         previewCache[taskId] = PreviewBundle(storePreview, mainPreview)
+        // 立即持久化预览图与缩略图，任务卡片在 PENDING 状态即可显示
+        scope.launch(Dispatchers.IO) {
+            val thumbnail = executor.cropThumbnail(storePreview)
+            taskStore.saveThumbnail(taskId, thumbnail)
+            taskStore.savePreview(taskId, storePreview)
+            if (thumbnail !== storePreview) thumbnail.recycle()
+        }
         _activeTasks.value = _activeTasks.value + task
         scheduleNext()
         return task

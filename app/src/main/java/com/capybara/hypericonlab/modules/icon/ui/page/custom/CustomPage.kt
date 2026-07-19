@@ -32,6 +32,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -39,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +62,7 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.ForegroundTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 
@@ -78,6 +83,10 @@ fun CustomPage(
 
     var showFullScreenPreview by remember { mutableStateOf(false) }
     var showBuildSheet by remember { mutableStateOf(false) }
+
+    // Snackbar：提交构建任务后提示用户去任务 tab 查看进度
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     val wallpaperLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -111,7 +120,16 @@ fun CustomPage(
         } else {
             // 全部权限处理完成，提交缓存的构建任务
             pendingBuildArgs?.let { (productType, iconSet) ->
-                viewModel.submitBuildTask(productType, iconSet.id, iconSet.label)
+                val submitted = viewModel.submitBuildTask(productType, iconSet.id, iconSet.label)
+                if (submitted != null) {
+                    // 弹出 Snackbar 提示用户去任务 tab 查看进度
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "已提交构建任务，可在任务 tab 中查看构建进度",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
             }
             pendingBuildArgs = null
         }
@@ -132,6 +150,7 @@ fun CustomPage(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         contentWindowInsets = windowInsetsSides?.let { ScaffoldDefaults.contentWindowInsets.only(it) }
             ?: ScaffoldDefaults.contentWindowInsets,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Box {
                 TopAppBar(
@@ -302,7 +321,17 @@ fun CustomPage(
                 // 方案 C：提交前检查权限，缺失则先逐个申请再提交
                 val missing = viewModel.buildPermissionsMissing()
                 if (missing.isEmpty()) {
-                    viewModel.submitBuildTask(productType, iconSet.id, iconSet.label)
+                    val submitted =
+                        viewModel.submitBuildTask(productType, iconSet.id, iconSet.label)
+                    if (submitted != null) {
+                        // 弹出 Snackbar 提示用户去任务 tab 查看进度
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "已提交构建任务，可在任务 tab 中查看构建进度",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
                 } else {
                     pendingBuildArgs = productType to iconSet
                     pendingPermissionQueue = missing

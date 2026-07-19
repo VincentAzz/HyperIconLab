@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -24,6 +25,16 @@ import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsShare
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 
 val LocalThemeState = staticCompositionLocalOf { ThemeState() }
+
+// 通知 Intent extras key：用于从通知 PendingIntent 传递目标 tab 索引到 Compose 层
+const val EXTRA_TAB_INDEX = "extra_tab_index"
+
+// 任务 tab 索引（与下方 tabs 列表顺序对应：home=0, custom=1, task=2, settings=3）
+const val TAB_INDEX_TASK = 2
+
+// 由 MainActivity 在 onCreate / onNewIntent 中更新，MainScreen 收集后调用 animateToPage 切换 tab
+// 使用 compositionLocalOf（非 static）以保证值变化能触发下游重组
+val LocalPendingTab = compositionLocalOf<Int?> { null }
 
 @Immutable
 data class NavigationTab(
@@ -82,6 +93,18 @@ fun MainScreen(
             sharedViewModel.updateLastMainPageIndex(settledPage)
         }
     }
+
+    // 监听通知 PendingIntent 传入的 tab 切换请求（点击构建通知 → 跳转到任务 tab）
+    val pendingTab = LocalPendingTab.current
+    LaunchedEffect(pendingTab) {
+        // pendingTab 非 null 且在有效范围内时切换；null 表示无请求
+        pendingTab?.let { target ->
+            if (target in tabs.indices && target != settledPage) {
+                mainPagerState.animateToPage(target)
+            }
+        }
+    }
+
     MainScreenBackHandler(
         mainPagerState = mainPagerState,
     )

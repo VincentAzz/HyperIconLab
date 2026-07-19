@@ -46,11 +46,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
-import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
+import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.symbol.refresh
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
@@ -60,6 +61,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ConfigCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,17 +72,18 @@ import java.io.File
  * 任务详情 Sheet：根据任务状态自适应布局。
  *
  * - **进行中**（PENDING / RUNNING）：[FloatingBottomSheet.fillMaxHeight] = true，
- *   全屏布局，包含预览图、信息 chips、进度条、底部"停止构建"按钮
- * - **已完成**（SUCCESS / FAILED / CANCELLED）：自适应高度，包含预览图、信息、导出位置/错误信息、
- *   底部"删除记录"按钮；FAILED 任务额外显示"重试"按钮
+ *   全屏布局，Header + LazyColumn(weight 1f, 可滚动) + 底部按钮区（独占高度，不被挤占）
+ * - **已完成**（SUCCESS / FAILED / CANCELLED）：自适应高度，Header + LazyColumn（自适应）+ 底部按钮区
+ *
+ * 布局关键点：
+ * - 整体用 Column 包裹 Header / 内容 / 按钮，按钮固定在 Column 末尾独占高度
+ * - LazyColumn 使用 weight(1f) 让按钮高度始终不被压缩
+ * - 卡片容器色使用 `surfaceBright.copy(alpha = 0.8f)`，与 LogSheet 风格一致，能透出 sheet 模糊
+ *
+ * 风格对齐 MaskPickerSheet / LogSheet：默认 dragHandle（可下滑关闭）、对称 40dp 圆形按钮保持 title 居中、
+ * backdrop/useLiquidGlass 由调用方透传跟随应用设置。
  *
  * 危险操作（停止/删除/重试）均配 [AlertDialog] 二次确认。
- *
- * @param task 当前任务
- * @param onStop 进行中任务"停止构建"回调
- * @param onDelete 已完成任务"删除记录"回调
- * @param onRetry 失败任务"重试"回调
- * @param onDismiss 关闭 sheet 回调
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,7 +120,7 @@ fun TaskDetailSheet(
     FloatingBottomSheet(
         onDismiss = onDismiss,
         sheetState = sheetState,
-        dragHandle = null,
+        // 使用默认 dragHandle（与 LogSheet 一致），允许用户从顶部 dragHandle 拖动关闭
         horizontalPadding = horizontalPadding,
         bottomPadding = bottomPadding,
         cornerRadius = cornerRadius,
@@ -126,55 +129,77 @@ fun TaskDetailSheet(
         liquidGlassBlurRadius = liquidGlassBlurRadius,
         fillMaxHeight = isActive
     ) {
-        // Header：与 BuildOptionSheet 风格一致
-        CenterAlignedTopAppBar(
-            title = { SheetTitle(if (isActive) "构建中" else "任务详情") },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent
-            ),
-            navigationIcon = {
-                Surface(
-                    onClick = { closeSheet() },
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    modifier = Modifier
-                        .padding(start = 12.dp)
-                        .size(TaskDetailSheetConfig.HEADER_ICON_SIZE)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            AppMaterialSymbols.close,
-                            contentDescription = "关闭",
-                            modifier = Modifier.size(TaskDetailSheetConfig.HEADER_ICON_INNER_SIZE),
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
+        // 整体 Column：Header + 内容 + 按钮；按钮独占底部高度不被 LazyColumn 挤压
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (isActive) Modifier.fillMaxSize() else Modifier.wrapContentHeight())
+        ) {
+            // Header：CenterAlignedTopAppBar + 左右对称 40dp 圆形按钮，title 居中（与 MaskPickerSheet 一致）
+            CenterAlignedTopAppBar(
+                title = { SheetTitle(if (isActive) "构建中" else "任务详情") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                ),
+                navigationIcon = {
+                    Surface(
+                        onClick = { closeSheet() },
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        modifier = Modifier
+                            .padding(start = TaskDetailSheetConfig.HEADER_ICON_LEADING_PADDING)
+                            .size(TaskDetailSheetConfig.HEADER_ICON_SIZE)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                AppMaterialSymbols.close,
+                                contentDescription = "关闭",
+                                modifier = Modifier.size(TaskDetailSheetConfig.HEADER_ICON_INNER_SIZE),
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                },
+                // 保留右侧确认按钮，与 MaskPickerSheet 风格一致；占位使 title 居中不偏移
+                actions = {
+                    Surface(
+                        onClick = { closeSheet() },
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        modifier = Modifier
+                            .padding(end = TaskDetailSheetConfig.HEADER_ICON_TRAILING_PADDING)
+                            .size(TaskDetailSheetConfig.HEADER_ICON_SIZE)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                AppMaterialSymbols.check,
+                                contentDescription = "确认",
+                                modifier = Modifier.size(TaskDetailSheetConfig.HEADER_ICON_INNER_SIZE),
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
                     }
                 }
-            }
-        )
+            )
 
-        // 内容主体：进行中 LazyColumn 占满剩余空间（weight(1f)），已完成 wrapContentHeight
-        // 注意：weight 是 ColumnScope 扩展，需在 if 分支内显式调用以正确解析 receiver
-        val contentModifier = if (isActive) {
-            Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        } else {
-            Modifier.fillMaxWidth()
+            // 内容主体：LazyColumn weight(1f)，让按钮独占底部高度
+            // 进行中全屏时 weight(1f) 占满剩余空间；已完成 wrapContentHeight 时 weight(1f) 也保证按钮不被挤
+            DetailContent(
+                task = task,
+                isActive = isActive,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
+
+            // 底部操作区：独占高度，wrapContentHeight 不被 LazyColumn 挤压
+            DetailBottomActions(
+                task = task,
+                onStop = { showStopDialog = true },
+                onDelete = { showDeleteDialog = true },
+                onRetry = { showRetryDialog = true }
+            )
         }
-        DetailContent(
-            task = task,
-            isActive = isActive,
-            modifier = contentModifier
-        )
-
-        // 底部操作区：进行中固定在底部，已完成跟在内容之后
-        DetailBottomActions(
-            task = task,
-            onStop = { showStopDialog = true },
-            onDelete = { showDeleteDialog = true },
-            onRetry = { showRetryDialog = true }
-        )
     }
 
     // 二次确认对话框
@@ -222,7 +247,7 @@ fun TaskDetailSheet(
     }
 }
 
-// 详情主体内容：预览图 + 任务信息 chips + 状态相关区
+// 详情主体内容：预览图 + 任务信息卡片 + 状态相关卡片
 @Composable
 private fun DetailContent(
     task: BuildTask,
@@ -230,18 +255,21 @@ private fun DetailContent(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    // 预览图位图：SUCCESS 时异步加载 filesDir/build_previews/<taskId>.png
+    // 预览图位图：提交时已持久化，所有状态均可加载 filesDir/build_previews/<taskId>.png
     var previewBitmap by remember(task.taskId, task.status) {
         mutableStateOf<android.graphics.Bitmap?>(null)
     }
     LaunchedEffect(task.taskId, task.status) {
-        if (task.status == BuildTaskStatus.SUCCESS) {
-            previewBitmap = withContext(Dispatchers.IO) {
-                val file = File(context.filesDir, "build_previews/${task.taskId}.png")
-                if (file.exists()) BitmapFactory.decodeFile(file.absolutePath) else null
-            }
+        // 任务提交即持久化预览图，统一异步加载
+        previewBitmap = withContext(Dispatchers.IO) {
+            val file = File(context.filesDir, "build_previews/${task.taskId}.png")
+            if (file.exists()) BitmapFactory.decodeFile(file.absolutePath) else null
         }
     }
+
+    // 卡片容器色：与 LogSheet 风格一致（surfaceBright alpha=0.8f），让 sheet 模糊透出
+    val cardContainerColor =
+        MaterialTheme.colorScheme.surfaceBright.copy(alpha = TaskDetailSheetConfig.CARD_ALPHA)
 
     LazyColumn(
         modifier = modifier
@@ -252,38 +280,53 @@ private fun DetailContent(
         ),
         verticalArrangement = Arrangement.spacedBy(TaskDetailSheetConfig.SECTION_SPACING)
     ) {
-        // 预览图区
+        // 预览图区（保持装饰性，不包卡片）
         item { PreviewSection(task = task, bitmap = previewBitmap) }
 
-        // 任务信息 chips
-        item { TaskInfoChips(task = task) }
-
-        // 进度区（仅 PENDING/RUNNING）
-        if (isActive) {
-            item { ProgressSection(task = task) }
+        // 任务信息卡片（ConfigCard 包裹）
+        item {
+            TaskInfoCard(task = task, containerColor = cardContainerColor)
         }
 
-        // 状态相关区
+        // 进度卡片（仅 PENDING/RUNNING）
+        if (isActive) {
+            item {
+                ProgressCard(task = task, containerColor = cardContainerColor)
+            }
+        }
+
+        // 状态相关卡片
         when (task.status) {
             BuildTaskStatus.SUCCESS -> {
                 item {
-                    ExportPathSection(
+                    ExportPathCard(
                         taskId = task.taskId,
-                        artifactPath = task.artifactPath
+                        artifactPath = task.artifactPath,
+                        containerColor = cardContainerColor
                     )
                 }
             }
 
             BuildTaskStatus.FAILED -> {
-                item { ErrorSection(errorMessage = task.errorMessage) }
+                item {
+                    ErrorCard(
+                        errorMessage = task.errorMessage,
+                        containerColor = cardContainerColor
+                    )
+                }
             }
 
             else -> {}
         }
+
+        // 末尾留白：避免 LazyColumn 最后一个 item 紧贴底部按钮组
+        item {
+            Spacer(Modifier.height(TaskDetailSheetConfig.CONTENT_BOTTOM_SPACING))
+        }
     }
 }
 
-// 预览图区：成功时展示位图，其他状态展示占位
+// 预览图区：有位图时展示位图，其他状态展示占位
 @Composable
 private fun PreviewSection(
     task: BuildTask,
@@ -318,43 +361,39 @@ private fun PreviewSection(
     }
 }
 
-// 任务信息 chips：产物类型、图标集、前景/背景样式、双层状态
+// 任务信息卡片：使用 ConfigCard 包裹，与自定义页面卡片风格一致
 @Composable
-private fun TaskInfoChips(task: BuildTask) {
-    SegmentedColumn(title = "任务信息") {
-        item {
+private fun TaskInfoCard(
+    task: BuildTask,
+    containerColor: Color
+) {
+    ConfigCard(
+        title = "任务信息",
+        containerColor = containerColor
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             InfoChipRow(
                 label = "任务 ID",
                 value = task.taskId,
                 useCodeFont = true
             )
-        }
-        item {
             InfoChipRow(
                 label = "产物类型",
                 value = task.productType.label
             )
-        }
-        item {
             InfoChipRow(
                 label = "图标集",
                 value = "${task.iconSetLabel} · ${task.iconCount} 个"
             )
-        }
-        item {
             InfoChipRow(
                 label = "前景",
                 value = "${fgStyleLabel(task.configSnapshot.fgStyle)} · ${colorSourceLabel(task.configSnapshot.fgColorSource)}"
             )
-        }
-        item {
             InfoChipRow(
                 label = "背景",
                 value = "${bgStyleLabel(task.configSnapshot.bgStyle)} · ${colorSourceLabel(task.configSnapshot.bgColorSource)}"
             )
-        }
-        if (task.configSnapshot.dualLayerEnabled) {
-            item {
+            if (task.configSnapshot.dualLayerEnabled) {
                 InfoChipRow(
                     label = "下层背景",
                     value = "${bgStyleLabel(task.configSnapshot.bgLayer2.style)} · ${
@@ -368,93 +407,112 @@ private fun TaskInfoChips(task: BuildTask) {
     }
 }
 
-// 进度区：进度条 + 当前处理包名
+// 进度卡片：进度条 + 当前处理包名（单行省略，避免换行跳动）
 @Composable
-private fun ProgressSection(task: BuildTask) {
-    SegmentedColumn(title = "进度") {
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(TaskDetailSheetConfig.PROGRESS_CONTENT_PADDING)
-            ) {
-                Text(
-                    text = if (task.currentPackage != null) {
-                        "正在处理：${task.currentPackage}"
-                    } else if (task.status == BuildTaskStatus.RUNNING) {
-                        "准备中..."
-                    } else {
-                        "排队等待中..."
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.height(TaskDetailSheetConfig.PROGRESS_BAR_TOP_SPACING))
-                LinearProgressIndicator(
-                    progress = { task.progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(TaskDetailSheetConfig.PROGRESS_HEIGHT),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
-                )
-                Spacer(Modifier.height(TaskDetailSheetConfig.PROGRESS_TEXT_TOP_SPACING))
-                Text(
-                    text = "${(task.progress * 100).toInt()}%",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontFamily = GoogleSansCodeFontFamily
-                )
-            }
-        }
-    }
-}
-
-// 导出位置区
-@Composable
-private fun ExportPathSection(taskId: String, artifactPath: String?) {
-    SegmentedColumn(title = "导出位置") {
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(TaskDetailSheetConfig.EXPORT_CONTENT_PADDING)
-            ) {
-                Text(
-                    text = "文件已保存到：",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.height(TaskDetailSheetConfig.EXPORT_PATH_TOP_SPACING))
-                Text(
-                    text = artifactPath ?: "Documents/HyperIconLabArtifacts/$taskId",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontFamily = GoogleSansCodeFontFamily
-                )
-            }
-        }
-    }
-}
-
-// 错误信息区
-@Composable
-private fun ErrorSection(errorMessage: String?) {
-    SegmentedColumn(title = "错误信息") {
-        item {
+private fun ProgressCard(
+    task: BuildTask,
+    containerColor: Color
+) {
+    ConfigCard(
+        title = "进度",
+        containerColor = containerColor
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(TaskDetailSheetConfig.PROGRESS_CONTENT_PADDING)
+        ) {
+            // 当前处理包名：单行省略，避免长包名换行导致卡片高度跳动
             Text(
-                text = errorMessage ?: "未知错误",
+                text = if (task.currentPackage != null) {
+                    "正在处理：${task.currentPackage}"
+                } else if (task.status == BuildTaskStatus.RUNNING) {
+                    "准备中..."
+                } else {
+                    "排队等待中..."
+                },
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.error,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.height(TaskDetailSheetConfig.PROGRESS_BAR_TOP_SPACING))
+            LinearProgressIndicator(
+                progress = { task.progress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(TaskDetailSheetConfig.ERROR_CONTENT_PADDING)
+                    .height(TaskDetailSheetConfig.PROGRESS_HEIGHT),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+            )
+            Spacer(Modifier.height(TaskDetailSheetConfig.PROGRESS_TEXT_TOP_SPACING))
+            Text(
+                text = "${(task.progress * 100).toInt()}%",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontFamily = GoogleSansCodeFontFamily
             )
         }
     }
 }
 
-// 底部操作按钮区
+// 导出位置卡片
+@Composable
+private fun ExportPathCard(
+    taskId: String,
+    artifactPath: String?,
+    containerColor: Color
+) {
+    ConfigCard(
+        title = "导出位置",
+        containerColor = containerColor
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(TaskDetailSheetConfig.EXPORT_CONTENT_PADDING)
+        ) {
+            Text(
+                text = "文件已保存到：",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(TaskDetailSheetConfig.EXPORT_PATH_TOP_SPACING))
+            // 路径可能较长，单行省略避免换行
+            Text(
+                text = artifactPath ?: "Documents/HyperIconLabArtifacts/$taskId",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontFamily = GoogleSansCodeFontFamily,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+// 错误信息卡片
+@Composable
+private fun ErrorCard(
+    errorMessage: String?,
+    containerColor: Color
+) {
+    ConfigCard(
+        title = "错误信息",
+        containerColor = containerColor
+    ) {
+        Text(
+            text = errorMessage ?: "未知错误",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(TaskDetailSheetConfig.ERROR_CONTENT_PADDING)
+        )
+    }
+}
+
+// 底部操作按钮区：独占高度，wrapContentHeight 不被 LazyColumn 挤压
 @Composable
 private fun DetailBottomActions(
     task: BuildTask,
@@ -463,17 +521,22 @@ private fun DetailBottomActions(
     onRetry: () -> Unit
 ) {
     val showRetry = task.status == BuildTaskStatus.FAILED
-    Row(
+    val isActive = task.status == BuildTaskStatus.PENDING ||
+            task.status == BuildTaskStatus.RUNNING
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(TaskDetailSheetConfig.BOTTOM_ACTION_PADDING),
-        horizontalArrangement = Arrangement.spacedBy(TaskDetailSheetConfig.BOTTOM_BUTTON_SPACING)
+            .wrapContentHeight()
+            .padding(TaskDetailSheetConfig.BOTTOM_ACTION_PADDING)
     ) {
-        // 失败任务：重试按钮（普通色，左侧 weight=1）
+        // 失败任务：重试按钮（独占一行，普通色）
         if (showRetry) {
             FilledTonalButton(
                 onClick = onRetry,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(TaskDetailSheetConfig.BUTTON_HEIGHT)
             ) {
                 Icon(
                     AppMaterialSymbols.refresh,
@@ -483,28 +546,46 @@ private fun DetailBottomActions(
                 Spacer(Modifier.size(TaskDetailSheetConfig.BUTTON_ICON_TEXT_SPACING))
                 Text("重试")
             }
+            Spacer(Modifier.height(TaskDetailSheetConfig.BOTTOM_BUTTON_SPACING))
         }
 
-        // 进行中：停止按钮（红色强调）；已完成：删除按钮（普通色）
-        if (task.status == BuildTaskStatus.PENDING ||
-            task.status == BuildTaskStatus.RUNNING
-        ) {
+        if (isActive) {
+            // 进行中：停止构建按钮（红色强调，独占一行）
             Button(
                 onClick = onStop,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.error,
                     contentColor = MaterialTheme.colorScheme.onError
                 ),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(TaskDetailSheetConfig.BUTTON_HEIGHT)
             ) {
                 Text("停止构建")
             }
         } else {
-            FilledTonalButton(
-                onClick = onDelete,
-                modifier = Modifier.weight(1f)
+            // 已完成：保存到预设 + 删除记录 按钮组（两按钮并列，各自有固定高度）
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(TaskDetailSheetConfig.BUTTON_HEIGHT),
+                horizontalArrangement = Arrangement.spacedBy(TaskDetailSheetConfig.BOTTOM_BUTTON_SPACING)
             ) {
-                Text("删除记录")
+                // 保存到预设：暂未实现，置 disabled
+                FilledTonalButton(
+                    onClick = { /* TODO: 预设页面实现后接入 */ },
+                    enabled = false,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("保存到预设")
+                }
+                // 删除记录：普通色
+                FilledTonalButton(
+                    onClick = onDelete,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("删除记录")
+                }
             }
         }
     }
@@ -535,7 +616,8 @@ private fun InfoChipRow(
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Medium,
             fontFamily = if (useCodeFont) GoogleSansCodeFontFamily else null,
-            maxLines = 1
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -581,7 +663,7 @@ private fun ConfirmDialog(
 // 预览图占位文案
 private fun previewPlaceholder(status: BuildTaskStatus): String = when (status) {
     BuildTaskStatus.PENDING -> "等待开始..."
-    BuildTaskStatus.RUNNING -> "构建中，预览图将在完成后显示"
+    BuildTaskStatus.RUNNING -> "构建中..."
     BuildTaskStatus.FAILED -> "构建失败"
     BuildTaskStatus.CANCELLED -> "已取消"
     BuildTaskStatus.SUCCESS -> "预览图加载中..."
@@ -627,10 +709,16 @@ private object TaskDetailSheetConfig {
     // section 间距
     val SECTION_SPACING = 12.dp
 
+    // 内容区底部留白：避免最后一个 item 紧贴底部按钮组
+    val CONTENT_BOTTOM_SPACING = 8.dp
+
     // 预览图高度（保持 store preview 1080×640 的 5:3 长宽比近似）
     val PREVIEW_HEIGHT = 200.dp
 
-    // 进度区内容内边距
+    // 卡片容器色透明度（与 LogSheet 一致，让 sheet 模糊透出）
+    const val CARD_ALPHA = 0.8f
+
+    // 进度卡片内容内边距
     val PROGRESS_CONTENT_PADDING = PaddingValues(16.dp)
 
     // 进度条上方间距
@@ -642,13 +730,13 @@ private object TaskDetailSheetConfig {
     // 进度条高度
     val PROGRESS_HEIGHT = 4.dp
 
-    // 导出位置区内容内边距
+    // 导出位置卡片内容内边距
     val EXPORT_CONTENT_PADDING = PaddingValues(16.dp)
 
     // 导出路径文本上方间距
     val EXPORT_PATH_TOP_SPACING = 4.dp
 
-    // 错误信息区内容内边距
+    // 错误信息卡片内容内边距
     val ERROR_CONTENT_PADDING = PaddingValues(16.dp)
 
     // 信息行内边距
@@ -659,6 +747,9 @@ private object TaskDetailSheetConfig {
 
     // 底部按钮间距
     val BOTTOM_BUTTON_SPACING = 12.dp
+
+    // 底部按钮高度（Material3 Button 默认 36dp，此处显式指定避免被压缩）
+    val BUTTON_HEIGHT = 48.dp
 
     // 按钮内图标尺寸
     val BUTTON_ICON_SIZE = 18.dp
@@ -671,4 +762,10 @@ private object TaskDetailSheetConfig {
 
     // Header 圆形按钮内部图标尺寸
     val HEADER_ICON_INNER_SIZE = 24.dp
+
+    // Header 关闭按钮左侧 padding
+    val HEADER_ICON_LEADING_PADDING = 12.dp
+
+    // Header 确认按钮右侧 padding
+    val HEADER_ICON_TRAILING_PADDING = 12.dp
 }

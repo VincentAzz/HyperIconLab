@@ -9,6 +9,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.capybara.hypericonlab.MainActivity
 import com.capybara.hypericonlab.R
+import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_TAB_INDEX
+import com.capybara.hypericonlab.core.designsystem.navigation.TAB_INDEX_TASK
 import com.capybara.hypericonlab.core.notification.BuildNotificationManager.Companion.RUNNING_NOTIFICATION_ID
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
@@ -150,16 +152,19 @@ class BuildNotificationManager(private val context: Context) {
         notificationManager.cancel(RUNNING_NOTIFICATION_ID)
     }
 
-    // 构建点击通知跳转 Intent（跳转到 MainActivity，由 MainScreen 路由到任务页）
+    // 构建点击通知跳转 Intent（跳转到 MainActivity 并携带目标 tab 索引，由 MainScreen 路由到任务页）
     private fun buildContentIntent(): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            // 携带目标 tab 索引：MainActivity 通过 onNewIntent / onCreate 读取并透传到 MainScreen
+            putExtra(EXTRA_TAB_INDEX, TAB_INDEX_TASK)
         }
         return PendingIntent.getActivity(
             context,
             ContentIntentConfig.REQUEST_CODE,
             intent,
-            PendingIntent.FLAG_IMMUTABLE
+            // FLAG_UPDATE_CURRENT：extras 变化时复用同一个 PendingIntent 并更新其 extras
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 

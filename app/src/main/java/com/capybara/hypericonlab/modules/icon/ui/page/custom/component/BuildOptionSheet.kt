@@ -3,19 +3,15 @@ package com.capybara.hypericonlab.modules.icon.ui.page.custom.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,9 +26,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
-import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
@@ -46,12 +40,15 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
 /**
  * 构建选项 Sheet：选择产物类型与图标集，确认后回调 [onConfirm]。
  *
- * 风格：复用 [FloatingBottomSheet] + [SheetTitle] + [SegmentedColumn] + [BaseWidget]，
- * 与项目其他 sheet（如 MaskPickerSheet、ColorPickerSheet）保持一致。
+ * 风格：复用 [FloatingBottomSheet] + [SheetTitle] + [ConfigCard] + [StyleChip]，
+ * 与自定义页面（前景/背景 tab）的卡片+chip 风格保持一致。
  *
- * - 产物类型：仅展示 [ProductType.enabled] = true 的项；单选
- * - 图标集：展示 [iconSets] 列表，单选；图标数量以 GoogleSansCode 字体展示
+ * - 产物类型：仅展示 [ProductType.enabled] = true 的项；单选；一行一个
+ * - 图标集：展示 [iconSets] 列表（full/filtered/test），单选；一行一个
  * - 确认按钮：未选中任一项时禁用（alpha=0.38）
+ *
+ * 一行一个 chip 的原因：产物类型与图标集文本较长（如 "zip (仅图标)"、"filtered · N 个图标"），
+ * 一行两个会换行或截断，改为 fillMaxWidth 单列展示，间距与圆角参考 ForegroundTab。
  *
  * @param iconSets 可用图标集列表（由 IconViewModel.availableIconSets 提供）
  * @param onConfirm 回调参数为 (产物类型, 图标集)
@@ -89,8 +86,10 @@ fun BuildOptionSheet(
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
         liquidGlassBlurRadius = liquidGlassBlurRadius,
+        // 自适应高度：仅展示产物类型与图标集两个卡片，内容有限无需全屏
+        fillMaxHeight = false
     ) {
-        // Header
+        // Header：与项目其他 sheet 一致的 CenterAlignedTopAppBar + 关闭/确认按钮
         CenterAlignedTopAppBar(
             title = { SheetTitle("构建") },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -106,14 +105,14 @@ fun BuildOptionSheet(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.secondaryContainer,
                     modifier = Modifier
-                        .padding(start = 12.dp)
-                        .size(40.dp)
+                        .padding(start = BuildOptionSheetConfig.HEADER_ICON_LEADING_PADDING)
+                        .size(BuildOptionSheetConfig.HEADER_ICON_SIZE)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             AppMaterialSymbols.close,
                             contentDescription = "关闭",
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(BuildOptionSheetConfig.HEADER_ICON_INNER_SIZE),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
@@ -138,16 +137,16 @@ fun BuildOptionSheet(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.secondaryContainer,
                     modifier = Modifier
-                        .padding(end = 12.dp)
-                        .size(40.dp)
+                        .padding(end = BuildOptionSheetConfig.HEADER_ICON_TRAILING_PADDING)
+                        .size(BuildOptionSheetConfig.HEADER_ICON_SIZE)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             AppMaterialSymbols.check,
                             contentDescription = "确定",
                             modifier = Modifier
-                                .size(24.dp)
-                                .alpha(if (enabled) 1f else 0.38f),
+                                .size(BuildOptionSheetConfig.HEADER_ICON_INNER_SIZE)
+                                .alpha(if (enabled) 1f else BuildOptionSheetConfig.DISABLED_ALPHA),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
@@ -155,52 +154,67 @@ fun BuildOptionSheet(
             }
         )
 
+        // 内容：两个 ConfigCard，chip 一行一个，间距 8dp，与 ForegroundTab 风格一致
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = BuildOptionSheetConfig.CONTENT_HORIZONTAL_PADDING)
+                .padding(bottom = BuildOptionSheetConfig.CONTENT_BOTTOM_PADDING)
         ) {
-            // 产物类型选择（仅展示 enabled=true 的项）
-            SegmentedColumn(title = "产物类型") {
-                ProductType.values().filter { it.enabled }.forEach { productType ->
-                    item {
-                        BaseWidget(
-                            title = productType.label,
+            // 产物类型卡片
+            ConfigCard(title = "产物类型") {
+                Column(verticalArrangement = Arrangement.spacedBy(BuildOptionSheetConfig.CHIP_SPACING)) {
+                    ProductType.values().filter { it.enabled }.forEach { productType ->
+                        StyleChip(
+                            label = productType.label,
                             selected = selectedProductType == productType,
-                            iconPlaceholder = false,
-                            onClick = { selectedProductType = productType }
+                            onClick = { selectedProductType = productType },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
             }
 
-            // 图标集列表
-            Text(
-                text = "图标集",
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    top = 16.dp,
-                    bottom = 8.dp
-                )
-            )
-            LazyColumn(
-                contentPadding = PaddingValues(bottom = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(iconSets, key = { it.id }) { iconSet ->
-                    BaseWidget(
-                        title = iconSet.label,
-                        description = "图标数量：${iconSet.iconCount}",
-                        descriptionColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        selected = selectedIconSet?.id == iconSet.id,
-                        iconPlaceholder = false,
-                        onClick = { selectedIconSet = iconSet }
-                    )
+            // 图标集卡片
+            ConfigCard(title = "图标集") {
+                Column(verticalArrangement = Arrangement.spacedBy(BuildOptionSheetConfig.CHIP_SPACING)) {
+                    iconSets.forEach { iconSet ->
+                        StyleChip(
+                            label = "${iconSet.label} · ${iconSet.iconCount} 个图标",
+                            selected = selectedIconSet?.id == iconSet.id,
+                            onClick = { selectedIconSet = iconSet },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+// BuildOptionSheet 关键参数集中声明，便于调参
+private object BuildOptionSheetConfig {
+    // Header 圆形按钮尺寸
+    val HEADER_ICON_SIZE = 40.dp
+
+    // Header 圆形按钮内部图标尺寸
+    val HEADER_ICON_INNER_SIZE = 24.dp
+
+    // Header 关闭按钮左侧 padding
+    val HEADER_ICON_LEADING_PADDING = 12.dp
+
+    // Header 确认按钮右侧 padding
+    val HEADER_ICON_TRAILING_PADDING = 12.dp
+
+    // 内容区水平内边距
+    val CONTENT_HORIZONTAL_PADDING = 16.dp
+
+    // 内容区底部内边距（避免最后一张卡片紧贴 sheet 底部）
+    val CONTENT_BOTTOM_PADDING = 24.dp
+
+    // chip 之间垂直间距（与 ForegroundTab 一致）
+    val CHIP_SPACING = 8.dp
+
+    // 禁用态透明度（Material 推荐 0.38）
+    const val DISABLED_ALPHA = 0.38f
 }

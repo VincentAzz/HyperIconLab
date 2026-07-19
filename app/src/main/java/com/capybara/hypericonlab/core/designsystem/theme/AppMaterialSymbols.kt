@@ -40,8 +40,8 @@ curl -o AndroidSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+R
 curl -o SyncSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/sync.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o TaskAltSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/task_alt.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 
-curl -o Symbol.kt ""
-curl -o Symbol.kt ""
+curl -o CategorySymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/category.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o DeleteSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/delete.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o Symbol.kt ""
 curl -o Symbol.kt ""
 */

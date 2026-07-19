@@ -9,6 +9,7 @@ import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconSetInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -63,9 +64,10 @@ class BuildTaskExecutor(
         var result: BuildTask? = null
 
         try {
-            // 1. 从 assets 直读 mapper
+            // 1. 从 assets 直读 mapper（iconSetId 为 full/filtered/test，需映射到实际文件名）
+            val mapperFileName = IconSetInfo.mapperFileName(task.iconSetId)
             val mapperMap = context.assets
-                .open("${ExecutorConfig.MAPPER_ASSET_DIR}/${task.iconSetId}.xml")
+                .open("${ExecutorConfig.MAPPER_ASSET_DIR}/$mapperFileName")
                 .use { stream -> IconMapperProcessor.parseIconMapper(stream) }
 
             // 解析得到真实图标数量后，立即更新 current（任务卡片可显示真实数量）
@@ -125,11 +127,7 @@ class BuildTaskExecutor(
                             throw IllegalStateException("工件导出失败（可能缺少存储权限）")
                         }
 
-                        // 6. 裁切缩略图并持久化预览图
-                        val thumbnail = cropThumbnail(storePreview)
-                        taskStore.saveThumbnail(task.taskId, thumbnail)
-                        taskStore.savePreview(task.taskId, storePreview)
-                        if (thumbnail != storePreview) thumbnail.recycle()
+                        // 注：缩略图与预览图已由 BuildTaskManager.submit 提交时持久化，此处不再重复保存
 
                         val finishedAt = System.currentTimeMillis()
                         val successTask = current.copy(
@@ -185,7 +183,8 @@ class BuildTaskExecutor(
     }
 
     // 从 store preview 裁切左上 2 图标区域作为缩略图（540×320 = 1080×640 的 1/2×1/2）
-    private fun cropThumbnail(storePreview: Bitmap): Bitmap {
+    // public：BuildTaskManager.submit 在提交时即调用以持久化缩略图，任务卡片 PENDING 即可显示
+    fun cropThumbnail(storePreview: Bitmap): Bitmap {
         val w = minOf(ExecutorConfig.THUMBNAIL_WIDTH, storePreview.width)
         val h = minOf(ExecutorConfig.THUMBNAIL_HEIGHT, storePreview.height)
         return Bitmap.createBitmap(storePreview, 0, 0, w, h)

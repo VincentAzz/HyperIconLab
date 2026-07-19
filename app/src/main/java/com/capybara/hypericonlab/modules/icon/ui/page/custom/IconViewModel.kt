@@ -63,15 +63,29 @@ data class LogEntry(
 /**
  * 图标集信息（用于 BuildOptionSheet 展示）。
  *
- * @param id 图标集 id，对应 assets/icon_mapper/<id>.xml（不含扩展名）
- * @param label 展示名（当前与 id 相同，预留后续国际化或自定义命名）
+ * @param id 图标集 id（full / filtered / test），同时用于任务 ID 拼接
+ * @param label 展示名（中文场景下仍使用英文，与 id 相同）
  * @param iconCount 图标数量（解析 mapper 得到，0 表示解析失败或未就绪）
  */
 data class IconSetInfo(
     val id: String,
     val label: String,
     val iconCount: Int
-)
+) {
+    companion object {
+        // 支持展示的图标集 id 列表（不展示 alt / preview）
+        val SUPPORTED_SETS = listOf("full", "filtered", "test")
+
+        // 图标集 id → assets/icon_mapper/ 下的实际文件名映射
+        fun mapperFileName(id: String): String = when (id) {
+            "full" -> "icon_mapper.xml"
+            "filtered" -> "icon_mapper_filtered.xml"
+            "test" -> "icon_mapper_test.xml"
+            // 兼容历史 id：未在映射表中的 id 按 icon_mapper_<id>.xml 推断
+            else -> "icon_mapper_$id.xml"
+        }
+    }
+}
 
 @SuppressLint("MissingPermission")
 class IconViewModel(
@@ -227,32 +241,22 @@ class IconViewModel(
     }
 
     /**
-     * 异步加载 assets/icon_mapper/ 下的图标集列表。
+     * 异步加载支持的图标集列表（full / filtered / test），不展示 alt / preview。
      * 同时解析每个 mapper 的图标数量，供 BuildOptionSheet 展示。
      */
     private fun loadAvailableIconSets() {
         viewModelScope.launch(Dispatchers.IO) {
-            val list = try {
-                context.assets.list(PipelineAssets.MAPPER_ASSET_DIR)
-                    ?.asSequence()
-                    ?.filter { it.endsWith(".xml") }
-                    ?.map { it.removeSuffix(".xml") }
-                    ?.sorted()
-                    ?.map { id ->
-                        // 解析图标数量，失败时返回 0
-                        val count = try {
-                            context.assets
-                                .open("${PipelineAssets.MAPPER_ASSET_DIR}/$id.xml")
-                                .use { IconMapperProcessor.parseIconMapper(it).size }
-                        } catch (_: Exception) {
-                            0
-                        }
-                        IconSetInfo(id = id, label = id, iconCount = count)
-                    }
-                    ?.toList()
-                    ?: emptyList()
-            } catch (_: Exception) {
-                emptyList()
+            val list = IconSetInfo.SUPPORTED_SETS.map { id ->
+                // 解析图标数量，失败时返回 0
+                val count = try {
+                    context.assets
+                        .open("${PipelineAssets.MAPPER_ASSET_DIR}/${IconSetInfo.mapperFileName(id)}")
+                        .use { IconMapperProcessor.parseIconMapper(it).size }
+                } catch (_: Exception) {
+                    0
+                }
+                // 中文场景下也使用英文 label，与 id 保持一致
+                IconSetInfo(id = id, label = id, iconCount = count)
             }
             _availableIconSets.value = list
         }
@@ -693,10 +697,34 @@ class IconViewModel(
 
     /**
      * 根据当前 [_config] 构造 [IconBuildConfig]，runPipeline 与 submitBuildTask 共用。
-     * 下层背景颜色（app 源除外）在此处预解析，executor 不再处理颜色解析。
+     *
+     * 颜色预解析策略（关键修复）：
+     * - 前景/上层背景/下层背景的 colorSource 非 "app" 时，在此处预解析为具体颜色 hex 后填入 fgColorHex/bgColorHex/bgColor2
+     * - "app" 源由 [IconPipelineUseCase] 按 packageName 实时从 appColorSchemes 解析（每个图标颜色不同），此处跳过预解析
+     * - 否则打包出的图标会使用 configValue 中残留的默认颜色（如 #FFFFFFFF/#FF3F51B5），与自定义页面预览图不一致
      */
     private fun buildIconBuildConfig(configValue: IconConfigState): IconBuildConfig {
-        // 预解析下层颜色（app 源由 IconPipelineUseCase 按 packageName 实时解析，此处跳过）
+        // 预解析前景颜色（app 源由 pipeline 按 packageName 实时解析，此处跳过）
+        val resolvedFgColor = if (configValue.fgColorSource != "app") {
+            generatePreviewUseCase.resolveConfigColors(
+                isFg = true,
+                config = configValue,
+                wallpaperColorScheme = wallpaperColorScheme.value,
+                appColorSchemes = appColorSchemes
+            )
+        } else configValue.fgColor
+
+        // 预解析上层背景颜色（同上）
+        val resolvedBgColor = if (configValue.bgColorSource != "app") {
+            generatePreviewUseCase.resolveConfigColors(
+                isFg = false,
+                config = configValue,
+                wallpaperColorScheme = wallpaperColorScheme.value,
+                appColorSchemes = appColorSchemes
+            )
+        } else configValue.bgColor
+
+        // 预解析下层颜色（app 源由 pipeline 按 packageName 实时解析，此处跳过）
         val resolvedBgColor2 = if (configValue.dualLayerEnabled &&
             configValue.bgLayer2.colorSource != "app"
         ) {
@@ -710,8 +738,8 @@ class IconViewModel(
         } else configValue.bgLayer2.color
 
         return IconBuildConfig(
-            fgColorHex = configValue.fgColor,
-            bgColorHex = configValue.bgColor,
+            fgColorHex = resolvedFgColor,
+            bgColorHex = resolvedBgColor,
             strokeWidthRatio = configValue.strokeWidthRatio,
             iconScale = configValue.iconScale,
             colorMode = configValue.colorMode,
@@ -719,6 +747,7 @@ class IconViewModel(
             masks = configValue.selectedMasks,
             fgStyle = configValue.fgStyle,
             bgStyle = configValue.bgStyle,
+            fgColorSource = configValue.fgColorSource,
             bgColorSource = configValue.bgColorSource,
             stickerConfig = if (configValue.fgStyle == "sticker") StickerConfig(
                 fillStyle = configValue.sticker.fillStyle,

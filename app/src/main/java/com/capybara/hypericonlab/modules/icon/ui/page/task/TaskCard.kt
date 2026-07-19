@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -56,21 +56,19 @@ import java.util.Locale
  * 布局（仅点击交互，不做 SwipeToDismiss，避免与底栏 tab 滑动冲突）：
  * ```
  * ┌──────────────────────────────────────────────────┐
- * │ [缩略图1] [缩略图2]  taskId (GoogleSansCode)      │
- * │                     图标集 · 图标数                │
- * │                     [产物类型 chip] [状态 chip]    │
+ * │ [缩略图]  taskId (GoogleSansCode)                 │
+ * │           图标集 · 图标数                          │
+ * │           [产物类型 chip] [状态 chip]              │
  * │ ─────────────────────────────────────────────    │
  * │ LinearProgressIndicator (仅 PENDING/RUNNING)      │
  * │ 状态文案 · 提交时间                                │
  * └──────────────────────────────────────────────────┘
  * ```
  *
- * 缩略图策略：
- * - PENDING：展示 store preview 缓存（由 BuildTaskManager.previewCache 提供，但 UI 层不直接访问，
- *   此处用占位色块）
- * - RUNNING：同 PENDING
- * - SUCCESS：从 filesDir/build_thumbnails/<taskId>.png 异步加载（单缩略图，按需复制展示两次以保持布局）
- * - FAILED：占位色块（错误图标）
+ * 缩略图策略（提交时即持久化，所有状态均尝试加载）：
+ * - PENDING/RUNNING：从 filesDir/build_thumbnails/<taskId>.png 异步加载（提交时已保存）
+ * - SUCCESS：同上
+ * - FAILED/CANCELLED：加载失败时显示占位色块
  *
  * @param task 当前任务
  * @param onClick 点击卡片回调（用于打开详情 sheet）
@@ -83,16 +81,15 @@ fun TaskCard(
 ) {
     val context = LocalContext.current
 
-    // 缩略图位图：SUCCESS 状态异步加载，其他状态为 null
+    // 缩略图位图：提交时已由 BuildTaskManager 持久化，所有状态均可加载
     var thumbnail by remember(task.taskId, task.status) {
         mutableStateOf<android.graphics.Bitmap?>(null)
     }
     LaunchedEffect(task.taskId, task.status) {
-        if (task.status == BuildTaskStatus.SUCCESS) {
-            thumbnail = withContext(Dispatchers.IO) {
-                val file = File(context.filesDir, "build_thumbnails/${task.taskId}.png")
-                if (file.exists()) BitmapFactory.decodeFile(file.absolutePath) else null
-            }
+        // 任务提交即持久化缩略图，此处统一异步加载
+        thumbnail = withContext(Dispatchers.IO) {
+            val file = File(context.filesDir, "build_thumbnails/${task.taskId}.png")
+            if (file.exists()) BitmapFactory.decodeFile(file.absolutePath) else null
         }
     }
 
@@ -110,16 +107,20 @@ fun TaskCard(
                 .fillMaxWidth()
                 .padding(TaskCardConfig.CONTENT_PADDING)
         ) {
-            // 顶部：2 个缩略图 + 任务信息
+            // 顶部：单张缩略图（长方形，540:320 比例）+ 任务信息
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // 2 个缩略图位（SUCCESS 时显示位图，其他状态显示占位色块）
-                ThumbnailSlot(thumbnail, task.status, Modifier.size(TaskCardConfig.THUMBNAIL_SIZE))
-                Spacer(Modifier.width(0.dp))
-                ThumbnailSlot(thumbnail, task.status, Modifier.size(TaskCardConfig.THUMBNAIL_SIZE))
+                // 单缩略图位（长方形，提交时已持久化，所有状态均显示位图或占位色块）
+                ThumbnailSlot(
+                    thumbnail = thumbnail,
+                    status = task.status,
+                    modifier = Modifier
+                        .height(TaskCardConfig.THUMBNAIL_HEIGHT)
+                        .width(TaskCardConfig.THUMBNAIL_WIDTH)
+                )
 
                 Spacer(Modifier.weight(1f))
 
@@ -145,7 +146,7 @@ fun TaskCard(
 
             Spacer(Modifier.height(8.dp))
 
-            // chips：产物类型 + 状态
+            // chips：产物类型 + 状态（不再展示当前处理包名，意义不大）
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -155,11 +156,6 @@ fun TaskCard(
                     text = statusLabel(task.status),
                     containerColor = statusColor(task.status)
                 )
-                if (task.status == BuildTaskStatus.RUNNING && task.currentPackage != null) {
-                    StatusChip(
-                        text = task.currentPackage.take(TaskCardConfig.MAX_PACKAGE_NAME_LENGTH)
-                    )
-                }
             }
 
             // 进度条：仅 PENDING/RUNNING 显示
@@ -200,7 +196,7 @@ fun TaskCard(
     }
 }
 
-// 缩略图位：SUCCESS 时显示位图，其他状态显示占位色块
+// 缩略图位：长方形（540:320 比例），Fit 显示避免裁切
 @Composable
 private fun ThumbnailSlot(
     thumbnail: android.graphics.Bitmap?,
@@ -225,8 +221,9 @@ private fun ThumbnailSlot(
             Image(
                 bitmap = thumbnail.asImageBitmap(),
                 contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Crop
+                modifier = Modifier.fillMaxSize(),
+                // Fit：按比例缩放完整显示，不裁切；图比例 540:320 = 1.6875:1，与 slot 1.5:1 不完全匹配但保证不裁切
+                contentScale = ContentScale.Fit
             )
         }
     }
@@ -292,12 +289,12 @@ private object TaskCardConfig {
     // 卡片内容内边距
     val CONTENT_PADDING = PaddingValues(16.dp)
 
-    // 缩略图尺寸（正方形）
-    val THUMBNAIL_SIZE = 48.dp
+    // 缩略图高度（长方形 slot，对应裁切的 540×320 缩略图）
+    val THUMBNAIL_HEIGHT = 48.dp
+
+    // 缩略图宽度（按 540:320 = 1.6875:1 比例，48 * 1.6875 ≈ 81dp）
+    val THUMBNAIL_WIDTH = 81.dp
 
     // 进度条高度
     val PROGRESS_HEIGHT = 4.dp
-
-    // 包名最大长度（避免过长 chip）
-    const val MAX_PACKAGE_NAME_LENGTH = 20
 }
