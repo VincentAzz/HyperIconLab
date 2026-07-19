@@ -4,6 +4,16 @@
 
     <uses-sdk tools:overrideLibrary="top.yukonga.miuix.kmp.blur,top.yukonga.miuix.kmp.shader,top.yukonga.miuix.kmp.ui,top.yukonga.miuix.kmp.core,top.yukonga.miuix.kmp.squircle" />
 
+    <!-- 构建任务：前台服务-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- 构建任务：进度通知（Android 13+ 需运行时申请） -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- 构建产物导出：Android 9 及以下写入公共 Documents 目录 -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
     <application
         android:name=".App"
         android:allowBackup="true"

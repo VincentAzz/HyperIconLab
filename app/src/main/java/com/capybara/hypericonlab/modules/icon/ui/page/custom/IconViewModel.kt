@@ -66,6 +66,14 @@ class IconViewModel(
 
     private val context = application.applicationContext
 
+    companion object {
+        // 打包流程关键参数集中声明，便于调参
+        private object PipelineAssets {
+            // assets 中 mapper 文件所在目录
+            const val MAPPER_ASSET_DIR = "icon_mapper"
+        }
+    }
+
     // Configuration State
     private val _config = MutableStateFlow(IconConfigState())
     val config: StateFlow<IconConfigState> = _config.asStateFlow()
@@ -175,7 +183,8 @@ class IconViewModel(
 
     init {
         viewModelScope.launch {
-            mapperExists.value = manageResourcesUseCase.checkMapperExists()
+            // mapper 已直接打包在 assets/icon_mapper/，无需首启动解压，默认即就绪
+            mapperExists.value = true
             autoInitializeResources()
         }
         loadColorSchemes()
@@ -219,21 +228,9 @@ class IconViewModel(
                 addLog("资源已就绪")
             }
 
-            if (!manageResourcesUseCase.checkMapperExists()) {
-                addLog("检测到映射器未生成，开始自动生成...")
-                val startTime = System.currentTimeMillis()
-                val result = manageResourcesUseCase.generateMapper()
-                val duration = System.currentTimeMillis() - startTime
-                result.onSuccess {
-                    addLog("映射器生成完成，耗时 ${duration}ms", LogType.SUCCESS)
-                    mapperExists.value = true
-                }.onFailure {
-                    addLog("映射器生成失败: ${it.message}", LogType.ERROR)
-                }
-            } else {
-                addLog("映射器已就绪")
-                mapperExists.value = true
-            }
+            // mapper 已直接打包在 assets 中，无需自动生成
+            addLog("映射器已就绪")
+            mapperExists.value = true
 
             // 资源和映射就绪后，自动生成初始预览图
             if (mapperExists.value) {
@@ -509,14 +506,13 @@ class IconViewModel(
             try {
                 _statusText.value = "准备 $mapperName..."
                 val filesDir = context.filesDir
-                val mapperBase = File(filesDir, "icon_mapper")
                 val lawniconsBase = File(filesDir, "lawnicons")
 
-                val mapperFile = withContext(Dispatchers.IO) {
-                    ZipUtils.findFileRecursive(
-                        mapperBase,
-                        mapperName
-                    )
+                // mapper 直接从 assets 读取，避免落盘与首启动解压
+                val mapperMap = withContext(Dispatchers.IO) {
+                    context.assets
+                        .open("${PipelineAssets.MAPPER_ASSET_DIR}/$mapperName")
+                        .use { stream -> IconMapperProcessor.parseIconMapper(stream) }
                 }
                 val svgDir =
                     withContext(Dispatchers.IO) { ZipUtils.findDirRecursive(lawniconsBase, "svgs") }
@@ -592,7 +588,7 @@ class IconViewModel(
                 val out = File(filesDir, "${mapperName.removeSuffix(".xml")}.mtz")
                 pipeline.executeWithFiles(
                     buildConfig,
-                    IconMapperProcessor.parseIconMapper(mapperFile!!),
+                    mapperMap,
                     svgDir!!,
                     maskBitmaps,
                     out,

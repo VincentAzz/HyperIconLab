@@ -6,6 +6,7 @@ import org.xmlpull.v1.XmlSerializer
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.io.StringWriter
 import java.util.regex.Pattern
 
@@ -136,25 +137,49 @@ object IconMapperProcessor {
             Timber.tag(TAG).e("Mapper file not found for parsing: ${xmlFile.absolutePath}")
             return mapper
         }
-
         try {
-            val parser = Xml.newPullParser()
-            parser.setInput(xmlFile.inputStream(), "UTF-8")
-            var eventType = parser.eventType
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG && parser.name == "item") {
-                    val pkg = parser.getAttributeValue(null, "package")
-                    val drawable = parser.getAttributeValue(null, "drawable")
-                    if (pkg != null && drawable != null) {
-                        mapper[pkg] = drawable
-                    }
-                }
-                eventType = parser.next()
+            xmlFile.inputStream().use { stream ->
+                parseIconMapperInternal(stream, xmlFile.name, mapper)
             }
-            Timber.tag(TAG).d("Parsed ${mapper.size} items from ${xmlFile.name}")
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Error parsing mapper file")
         }
         return mapper
+    }
+
+    /**
+     * 从 [InputStream] 直接解析 icon_mapper.xml，避免落盘。
+     * 调用方负责关闭流。
+     */
+    fun parseIconMapper(inputStream: InputStream): Map<String, String> {
+        val mapper = mutableMapOf<String, String>()
+        try {
+            parseIconMapperInternal(inputStream, "inputStream", mapper)
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error parsing mapper from stream")
+        }
+        return mapper
+    }
+
+    // 解析 mapper XML 内部实现，由 File/InputStream 重载共用
+    private fun parseIconMapperInternal(
+        stream: InputStream,
+        nameForLog: String,
+        mapper: MutableMap<String, String>
+    ) {
+        val parser = Xml.newPullParser()
+        parser.setInput(stream, "UTF-8")
+        var eventType = parser.eventType
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            if (eventType == XmlPullParser.START_TAG && parser.name == "item") {
+                val pkg = parser.getAttributeValue(null, "package")
+                val drawable = parser.getAttributeValue(null, "drawable")
+                if (pkg != null && drawable != null) {
+                    mapper[pkg] = drawable
+                }
+            }
+            eventType = parser.next()
+        }
+        Timber.tag(TAG).d("Parsed ${mapper.size} items from $nameForLog")
     }
 }

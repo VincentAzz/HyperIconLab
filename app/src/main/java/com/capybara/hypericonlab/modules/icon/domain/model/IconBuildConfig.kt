@@ -1,6 +1,9 @@
 package com.capybara.hypericonlab.modules.icon.domain.model
 
+import kotlinx.serialization.Serializable
+
 // 图标构建配置
+@Serializable
 data class IconBuildConfig(
     val iconSize: Int = 512,
     val iconScale: Float = 0.8f,
@@ -43,6 +46,7 @@ data class IconBuildConfig(
     val imageFilling2ScaleMode: String = "scale"
 )
 
+@Serializable
 data class StickerConfig(
     val fillStyle: String = "none", // "none", "fill", "glow"
     val strokeWidth: Float = 0.15f,
@@ -51,12 +55,14 @@ data class StickerConfig(
     val fillColor: String = "#00000000"
 )
 
+@Serializable
 data class GlassConfig(
     val strokeDiff: Float = -0.4f,
     val angle: Float = -45f,
     val shadowEnabled: Boolean = true
 )
 
+@Serializable
 enum class ColorMode {
     MONET, CUSTOM, COLORFUL, BLACK_WHITE
 }

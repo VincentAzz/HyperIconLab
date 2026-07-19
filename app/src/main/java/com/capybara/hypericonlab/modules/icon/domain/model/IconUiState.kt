@@ -5,7 +5,9 @@ import androidx.compose.ui.graphics.toArgb
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class StickerUiState(
     val fillStyle: String = "none",
     val strokeWidth: Float = 0.12f,
@@ -14,18 +16,21 @@ data class StickerUiState(
     val fillColor: String = "#FFB0C4DE"
 )
 
+@Serializable
 data class GlassUiState(
     val angle: Float = -45f,
     val strokeDiff: Float = -0.4f,
     val shadowEnabled: Boolean = true
 )
 
+@Serializable
 data class CtcUiState(
     val type: String = "monochromatic",
     val variant: String = "light",
     val selectedIndex: Int = 0
 )
 
+@Serializable
 data class PresetUiState(
     val seedColor: Int = PresetColors[0].color.toArgb(),
     val paletteStyle: PaletteStyle = PaletteStyle.Expressive,
@@ -33,11 +38,13 @@ data class PresetUiState(
 )
 
 // 默认 TonalSpot + SPEC_2021
+@Serializable
 data class WallpaperUiState(
     val paletteStyle: PaletteStyle = PaletteStyle.TonalSpot,
     val colorSpec: ThemeColorSpec = ThemeColorSpec.SPEC_2021
 )
 
+@Serializable
 data class IconConfigState(
     val colorMode: ColorMode = ColorMode.CUSTOM,
     val fgColor: String = "#FFFFFFFF",
@@ -78,6 +85,7 @@ data class IconConfigState(
  * 下层背景独立配置。
  * 与上层背景字段一一对应但不共享，上下层颜色完全分离处理。
  */
+@Serializable
 data class BgLayerUiState(
     // 背景样式：none/solid/img_static/img_filling
     val style: String = "solid",
@@ -99,6 +107,7 @@ data class BgLayerUiState(
     val imageFilling: ImageFillingUiState = ImageFillingUiState()
 )
 
+@Serializable
 data class ImageFillingUiState(
     // 是否随机旋转
     val randomRotation: Boolean = false,
