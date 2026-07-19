@@ -25,6 +25,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -39,17 +42,16 @@ import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 
 /**
- * 任务页面：展示活动任务与已完成任务列表。
+ * 任务页面：展示活动任务与已完成任务列表，并承载 [TaskDetailSheet]。
  *
  * 布局：
  * - 顶部 TopAppBar（标题"任务"）
  * - LazyColumn：
  *   - "活动任务" section（PENDING + RUNNING），无活动任务时不显示
  *   - "已完成任务" section（SUCCESS + FAILED），无已完成任务时显示空态文案
+ * - 卡片点击：设置内部 selectedTaskId 状态，渲染 [TaskDetailSheet]
  *
- * 卡片点击：触发 [onTaskClick] 回调，由上层打开 TaskDetailSheet。
- *
- * @param onTaskClick 任务卡片点击回调，参数为任务 id
+ * @param onTaskClick 可选外部回调（用于上层联动）；默认空实现，页面内部已自带 sheet 渲染
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -64,6 +66,9 @@ fun TaskPage(
     val activeTasks by viewModel.activeBuildTasks.collectAsStateWithLifecycle()
     val finishedTasks by viewModel.finishedBuildTasks.collectAsStateWithLifecycle()
     val themeState by themeViewModel.state.collectAsStateWithLifecycle()
+
+    // 当前选中的任务 id（点击卡片时设置，详情 sheet 关闭时清空）
+    var selectedTaskId by remember { mutableStateOf<String?>(null) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val backdrop = rememberMaterial3BlurBackdrop(themeState.useBlur)
@@ -120,7 +125,10 @@ fun TaskPage(
                 items(activeTasks, key = { it.taskId }) { task ->
                     TaskCard(
                         task = task,
-                        onClick = { onTaskClick(task.taskId) }
+                        onClick = {
+                            selectedTaskId = task.taskId
+                            onTaskClick(task.taskId)
+                        }
                     )
                 }
             }
@@ -136,7 +144,10 @@ fun TaskPage(
                 items(finishedTasks, key = { it.taskId }) { task ->
                     TaskCard(
                         task = task,
-                        onClick = { onTaskClick(task.taskId) }
+                        onClick = {
+                            selectedTaskId = task.taskId
+                            onTaskClick(task.taskId)
+                        }
                     )
                 }
             }
@@ -168,6 +179,20 @@ fun TaskPage(
             }
         }
     }
+
+    // 详情 sheet：选中任务 id 时渲染，从活动 + 已完成列表中查找最新任务数据
+    val selectedTask = selectedTaskId?.let { id ->
+        activeTasks.find { it.taskId == id } ?: finishedTasks.find { it.taskId == id }
+    }
+    selectedTask?.let { task ->
+        TaskDetailSheet(
+            task = task,
+            onStop = { viewModel.cancelBuildTask(task.taskId) },
+            onDelete = { viewModel.deleteFinishedBuildTask(task.taskId) },
+            onRetry = { viewModel.retryBuildTask(task.taskId) },
+            onDismiss = { selectedTaskId = null }
+        )
+    }
 }
 
 // section 标题（与 SegmentedColumn 标题风格一致）
@@ -189,13 +214,10 @@ private fun SectionTitle(text: String) {
 private object TaskPageConfig {
     // 列表水平内边距
     val HORIZONTAL_PADDING = 16.dp
-
     // 列表垂直内边距
     val VERTICAL_PADDING = 8.dp
-
     // 卡片间距
     val CARD_SPACING = 12.dp
-
     // section 间距
     val SECTION_GAP = 16.dp
 }
