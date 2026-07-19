@@ -2,6 +2,8 @@ package com.capybara.hypericonlab.modules.icon.domain.usecase
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
+import com.capybara.hypericonlab.core.notification.BuildForegroundService
 import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
@@ -67,6 +69,9 @@ class BuildTaskManager(
     // appColorSchemes 缓存（由 IconViewModel 加载完成后调用 updateAppColorSchemes）
     private var appColorSchemes: Map<String, Pair<String, String>> = emptyMap()
 
+    // 前台服务启动标志位，避免重复 startService
+    private var foregroundServiceStarted = false
+
     // 单线程串行调度器，保证一次只执行一个构建任务
     private val buildDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
@@ -77,6 +82,43 @@ class BuildTaskManager(
         // 启动时异步加载已完成任务
         scope.launch {
             _finishedTasks.value = taskStore.loadFinishedTasks()
+        }
+        // 观察活动任务变化，自动启停前台服务
+        scope.launch {
+            _activeTasks.collect { tasks ->
+                if (tasks.isNotEmpty()) {
+                    startForegroundServiceIfNeeded()
+                } else {
+                    stopForegroundServiceIfNeeded()
+                }
+            }
+        }
+    }
+
+    // 启动前台服务（仅在有活动任务时）
+    private fun startForegroundServiceIfNeeded() {
+        if (foregroundServiceStarted) return
+        foregroundServiceStarted = true
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(BuildForegroundService.createIntent(context))
+            } else {
+                context.startService(BuildForegroundService.createIntent(context))
+            }
+        } catch (e: Exception) {
+            Timber.tag(TAG).w(e, "Failed to start BuildForegroundService")
+            foregroundServiceStarted = false
+        }
+    }
+
+    // 停止前台服务（无活动任务时由服务自身 stopSelf，这里只重置标志位）
+    private fun stopForegroundServiceIfNeeded() {
+        if (!foregroundServiceStarted) return
+        foregroundServiceStarted = false
+        try {
+            context.stopService(BuildForegroundService.createIntent(context))
+        } catch (e: Exception) {
+            // 忽略停止失败
         }
     }
 

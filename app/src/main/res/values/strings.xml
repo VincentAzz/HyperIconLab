@@ -68,4 +68,25 @@
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="personalization">Personalization</string>
+
+    <!-- Build task notifications -->
+    <string name="build_notification_channel_name">Build Tasks</string>
+    <string name="build_notification_channel_desc">Show progress and results of icon build tasks</string>
+    <string name="build_notification_title_fmt">Building: %1$s</string>
+    <string name="build_notification_preparing">Preparing: %1$s</string>
+    <string name="build_notification_progress_fmt">Current: %1$s (%2$d/%3$d)</string>
+    <string name="build_notification_success_title">Build finished</string>
+    <string name="build_notification_success_fmt">%1$s · %2$d icons · %3$.1f s</string>
+    <string name="build_notification_failed_title">Build failed</string>
+    <string name="build_notification_failed_fmt">%1$s failed: %2$s</string>
+    <string name="build_notification_unknown_error">Unknown error</string>
+
+    <!-- Permission check card -->
+    <string name="permission_check_title">Permission Status</string>
+    <string name="permission_check_notification_title">Notification Permission</string>
+    <string name="permission_check_notification_desc">Used to show build progress notifications. Tasks still run without it, but no notifications will be displayed</string>
+    <string name="permission_check_storage_title">Storage Permission</string>
+    <string name="permission_check_storage_desc">Required to export build artifacts to the Documents directory (only Android 9 and below)</string>
+    <string name="permission_check_grant">Grant</string>
+    <string name="permission_check_all_granted">All permissions granted</string>
 </resources>

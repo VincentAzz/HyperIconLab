@@ -55,6 +55,7 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsState
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.PermissionCheckCard
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
@@ -89,6 +90,10 @@ fun SettingsTab(
             bottom = outerPadding.calculateBottomPadding()
         )
     ) {
+        // 权限检查卡片：仅在权限未授权时显示（已授权则自动隐藏，不占空间）
+        item {
+            PermissionCheckCard()
+        }
         item {
             SegmentedColumn(
                 title = "应用视觉效果"

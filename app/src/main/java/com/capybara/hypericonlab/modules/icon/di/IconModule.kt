@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.di
 
+import com.capybara.hypericonlab.core.notification.BuildNotificationManager
 import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
 import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskExecutor
@@ -20,5 +21,7 @@ val iconModule = module {
     factory { BuildTaskStore(get()) }
     factory { BuildTaskExecutor(get(), get(), get(), get()) }
     single { BuildTaskManager(get(), get(), get()) }
+    // 通知管理器为工厂（含 lastProgressTime 实例状态，每个 Manager 注入一份）
+    factory { BuildNotificationManager(get()) }
     viewModelOf(::IconViewModel)
 }
