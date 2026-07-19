@@ -51,8 +51,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
 import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
+import com.capybara.hypericonlab.core.designsystem.symbol.category
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
+import com.capybara.hypericonlab.core.designsystem.symbol.delete
 import com.capybara.hypericonlab.core.designsystem.symbol.refresh
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
@@ -564,26 +566,38 @@ private fun DetailBottomActions(
                 Text("停止构建")
             }
         } else {
-            // 已完成：保存到预设 + 删除记录 按钮组（两按钮并列，各自有固定高度）
+            // 已完成：保存到预设 + 删除记录 按钮组（两按钮并列，各自有固定高度，前导图标）
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(TaskDetailSheetConfig.BUTTON_HEIGHT),
                 horizontalArrangement = Arrangement.spacedBy(TaskDetailSheetConfig.BOTTOM_BUTTON_SPACING)
             ) {
-                // 保存到预设：暂未实现，置 disabled
+                // 保存到预设：暂未实现，置 disabled；前导 category 图标
                 FilledTonalButton(
                     onClick = { /* TODO: 预设页面实现后接入 */ },
                     enabled = false,
                     modifier = Modifier.weight(1f)
                 ) {
+                    Icon(
+                        AppMaterialSymbols.category,
+                        contentDescription = null,
+                        modifier = Modifier.size(TaskDetailSheetConfig.BUTTON_ICON_SIZE)
+                    )
+                    Spacer(Modifier.size(TaskDetailSheetConfig.BUTTON_ICON_TEXT_SPACING))
                     Text("保存到预设")
                 }
-                // 删除记录：普通色
+                // 删除记录：普通色；前导 delete 图标
                 FilledTonalButton(
                     onClick = onDelete,
                     modifier = Modifier.weight(1f)
                 ) {
+                    Icon(
+                        AppMaterialSymbols.delete,
+                        contentDescription = null,
+                        modifier = Modifier.size(TaskDetailSheetConfig.BUTTON_ICON_SIZE)
+                    )
+                    Spacer(Modifier.size(TaskDetailSheetConfig.BUTTON_ICON_TEXT_SPACING))
                     Text("删除记录")
                 }
             }

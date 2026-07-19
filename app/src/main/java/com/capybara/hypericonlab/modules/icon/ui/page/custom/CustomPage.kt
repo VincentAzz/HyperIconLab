@@ -8,28 +8,22 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.SnackbarDuration
@@ -208,7 +202,7 @@ fun CustomPage(
                     bottom = 0.dp
                 )
         ) {
-            // 固定预览区
+            // 固定预览区（包含预览图与下方按钮组：壁纸/刷新/全屏 + 构建/保存预设）
             PreviewSection(
                 bitmap = storePreviewBitmap,
                 onPickWallpaper = {
@@ -221,42 +215,11 @@ fun CustomPage(
                 onExpand = {
                     viewModel.generatePreview(isLive = false)
                     showFullScreenPreview = true
-                }
+                },
+                onBuild = { showBuildSheet = true },
+                onSavePreset = { /* TODO 预设功能 */ },
+                savePresetEnabled = false
             )
-
-            // 构建与保存到预设按钮组
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // 主按钮：构建（点击弹出 BuildOptionSheet）
-                Button(
-                    onClick = { showBuildSheet = true },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    androidx.compose.material3.Text(
-                        text = "构建",
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-                // 次按钮：保存到预设（暂 disable，待预设功能落地后启用）
-                OutlinedButton(
-                    onClick = { /* TODO 预设功能 */ },
-                    enabled = false,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    androidx.compose.material3.Text(
-                        text = "保存到预设",
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
