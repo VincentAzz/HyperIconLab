@@ -26,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -144,7 +145,20 @@ fun CustomPage(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         contentWindowInsets = windowInsetsSides?.let { ScaffoldDefaults.contentWindowInsets.only(it) }
             ?: ScaffoldDefaults.contentWindowInsets,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = outerPadding.calculateBottomPadding() + 8.dp)
+            ) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    actionColor = MaterialTheme.colorScheme.primary,
+                    shape = MaterialTheme.shapes.medium
+                )
+            }
+        },
         topBar = {
             Box {
                 TopAppBar(
@@ -281,13 +295,11 @@ fun CustomPage(
             iconSets = availableIconSets,
             onConfirm = { productType, iconSet ->
                 showBuildSheet = false
-                // 方案 C：提交前检查权限，缺失则先逐个申请再提交
                 val missing = viewModel.buildPermissionsMissing()
                 if (missing.isEmpty()) {
                     val submitted =
                         viewModel.submitBuildTask(productType, iconSet.id, iconSet.label)
                     if (submitted != null) {
-                        // 弹出 Snackbar 提示用户去任务 tab 查看进度
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
                                 message = "已提交构建任务，可在任务 tab 中查看构建进度",

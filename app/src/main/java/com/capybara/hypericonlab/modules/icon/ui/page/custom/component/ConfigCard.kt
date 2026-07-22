@@ -110,17 +110,25 @@ fun StyleChip(
     label: String,
     selected: Boolean,
     onClick: () -> Unit = {},
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    selectedContainerColor: Color = MaterialTheme.colorScheme.primary,
+    unselectedContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+    selectedContentColor: Color = MaterialTheme.colorScheme.onPrimary,
+    unselectedContentColor: Color? = null
 ) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colorScheme.primary
-        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        targetValue = if (selected) selectedContainerColor
+        else unselectedContainerColor,
         label = "chip_background_color"
     )
+
+    val resolvedUnselectedContentColor = unselectedContentColor
+        ?: if (enabled) MaterialTheme.colorScheme.onSurface
+        else MaterialTheme.colorScheme.onSurfaceVariant
+
     val textColor by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colorScheme.onPrimary
-        else if (enabled) MaterialTheme.colorScheme.onSurface
-        else MaterialTheme.colorScheme.onSurfaceVariant,
+        targetValue = if (selected) selectedContentColor
+        else resolvedUnselectedContentColor,
         label = "chip_text_color"
     )
 
@@ -148,7 +156,7 @@ fun StyleChip(
                             imageVector = AppMaterialSymbols.check,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = selectedContentColor
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                     }

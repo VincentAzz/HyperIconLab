@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -129,17 +130,14 @@ fun TaskDetailSheet(
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
         liquidGlassBlurRadius = liquidGlassBlurRadius,
-        fillMaxHeight = isActive
+        fillMaxHeight = true
     ) {
-        // 整体 Column：Header + 内容 + 按钮；按钮独占底部高度不被 LazyColumn 挤压
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(if (isActive) Modifier.fillMaxSize() else Modifier.wrapContentHeight())
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Header：CenterAlignedTopAppBar + 左右对称 40dp 圆形按钮，title 居中（与 MaskPickerSheet 一致）
             CenterAlignedTopAppBar(
                 title = { SheetTitle(if (isActive) "构建中" else "任务详情") },
+                windowInsets = WindowInsets(0),
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 ),
@@ -162,7 +160,6 @@ fun TaskDetailSheet(
                         }
                     }
                 },
-                // 保留右侧确认按钮，与 MaskPickerSheet 风格一致；占位使 title 居中不偏移
                 actions = {
                     Surface(
                         onClick = { closeSheet() },
@@ -183,18 +180,16 @@ fun TaskDetailSheet(
                     }
                 }
             )
-
-            // 内容主体：LazyColumn weight(1f)，让按钮独占底部高度
-            // 进行中全屏时 weight(1f) 占满剩余空间；已完成 wrapContentHeight 时 weight(1f) 也保证按钮不被挤
-            DetailContent(
-                task = task,
-                isActive = isActive,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-            )
-
-            // 底部操作区：独占高度，wrapContentHeight 不被 LazyColumn 挤压
+            ) {
+                DetailContent(
+                    task = task,
+                    isActive = isActive
+                )
+            }
             DetailBottomActions(
                 task = task,
                 onStop = { showStopDialog = true },
@@ -204,7 +199,6 @@ fun TaskDetailSheet(
         }
     }
 
-    // 二次确认对话框
     if (showStopDialog) {
         ConfirmDialog(
             title = "停止构建",
@@ -249,7 +243,7 @@ fun TaskDetailSheet(
     }
 }
 
-// 详情主体内容：预览图 + 任务信息卡片 + 状态相关卡片
+
 @Composable
 private fun DetailContent(
     task: BuildTask,
@@ -269,35 +263,29 @@ private fun DetailContent(
         }
     }
 
-    // 卡片容器色：与 LogSheet 风格一致（surfaceBright alpha=0.8f），让 sheet 模糊透出
     val cardContainerColor =
         MaterialTheme.colorScheme.surfaceBright.copy(alpha = TaskDetailSheetConfig.CARD_ALPHA)
 
     LazyColumn(
-        modifier = modifier
-            .then(if (isActive) Modifier.fillMaxSize() else Modifier.wrapContentHeight()),
+        modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(
             horizontal = TaskDetailSheetConfig.CONTENT_HORIZONTAL_PADDING,
             vertical = TaskDetailSheetConfig.CONTENT_VERTICAL_PADDING
         ),
         verticalArrangement = Arrangement.spacedBy(TaskDetailSheetConfig.SECTION_SPACING)
     ) {
-        // 预览图区（保持装饰性，不包卡片）
         item { PreviewSection(task = task, bitmap = previewBitmap) }
 
-        // 任务信息卡片（ConfigCard 包裹）
         item {
             TaskInfoCard(task = task, containerColor = cardContainerColor)
         }
 
-        // 进度卡片（仅 PENDING/RUNNING）
         if (isActive) {
             item {
                 ProgressCard(task = task, containerColor = cardContainerColor)
             }
         }
 
-        // 状态相关卡片
         when (task.status) {
             BuildTaskStatus.SUCCESS -> {
                 item {
@@ -321,14 +309,12 @@ private fun DetailContent(
             else -> {}
         }
 
-        // 末尾留白：避免 LazyColumn 最后一个 item 紧贴底部按钮组
         item {
             Spacer(Modifier.height(TaskDetailSheetConfig.CONTENT_BOTTOM_SPACING))
         }
     }
 }
 
-// 预览图区：有位图时展示位图，其他状态展示占位
 @Composable
 private fun PreviewSection(
     task: BuildTask,
@@ -363,7 +349,6 @@ private fun PreviewSection(
     }
 }
 
-// 任务信息卡片：使用 ConfigCard 包裹，与自定义页面卡片风格一致
 @Composable
 private fun TaskInfoCard(
     task: BuildTask,
@@ -409,7 +394,6 @@ private fun TaskInfoCard(
     }
 }
 
-// 进度卡片：进度条 + 当前处理包名（单行省略，避免换行跳动）
 @Composable
 private fun ProgressCard(
     task: BuildTask,
@@ -424,7 +408,6 @@ private fun ProgressCard(
                 .fillMaxWidth()
                 .padding(TaskDetailSheetConfig.PROGRESS_CONTENT_PADDING)
         ) {
-            // 当前处理包名：单行省略，避免长包名换行导致卡片高度跳动
             Text(
                 text = if (task.currentPackage != null) {
                     "正在处理：${task.currentPackage}"
@@ -458,7 +441,6 @@ private fun ProgressCard(
     }
 }
 
-// 导出位置卡片
 @Composable
 private fun ExportPathCard(
     taskId: String,
@@ -493,7 +475,6 @@ private fun ExportPathCard(
     }
 }
 
-// 错误信息卡片
 @Composable
 private fun ErrorCard(
     errorMessage: String?,
@@ -532,7 +513,6 @@ private fun DetailBottomActions(
             .wrapContentHeight()
             .padding(TaskDetailSheetConfig.BOTTOM_ACTION_PADDING)
     ) {
-        // 失败任务：重试按钮（独占一行，普通色）
         if (showRetry) {
             FilledTonalButton(
                 onClick = onRetry,
@@ -552,7 +532,6 @@ private fun DetailBottomActions(
         }
 
         if (isActive) {
-            // 进行中：停止构建按钮（红色强调，独占一行）
             Button(
                 onClick = onStop,
                 colors = ButtonDefaults.buttonColors(
@@ -566,14 +545,13 @@ private fun DetailBottomActions(
                 Text("停止构建")
             }
         } else {
-            // 已完成：保存到预设 + 删除记录 按钮组（两按钮并列，各自有固定高度，前导图标）
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(TaskDetailSheetConfig.BUTTON_HEIGHT),
                 horizontalArrangement = Arrangement.spacedBy(TaskDetailSheetConfig.BOTTOM_BUTTON_SPACING)
             ) {
-                // 保存到预设：暂未实现，置 disabled；前导 category 图标
+                // 保存到预设：暂未实现，置 disabled
                 FilledTonalButton(
                     onClick = { /* TODO: 预设页面实现后接入 */ },
                     enabled = false,
@@ -587,7 +565,6 @@ private fun DetailBottomActions(
                     Spacer(Modifier.size(TaskDetailSheetConfig.BUTTON_ICON_TEXT_SPACING))
                     Text("保存到预设")
                 }
-                // 删除记录：普通色；前导 delete 图标
                 FilledTonalButton(
                     onClick = onDelete,
                     modifier = Modifier.weight(1f)
@@ -605,7 +582,6 @@ private fun DetailBottomActions(
     }
 }
 
-// 简单信息行：label + value
 @Composable
 private fun InfoChipRow(
     label: String,
@@ -636,7 +612,7 @@ private fun InfoChipRow(
     }
 }
 
-// 二次确认对话框
+
 @Composable
 private fun ConfirmDialog(
     title: String,
@@ -672,7 +648,6 @@ private fun ConfirmDialog(
     )
 }
 
-// === 文案映射工具函数 ===
 
 // 预览图占位文案
 private fun previewPlaceholder(status: BuildTaskStatus): String = when (status) {
@@ -712,7 +687,6 @@ private fun colorSourceLabel(source: String): String = when (source) {
     else -> source
 }
 
-// 任务详情 sheet 关键参数集中声明，便于调参
 private object TaskDetailSheetConfig {
     // 主体内容水平内边距
     val CONTENT_HORIZONTAL_PADDING = 16.dp

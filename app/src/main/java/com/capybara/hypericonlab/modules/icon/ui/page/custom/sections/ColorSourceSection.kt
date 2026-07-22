@@ -184,7 +184,7 @@ fun ColorSourceSection(
 
     if (showWallpaperPaletteStyleSheet) {
         SelectionSheet(
-            title = "壁纸调色板样式",
+            title = "调色板样式",
             items = PaletteStyle.entries,
             selectedItem = wallpaperPaletteStyle,
             onDismiss = { showWallpaperPaletteStyleSheet = false },
@@ -200,7 +200,7 @@ fun ColorSourceSection(
 
     if (showWallpaperColorSpecSheet) {
         SelectionSheet(
-            title = "壁纸色彩规格",
+            title = "色彩规格",
             items = ThemeColorSpec.entries,
             selectedItem = wallpaperColorSpec,
             onDismiss = { showWallpaperColorSpecSheet = false },

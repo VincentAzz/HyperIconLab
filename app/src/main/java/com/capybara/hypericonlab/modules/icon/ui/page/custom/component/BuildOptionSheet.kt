@@ -37,6 +37,33 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconSetInfo
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
+private object BuildOptionSheetConfig {
+    // Header 圆形按钮尺寸
+    val HEADER_ICON_SIZE = 40.dp
+
+    // Header 圆形按钮内部图标尺寸
+    val HEADER_ICON_INNER_SIZE = 24.dp
+
+    // Header 关闭按钮左侧 padding
+    val HEADER_ICON_LEADING_PADDING = 12.dp
+
+    // Header 确认按钮右侧 padding
+    val HEADER_ICON_TRAILING_PADDING = 12.dp
+
+    // 内容区水平内边距
+    val CONTENT_HORIZONTAL_PADDING = 16.dp
+
+    // 内容区底部内边距（避免最后一张卡片紧贴 sheet 底部）
+    val CONTENT_BOTTOM_PADDING = 16.dp
+
+    // chip 之间垂直间距（与 ForegroundTab 一致）
+    val CHIP_SPACING = 8.dp
+
+    // 禁用态透明度
+    const val DISABLED_ALPHA = 0.38f
+}
+
+
 /**
  * 构建选项 Sheet：选择产物类型与图标集，确认后回调 [onConfirm]。
  *
@@ -68,7 +95,7 @@ fun BuildOptionSheet(
 ) {
     // 默认选中第一个 enabled 的产物类型与第一个图标集
     var selectedProductType by remember {
-        mutableStateOf(ProductType.values().first { it.enabled })
+        mutableStateOf(ProductType.entries.first { it.enabled })
     }
     var selectedIconSet by remember {
         mutableStateOf<IconSetInfo?>(iconSets.firstOrNull())
@@ -86,12 +113,11 @@ fun BuildOptionSheet(
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
         liquidGlassBlurRadius = liquidGlassBlurRadius,
-        // 自适应高度：仅展示产物类型与图标集两个卡片，内容有限无需全屏
         fillMaxHeight = false
     ) {
         // Header：与项目其他 sheet 一致的 CenterAlignedTopAppBar + 关闭/确认按钮
         CenterAlignedTopAppBar(
-            title = { SheetTitle("构建") },
+            title = { SheetTitle("从自定义构建") },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent
             ),
@@ -161,10 +187,16 @@ fun BuildOptionSheet(
                 .padding(horizontal = BuildOptionSheetConfig.CONTENT_HORIZONTAL_PADDING)
                 .padding(bottom = BuildOptionSheetConfig.CONTENT_BOTTOM_PADDING)
         ) {
+            // val cardContainerColor = MaterialTheme.colorScheme.surfaceBright
+            val cardContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+
             // 产物类型卡片
-            ConfigCard(title = "产物类型") {
+            ConfigCard(
+                title = "产物类型",
+                containerColor = cardContainerColor
+            ) {
                 Column(verticalArrangement = Arrangement.spacedBy(BuildOptionSheetConfig.CHIP_SPACING)) {
-                    ProductType.values().filter { it.enabled }.forEach { productType ->
+                    ProductType.entries.filter { it.enabled }.forEach { productType ->
                         StyleChip(
                             label = productType.label,
                             selected = selectedProductType == productType,
@@ -176,7 +208,10 @@ fun BuildOptionSheet(
             }
 
             // 图标集卡片
-            ConfigCard(title = "图标集") {
+            ConfigCard(
+                title = "图标集",
+                containerColor = cardContainerColor
+            ) {
                 Column(verticalArrangement = Arrangement.spacedBy(BuildOptionSheetConfig.CHIP_SPACING)) {
                     iconSets.forEach { iconSet ->
                         StyleChip(
@@ -190,31 +225,4 @@ fun BuildOptionSheet(
             }
         }
     }
-}
-
-// BuildOptionSheet 关键参数集中声明，便于调参
-private object BuildOptionSheetConfig {
-    // Header 圆形按钮尺寸
-    val HEADER_ICON_SIZE = 40.dp
-
-    // Header 圆形按钮内部图标尺寸
-    val HEADER_ICON_INNER_SIZE = 24.dp
-
-    // Header 关闭按钮左侧 padding
-    val HEADER_ICON_LEADING_PADDING = 12.dp
-
-    // Header 确认按钮右侧 padding
-    val HEADER_ICON_TRAILING_PADDING = 12.dp
-
-    // 内容区水平内边距
-    val CONTENT_HORIZONTAL_PADDING = 16.dp
-
-    // 内容区底部内边距（避免最后一张卡片紧贴 sheet 底部）
-    val CONTENT_BOTTOM_PADDING = 24.dp
-
-    // chip 之间垂直间距（与 ForegroundTab 一致）
-    val CHIP_SPACING = 8.dp
-
-    // 禁用态透明度（Material 推荐 0.38）
-    const val DISABLED_ALPHA = 0.38f
 }
