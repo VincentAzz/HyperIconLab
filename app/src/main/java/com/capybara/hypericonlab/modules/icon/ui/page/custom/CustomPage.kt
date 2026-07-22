@@ -275,7 +275,12 @@ fun CustomPage(
                             liquidGlassBlurRadius = themeState.liquidGlassBlurRadius.dp
                         )
 
-                        2 -> BorderTab()
+                        2 -> BorderTab(
+                            viewModel = viewModel,
+                            onGoToBackgroundTab = {
+                                viewModel.updateConfig { c -> c.copy(selectedTab = 1) }
+                            }
+                        )
                     }
                 }
             }
