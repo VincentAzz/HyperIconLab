@@ -21,6 +21,8 @@ import com.capybara.hypericonlab.modules.icon.domain.model.GlassUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.ImageFillingUiState
+import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowConfig
+import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.PresetUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
@@ -37,8 +39,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -109,6 +114,15 @@ class IconViewModel(
         private object BuildConfig {
             // 提交任务时占位的图标数量，真实数量在 executor 解析 mapper 后更新
             const val PLACEHOLDER_ICON_COUNT = 0
+        }
+
+        // 内阴影资源关键参数集中声明
+        private object InnerShadowAssets {
+            // assets 中阴影烘焙图所在目录
+            const val DIR = "shadow_baking"
+
+            // 阴影文件后缀（含 _shadow_512.png）
+            const val FILE_SUFFIX = "_shadow_512.png"
         }
     }
 
@@ -183,6 +197,14 @@ class IconViewModel(
         .stateIn(viewModelScope, SharingStarted.Eagerly, BgLayerUiState())
     val syncDualLayerColorSource = _config.map { it.syncDualLayerColorSource }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    // 内阴影 StateFlow
+    val innerShadow = _config.map { it.innerShadow }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, InnerShadowUiState())
+
+    // 内阴影可用资源映射：形状名 → 可用样式名列表（扫描 assets/shadow_baking/ 目录）
+    private val _shadowAssetsMap = MutableStateFlow<Map<String, List<String>>>(emptyMap())
+    val shadowAssetsMap: StateFlow<Map<String, List<String>>> = _shadowAssetsMap.asStateFlow()
 
     // UI Status State
     private val _statusText = MutableStateFlow("就绪")
@@ -415,10 +437,83 @@ class IconViewModel(
                 .distinctUntilChanged()
                 .collect { generateLivePreview() }
         }
+
+        // 监听上层形状变化：切换形状时内阴影默认取消选择回到关闭状态
+        viewModelScope.launch(Dispatchers.Default) {
+            _config
+                .map { it.selectedMasks }
+                .distinctUntilChanged()
+                .drop(1) // 跳过初始值，避免启动时误触发
+                .collect {
+                    _config.update { config ->
+                        if (config.innerShadow.enabled || config.innerShadow.styleName != null) {
+                            config.copy(innerShadow = InnerShadowUiState())
+                        } else config
+                    }
+                }
+        }
+
+        // 监听双层背景开关：启用双层时自动关闭内阴影（仅单层背景生效）
+        viewModelScope.launch(Dispatchers.Default) {
+            _config
+                .map { it.dualLayerEnabled }
+                .distinctUntilChanged()
+                .drop(1)
+                .filter { it } // 仅在启用双层时触发
+                .collect {
+                    _config.update { config ->
+                        if (config.innerShadow.enabled || config.innerShadow.styleName != null) {
+                            config.copy(innerShadow = InnerShadowUiState())
+                        } else config
+                    }
+                }
+        }
+
+        // 初始化时扫描 assets/shadow_baking/ 目录，构建形状 → 样式列表映射
+        viewModelScope.launch(Dispatchers.IO) {
+            _shadowAssetsMap.value = scanInnerShadowAssets()
+        }
+    }
+
+    /**
+     * 扫描 assets/shadow_baking/ 目录，解析文件名 `<shapeName>_<styleName>_shadow_512.png`
+     * 为形状 → 样式列表的映射。
+     */
+    private suspend fun scanInnerShadowAssets(): Map<String, List<String>> =
+        withContext(Dispatchers.IO) {
+            val suffix = InnerShadowAssets.FILE_SUFFIX
+            try {
+                getApplication<Application>().assets.list(InnerShadowAssets.DIR)
+                    ?.asSequence()
+                    ?.filter { it.endsWith(suffix) }
+                    ?.map { filename ->
+                        // oneui_3d_shadow_512.png → shapeName="oneui", styleName="3d"
+                        val core = filename.removeSuffix(suffix)
+                        val firstUnderscore = core.indexOf('_')
+                        if (firstUnderscore > 0) {
+                            val shapeName = core.substring(0, firstUnderscore)
+                            val styleName = core.substring(firstUnderscore + 1)
+                            shapeName to styleName
+                        } else null
+                    }
+                    ?.filterNotNull()
+                    ?.groupBy({ it.first }, { it.second })
+                    ?.mapValues { (_, styles) -> styles.sorted() }
+                    ?: emptyMap()
+            } catch (_: Exception) {
+                emptyMap()
+            }
     }
 
     fun updateConfig(update: (IconConfigState) -> IconConfigState) {
         _config.value = update(_config.value)
+    }
+
+    /**
+     * 更新内阴影配置。
+     */
+    fun updateInnerShadow(update: (InnerShadowUiState) -> InnerShadowUiState) {
+        _config.update { it.copy(innerShadow = update(it.innerShadow)) }
     }
 
     /**
@@ -771,7 +866,13 @@ class IconViewModel(
             selectedStaticImages2 = configValue.bgLayer2.selectedStaticImages,
             selectedFillingImages2 = configValue.bgLayer2.selectedFillingImages,
             imageFilling2RandomRotation = configValue.bgLayer2.imageFilling.randomRotation,
-            imageFilling2ScaleMode = configValue.bgLayer2.imageFilling.scaleMode
+            imageFilling2ScaleMode = configValue.bgLayer2.imageFilling.scaleMode,
+            innerShadow = InnerShadowConfig(
+                // 双层背景启用时强制禁用内阴影（UI 已禁止，此处为安全兜底）
+                enabled = configValue.innerShadow.enabled && !configValue.dualLayerEnabled,
+                styleName = configValue.innerShadow.styleName,
+                intensityLayers = configValue.innerShadow.intensityLayers
+            )
         )
     }
 

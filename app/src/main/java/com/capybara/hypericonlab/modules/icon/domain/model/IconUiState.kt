@@ -78,7 +78,9 @@ data class IconConfigState(
     // 下层背景相对上层的大小差异，0.0~0.3，步进 0.02（15 档）
     val dualLayerSizeDiff: Float = 0.08f,
     // 双层启用时，上层颜色来源变更是否同步应用到下层（仅同步 colorSource，下层 monet 变体保持独立）
-    val syncDualLayerColorSource: Boolean = false
+    val syncDualLayerColorSource: Boolean = false,
+    // 内阴影配置（仅单层背景生效）
+    val innerShadow: InnerShadowUiState = InnerShadowUiState()
 )
 
 /**
@@ -113,6 +115,17 @@ data class ImageFillingUiState(
     val randomRotation: Boolean = false,
     // 缩放模式："scale"=缩放填充(默认), "crop"=居中裁切
     val scaleMode: String = "scale"
+)
+
+
+@Serializable
+data class InnerShadowUiState(
+    // 内阴影总开关
+    val enabled: Boolean = false,
+    // 选中的阴影样式名（如 "3d"），null 表示未选择
+    val styleName: String? = null,
+    // 阴影强度层数 1/2/3，对应弱/中/强
+    val intensityLayers: Int = 1
 )
 
 data class PreviewState(

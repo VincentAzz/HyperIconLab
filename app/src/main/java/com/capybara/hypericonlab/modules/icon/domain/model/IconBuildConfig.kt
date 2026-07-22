@@ -45,7 +45,20 @@ data class IconBuildConfig(
     val selectedStaticImages2: List<String> = emptyList(),
     val selectedFillingImages2: List<String> = emptyList(),
     val imageFilling2RandomRotation: Boolean = false,
-    val imageFilling2ScaleMode: String = "scale"
+    val imageFilling2ScaleMode: String = "scale",
+    // 内阴影配置（仅单层背景生效，双层背景时 enabled 应为 false）
+    val innerShadow: InnerShadowConfig = InnerShadowConfig()
+)
+
+/**
+ * 内阴影构建配置（扁平化，供 pipeline 使用）。
+ * 与 [InnerShadowUiState] 一一对应。
+ */
+@Serializable
+data class InnerShadowConfig(
+    val enabled: Boolean = false,
+    val styleName: String? = null,
+    val intensityLayers: Int = 1
 )
 
 @Serializable
