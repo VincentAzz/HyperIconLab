@@ -44,7 +44,9 @@ class IconPipelineUseCase(
         maskBitmaps: List<Bitmap> = emptyList(),
         outputFile: File,
         appColorSchemes: Map<String, Pair<String, String>> = emptyMap(),
-        maskBitmaps2: List<Bitmap> = emptyList()
+        maskBitmaps2: List<Bitmap> = emptyList(),
+        // 内阴影位图（已按 iconSize 缩放，仅单层背景且 innerShadow.enabled 时非空）
+        innerShadowBitmap: Bitmap? = null
     ): Flow<PipelineProgress> = flow {
         val total = iconMap.size
         var completed = 0
@@ -166,10 +168,12 @@ class IconPipelineUseCase(
                                 maskBitmap = maskBmp
                             )
 
-                            // 先合成上层背景 + 图标 → upperComposite（iconSize×iconSize）
+                            // 先合成上层背景 + 内阴影 + 图标 → upperComposite（iconSize×iconSize）
+                            // 内阴影仅在单层背景生效：双层背景时 innerShadowBitmap 应为 null
                             val upperComposite = LayerMerger.merge(
                                 background = upperBg,
                                 icon = processedIcon,
+                                innerShadow = innerShadowBitmap,
                                 subtractIcon = config.fgStyle == "hollow",
                                 fgAlpha = if (config.fgStyle == "glass") 1.0f else resolveAlpha(
                                     currentFg

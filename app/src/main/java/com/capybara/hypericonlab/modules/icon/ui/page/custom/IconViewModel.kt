@@ -11,6 +11,7 @@ import com.capybara.hypericonlab.core.color.AppColorSchemesLoader
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
+import com.capybara.hypericonlab.core.image.InnerShadowProcessor
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
@@ -705,6 +706,41 @@ class IconViewModel(
                 } else emptyList()
                 val buildConfig = buildIconBuildConfig(configValue)
 
+                // 内阴影 bitmap（仅单层背景且启用内阴影时加载，加载后预合并多层强度）
+                val innerShadowBitmap =
+                    if (buildConfig.innerShadow.enabled && !buildConfig.dualLayerEnabled) {
+                        buildConfig.innerShadow.styleName?.let { styleName ->
+                            buildConfig.masks.firstOrNull()?.let { shapeName ->
+                                try {
+                                    context.assets.open(
+                                        "${InnerShadowAssets.DIR}/${shapeName}_${styleName}${InnerShadowAssets.FILE_SUFFIX}"
+                                    ).use { stream ->
+                                        BitmapFactory.decodeStream(stream)
+                                    }?.let { raw ->
+                                        val scaled = if (raw.width != buildConfig.iconSize) {
+                                            val s = Bitmap.createScaledBitmap(
+                                                raw,
+                                                buildConfig.iconSize,
+                                                buildConfig.iconSize,
+                                                true
+                                            )
+                                            raw.recycle()
+                                            s
+                                        } else raw
+                                        // 预合并多层阴影为单张阴影层，管线内每个图标只绘制一次
+                                        val merged = InnerShadowProcessor.mergeShadowLayers(
+                                            scaled, buildConfig.innerShadow.intensityLayers
+                                        )
+                                        scaled.recycle()
+                                        merged
+                                    }
+                                } catch (_: Exception) {
+                                    null
+                                }
+                            }
+                        }
+                    } else null
+
                 val out = File(filesDir, "${mapperName.removeSuffix(".xml")}.mtz")
                 pipeline.executeWithFiles(
                     buildConfig,
@@ -713,7 +749,8 @@ class IconViewModel(
                     maskBitmaps,
                     out,
                     appColorSchemes,
-                    maskBitmaps2
+                    maskBitmaps2,
+                    innerShadowBitmap
                 )
                     .collect { state ->
                         when (state) {

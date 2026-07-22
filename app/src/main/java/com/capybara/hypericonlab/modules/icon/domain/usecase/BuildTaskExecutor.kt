@@ -3,6 +3,7 @@ package com.capybara.hypericonlab.modules.icon.domain.usecase
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.capybara.hypericonlab.core.image.InnerShadowProcessor
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
@@ -88,6 +89,27 @@ class BuildTaskExecutor(
                 task.config.selectedMasks2.mapNotNull { loadMask(it) }
             } else emptyList()
 
+            // 3.2 加载内阴影 bitmap 并预合并多层强度（仅单层背景且启用内阴影时）
+            val innerShadowBitmap =
+                if (task.config.innerShadow.enabled && !task.config.dualLayerEnabled) {
+                    task.config.innerShadow.styleName?.let { styleName ->
+                        task.config.masks.firstOrNull()?.let { shapeName ->
+                            loadInnerShadow(
+                                shapeName,
+                                styleName,
+                                task.config.iconSize
+                            )?.let { raw ->
+                                // 预合并多层阴影为单张阴影层，管线内每个图标只绘制一次
+                                val merged = InnerShadowProcessor.mergeShadowLayers(
+                                    raw, task.config.innerShadow.intensityLayers
+                                )
+                                raw.recycle()
+                                merged
+                            }
+                        }
+                    }
+                } else null
+
             // 4. 调用流水线，写入临时文件
             pipeline.executeWithFiles(
                 config = task.config,
@@ -96,7 +118,8 @@ class BuildTaskExecutor(
                 maskBitmaps = maskBitmaps,
                 outputFile = tempArtifact,
                 appColorSchemes = appColorSchemes,
-                maskBitmaps2 = maskBitmaps2
+                maskBitmaps2 = maskBitmaps2,
+                innerShadowBitmap = innerShadowBitmap
             ).collect { state ->
                 // 协作式取消检查：在每个进度事件时响应取消
                 currentCoroutineContext().ensureActive()
@@ -182,6 +205,23 @@ class BuildTaskExecutor(
         null
     }
 
+    // 从 assets 加载烘焙内阴影 PNG，失败返回 null
+    private fun loadInnerShadow(shapeName: String, styleName: String, targetSize: Int): Bitmap? =
+        try {
+            context.assets.open("${ExecutorConfig.SHADOW_DIRNAME}/${shapeName}_${styleName}${ExecutorConfig.SHADOW_FILE_SUFFIX}")
+                .use { BitmapFactory.decodeStream(it) }
+                ?.let { raw ->
+                    if (raw.width != targetSize) {
+                        val scaled = Bitmap.createScaledBitmap(raw, targetSize, targetSize, true)
+                        raw.recycle()
+                        scaled
+                    } else raw
+                }
+        } catch (e: Exception) {
+            Timber.tag(TAG).w(e, "Inner shadow not found: $shapeName/$styleName")
+            null
+        }
+
     // 从 store preview 裁切左上 2 图标区域作为缩略图（540×320 = 1080×640 的 1/2×1/2）
     // public：BuildTaskManager.submit 在提交时即调用以持久化缩略图，任务卡片 PENDING 即可显示
     fun cropThumbnail(storePreview: Bitmap): Bitmap {
@@ -210,6 +250,12 @@ class BuildTaskExecutor(
             // mask 文件名前缀与后缀（与 IconViewModel 保持一致）
             const val MASK_FILE_PREFIX = "mask_"
             const val MASK_FILE_SUFFIX = "_512.png"
+
+            // assets 中烘焙内阴影文件所在目录（与 IconViewModel 保持一致）
+            const val SHADOW_DIRNAME = "shadow_baking"
+
+            // 内阴影文件名后缀（与 IconViewModel 保持一致）
+            const val SHADOW_FILE_SUFFIX = "_shadow_512.png"
 
             // 临时工件目录名（位于 filesDir 根下）
             const val TEMP_DIRNAME = "build_temp"

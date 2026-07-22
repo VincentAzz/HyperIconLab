@@ -13,6 +13,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
 import com.capybara.hypericonlab.core.image.BackgroundGenerator
 import com.capybara.hypericonlab.core.image.GlassProcessor
+import com.capybara.hypericonlab.core.image.InnerShadowProcessor
 import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.core.image.StickerProcessor
 import com.capybara.hypericonlab.core.image.SvgProcessor
@@ -89,6 +90,29 @@ class GeneratePreviewUseCase(private val context: Context) {
             }
         } else emptyList()
 
+        // 内阴影位图（仅单层背景且启用内阴影时加载，512 尺寸与预览图标一致）
+        // 双层背景时 config.innerShadow.enabled 应为 false（ViewModel 已强制禁用）
+        // 加载后预合并多层强度为单张阴影层，管线内每个图标只绘制一次
+        val innerShadowBitmap = if (config.innerShadow.enabled && !config.dualLayerEnabled) {
+            config.innerShadow.styleName?.let { styleName ->
+                config.selectedMasks.firstOrNull()?.let { shapeName ->
+                    withContext(Dispatchers.IO) {
+                        loadInnerShadowBitmap(
+                            shapeName,
+                            styleName,
+                            InnerShadowPreviewConfig.SHADOW_SIZE
+                        )?.let { raw ->
+                            val merged = InnerShadowProcessor.mergeShadowLayers(
+                                raw, config.innerShadow.intensityLayers
+                            )
+                            raw.recycle()
+                            merged
+                        }
+                    }
+                }
+            }
+        } else null
+
         val fullMap = IconMapperProcessor.parseIconMapper(mapperFile)
         val targets = listOf(
             "com.android.contacts.activities.TwelveKeyDialer",
@@ -112,7 +136,8 @@ class GeneratePreviewUseCase(private val context: Context) {
             maskBitmaps2,
             config,
             wallpaperColorScheme,
-            appColorSchemes
+            appColorSchemes,
+            innerShadowBitmap
         )
         val storePreview =
             PreviewGenerator.generateStorePreview(context, previewIcons, wallpaperBitmap)
@@ -127,7 +152,8 @@ class GeneratePreviewUseCase(private val context: Context) {
             maskBitmaps2,
             config,
             wallpaperColorScheme,
-            appColorSchemes
+            appColorSchemes,
+            innerShadowBitmap
         )
         val mainPreview =
             PreviewGenerator.generateMainPreview(context, fullPreviewIcons, wallpaperBitmap)
@@ -135,6 +161,7 @@ class GeneratePreviewUseCase(private val context: Context) {
         fullPreviewIcons.forEach { it.recycle() }
         maskBitmaps.forEach { it.recycle() }
         maskBitmaps2.forEach { it.recycle() }
+        innerShadowBitmap?.recycle()
 
         mainPreview
     }
@@ -146,7 +173,8 @@ class GeneratePreviewUseCase(private val context: Context) {
         maskBitmaps2: List<Bitmap>,
         config: IconConfigState,
         wallpaperColorScheme: MonetColorExtractor.WallpaperColorScheme?,
-        appColorSchemes: Map<String, Pair<String, String>>
+        appColorSchemes: Map<String, Pair<String, String>>,
+        innerShadowBitmap: Bitmap? = null
     ): List<Bitmap> {
         val results = mutableListOf<Bitmap>()
         iconMap.forEach { (packageName, drawableName) ->
@@ -284,10 +312,12 @@ class GeneratePreviewUseCase(private val context: Context) {
                             )
                         } ?: BackgroundGenerator.createBackground(finalIconSize, finalBg, maskBmp)
 
-                        // 先合成上层背景 + 图标 → upperComposite（finalIconSize×finalIconSize）
+                        // 先合成上层背景 + 内阴影 + 图标 → upperComposite（finalIconSize×finalIconSize）
+                        // 内阴影仅在单层背景生效：双层背景时 innerShadowBitmap 应为 null
                         val upperComposite = LayerMerger.merge(
                             background = upperBg,
                             icon = processedIcon,
+                            innerShadow = innerShadowBitmap,
                             subtractIcon = config.fgStyle == "hollow",
                             fgAlpha = if (config.fgStyle == "glass") 1.0f else try {
                                 Color.alpha(finalFg.toColorInt()) / 255f
@@ -493,5 +523,43 @@ class GeneratePreviewUseCase(private val context: Context) {
         } catch (_: Exception) {
             false
         }
+    }
+
+    /**
+     * 加载烘焙内阴影 PNG 并缩放到目标尺寸。
+     * 文件路径：assets/shadow_baking/<shapeName>_<styleName>_shadow_512.png
+     */
+    private fun loadInnerShadowBitmap(
+        shapeName: String,
+        styleName: String,
+        targetSize: Int
+    ): Bitmap? {
+        return try {
+            val path =
+                "${InnerShadowAssets.DIR}/${shapeName}_${styleName}${InnerShadowAssets.FILE_SUFFIX}"
+            context.assets.open(path).use { stream ->
+                BitmapFactory.decodeStream(stream)
+            }?.let { raw ->
+                if (raw.width != targetSize) {
+                    val scaled = Bitmap.createScaledBitmap(raw, targetSize, targetSize, true)
+                    raw.recycle()
+                    scaled
+                } else raw
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    // 内阴影资源关键参数集中声明
+    private object InnerShadowAssets {
+        const val DIR = "shadow_baking"
+        const val FILE_SUFFIX = "_shadow_512.png"
+    }
+
+    // 预览场景内阴影参数
+    private object InnerShadowPreviewConfig {
+        // 预览图标尺寸（与 finalIconSize 一致）
+        const val SHADOW_SIZE = 512
     }
 }
