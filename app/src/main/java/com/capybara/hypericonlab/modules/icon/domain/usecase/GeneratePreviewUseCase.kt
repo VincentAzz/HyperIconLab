@@ -527,7 +527,7 @@ class GeneratePreviewUseCase(private val context: Context) {
 
     /**
      * 加载烘焙内阴影 PNG 并缩放到目标尺寸。
-     * 文件路径：assets/shadow_baking/<shapeName>_<styleName>_shadow_512.png
+     * 文件路径：assets/shadow_baked/<shapeName>_<styleName>_shadow_512.png
      */
     private fun loadInnerShadowBitmap(
         shapeName: String,
@@ -553,7 +553,7 @@ class GeneratePreviewUseCase(private val context: Context) {
 
     // 内阴影资源关键参数集中声明
     private object InnerShadowAssets {
-        const val DIR = "shadow_baking"
+        const val DIR = "shadow_baked"
         const val FILE_SUFFIX = "_shadow_512.png"
     }
 

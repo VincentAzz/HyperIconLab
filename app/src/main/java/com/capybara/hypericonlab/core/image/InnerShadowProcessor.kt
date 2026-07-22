@@ -8,7 +8,7 @@ import androidx.core.graphics.createBitmap
 /**
  * 内阴影处理器。
  *
- * 阴影来源于 assets/shadow_baking/ 下烘焙好的 PNG（四周内阴影，中心透明）。
+ * 阴影来源于 assets/shadow_baked/ 下烘焙好的 PNG（四周内阴影，中心透明）。
  * 强度采用多层叠加方式：同一阴影图层重复绘制 N 次，alpha 自然累加获得弱/中/强效果。
  * 叠加位置：上层背景与前景图标之间。
  *

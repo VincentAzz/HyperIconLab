@@ -252,7 +252,7 @@ class BuildTaskExecutor(
             const val MASK_FILE_SUFFIX = "_512.png"
 
             // assets 中烘焙内阴影文件所在目录（与 IconViewModel 保持一致）
-            const val SHADOW_DIRNAME = "shadow_baking"
+            const val SHADOW_DIRNAME = "shadow_baked"
 
             // 内阴影文件名后缀（与 IconViewModel 保持一致）
             const val SHADOW_FILE_SUFFIX = "_shadow_512.png"

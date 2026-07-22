@@ -120,7 +120,7 @@ class IconViewModel(
         // 内阴影资源关键参数集中声明
         private object InnerShadowAssets {
             // assets 中阴影烘焙图所在目录
-            const val DIR = "shadow_baking"
+            const val DIR = "shadow_baked"
 
             // 阴影文件后缀（含 _shadow_512.png）
             const val FILE_SUFFIX = "_shadow_512.png"
@@ -203,7 +203,7 @@ class IconViewModel(
     val innerShadow = _config.map { it.innerShadow }
         .stateIn(viewModelScope, SharingStarted.Eagerly, InnerShadowUiState())
 
-    // 内阴影可用资源映射：形状名 → 可用样式名列表（扫描 assets/shadow_baking/ 目录）
+    // 内阴影可用资源映射：形状名 → 可用样式名列表（扫描 assets/shadow_baked/ 目录）
     private val _shadowAssetsMap = MutableStateFlow<Map<String, List<String>>>(emptyMap())
     val shadowAssetsMap: StateFlow<Map<String, List<String>>> = _shadowAssetsMap.asStateFlow()
 
@@ -470,14 +470,14 @@ class IconViewModel(
                 }
         }
 
-        // 初始化时扫描 assets/shadow_baking/ 目录，构建形状 → 样式列表映射
+        // 初始化时扫描 assets/shadow_baked/ 目录，构建形状 → 样式列表映射
         viewModelScope.launch(Dispatchers.IO) {
             _shadowAssetsMap.value = scanInnerShadowAssets()
         }
     }
 
     /**
-     * 扫描 assets/shadow_baking/ 目录，解析文件名 `<shapeName>_<styleName>_shadow_512.png`
+     * 扫描 assets/shadow_baked/ 目录，解析文件名 `<shapeName>_<styleName>_shadow_512.png`
      * 为形状 → 样式列表的映射。
      */
     private suspend fun scanInnerShadowAssets(): Map<String, List<String>> =
@@ -487,7 +487,7 @@ class IconViewModel(
                 getApplication<Application>().assets.list(InnerShadowAssets.DIR)
                     ?.asSequence()
                     ?.filter { it.endsWith(suffix) }
-                    ?.map { filename ->
+                    ?.mapNotNull { filename ->
                         // oneui_3d_shadow_512.png → shapeName="oneui", styleName="3d"
                         val core = filename.removeSuffix(suffix)
                         val firstUnderscore = core.indexOf('_')
@@ -497,14 +497,13 @@ class IconViewModel(
                             shapeName to styleName
                         } else null
                     }
-                    ?.filterNotNull()
                     ?.groupBy({ it.first }, { it.second })
                     ?.mapValues { (_, styles) -> styles.sorted() }
                     ?: emptyMap()
             } catch (_: Exception) {
                 emptyMap()
             }
-    }
+        }
 
     fun updateConfig(update: (IconConfigState) -> IconConfigState) {
         _config.value = update(_config.value)

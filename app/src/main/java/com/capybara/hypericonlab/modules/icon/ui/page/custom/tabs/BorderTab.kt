@@ -2,10 +2,9 @@ package com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
@@ -23,6 +22,27 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
+
+// <shapeName>_<styleName>_shadow_512.png
+
+private fun friendlyStyleName(styleName: String): String = when (styleName) {
+    "3d" -> "OneUI 8.5 3D"
+    "neumorphism" -> "拟物"
+    else -> styleName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+}
+
+
+private enum class IntensityOption(val label: String, val layers: Int) {
+    WEAK("弱", 1),
+    MEDIUM("中", 2),
+    STRONG("强", 3)
+}
+
+private object BorderTabUiConstants {
+    val HORIZONTAL_PADDING = 16.dp
+    val CARD_INNER_PADDING = 12.dp
+    const val STYLE_CHIPS_PER_ROW = 2
+}
 
 
 @Composable
@@ -42,25 +62,31 @@ fun BorderTab(
         when {
             dualLayerEnabled -> InnerShadowUnavailableHint(
                 title = "启用双层背景时无法设定内阴影",
-                description = "如需使用内阴影，请先关闭双层背景",
+                description = "请先禁用双层背景",
                 actionLabel = "去关闭",
                 onAction = onGoToBackgroundTab
             )
 
             availableStyles.isEmpty() -> InnerShadowUnavailableHint(
                 title = "当前形状未提供内阴影",
-                description = "请选择提供了内阴影样式的常用形状",
+                description = "请选用常用形状",
                 actionLabel = "去修改",
                 onAction = onGoToBackgroundTab
             )
-            // 状态 C：符合启用条件，显示正常卡片组
+
             else -> InnerShadowCardGroup(
                 enabled = innerShadow.enabled,
                 styleName = innerShadow.styleName,
                 intensityLayers = innerShadow.intensityLayers,
                 availableStyles = availableStyles,
                 onToggleEnabled = { enabled ->
-                    viewModel.updateInnerShadow { it.copy(enabled = enabled) }
+                    viewModel.updateInnerShadow { shadow ->
+                        if (enabled && shadow.styleName == null && availableStyles.isNotEmpty()) {
+                            shadow.copy(enabled = true, styleName = availableStyles.first())
+                        } else {
+                            shadow.copy(enabled = enabled)
+                        }
+                    }
                 },
                 onStyleSelected = { style ->
                     viewModel.updateInnerShadow { it.copy(styleName = style) }
@@ -81,7 +107,10 @@ private fun InnerShadowUnavailableHint(
     actionLabel: String,
     onAction: () -> Unit
 ) {
-    SegmentedColumn(title = "内阴影") {
+    SegmentedColumn(
+        title = "内阴影",
+        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
+    ) {
         item { shape ->
             BaseItemContainer(shape = shape) {
                 BaseWidget(
@@ -99,7 +128,7 @@ private fun InnerShadowUnavailableHint(
 }
 
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun InnerShadowCardGroup(
     enabled: Boolean,
@@ -131,7 +160,6 @@ private fun InnerShadowCardGroup(
             }
         }
 
-        // 样式选择
         item(
             animatedVisibility = enabled,
             topPadding = ListItemDefaults.SegmentedGap
@@ -142,18 +170,22 @@ private fun InnerShadowCardGroup(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text("样式", style = MaterialTheme.typography.titleSmall)
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        availableStyles.forEach { style ->
-                            StyleChip(
-                                label = friendlyStyleName(style),
-                                selected = styleName == style,
-                                onClick = { onStyleSelected(style) }
-                            )
+                    availableStyles.chunked(BorderTabUiConstants.STYLE_CHIPS_PER_ROW)
+                        .forEach { rowStyles ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                rowStyles.forEach { style ->
+                                    StyleChip(
+                                        label = friendlyStyleName(style),
+                                        selected = styleName == style,
+                                        onClick = { onStyleSelected(style) },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                if (rowStyles.size < BorderTabUiConstants.STYLE_CHIPS_PER_ROW) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
                         }
-                    }
                 }
             }
         }
@@ -170,7 +202,7 @@ private fun InnerShadowCardGroup(
                 ) {
                     Text("强度", style = MaterialTheme.typography.titleSmall)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        IntensityOption.values().forEach { option ->
+                        IntensityOption.entries.forEach { option ->
                             StyleChip(
                                 label = option.label,
                                 selected = intensityLayers == option.layers,
@@ -186,20 +218,3 @@ private fun InnerShadowCardGroup(
 }
 
 
-private fun friendlyStyleName(styleName: String): String = when (styleName) {
-    "3d" -> "3D"
-    "neumorphism" -> "拟物"
-    else -> styleName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-}
-
-
-private enum class IntensityOption(val label: String, val layers: Int) {
-    WEAK("弱", 1),
-    MEDIUM("中", 2),
-    STRONG("强", 3)
-}
-
-private object BorderTabUiConstants {
-    val HORIZONTAL_PADDING = 16.dp
-    val CARD_INNER_PADDING = 12.dp
-}
