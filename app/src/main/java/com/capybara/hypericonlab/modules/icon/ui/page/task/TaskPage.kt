@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -47,17 +48,7 @@ import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewM
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 
-/**
- * 任务页面：展示活动任务与已完成任务列表，并承载 [TaskDetailSheet]。
- *
- * 布局：
- * - 顶部 TopAppBar 内嵌 FloatingTabRow（"进行中"/"已完成"两 tab），与自定义页面风格一致
- * - LazyColumn：根据当前 tab 展示活动任务或已完成任务
- * - 空列表展示对应空态文案
- * - 卡片点击：设置内部 selectedTaskId 状态，渲染 [TaskDetailSheet]
- *
- * @param onTaskClick 可选外部回调（用于上层联动）；默认空实现，页面内部已自带 sheet 渲染
- */
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TaskPage(
@@ -73,7 +64,7 @@ fun TaskPage(
     val themeState by themeViewModel.state.collectAsStateWithLifecycle()
 
     // 当前选中的 tab（0 = 进行中，1 = 已完成），使用 rememberSaveable 跨重组保持
-    var selectedTab by rememberSaveable { mutableStateOf(TaskPageConfig.DEFAULT_TAB_INDEX) }
+    var selectedTab by rememberSaveable { mutableIntStateOf(TaskPageConfig.DEFAULT_TAB_INDEX) }
 
     // 当前选中的任务 id（点击卡片时设置，详情 sheet 关闭时清空）
     var selectedTaskId by remember { mutableStateOf<String?>(null) }
@@ -156,13 +147,18 @@ fun TaskPage(
             verticalArrangement = Arrangement.spacedBy(TaskPageConfig.CARD_SPACING)
         ) {
             if (displayTasks.isNotEmpty()) {
-                items(displayTasks, key = { it.taskId }) { task ->
+                itemsIndexed(
+                    items = displayTasks,
+                    key = { _, task -> task.taskId }
+                ) { index, task ->
                     TaskCard(
                         task = task,
                         onClick = {
                             selectedTaskId = task.taskId
                             onTaskClick(task.taskId)
-                        }
+                        },
+                        isFirst = index == 0,
+                        isLast = index == displayTasks.lastIndex
                     )
                 }
             } else {
@@ -230,8 +226,7 @@ private object TaskPageConfig {
     // 列表垂直内边距
     val VERTICAL_PADDING = 8.dp
 
-    // 卡片间距
-    val CARD_SPACING = 12.dp
+    val CARD_SPACING = 2.dp
 
     // FloatingTabRow 水平边距
     val TABROW_HORIZONTAL_PADDING = 16.dp

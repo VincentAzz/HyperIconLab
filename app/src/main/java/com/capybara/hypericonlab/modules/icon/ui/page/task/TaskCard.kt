@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,9 +35,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.ConnectionRadius
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
+import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
@@ -50,34 +51,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * 任务卡片：展示单个 [BuildTask] 的关键信息，点击进入详情 sheet。
- *
- * 布局（仅点击交互，不做 SwipeToDismiss，避免与底栏 tab 滑动冲突）：
- * ```
- * ┌──────────────────────────────────────────────────┐
- * │ [缩略图]  taskId (GoogleSansCode)                 │
- * │           图标集 · 图标数                          │
- * │           [产物类型 chip] [状态 chip]              │
- * │ ─────────────────────────────────────────────    │
- * │ LinearProgressIndicator (仅 PENDING/RUNNING)      │
- * │ 状态文案 · 提交时间                                │
- * └──────────────────────────────────────────────────┘
- * ```
- *
- * 缩略图策略（提交时即持久化，所有状态均尝试加载）：
- * - PENDING/RUNNING：从 filesDir/build_thumbnails/<taskId>.png 异步加载（提交时已保存）
- * - SUCCESS：同上
- * - FAILED/CANCELLED：加载失败时显示占位色块
- *
- * @param task 当前任务
- * @param onClick 点击卡片回调（用于打开详情 sheet）
- */
+
 @Composable
 fun TaskCard(
     task: BuildTask,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFirst: Boolean = false,
+    isLast: Boolean = false
 ) {
     val context = LocalContext.current
 
@@ -93,14 +74,26 @@ fun TaskCard(
         }
     }
 
-    Card(
+    // 根据位置计算圆角：首项顶部大圆角、末项底部大圆角、中间项连接小圆角
+    val smootherEnabled = isSmootherRoundedCornersEnabled()
+    val cardShape = remember(isFirst, isLast, smootherEnabled) {
+        val topRadius = if (isFirst) CornerRadius else ConnectionRadius
+        val bottomRadius = if (isLast) CornerRadius else ConnectionRadius
+        kyantUnevenRoundedShape(
+            topStart = topRadius,
+            topEnd = topRadius,
+            bottomEnd = bottomRadius,
+            bottomStart = bottomRadius,
+            enabled = smootherEnabled
+        )
+    }
+
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = rememberKyantRoundedRectangleShape(CardCornerRadius),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        )
+            .clip(cardShape)
+            .background(MaterialTheme.colorScheme.surfaceBright)
+            .clickable { onClick() }
     ) {
         Column(
             modifier = Modifier
