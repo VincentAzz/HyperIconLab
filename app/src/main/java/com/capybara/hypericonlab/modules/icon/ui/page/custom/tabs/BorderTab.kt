@@ -11,7 +11,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
@@ -39,7 +39,6 @@ private enum class IntensityOption(val label: String, val layers: Int) {
 }
 
 private object BorderTabUiConstants {
-    val HORIZONTAL_PADDING = 16.dp
     val CARD_INNER_PADDING = 12.dp
     const val STYLE_CHIPS_PER_ROW = 2
 }
@@ -58,7 +57,7 @@ fun BorderTab(
     val upperShape = selectedMasks.firstOrNull()
     val availableStyles = shadowAssetsMap[upperShape] ?: emptyList()
 
-    Column(modifier = Modifier.padding(horizontal = BorderTabUiConstants.HORIZONTAL_PADDING)) {
+    Column {
         when {
             dualLayerEnabled -> InnerShadowUnavailableHint(
                 title = "启用双层背景时无法设定内阴影",
@@ -119,7 +118,10 @@ private fun InnerShadowUnavailableHint(
                     title = title,
                     description = description,
                     trailingContent = {
-                        TextButton(onClick = onAction) { Text(actionLabel) }
+                        PrimaryActionButton(
+                            text = actionLabel,
+                            onClick = onAction
+                        )
                     }
                 )
             }

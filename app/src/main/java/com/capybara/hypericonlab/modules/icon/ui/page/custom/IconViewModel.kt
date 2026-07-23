@@ -806,7 +806,7 @@ class IconViewModel(
     private fun loadDefaultWallpaper() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                context.assets.open("wallpapers/wallpaper.jpg").use {
+                context.assets.open("wallpapers/wallpaper_fallback.jpg").use {
                     BitmapFactory.decodeStream(it)?.let { bmp -> updateWallpaper(bmp) }
                 }
             } catch (_: Exception) {

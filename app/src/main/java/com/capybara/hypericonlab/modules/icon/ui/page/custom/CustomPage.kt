@@ -41,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,6 +51,9 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidth
 import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
+import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.BuildOptionSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.FullScreenPreview
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.PreviewSection
@@ -237,10 +241,23 @@ fun CustomPage(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 可滚动内容
+            // 可滚动内容：左右内边距提到外层使 clip 圆角与卡片对齐，
+            // 顶部使用与卡片一致的圆角，避免滚动时卡片顶部被平直截断
+            val smootherRoundedCornersEnabled = isSmootherRoundedCornersEnabled()
+            val scrollAreaTopShape = remember(smootherRoundedCornersEnabled) {
+                kyantUnevenRoundedShape(
+                    topStart = CornerRadius,
+                    topEnd = CornerRadius,
+                    bottomEnd = 0.dp,
+                    bottomStart = 0.dp,
+                    enabled = smootherRoundedCornersEnabled
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .clip(scrollAreaTopShape)
                     .verticalScroll(rememberScrollState())
                     .padding(bottom = outerPadding.calculateBottomPadding())
             ) {

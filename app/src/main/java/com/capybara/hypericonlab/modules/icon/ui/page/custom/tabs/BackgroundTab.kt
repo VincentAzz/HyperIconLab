@@ -73,7 +73,7 @@ fun BackgroundTab(
     var showStaticImagePicker2 by remember { mutableStateOf(false) }
     var showFillingImagePicker2 by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column {
         // 双层背景开关卡片组
         SegmentedColumn(
             title = "双层背景",
