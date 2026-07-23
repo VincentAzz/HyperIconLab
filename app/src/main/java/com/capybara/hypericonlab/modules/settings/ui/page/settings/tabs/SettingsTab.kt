@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
@@ -536,16 +535,17 @@ fun StickerCacheSettings() {
                 title = "清除贴纸缓存",
                 description = "当前占用: $cacheSize",
                 trailingContent = {
-                    TextButton(onClick = {
-                        try {
-                            val dir = stickerProcessor.getCacheDir(context)
-                            dir.deleteRecursively()
-                            updateSize()
-                        } catch (_: Exception) {
+                    PrimaryActionButton(
+                        text = "清除",
+                        onClick = {
+                            try {
+                                val dir = stickerProcessor.getCacheDir(context)
+                                dir.deleteRecursively()
+                                updateSize()
+                            } catch (_: Exception) {
+                            }
                         }
-                    }) {
-                        Text("清除")
-                    }
+                    )
                 }
             )
         }
@@ -567,9 +567,10 @@ fun RunLogSettings(onViewLog: () -> Unit) {
                 title = "运行日志",
                 description = "查看图标生成与构建过程的运行日志",
                 trailingContent = {
-                    TextButton(onClick = onViewLog) {
-                        Text("查看")
-                    }
+                    PrimaryActionButton(
+                        text = "查看",
+                        onClick = onViewLog
+                    )
                 }
             )
         }

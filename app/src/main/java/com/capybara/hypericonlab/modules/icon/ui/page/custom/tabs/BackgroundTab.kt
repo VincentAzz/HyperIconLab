@@ -16,7 +16,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.image.BgImageDir
@@ -209,9 +209,10 @@ fun BackgroundTab(
                                 MaskThumbnail(mask = mask)
                             }
                         }
-                        TextButton(onClick = { showMaskPicker = true }) {
-                            Text("更改")
-                        }
+                        PrimaryActionButton(
+                            text = "更改",
+                            onClick = { showMaskPicker = true }
+                        )
                     }
                 }
             }
@@ -538,9 +539,10 @@ private fun LowerLayerBackgroundSection(
                             MaskThumbnail(mask = mask)
                         }
                     }
-                    TextButton(onClick = onPickMask) {
-                        Text("更改")
-                    }
+                    PrimaryActionButton(
+                        text = "更改",
+                        onClick = onPickMask
+                    )
                 }
             }
         }
@@ -700,9 +702,10 @@ private fun ImageSelectionRow(
                 ImageThumbnail(ref = ref)
             }
         }
-        TextButton(onClick = onPickClick) {
-            Text("更改")
-        }
+        PrimaryActionButton(
+            text = "更改",
+            onClick = onPickClick
+        )
     }
 }
 
