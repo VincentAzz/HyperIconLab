@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capybara.hypericonlab.R
+import com.capybara.hypericonlab.core.AppVersion
 import com.capybara.hypericonlab.core.designsystem.effect.BgEffectBackground
 import com.capybara.hypericonlab.core.designsystem.symbol.commit
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
@@ -87,11 +88,11 @@ fun AboutCard(
             ) {
                 VersionRow(
                     label = "HyperIconLab",
-                    version = "20260704-1.0.0"
+                    version = AppVersion.HYPERICONLAB_VERSION
                 )
                 VersionRow(
                     label = "Lawnicons",
-                    version = "20260704-0deca2c"
+                    version = AppVersion.LAWNICONS_VERSION
                 )
             }
         }

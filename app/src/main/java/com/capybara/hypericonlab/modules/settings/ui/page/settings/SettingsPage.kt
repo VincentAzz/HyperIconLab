@@ -51,7 +51,9 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
 import com.capybara.hypericonlab.modules.icon.ui.page.home.component.LogSheet
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.LawniconsBrowserSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AboutTab
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AssetsTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.SettingsTab
 import org.koin.androidx.compose.koinViewModel
 
@@ -82,6 +84,8 @@ fun SettingsPage(
     var showColorSpecSheet by remember { mutableStateOf(false) }
     // 运行日志 sheet 显示状态：由设置页底部"运行日志"卡片触发
     var showLogSheet by remember { mutableStateOf(false) }
+    // 资产页"浏览原始图标"卡片触发的 SVG 浏览 sheet
+    var showLawniconsSheet by remember { mutableStateOf(false) }
 
     val backdrop = rememberMaterial3BlurBackdrop(uiState.useBlur)
 
@@ -148,6 +152,16 @@ fun SettingsPage(
         LogSheet(
             viewModel = iconViewModel,
             onDismiss = { showLogSheet = false },
+            backdrop = backdrop,
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
+            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+        )
+    }
+
+    // 资产页 SVG 浏览 sheet：由"浏览原始图标"卡片触发
+    if (showLawniconsSheet) {
+        LawniconsBrowserSheet(
+            onDismiss = { showLawniconsSheet = false },
             backdrop = backdrop,
             useLiquidGlass = uiState.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
@@ -233,10 +247,11 @@ fun SettingsPage(
                 }
 
                 1 -> {
-                    AboutTab(
+                    AssetsTab(
                         paddingValues = paddingValues,
                         outerPadding = outerPadding,
                         backdrop = backdrop,
+                        onBrowseLawnicons = { showLawniconsSheet = true }
                     )
                 }
 

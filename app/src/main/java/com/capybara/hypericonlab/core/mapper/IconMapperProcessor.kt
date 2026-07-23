@@ -10,6 +10,15 @@ import java.io.InputStream
 import java.io.StringWriter
 import java.util.regex.Pattern
 
+/**
+ * icon_mapper 条目完整信息（含应用名、包名、drawable），用于资产浏览与搜索。
+ */
+data class IconMapperEntry(
+    val name: String,
+    val packageName: String,
+    val drawable: String
+)
+
 // mapper处理器
 object IconMapperProcessor {
 
@@ -181,5 +190,39 @@ object IconMapperProcessor {
             eventType = parser.next()
         }
         Timber.tag(TAG).d("Parsed ${mapper.size} items from $nameForLog")
+    }
+
+    /**
+     * 从 [InputStream] 解析 icon_mapper.xml，返回保留应用名的完整条目列表。
+     * 供资产浏览页使用（需通过应用名/包名搜索）。调用方负责关闭流。
+     */
+    fun parseIconMapperEntries(inputStream: InputStream): List<IconMapperEntry> {
+        val entries = mutableListOf<IconMapperEntry>()
+        try {
+            val parser = Xml.newPullParser()
+            parser.setInput(inputStream, "UTF-8")
+            var eventType = parser.eventType
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_TAG && parser.name == "item") {
+                    val name = parser.getAttributeValue(null, "name") ?: ""
+                    val pkg = parser.getAttributeValue(null, "package") ?: ""
+                    val drawable = parser.getAttributeValue(null, "drawable") ?: ""
+                    if (pkg.isNotEmpty() && drawable.isNotEmpty()) {
+                        entries.add(
+                            IconMapperEntry(
+                                name = name,
+                                packageName = pkg,
+                                drawable = drawable
+                            )
+                        )
+                    }
+                }
+                eventType = parser.next()
+            }
+            Timber.tag(TAG).d("Parsed ${entries.size} entries from inputStream")
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Error parsing mapper entries from stream")
+        }
+        return entries
     }
 }

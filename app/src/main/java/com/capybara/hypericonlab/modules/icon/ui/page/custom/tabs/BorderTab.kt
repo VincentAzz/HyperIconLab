@@ -23,7 +23,7 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 
-// <shapeName>_<styleName>_shadow_512.png
+// assets/shadow_baked/<shapeName>_<styleName>_shadow_512.png
 
 private fun friendlyStyleName(styleName: String): String = when (styleName) {
     "3d" -> "OneUI 8.5 3D"
