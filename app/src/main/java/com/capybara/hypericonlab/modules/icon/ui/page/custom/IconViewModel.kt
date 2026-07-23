@@ -2,6 +2,8 @@ package com.capybara.hypericonlab.modules.icon.ui.page.custom
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -9,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.color.AppColorSchemesLoader
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
+import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
 import com.capybara.hypericonlab.core.image.InnerShadowProcessor
@@ -33,6 +36,7 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
+import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +46,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -99,7 +104,8 @@ class IconViewModel(
     private val manageResourcesUseCase: ManageResourcesUseCase,
     private val generatePreviewUseCase: GeneratePreviewUseCase,
     private val pipeline: IconPipelineUseCase,
-    private val buildTaskManager: BuildTaskManager
+    private val buildTaskManager: BuildTaskManager,
+    private val appSettingsRepository: AppSettingsRepository
 ) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
@@ -252,6 +258,20 @@ class IconViewModel(
 
     init {
         viewModelScope.launch {
+            // 根据应用主题模式设置默认 previewThemeMode，使自定义 tab 的
+            // 前景背景壁纸配色与应用当前亮/暗色保持一致
+            val themeMode = appSettingsRepository.preferencesFlow.first().themeMode
+            val isSystemDark = Resources.getSystem().configuration.uiMode and
+                    Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+            val isDark = when (themeMode) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> isSystemDark
+            }
+            _config.update { current ->
+                current.copy(previewThemeMode = if (isDark) "dark" else "light")
+            }
+
             // mapper 已直接打包在 assets/icon_mapper/，无需首启动解压，默认即就绪
             mapperExists.value = true
             autoInitializeResources()
