@@ -23,9 +23,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,11 +48,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
+import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.symbol.category
 import com.capybara.hypericonlab.core.designsystem.symbol.check
@@ -276,8 +279,12 @@ private fun DetailContent(
     ) {
         item { PreviewSection(task = task, bitmap = previewBitmap) }
 
+        // 任务信息（含导出位置）：使用 SegmentedColumn 分段展示，与设置页风格一致
         item {
-            TaskInfoCard(task = task, containerColor = cardContainerColor)
+            TaskInfoSection(
+                task = task,
+                containerColorAlpha = TaskDetailSheetConfig.CARD_ALPHA
+            )
         }
 
         if (isActive) {
@@ -286,27 +293,13 @@ private fun DetailContent(
             }
         }
 
-        when (task.status) {
-            BuildTaskStatus.SUCCESS -> {
-                item {
-                    ExportPathCard(
-                        taskId = task.taskId,
-                        artifactPath = task.artifactPath,
-                        containerColor = cardContainerColor
-                    )
-                }
+        if (task.status == BuildTaskStatus.FAILED) {
+            item {
+                ErrorCard(
+                    errorMessage = task.errorMessage,
+                    containerColor = cardContainerColor
+                )
             }
-
-            BuildTaskStatus.FAILED -> {
-                item {
-                    ErrorCard(
-                        errorMessage = task.errorMessage,
-                        containerColor = cardContainerColor
-                    )
-                }
-            }
-
-            else -> {}
         }
 
         item {
@@ -349,45 +342,125 @@ private fun PreviewSection(
     }
 }
 
+/**
+ * 任务信息分段卡片：合并原任务信息与导出位置，使用 SegmentedColumn 分段展示。
+ * 导出位置仅在 SUCCESS 状态显示，路径过长时换行而非截断。
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun TaskInfoCard(
+private fun TaskInfoSection(
     task: BuildTask,
-    containerColor: Color
+    containerColorAlpha: Float
 ) {
-    ConfigCard(
-        title = "任务信息",
-        containerColor = containerColor
+    SegmentedColumn(
+        title = "详情",
+        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp),
+        containerColorAlpha = containerColorAlpha
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            InfoChipRow(
-                label = "任务 ID",
-                value = task.taskId,
-                useCodeFont = true
+        item {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = "ID",
+                trailingContent = {
+                    Text(
+                        text = task.taskId,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = GoogleSansCodeFontFamily,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             )
-            InfoChipRow(
-                label = "产物类型",
-                value = task.productType.label
+        }
+        item(topPadding = ListItemDefaults.SegmentedGap) {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = "产物类型",
+                trailingContent = {
+                    Text(
+                        text = task.productType.label,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             )
-            InfoChipRow(
-                label = "图标集",
-                value = "${task.iconSetLabel} · ${task.iconCount} 个"
+        }
+        item(topPadding = ListItemDefaults.SegmentedGap) {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = "图标集",
+                trailingContent = {
+                    Text(
+                        text = "${task.iconSetLabel} · ${task.iconCount} 个",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             )
-            InfoChipRow(
-                label = "前景",
-                value = "${fgStyleLabel(task.configSnapshot.fgStyle)} · ${colorSourceLabel(task.configSnapshot.fgColorSource)}"
+        }
+        item(topPadding = ListItemDefaults.SegmentedGap) {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = "前景",
+                trailingContent = {
+                    Text(
+                        text = "${fgStyleLabel(task.configSnapshot.fgStyle)} · ${
+                            colorSourceLabel(
+                                task.configSnapshot.fgColorSource
+                            )
+                        }",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             )
-            InfoChipRow(
-                label = "背景",
-                value = "${bgStyleLabel(task.configSnapshot.bgStyle)} · ${colorSourceLabel(task.configSnapshot.bgColorSource)}"
+        }
+        item(topPadding = ListItemDefaults.SegmentedGap) {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = "背景",
+                trailingContent = {
+                    Text(
+                        text = "${bgStyleLabel(task.configSnapshot.bgStyle)} · ${
+                            colorSourceLabel(
+                                task.configSnapshot.bgColorSource
+                            )
+                        }",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             )
-            if (task.configSnapshot.dualLayerEnabled) {
-                InfoChipRow(
-                    label = "下层背景",
-                    value = "${bgStyleLabel(task.configSnapshot.bgLayer2.style)} · ${
-                        colorSourceLabel(
-                            task.configSnapshot.bgLayer2.colorSource
+        }
+        if (task.configSnapshot.dualLayerEnabled) {
+            item(topPadding = ListItemDefaults.SegmentedGap) {
+                BaseWidget(
+                    iconPlaceholder = false,
+                    title = "下层背景",
+                    trailingContent = {
+                        Text(
+                            text = "${bgStyleLabel(task.configSnapshot.bgLayer2.style)} · ${
+                                colorSourceLabel(
+                                    task.configSnapshot.bgLayer2.colorSource
+                                )
+                            }",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    }"
+                    }
+                )
+            }
+        }
+        // 导出位置：仅 SUCCESS 显示，路径换行展示不截断
+        if (task.status == BuildTaskStatus.SUCCESS) {
+            item(topPadding = ListItemDefaults.SegmentedGap) {
+                BaseWidget(
+                    iconPlaceholder = false,
+                    title = "导出位置",
+                    description = task.artifactPath
+                        ?: "Documents/HyperIconLabArtifacts/${task.taskId}",
+                    descriptionStyle = MaterialTheme.typography.bodySmall.copy(
+                        fontFamily = GoogleSansCodeFontFamily
+                    )
                 )
             }
         }
@@ -436,40 +509,6 @@ private fun ProgressCard(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontFamily = GoogleSansCodeFontFamily
-            )
-        }
-    }
-}
-
-@Composable
-private fun ExportPathCard(
-    taskId: String,
-    artifactPath: String?,
-    containerColor: Color
-) {
-    ConfigCard(
-        title = "导出位置",
-        containerColor = containerColor
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(TaskDetailSheetConfig.EXPORT_CONTENT_PADDING)
-        ) {
-            Text(
-                text = "文件已保存到：",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(Modifier.height(TaskDetailSheetConfig.EXPORT_PATH_TOP_SPACING))
-            // 路径可能较长，单行省略避免换行
-            Text(
-                text = artifactPath ?: "Documents/HyperIconLabArtifacts/$taskId",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontFamily = GoogleSansCodeFontFamily,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -582,36 +621,6 @@ private fun DetailBottomActions(
     }
 }
 
-@Composable
-private fun InfoChipRow(
-    label: String,
-    value: String,
-    useCodeFont: Boolean = false
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(TaskDetailSheetConfig.INFO_ROW_PADDING),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Medium,
-            fontFamily = if (useCodeFont) GoogleSansCodeFontFamily else null,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
 
 @Composable
 private fun ConfirmDialog(
@@ -718,17 +727,8 @@ private object TaskDetailSheetConfig {
     // 进度条高度
     val PROGRESS_HEIGHT = 4.dp
 
-    // 导出位置卡片内容内边距
-    val EXPORT_CONTENT_PADDING = PaddingValues(16.dp)
-
-    // 导出路径文本上方间距
-    val EXPORT_PATH_TOP_SPACING = 4.dp
-
     // 错误信息卡片内容内边距
     val ERROR_CONTENT_PADDING = PaddingValues(16.dp)
-
-    // 信息行内边距
-    val INFO_ROW_PADDING = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
 
     // 底部操作区按钮组内边距
     val BOTTOM_ACTION_PADDING = PaddingValues(horizontal = 16.dp, vertical = 12.dp)

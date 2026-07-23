@@ -1,5 +1,11 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.task
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -123,69 +129,90 @@ fun TaskPage(
         }
     ) { paddingValues ->
         val layoutDirection = LocalLayoutDirection.current
-        // 根据当前 tab 决定展示的列表
-        val displayTasks =
-            if (selectedTab == TaskPageConfig.TAB_INDEX_ACTIVE) activeTasks else finishedTasks
         // 关键：参照设置页实现，layerBackdrop 必须放在最外层（不带 padding），
         // 让 backdrop 捕获区域覆盖整个 Scaffold content（含 TopAppBar 下方位置），
         // TopAppBar 通过 appBarBlurEffect 采样 backdrop 时才能取到内容；
         // 所有 padding 通过 contentPadding 实现，不挤占 backdrop 捕获区域。
-        LazyColumn(
+        Box(
             modifier = modifier
                 .fillMaxSize()
-                .then(backdrop?.let { Modifier.layerBackdrop(it) } ?: Modifier),
-            contentPadding = PaddingValues(
-                start = paddingValues.calculateStartPadding(layoutDirection) +
-                        outerPadding.calculateStartPadding(layoutDirection) +
-                        TaskPageConfig.HORIZONTAL_PADDING,
-                top = paddingValues.calculateTopPadding() + TaskPageConfig.VERTICAL_PADDING,
-                end = paddingValues.calculateEndPadding(layoutDirection) +
-                        outerPadding.calculateEndPadding(layoutDirection) +
-                        TaskPageConfig.HORIZONTAL_PADDING,
-                bottom = TaskPageConfig.VERTICAL_PADDING + outerPadding.calculateBottomPadding()
-            ),
-            verticalArrangement = Arrangement.spacedBy(TaskPageConfig.CARD_SPACING)
+                .then(backdrop?.let { Modifier.layerBackdrop(it) } ?: Modifier)
         ) {
-            if (displayTasks.isNotEmpty()) {
-                itemsIndexed(
-                    items = displayTasks,
-                    key = { _, task -> task.taskId }
-                ) { index, task ->
-                    TaskCard(
-                        task = task,
-                        onClick = {
-                            selectedTaskId = task.taskId
-                            onTaskClick(task.taskId)
-                        },
-                        isFirst = index == 0,
-                        isLast = index == displayTasks.lastIndex
-                    )
+            // tab 切换动画：与设置页一致的横向滑动 + 淡入淡出
+            AnimatedContent(
+                targetState = selectedTab,
+                label = "task_tab_content",
+                transitionSpec = {
+                    if (targetState > initialState) {
+                        (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
+                            slideOutHorizontally { width -> -width } + fadeOut()
+                        )
+                    } else {
+                        (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(
+                            slideOutHorizontally { width -> width } + fadeOut()
+                        )
+                    }
                 }
-            } else {
-                // 空态文案：根据 tab 显示不同提示
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = TaskPageConfig.EMPTY_STATE_TOP_PADDING),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = if (selectedTab == TaskPageConfig.TAB_INDEX_ACTIVE)
-                                    "暂无进行中的任务"
-                                else "暂无已完成的任务",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+            ) { targetTab ->
+                // 根据当前 tab 决定展示的列表
+                val displayTasks =
+                    if (targetTab == TaskPageConfig.TAB_INDEX_ACTIVE) activeTasks else finishedTasks
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        start = paddingValues.calculateStartPadding(layoutDirection) +
+                                outerPadding.calculateStartPadding(layoutDirection) +
+                                TaskPageConfig.HORIZONTAL_PADDING,
+                        top = paddingValues.calculateTopPadding() + TaskPageConfig.VERTICAL_PADDING,
+                        end = paddingValues.calculateEndPadding(layoutDirection) +
+                                outerPadding.calculateEndPadding(layoutDirection) +
+                                TaskPageConfig.HORIZONTAL_PADDING,
+                        bottom = TaskPageConfig.VERTICAL_PADDING + outerPadding.calculateBottomPadding()
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(TaskPageConfig.CARD_SPACING)
+                ) {
+                    if (displayTasks.isNotEmpty()) {
+                        itemsIndexed(
+                            items = displayTasks,
+                            key = { _, task -> task.taskId }
+                        ) { index, task ->
+                            TaskCard(
+                                task = task,
+                                onClick = {
+                                    selectedTaskId = task.taskId
+                                    onTaskClick(task.taskId)
+                                },
+                                isFirst = index == 0,
+                                isLast = index == displayTasks.lastIndex
                             )
-                            Spacer(Modifier.height(TaskPageConfig.EMPTY_STATE_TEXT_GAP))
-                            Text(
-                                text = if (selectedTab == TaskPageConfig.TAB_INDEX_ACTIVE)
-                                    "前往「自定义」页面构建图标包"
-                                else "完成构建的任务将显示在此处",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                        }
+                    } else {
+                        // 空态文案：根据 tab 显示不同提示
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = TaskPageConfig.EMPTY_STATE_TOP_PADDING),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = if (targetTab == TaskPageConfig.TAB_INDEX_ACTIVE)
+                                            "暂无进行中的任务"
+                                        else "暂无已完成的任务",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(Modifier.height(TaskPageConfig.EMPTY_STATE_TEXT_GAP))
+                                    Text(
+                                        text = if (targetTab == TaskPageConfig.TAB_INDEX_ACTIVE)
+                                            "前往「自定义」页面构建图标包"
+                                        else "完成构建的任务将显示在此处",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
                         }
                     }
                 }
