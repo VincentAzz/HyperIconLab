@@ -2,21 +2,41 @@ package com.capybara.hypericonlab.modules.settings.ui.page.settings.component
 
 import android.graphics.Bitmap
 import android.util.LruCache
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,18 +53,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
 import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
+import com.capybara.hypericonlab.core.designsystem.symbol.search
+import com.capybara.hypericonlab.core.designsystem.symbol.search_off
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.MiuixThemeBridge
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.core.image.SvgProcessor
@@ -58,6 +86,7 @@ import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 private val svgBitmapCache: LruCache<String, Bitmap> by lazy {
     val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
@@ -80,6 +109,7 @@ fun LawniconsBrowserSheet(
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // 加载全部 mapper 条目与 svgs 目录
     var allEntries by remember { mutableStateOf<List<IconMapperEntry>>(emptyList()) }
@@ -97,8 +127,7 @@ fun LawniconsBrowserSheet(
             }
             svgDir = dir
             val entries = try {
-                context.assets
-                    .open("${LawniconsSheetConstants.MAPPER_ASSET_DIR}/${LawniconsSheetConstants.FULL_MAPPER_FILE}")
+                context.assets.open("${LawniconsSheetConstants.MAPPER_ASSET_DIR}/${LawniconsSheetConstants.FULL_MAPPER_FILE}")
                     .use { IconMapperProcessor.parseIconMapperEntries(it) }
             } catch (_: Exception) {
                 emptyList()
@@ -109,20 +138,31 @@ fun LawniconsBrowserSheet(
         }
     }
 
-    // 搜索过滤：按应用名或包名模糊匹配
     var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    var selectedEntry by remember { mutableStateOf<IconMapperEntry?>(null) }
+    var displayedEntry by remember { mutableStateOf<IconMapperEntry?>(null) }
+
+    var needsPadding by remember { mutableStateOf(false) }
+    val gridState = rememberLazyGridState()
+    val density = LocalDensity.current
+    val isScrolling by remember { derivedStateOf { gridState.isScrollInProgress } }
+
     val filteredEntries by remember(allEntries) {
         derivedStateOf {
             val q = searchQuery.trim()
             if (q.isEmpty()) allEntries
             else allEntries.filter {
-                it.name.contains(q, ignoreCase = true) ||
-                        it.packageName.contains(q, ignoreCase = true)
+                it.name.contains(q, ignoreCase = true) || it.packageName.contains(
+                    q,
+                    ignoreCase = true
+                )
             }
         }
     }
 
-    // SVG 渲染颜色：深色主题用白色，浅色主题用黑色（保持原色）
+
     val isDark = AppTheme.isDark
     val fgColorHex = if (isDark) {
         LawniconsSheetConstants.DARK_FG_COLOR
@@ -140,7 +180,6 @@ fun LawniconsBrowserSheet(
         useLiquidGlass = useLiquidGlass,
         liquidGlassBlurRadius = liquidGlassBlurRadius,
     ) {
-        // Header：居中标题 + 左侧关闭按钮 + 右侧确定按钮（与 MaskPickerSheet 风格一致）
         CenterAlignedTopAppBar(
             title = { SheetTitle("浏览原始图标") },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
@@ -168,7 +207,6 @@ fun LawniconsBrowserSheet(
                 }
             },
             actions = {
-                // 右侧确定按钮：浏览场景无选择行为，点击即关闭 sheet
                 Surface(
                     onClick = {
                         coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -190,25 +228,30 @@ fun LawniconsBrowserSheet(
                         )
                     }
                 }
-            }
-        )
+            })
 
-        MiuixThemeBridge {
-            TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                label = "搜索应用名或包名",
-                singleLine = true,
-                textStyle = MiuixTheme.textStyles.main.copy(
-                    color = MiuixTheme.colorScheme.onSurface
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+        AnimatedVisibility(visible = isSearchActive) {
+            MiuixThemeBridge {
+                TextField(
+                    value = searchQuery,
+                    onValueChange = {
+                        searchQuery = it
+                        selectedEntry = null
+                        needsPadding = false
+                    },
+                    label = "搜索应用名或包名",
+                    singleLine = true,
+                    textStyle = MiuixTheme.textStyles.main.copy(
+                        color = MiuixTheme.colorScheme.onSurface
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .focusRequester(focusRequester)
+                )
+            }
         }
 
-        // 数量提示文本（位于卡片外部）
         Text(
             text = "${filteredEntries.size} 个图标",
             style = MaterialTheme.typography.bodySmall,
@@ -233,8 +276,7 @@ fun LawniconsBrowserSheet(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                "加载中...",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                "加载中...", color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -268,13 +310,16 @@ fun LawniconsBrowserSheet(
                                 )
                             }
                         } else {
+                            val gridTopPadding by animateDpAsState(
+                                targetValue = if (needsPadding && selectedEntry != null) LawniconsSheetConstants.GRID_TOP_PADDING + LawniconsSheetConstants.BANNER_HEIGHT + LawniconsSheetConstants.BANNER_BOTTOM_GAP
+                                else LawniconsSheetConstants.GRID_TOP_PADDING,
+                                label = "gridTopPadding"
+                            )
                             LazyVerticalGrid(
+                                state = gridState,
                                 columns = GridCells.Fixed(LawniconsSheetConstants.COLUMNS),
                                 contentPadding = PaddingValues(
-                                    start = 16.dp,
-                                    end = 16.dp,
-                                    top = 16.dp,
-                                    bottom = 32.dp
+                                    start = 16.dp, end = 16.dp, top = gridTopPadding, bottom = 32.dp
                                 ),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -284,11 +329,36 @@ fun LawniconsBrowserSheet(
                             ) {
                                 items(
                                     filteredEntries,
-                                    key = { "${it.packageName}_${it.drawable}" }
-                                ) { entry ->
+                                    key = { "${it.packageName}_${it.drawable}" }) { entry ->
+                                    val isSelected = selectedEntry?.let {
+                                        it.packageName == entry.packageName && it.drawable == entry.drawable
+                                    } ?: false
                                     SvgIconItem(
                                         svgFile = File(dir, "${entry.drawable}.svg"),
                                         fgColorHex = fgColorHex,
+                                        isSelected = isSelected,
+                                        onClick = {
+                                            if (isSelected) {
+                                                selectedEntry = null
+                                                needsPadding = false
+                                            } else {
+                                                val index = filteredEntries.indexOfFirst {
+                                                    it.packageName == entry.packageName && it.drawable == entry.drawable
+                                                }
+                                                needsPadding = if (index >= 0) {
+                                                    val itemInfo =
+                                                        gridState.layoutInfo.visibleItemsInfo.find { it.index == index }
+                                                    if (itemInfo != null) {
+                                                        val thresholdPx = with(density) {
+                                                            (LawniconsSheetConstants.BANNER_HEIGHT + LawniconsSheetConstants.BANNER_BOTTOM_GAP + LawniconsSheetConstants.ICON_CELL_SIZE / 2).roundToPx()
+                                                        }
+                                                        itemInfo.offset.y < thresholdPx
+                                                    } else false
+                                                } else false
+                                                displayedEntry = entry
+                                                selectedEntry = entry
+                                            }
+                                        },
                                         modifier = Modifier.size(LawniconsSheetConstants.ICON_CELL_SIZE)
                                     )
                                 }
@@ -296,30 +366,80 @@ fun LawniconsBrowserSheet(
                         }
                     }
                 }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = selectedEntry != null,
+                    enter = slideInVertically { -it },
+                    exit = slideOutVertically { -it },
+                    modifier = Modifier.align(Alignment.TopStart)
+                ) {
+                    displayedEntry?.let { entry ->
+                        svgDir?.let { dir ->
+                            IconInfoBanner(
+                                entry = entry,
+                                svgDir = dir,
+                                fgColorHex = fgColorHex,
+                            )
+                        }
+                    }
+                }
+
+                // 搜索 FAB：右下角，滚动时隐藏
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = !isScrolling,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut(),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(24.dp)
+                        .navigationBarsPadding()
+                ) {
+                    FloatingActionButton(
+                        onClick = {
+                            isSearchActive = !isSearchActive
+                            if (isSearchActive) {
+                                coroutineScope.launch {
+                                    kotlinx.coroutines.delay(200.milliseconds)
+                                    focusRequester.requestFocus()
+                                }
+                            } else {
+                                searchQuery = ""
+                                keyboardController?.hide()
+                            }
+                        },
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shape = CircleShape
+                    ) {
+                        Icon(
+                            imageVector = if (isSearchActive) AppMaterialSymbols.search_off else AppMaterialSymbols.search,
+                            contentDescription = if (isSearchActive) "取消搜索" else "搜索",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
         }
     }
 }
 
-/**
- * 单个 SVG 图标渲染项，LruCache 缓存
- */
+
 @Composable
 private fun SvgIconItem(
     svgFile: File,
     fgColorHex: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     val cacheKey = "${svgFile.name}:$fgColorHex"
 
     LaunchedEffect(svgFile, fgColorHex) {
-        // 命中缓存直接使用
         svgBitmapCache.get(cacheKey)?.let {
             bitmap = it
             return@LaunchedEffect
         }
-        // 缓存未命中则 IO 线程渲染
         if (svgFile.exists()) {
             val rendered = withContext(Dispatchers.IO) {
                 SvgProcessor.processSvgFile(
@@ -335,7 +455,21 @@ private fun SvgIconItem(
         }
     }
 
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+    val itemShape = rememberKyantRoundedRectangleShape(LawniconsSheetConstants.ITEM_CORNER_RADIUS)
+
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.secondaryContainer
+        else Color.Transparent,
+        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
+        label = "selectionColor"
+    )
+
+    Box(
+        modifier = modifier
+            .clip(itemShape)
+            .background(backgroundColor)
+            .clickable(onClick = onClick), contentAlignment = Alignment.Center
+    ) {
         bitmap?.let {
             Image(
                 bitmap = it.asImageBitmap(),
@@ -346,16 +480,97 @@ private fun SvgIconItem(
     }
 }
 
+
+@Composable
+private fun IconInfoBanner(
+    entry: IconMapperEntry, svgDir: File, fgColorHex: String, modifier: Modifier = Modifier
+) {
+    val bannerShape = RoundedCornerShape(
+        topStart = LawniconsSheetConstants.BANNER_TOP_RADIUS,
+        topEnd = LawniconsSheetConstants.BANNER_TOP_RADIUS,
+        bottomEnd = 0.dp,
+        bottomStart = 0.dp
+    )
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(bannerShape)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        InfoCardIcon(
+            svgFile = File(svgDir, "${entry.drawable}.svg"), fgColorHex = fgColorHex
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = entry.drawable,
+                style = MaterialTheme.typography.bodyMedium,
+                fontFamily = GoogleSansCodeFontFamily,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Text(
+                text = entry.packageName,
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = GoogleSansCodeFontFamily,
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun InfoCardIcon(
+    svgFile: File, fgColorHex: String
+) {
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+    val cacheKey = "${svgFile.name}:$fgColorHex"
+
+    LaunchedEffect(svgFile, fgColorHex) {
+        svgBitmapCache.get(cacheKey)?.let {
+            bitmap = it
+            return@LaunchedEffect
+        }
+        if (svgFile.exists()) {
+            val rendered = withContext(Dispatchers.IO) {
+                SvgProcessor.processSvgFile(
+                    svgFile = svgFile,
+                    fgColorHex = fgColorHex,
+                    iconSize = LawniconsSheetConstants.SVG_RENDER_SIZE
+                )
+            }
+            if (rendered != null) {
+                svgBitmapCache.put(cacheKey, rendered)
+                bitmap = rendered
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier.size(LawniconsSheetConstants.INFO_ICON_DISPLAY_SIZE),
+        contentAlignment = Alignment.Center
+    ) {
+        bitmap?.let {
+            Image(
+                bitmap = it.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier.size(LawniconsSheetConstants.INFO_ICON_DISPLAY_SIZE)
+            )
+        }
+    }
+}
+
 private enum class LawniconsLoadState { LOADING, READY, ERROR }
 
 private object LawniconsSheetConstants {
-    // 资源目录
     const val LAWNICONS_DIR = "lawnicons"
     const val SVGS_DIR = "svgs"
     const val MAPPER_ASSET_DIR = "icon_mapper"
     const val FULL_MAPPER_FILE = "icon_mapper.xml"
 
-    // 渲染颜色（9 位 ARGB，SvgProcessor 会截取后 6 位作为替换色）
     const val DARK_FG_COLOR = "#FFFFFFFF"
     const val LIGHT_FG_COLOR = "#FF000000"
 
@@ -363,10 +578,18 @@ private object LawniconsSheetConstants {
     const val COLUMNS = 4
     val ICON_CELL_SIZE = 56.dp
     val ICON_DISPLAY_SIZE = 40.dp
+    val GRID_TOP_PADDING = 16.dp
 
-    // SVG 渲染尺寸（cell 56dp，按 2x 密度渲染 96px 足够清晰）
+    // 信息横幅与选中项
+    val INFO_ICON_DISPLAY_SIZE = 48.dp
+    val ITEM_CORNER_RADIUS = 16.dp
+    val BANNER_TOP_RADIUS = ExtraLargeRadius - 8.dp
+    val BANNER_HEIGHT = 72.dp
+
+    // 横幅底部与首行图标的间距
+    val BANNER_BOTTOM_GAP = 8.dp
+
     const val SVG_RENDER_SIZE = 96
 
-    // LruCache 占用最大内存的比例
     const val CACHE_FRACTION = 16
 }
