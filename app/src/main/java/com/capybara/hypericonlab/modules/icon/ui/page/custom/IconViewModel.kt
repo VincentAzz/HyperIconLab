@@ -41,6 +41,7 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.IconLogger
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.InnerShadowAssetScanner
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogType
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.PreviewCoordinator
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ResourceInitializer
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.WallpaperManager
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
@@ -220,18 +221,26 @@ class IconViewModel(
     private val _lastPackDuration = MutableStateFlow<Long?>(null)
     val lastPackDuration: StateFlow<Long?> = _lastPackDuration.asStateFlow()
 
-    // Previews
-    private val _storePreviewBitmap = MutableStateFlow<Bitmap?>(null)
-    val storePreviewBitmap: StateFlow<Bitmap?> = _storePreviewBitmap.asStateFlow()
-
-    private val _mainPreviewBitmap = MutableStateFlow<Bitmap?>(null)
-    val mainPreviewBitmap: StateFlow<Bitmap?> = _mainPreviewBitmap.asStateFlow()
-
     // 日志管理器：封装日志状态流与添加/清空，ViewModel 转发对外暴露
     private val logger = IconLogger()
     val logs: StateFlow<List<LogEntry>> = logger.logs
 
-    private var previewJob: kotlinx.coroutines.Job? = null
+    // 预览协调器：管理 store/main 预览位图与生成流程，通过 provider/回调解耦 ViewModel 状态
+    private val previewCoordinator = PreviewCoordinator(
+        scope = viewModelScope,
+        generatePreviewUseCase = generatePreviewUseCase,
+        configProvider = { _config.value },
+        wallpaperBitmapProvider = { wallpaperBitmap.value },
+        wallpaperColorSchemeProvider = { wallpaperColorScheme.value },
+        appColorSchemesProvider = { appColorSchemes },
+        isRunningProvider = { _isRunning.value },
+        onLog = { message, type -> addLog(message, type) },
+        onStatusTextChange = { _statusText.value = it },
+        onProgressChange = { _currentProgress.value = it },
+        onRunningChange = { _isRunning.value = it }
+    )
+    val storePreviewBitmap: StateFlow<Bitmap?> = previewCoordinator.storePreviewBitmap
+    val mainPreviewBitmap: StateFlow<Bitmap?> = previewCoordinator.mainPreviewBitmap
 
     init {
         viewModelScope.launch {
@@ -461,62 +470,11 @@ class IconViewModel(
         }
     }
 
-    fun generateLivePreview() {
-        previewJob?.cancel()
-        previewJob = viewModelScope.launch {
-            delay(300.milliseconds)
-            generatePreview(isLive = true)
-        }
-    }
+    fun generateLivePreview() = previewCoordinator.generateLivePreview()
 
-    fun refreshPreview() {
-        generateLivePreview()
-    }
+    fun refreshPreview() = previewCoordinator.refreshPreview()
 
-    fun generatePreview(isLive: Boolean = false) {
-        if (_isRunning.value && !isLive) return
-        if (!isLive) _isRunning.value = true
-
-        val typeStr = if (isLive) "实时预览" else "大预览图"
-        val startTime = System.currentTimeMillis()
-
-        previewJob?.cancel()
-        previewJob = viewModelScope.launch {
-            try {
-                if (!isLive) _statusText.value = "正在加载图标..."
-                val result = generatePreviewUseCase.execute(
-                    config = _config.value,
-                    wallpaperBitmap = wallpaperBitmap.value,
-                    wallpaperColorScheme = wallpaperColorScheme.value,
-                    appColorSchemes = appColorSchemes,
-                    onStorePreviewGenerated = { _storePreviewBitmap.value = it }
-                )
-                _mainPreviewBitmap.value = result
-                val duration = System.currentTimeMillis() - startTime
-                if (result == null) {
-                    // execute 返回 null（如 svgDir 不存在），记录失败避免误导
-                    if (!isLive) {
-                        _statusText.value = "预览错误"
-                        _isRunning.value = false
-                    }
-                    addLog("生成 $typeStr 失败：资源未就绪", LogType.ERROR)
-                } else if (!isLive) {
-                    _statusText.value = "预览已生成。"
-                    _currentProgress.value = 1.0f
-                    _isRunning.value = false
-                    addLog("生成 $typeStr 成功，耗时 ${duration}ms", LogType.SUCCESS)
-                } else {
-                    addLog("生成 $typeStr 成功，耗时 ${duration}ms", LogType.INFO)
-                }
-            } catch (e: Exception) {
-                if (!isLive) {
-                    _statusText.value = "预览错误"
-                    _isRunning.value = false
-                    addLog("生成 $typeStr 失败: ${e.message}", LogType.ERROR)
-                }
-            }
-        }
-    }
+    fun generatePreview(isLive: Boolean = false) = previewCoordinator.generatePreview(isLive)
 
     fun unzipResources() {
         if (_isRunning.value) return
@@ -776,11 +734,11 @@ class IconViewModel(
         iconSetId: String,
         iconSetLabel: String
     ): BuildTask? {
-        val storePreview = _storePreviewBitmap.value ?: run {
+        val storePreview = previewCoordinator.storePreviewBitmap.value ?: run {
             addLog("提交失败：store 预览图未就绪", LogType.ERROR)
             return null
         }
-        val mainPreview = _mainPreviewBitmap.value ?: run {
+        val mainPreview = previewCoordinator.mainPreviewBitmap.value ?: run {
             addLog("提交失败：main 预览图未就绪", LogType.ERROR)
             return null
         }
@@ -822,8 +780,8 @@ class IconViewModel(
         generateLivePreview()
         // 等待预览图生成完成（generateLivePreview 异步，使用 runBlocking 不合适，
         // 此处简化处理：直接读当前缓存的预览图，若未就绪则恢复配置并返回 null）
-        val storePreview = _storePreviewBitmap.value
-        val mainPreview = _mainPreviewBitmap.value
+        val storePreview = previewCoordinator.storePreviewBitmap.value
+        val mainPreview = previewCoordinator.mainPreviewBitmap.value
         // 恢复当前配置
         _config.value = currentConfig
         generateLivePreview()
