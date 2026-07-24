@@ -13,8 +13,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
 import com.capybara.hypericonlab.core.image.BackgroundGenerator
 import com.capybara.hypericonlab.core.image.GlassProcessor
-import com.capybara.hypericonlab.core.image.InnerShadowAssets
-import com.capybara.hypericonlab.core.image.InnerShadowProcessor
+import com.capybara.hypericonlab.core.image.InnerShadowBitmapLoader
 import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.core.image.StickerProcessor
 import com.capybara.hypericonlab.core.image.SvgProcessor
@@ -93,22 +92,17 @@ class GeneratePreviewUseCase(private val context: Context) {
 
         // 内阴影位图（仅单层背景且启用内阴影时加载，512 尺寸与预览图标一致）
         // 双层背景时 config.innerShadow.enabled 应为 false（ViewModel 已强制禁用）
-        // 加载后预合并多层强度为单张阴影层，管线内每个图标只绘制一次
         val innerShadowBitmap = if (config.innerShadow.enabled && !config.dualLayerEnabled) {
             config.innerShadow.styleName?.let { styleName ->
                 config.selectedMasks.firstOrNull()?.let { shapeName ->
                     withContext(Dispatchers.IO) {
-                        loadInnerShadowBitmap(
+                        InnerShadowBitmapLoader.loadAndMerge(
                             shapeName,
                             styleName,
-                            InnerShadowPreviewConfig.SHADOW_SIZE
-                        )?.let { raw ->
-                            val merged = InnerShadowProcessor.mergeShadowLayers(
-                                raw, config.innerShadow.intensityLayers
-                            )
-                            raw.recycle()
-                            merged
-                        }
+                            InnerShadowPreviewConfig.SHADOW_SIZE,
+                            config.innerShadow.intensityLayers,
+                            context
+                        )
                     }
                 }
             }
@@ -523,32 +517,6 @@ class GeneratePreviewUseCase(private val context: Context) {
             Color.red(color) > 240 && Color.green(color) > 240 && Color.blue(color) > 240
         } catch (_: Exception) {
             false
-        }
-    }
-
-    /**
-     * 加载烘焙内阴影 PNG 并缩放到目标尺寸。
-     * 文件路径：assets/shadow_baked/<shapeName>_<styleName>_shadow_512.png
-     */
-    private fun loadInnerShadowBitmap(
-        shapeName: String,
-        styleName: String,
-        targetSize: Int
-    ): Bitmap? {
-        return try {
-            val path =
-                "${InnerShadowAssets.DIR}/${shapeName}_${styleName}${InnerShadowAssets.FILE_SUFFIX}"
-            context.assets.open(path).use { stream ->
-                BitmapFactory.decodeStream(stream)
-            }?.let { raw ->
-                if (raw.width != targetSize) {
-                    val scaled = Bitmap.createScaledBitmap(raw, targetSize, targetSize, true)
-                    raw.recycle()
-                    scaled
-                } else raw
-            }
-        } catch (_: Exception) {
-            null
         }
     }
 

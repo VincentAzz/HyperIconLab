@@ -15,7 +15,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
 import com.capybara.hypericonlab.core.image.InnerShadowAssets
-import com.capybara.hypericonlab.core.image.InnerShadowProcessor
+import com.capybara.hypericonlab.core.image.InnerShadowBitmapLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
@@ -722,32 +722,13 @@ class IconViewModel(
                     if (buildConfig.innerShadow.enabled && !buildConfig.dualLayerEnabled) {
                         buildConfig.innerShadow.styleName?.let { styleName ->
                             buildConfig.masks.firstOrNull()?.let { shapeName ->
-                                try {
-                                    context.assets.open(
-                                        "${InnerShadowAssets.DIR}/${shapeName}_${styleName}${InnerShadowAssets.FILE_SUFFIX}"
-                                    ).use { stream ->
-                                        BitmapFactory.decodeStream(stream)
-                                    }?.let { raw ->
-                                        val scaled = if (raw.width != buildConfig.iconSize) {
-                                            val s = Bitmap.createScaledBitmap(
-                                                raw,
-                                                buildConfig.iconSize,
-                                                buildConfig.iconSize,
-                                                true
-                                            )
-                                            raw.recycle()
-                                            s
-                                        } else raw
-                                        // 预合并多层阴影为单张阴影层，管线内每个图标只绘制一次
-                                        val merged = InnerShadowProcessor.mergeShadowLayers(
-                                            scaled, buildConfig.innerShadow.intensityLayers
-                                        )
-                                        scaled.recycle()
-                                        merged
-                                    }
-                                } catch (_: Exception) {
-                                    null
-                                }
+                                InnerShadowBitmapLoader.loadAndMerge(
+                                    shapeName,
+                                    styleName,
+                                    buildConfig.iconSize,
+                                    buildConfig.innerShadow.intensityLayers,
+                                    context
+                                )
                             }
                         }
                     } else null
