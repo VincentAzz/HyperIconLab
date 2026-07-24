@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,23 +12,16 @@ import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
-import com.capybara.hypericonlab.core.image.InnerShadowBitmapLoader
-import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassUiState
-import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.ImageFillingUiState
-import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.PresetUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
-import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.WallpaperUiState
 import com.capybara.hypericonlab.modules.icon.domain.render.ConfigColorResolver
@@ -37,6 +29,7 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.BuildTaskCoordinator
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.IconLogger
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.InnerShadowAssetScanner
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
@@ -59,8 +52,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
 @SuppressLint("MissingPermission")
@@ -74,24 +65,6 @@ class IconViewModel(
 ) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
-
-    companion object {
-        // 打包流程关键参数集中声明，便于调参
-        private object PipelineAssets {
-            // assets 中 mapper 文件所在目录
-            const val MAPPER_ASSET_DIR = "icon_mapper"
-        }
-
-        // 构建任务关键参数集中声明，便于调参
-        private object BuildConfig {
-            // 提交任务时占位的图标数量，真实数量在 executor 解析 mapper 后更新
-            const val PLACEHOLDER_ICON_COUNT = 0
-        }
-    }
-
-    // 构建任务队列与已完成列表（直接转发 BuildTaskManager 的 StateFlow）
-    val activeBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.activeTasks
-    val finishedBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.finishedTasks
 
     // Configuration State
     private val _config = MutableStateFlow(IconConfigState())
@@ -241,6 +214,34 @@ class IconViewModel(
     )
     val storePreviewBitmap: StateFlow<Bitmap?> = previewCoordinator.storePreviewBitmap
     val mainPreviewBitmap: StateFlow<Bitmap?> = previewCoordinator.mainPreviewBitmap
+
+    // 构建任务协调器：管理打包流程、任务提交/重试/取消/删除、权限检查
+    // 通过 provider 回调解耦状态读取，通过回调解耦状态写回与配置切换
+    private val buildTaskCoordinator = BuildTaskCoordinator(
+        context = context,
+        scope = viewModelScope,
+        pipeline = pipeline,
+        buildTaskManager = buildTaskManager,
+        configProvider = { _config.value },
+        wallpaperBitmapProvider = { wallpaperBitmap.value },
+        wallpaperColorSchemeProvider = { wallpaperColorScheme.value },
+        appColorSchemesProvider = { appColorSchemes },
+        useStreamingProvider = { useStreaming.value },
+        storePreviewProvider = { previewCoordinator.storePreviewBitmap.value },
+        mainPreviewProvider = { previewCoordinator.mainPreviewBitmap.value },
+        isRunningProvider = { _isRunning.value },
+        onLog = { message, type -> addLog(message, type) },
+        onStatusTextChange = { _statusText.value = it },
+        onProgressChange = { _currentProgress.value = it },
+        onRunningChange = { _isRunning.value = it },
+        onLastPackDurationChange = { _lastPackDuration.value = it },
+        onConfigSwap = { newConfig -> _config.value = newConfig },
+        onRegeneratePreview = { generateLivePreview() }
+    )
+
+    // 构建任务队列与已完成列表（转发 BuildTaskCoordinator 的 StateFlow）
+    val activeBuildTasks: StateFlow<List<BuildTask>> = buildTaskCoordinator.activeBuildTasks
+    val finishedBuildTasks: StateFlow<List<BuildTask>> = buildTaskCoordinator.finishedBuildTasks
 
     init {
         viewModelScope.launch {
@@ -520,106 +521,7 @@ class IconViewModel(
         }
     }
 
-    fun runPipeline(mapperName: String) {
-        if (_isRunning.value) return
-        _isRunning.value = true
-        addLog("开始打包: $mapperName")
-        val startTime = System.currentTimeMillis()
-        viewModelScope.launch {
-            try {
-                _statusText.value = "准备 $mapperName..."
-                val filesDir = context.filesDir
-                val lawniconsBase = File(filesDir, "lawnicons")
-
-                // mapper 直接从 assets 读取，避免落盘与首启动解压
-                val mapperMap = withContext(Dispatchers.IO) {
-                    context.assets
-                        .open("${PipelineAssets.MAPPER_ASSET_DIR}/$mapperName")
-                        .use { stream -> IconMapperProcessor.parseIconMapper(stream) }
-                }
-                val svgDir =
-                    withContext(Dispatchers.IO) { ZipUtils.findDirRecursive(lawniconsBase, "svgs") }
-                val configValue = _config.value
-                val maskBitmaps = configValue.selectedMasks.mapNotNull { name ->
-                    try {
-                        context.assets.open("masks/mask_${name}_512.png")
-                            .use { BitmapFactory.decodeStream(it) }
-                    } catch (_: Exception) {
-                        null
-                    }
-                }
-
-                // 下层 mask bitmaps（仅双层启用时加载）
-                val maskBitmaps2 = if (configValue.dualLayerEnabled) {
-                    configValue.bgLayer2.selectedMasks.mapNotNull { name ->
-                        try {
-                            context.assets.open("masks/mask_${name}_512.png")
-                                .use { BitmapFactory.decodeStream(it) }
-                        } catch (_: Exception) {
-                            null
-                        }
-                    }
-                } else emptyList()
-                val buildConfig = buildIconBuildConfig(configValue)
-
-                // 内阴影 bitmap（仅单层背景且启用内阴影时加载，加载后预合并多层强度）
-                val innerShadowBitmap =
-                    if (buildConfig.innerShadow.enabled && !buildConfig.dualLayerEnabled) {
-                        buildConfig.innerShadow.styleName?.let { styleName ->
-                            buildConfig.masks.firstOrNull()?.let { shapeName ->
-                                InnerShadowBitmapLoader.loadAndMerge(
-                                    shapeName,
-                                    styleName,
-                                    buildConfig.iconSize,
-                                    buildConfig.innerShadow.intensityLayers,
-                                    context
-                                )
-                            }
-                        }
-                    } else null
-
-                val out = File(filesDir, "${mapperName.removeSuffix(".xml")}.mtz")
-                pipeline.executeWithFiles(
-                    buildConfig,
-                    mapperMap,
-                    svgDir!!,
-                    maskBitmaps,
-                    out,
-                    appColorSchemes,
-                    maskBitmaps2,
-                    innerShadowBitmap
-                )
-                    .collect { state ->
-                        when (state) {
-                            is IconPipelineUseCase.PipelineProgress.Processing -> {
-                                _statusText.value = "打包中: ${state.packageName}"
-                                _currentProgress.value = state.current.toFloat() / state.total
-                            }
-
-                            is IconPipelineUseCase.PipelineProgress.Complete -> {
-                                val duration = System.currentTimeMillis() - startTime
-                                _lastPackDuration.value = duration
-                                _statusText.value = "已保存到 ${out.name} (${duration}ms)"
-                                _currentProgress.value = 1.0f
-                                _isRunning.value = false
-                                maskBitmaps.forEach { it.recycle() }
-                                maskBitmaps2.forEach { it.recycle() }
-                                addLog(
-                                    "打包完成: ${out.name}，总耗时 ${duration}ms",
-                                    LogType.SUCCESS
-                                )
-                            }
-
-                            else -> {}
-                        }
-                    }
-            } catch (e: Exception) {
-                _statusText.value = "发生错误"
-                _isRunning.value = false
-                addLog("打包失败 ($mapperName): ${e.message}", LogType.ERROR)
-            }
-        }
-    }
+    fun runPipeline(mapperName: String) = buildTaskCoordinator.runPipeline(mapperName)
 
     private fun loadDefaultWallpaper() = wallpaperManager.loadDefaultWallpaper()
 
@@ -629,217 +531,19 @@ class IconViewModel(
 
     private fun reextractWallpaperColors() = wallpaperManager.reextractWallpaperColors()
 
-    // ========================================================================
-    // 构建任务相关 API（对接 BuildTaskManager）
-    // ========================================================================
-
-    /**
-     * 根据当前 [_config] 构造 [IconBuildConfig]，runPipeline 与 submitBuildTask 共用。
-     *
-     * 颜色预解析策略（关键修复）：
-     * - 前景/上层背景/下层背景的 colorSource 非 "app" 时，在此处预解析为具体颜色 hex 后填入 fgColorHex/bgColorHex/bgColor2
-     * - "app" 源由 [IconPipelineUseCase] 按 packageName 实时从 appColorSchemes 解析（每个图标颜色不同），此处跳过预解析
-     * - 否则打包出的图标会使用 configValue 中残留的默认颜色（如 #FFFFFFFF/#FF3F51B5），与自定义页面预览图不一致
-     */
-    private fun buildIconBuildConfig(configValue: IconConfigState): IconBuildConfig {
-        // 预解析前景颜色（app 源由 pipeline 按 packageName 实时解析，此处跳过）
-        val resolvedFgColor = if (configValue.fgColorSource != "app") {
-            ConfigColorResolver.resolveConfigColors(
-                isFg = true,
-                config = configValue,
-                wallpaperColorScheme = wallpaperColorScheme.value,
-                appColorSchemes = appColorSchemes
-            )
-        } else configValue.fgColor
-
-        // 预解析上层背景颜色（同上）
-        val resolvedBgColor = if (configValue.bgColorSource != "app") {
-            ConfigColorResolver.resolveConfigColors(
-                isFg = false,
-                config = configValue,
-                wallpaperColorScheme = wallpaperColorScheme.value,
-                appColorSchemes = appColorSchemes
-            )
-        } else configValue.bgColor
-
-        // 预解析下层颜色（app 源由 pipeline 按 packageName 实时解析，此处跳过）
-        val resolvedBgColor2 = if (configValue.dualLayerEnabled &&
-            configValue.bgLayer2.colorSource != "app"
-        ) {
-            ConfigColorResolver.resolveConfigColors(
-                isFg = false,
-                config = configValue,
-                wallpaperColorScheme = wallpaperColorScheme.value,
-                appColorSchemes = appColorSchemes,
-                layerIndex = 1
-            )
-        } else configValue.bgLayer2.color
-
-        return IconBuildConfig(
-            fgColorHex = resolvedFgColor,
-            bgColorHex = resolvedBgColor,
-            strokeWidthRatio = configValue.strokeWidthRatio,
-            iconScale = configValue.iconScale,
-            colorMode = configValue.colorMode,
-            useStreaming = useStreaming.value,
-            masks = configValue.selectedMasks,
-            fgStyle = configValue.fgStyle,
-            bgStyle = configValue.bgStyle,
-            fgColorSource = configValue.fgColorSource,
-            bgColorSource = configValue.bgColorSource,
-            stickerConfig = if (configValue.fgStyle == "sticker") StickerConfig(
-                fillStyle = configValue.sticker.fillStyle,
-                strokeWidth = configValue.sticker.strokeWidth,
-                glowIntensity = configValue.sticker.glowIntensity,
-                lineColor = configValue.sticker.lineColor,
-                fillColor = configValue.sticker.fillColor
-            ) else null,
-            selectedStaticImages = configValue.selectedStaticImages,
-            selectedFillingImages = configValue.selectedFillingImages,
-            imageFillingRandomRotation = configValue.imageFilling.randomRotation,
-            imageFillingScaleMode = configValue.imageFilling.scaleMode,
-            dualLayerEnabled = configValue.dualLayerEnabled,
-            dualLayerSizeDiff = configValue.dualLayerSizeDiff,
-            bgStyle2 = configValue.bgLayer2.style,
-            bgColor2 = resolvedBgColor2,
-            bgColorSource2 = configValue.bgLayer2.colorSource,
-            bgPreviewThemeMode2 = configValue.bgLayer2.previewThemeMode,
-            bgLayer2Alpha = configValue.bgLayer2.alpha,
-            selectedMasks2 = configValue.bgLayer2.selectedMasks,
-            selectedStaticImages2 = configValue.bgLayer2.selectedStaticImages,
-            selectedFillingImages2 = configValue.bgLayer2.selectedFillingImages,
-            imageFilling2RandomRotation = configValue.bgLayer2.imageFilling.randomRotation,
-            imageFilling2ScaleMode = configValue.bgLayer2.imageFilling.scaleMode,
-            innerShadow = InnerShadowConfig(
-                // 双层背景启用时强制禁用内阴影（UI 已禁止，此处为安全兜底）
-                enabled = configValue.innerShadow.enabled && !configValue.dualLayerEnabled,
-                styleName = configValue.innerShadow.styleName,
-                intensityLayers = configValue.innerShadow.intensityLayers
-            )
-        )
-    }
-
-    /**
-     * 提交构建任务。本方法不检查权限，调用方应先通过 [buildPermissionsMissing] 检查并申请权限。
-     *
-     * iconCount 传 0（占位），BuildTaskExecutor 解析 mapper 后会更新真实数量。
-     *
-     * @param productType 产物类型（如 ZIP_ICONS）
-     * @param iconSetId 图标集 id（对应 assets/icon_mapper/<id>.xml，不含扩展名）
-     * @param iconSetLabel 图标集展示名
-     * @return 创建的 [BuildTask]（PENDING 状态），若预览图未就绪则返回 null
-     */
     fun submitBuildTask(
         productType: ProductType,
         iconSetId: String,
         iconSetLabel: String
-    ): BuildTask? {
-        val storePreview = previewCoordinator.storePreviewBitmap.value ?: run {
-            addLog("提交失败：store 预览图未就绪", LogType.ERROR)
-            return null
-        }
-        val mainPreview = previewCoordinator.mainPreviewBitmap.value ?: run {
-            addLog("提交失败：main 预览图未就绪", LogType.ERROR)
-            return null
-        }
+    ): BuildTask? = buildTaskCoordinator.submitBuildTask(productType, iconSetId, iconSetLabel)
 
-        val configValue = _config.value
-        val buildConfig = buildIconBuildConfig(configValue)
-        // 壁纸引用：当前壁纸位图的临时路径（用于失败重试时重新解析颜色，暂存 URI 字符串）
-        val wallpaperUri = wallpaperBitmap.value?.let { "embedded:wallpaper" }
+    fun retryBuildTask(originalTaskId: String): BuildTask? =
+        buildTaskCoordinator.retryBuildTask(originalTaskId)
 
-        return buildTaskManager.submit(
-            config = buildConfig,
-            configSnapshot = configValue,
-            productType = productType,
-            iconSetId = iconSetId,
-            iconSetLabel = iconSetLabel,
-            iconCount = BuildConfig.PLACEHOLDER_ICON_COUNT,
-            wallpaperUri = wallpaperUri,
-            storePreview = storePreview,
-            mainPreview = mainPreview
-        ).also {
-            addLog("已提交构建任务: ${it.taskId}")
-        }
-    }
+    fun cancelBuildTask(taskId: String) = buildTaskCoordinator.cancelBuildTask(taskId)
 
-    /**
-     * 重试失败任务。基于原任务的 configSnapshot 重新生成预览图后提交新任务。
-     *
-     * @param originalTaskId 原 FAILED 任务 id
-     * @return 新创建的 [BuildTask]（PENDING 状态），原任务不存在/非 FAILED/预览图生成失败时返回 null
-     */
-    fun retryBuildTask(originalTaskId: String): BuildTask? {
-        // 临时切到原 configSnapshot 生成预览图，再切回当前 config
-        val original = finishedBuildTasks.value.find { it.taskId == originalTaskId } ?: return null
-        if (original.status != BuildTaskStatus.FAILED) return null
+    fun deleteFinishedBuildTask(taskId: String) =
+        buildTaskCoordinator.deleteFinishedBuildTask(taskId)
 
-        val currentConfig = _config.value
-        // 临时应用原配置以生成对应预览图
-        _config.value = original.configSnapshot
-        generateLivePreview()
-        // 等待预览图生成完成（generateLivePreview 异步，使用 runBlocking 不合适，
-        // 此处简化处理：直接读当前缓存的预览图，若未就绪则恢复配置并返回 null）
-        val storePreview = previewCoordinator.storePreviewBitmap.value
-        val mainPreview = previewCoordinator.mainPreviewBitmap.value
-        // 恢复当前配置
-        _config.value = currentConfig
-        generateLivePreview()
-
-        if (storePreview == null || mainPreview == null) {
-            addLog("重试失败：预览图未就绪，请稍后再试", LogType.ERROR)
-            return null
-        }
-
-        return buildTaskManager.retry(
-            originalTaskId = originalTaskId,
-            storePreview = storePreview,
-            mainPreview = mainPreview
-        )?.also {
-            addLog("已重试任务: ${it.taskId}")
-        }
-    }
-
-    /**
-     * 取消任务。RUNNING 任务取消执行，PENDING 任务直接从队列移除。
-     * CANCELLED 状态不进入已完成列表。
-     */
-    fun cancelBuildTask(taskId: String) {
-        buildTaskManager.cancel(taskId)
-        addLog("已取消任务: $taskId")
-    }
-
-    /**
-     * 删除已完成任务（同时清理其缩略图与预览图文件）。
-     */
-    fun deleteFinishedBuildTask(taskId: String) {
-        buildTaskManager.deleteFinished(taskId)
-        addLog("已删除任务: $taskId")
-    }
-
-    /**
-     * 检查构建任务所需的权限，返回缺失的权限列表（空列表表示权限齐全）。
-     * 调用方应使用 ActivityResultContracts.RequestPermission() 逐个申请。
-     *
-     * - Android 13+：POST_NOTIFICATIONS（用于进度通知）
-     * - Android 9 及以下：WRITE_EXTERNAL_STORAGE（用于导出产物到公共 Documents）
-     */
-    fun buildPermissionsMissing(): List<String> {
-        val missing = mutableListOf<String>()
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            val granted = androidx.core.content.ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.POST_NOTIFICATIONS
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-            if (!granted) missing.add(android.Manifest.permission.POST_NOTIFICATIONS)
-        }
-        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P) {
-            val granted = androidx.core.content.ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-            if (!granted) missing.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        return missing
-    }
+    fun buildPermissionsMissing(): List<String> = buildTaskCoordinator.buildPermissionsMissing()
 }
