@@ -25,6 +25,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
+import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.ImageFillingUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowUiState
@@ -38,6 +39,9 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.IconLogger
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogType
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -55,50 +59,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
-
-enum class LogType { INFO, ERROR, SUCCESS }
-data class LogEntry(
-    val message: String,
-    val timestamp: Long = System.currentTimeMillis(),
-    val type: LogType = LogType.INFO,
-    val duration: String? = null
-) {
-    val formattedTime: String
-        get() = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault()).format(
-            Date(timestamp)
-        )
-}
-
-/**
- * 图标集信息（用于 BuildOptionSheet 展示）。
- *
- * @param id 图标集 id（full / filtered / test），同时用于任务 ID 拼接
- * @param label 展示名（中文场景下仍使用英文，与 id 相同）
- * @param iconCount 图标数量（解析 mapper 得到，0 表示解析失败或未就绪）
- */
-data class IconSetInfo(
-    val id: String,
-    val label: String,
-    val iconCount: Int
-) {
-    companion object {
-        // 支持展示的图标集 id 列表（不展示 alt / preview）
-        val SUPPORTED_SETS = listOf("full", "filtered", "test")
-
-        // 图标集 id → assets/icon_mapper/ 下的实际文件名映射
-        fun mapperFileName(id: String): String = when (id) {
-            "full" -> "icon_mapper.xml"
-            "filtered" -> "icon_mapper_filtered.xml"
-            "test" -> "icon_mapper_test.xml"
-            // 兼容历史 id：未在映射表中的 id 按 icon_mapper_<id>.xml 推断
-            else -> "icon_mapper_$id.xml"
-        }
-    }
-}
 
 @SuppressLint("MissingPermission")
 class IconViewModel(
@@ -243,8 +204,9 @@ class IconViewModel(
     private val _mainPreviewBitmap = MutableStateFlow<Bitmap?>(null)
     val mainPreviewBitmap: StateFlow<Bitmap?> = _mainPreviewBitmap.asStateFlow()
 
-    private val _logs = MutableStateFlow<List<LogEntry>>(emptyList())
-    val logs: StateFlow<List<LogEntry>> = _logs.asStateFlow()
+    // 日志管理器：封装日志状态流与添加/清空，ViewModel 转发对外暴露
+    private val logger = IconLogger()
+    val logs: StateFlow<List<LogEntry>> = logger.logs
 
     private var previewJob: kotlinx.coroutines.Job? = null
     private var appColorSchemes: Map<String, Pair<String, String>> = emptyMap()
@@ -298,22 +260,9 @@ class IconViewModel(
         }
     }
 
-    private fun addLog(message: String, type: LogType = LogType.INFO) {
-        val durationRegex = "[,，]?\\s*耗时\\s*(\\d+ms)".toRegex()
-        val match = durationRegex.find(message)
-        val (finalMessage, duration) = if (match != null) {
-            val d = match.groupValues[1]
-            val m = message.replace(durationRegex, "").trim()
-            m to d
-        } else {
-            message to null
-        }
-        _logs.value += LogEntry(finalMessage, type = type, duration = duration)
-    }
+    private fun addLog(message: String, type: LogType = LogType.INFO) = logger.addLog(message, type)
 
-    fun clearLogs() {
-        _logs.value = emptyList()
-    }
+    fun clearLogs() = logger.clearLogs()
 
     private suspend fun autoInitializeResources() {
         viewModelScope.launch(Dispatchers.IO) {

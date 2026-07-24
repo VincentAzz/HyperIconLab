@@ -54,6 +54,7 @@ import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
+import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.BuildOptionSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.FullScreenPreview
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.PreviewSection

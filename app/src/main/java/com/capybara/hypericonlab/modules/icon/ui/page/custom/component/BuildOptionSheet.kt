@@ -32,8 +32,8 @@ import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconSetInfo
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 

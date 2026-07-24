@@ -10,7 +10,7 @@ import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconSetInfo
+import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive

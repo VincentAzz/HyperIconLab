@@ -48,8 +48,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.LogEntry
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.LogType
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogType
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
