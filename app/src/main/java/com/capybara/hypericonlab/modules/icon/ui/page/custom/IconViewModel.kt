@@ -10,8 +10,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
-import com.capybara.hypericonlab.core.image.BgImageDir
-import com.capybara.hypericonlab.core.image.BgImageLoader
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
@@ -30,29 +28,25 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseC
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.BuildTaskCoordinator
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ConfigSyncObserver
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.IconLogger
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.InnerShadowAssetScanner
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogType
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.PreviewCoordinator
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ProgressCountdownObserver
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ResourceInitializer
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.WallpaperManager
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 @SuppressLint("MissingPermission")
 class IconViewModel(
@@ -144,15 +138,6 @@ class IconViewModel(
     private val _isRunning = MutableStateFlow(false)
     val isRunning: StateFlow<Boolean> = _isRunning.asStateFlow()
 
-    private val _showProgress = MutableStateFlow(false)
-    val showProgress: StateFlow<Boolean> = _showProgress.asStateFlow()
-
-    private val _isCountdownActive = MutableStateFlow(false)
-    val isCountdownActive: StateFlow<Boolean> = _isCountdownActive.asStateFlow()
-
-    private val _countdownProgress = MutableStateFlow(1f)
-    val countdownProgress: StateFlow<Float> = _countdownProgress.asStateFlow()
-
     // Data State
 
     // 壁纸管理器：封装壁纸位图与配色方案状态，configProvider 提供当前 wallpaper 配置，更新后触发预览重生成
@@ -243,6 +228,33 @@ class IconViewModel(
     val activeBuildTasks: StateFlow<List<BuildTask>> = buildTaskCoordinator.activeBuildTasks
     val finishedBuildTasks: StateFlow<List<BuildTask>> = buildTaskCoordinator.finishedBuildTasks
 
+    // 进度倒计时观察器：监听运行状态，任务完成后启动 3 秒倒计时动画
+    // showProgress/isCountdownActive/countdownProgress 内聚于此，ViewModel 转发对外暴露
+    private val progressCountdownObserver = ProgressCountdownObserver(
+        scope = viewModelScope,
+        isRunning = _isRunning,
+        currentProgress = _currentProgress,
+        onCountdownActiveChange = { },
+        onCountdownProgressChange = { },
+        onShowProgressChange = { },
+        onCurrentProgressChange = { _currentProgress.value = it }
+    )
+    val showProgress: StateFlow<Boolean> = progressCountdownObserver.showProgress
+    val isCountdownActive: StateFlow<Boolean> = progressCountdownObserver.isCountdownActive
+    val countdownProgress: StateFlow<Float> = progressCountdownObserver.countdownProgress
+
+    // 配置同步观察器：监听 config 变化，自动修正非法配置组合、提取壁纸颜色、
+    // 触发预览重生成、重置内阴影状态、扫描内阴影资源
+    private val configSyncObserver = ConfigSyncObserver(
+        context = context,
+        scope = viewModelScope,
+        configFlow = _config,
+        onConfigUpdate = { update -> updateConfig(update) },
+        onReextractWallpaperColors = { reextractWallpaperColors() },
+        onRegeneratePreview = { generateLivePreview() },
+        onScanInnerShadowAssets = { innerShadowAssetScanner.scan() }
+    )
+
     init {
         viewModelScope.launch {
             // 根据应用主题模式设置默认 previewThemeMode，使自定义 tab 的
@@ -263,8 +275,8 @@ class IconViewModel(
             resourceInitializer.autoInitializeResources()
         }
         resourceInitializer.loadColorSchemes()
-        observeRunningState()
-        observeConfigChanges()
+        progressCountdownObserver.observe()
+        configSyncObserver.observe()
         loadDefaultWallpaper()
         resourceInitializer.loadAvailableIconSets()
     }
@@ -272,140 +284,6 @@ class IconViewModel(
     private fun addLog(message: String, type: LogType = LogType.INFO) = logger.addLog(message, type)
 
     fun clearLogs() = logger.clearLogs()
-
-    private fun observeRunningState() {
-        viewModelScope.launch {
-            isRunning.collect { running ->
-                if (!running && currentProgress.value >= 1f) {
-                    _isCountdownActive.value = true
-                    val startTime = System.currentTimeMillis()
-                    val duration = 3000L
-                    while (System.currentTimeMillis() - startTime < duration) {
-                        _countdownProgress.value =
-                            1f - (System.currentTimeMillis() - startTime).toFloat() / duration
-                        delay(16.milliseconds)
-                    }
-                    _isCountdownActive.value = false
-                    _showProgress.value = false
-                    _currentProgress.value = 0f
-                } else if (running) {
-                    _showProgress.value = true
-                    _isCountdownActive.value = false
-                }
-            }
-        }
-    }
-
-    private fun observeConfigChanges() {
-        viewModelScope.launch {
-            _config.collect { config ->
-                // Sync logic
-                if (config.fgStyle != "sticker" && config.fgColorSource == "black_white") {
-                    updateConfig { it.copy(fgColorSource = "wallpaper") }
-                }
-                if (config.fgStyle == "sticker" && config.fgColorSource == "black_white" && config.sticker.fillStyle == "none") {
-                    updateConfig { it.copy(sticker = it.sticker.copy(fillStyle = "fill")) }
-                }
-                if (config.fgStyle == "hollow" && config.bgStyle == "none") {
-                    updateConfig { it.copy(bgStyle = "solid", bgColorSource = "wallpaper") }
-                }
-                if (config.bgStyle == "img_static" && config.selectedStaticImages.isEmpty()) {
-                    val presets = BgImageLoader.listPresetAssets(context, BgImageDir.STATIC)
-                    if (presets.isNotEmpty()) {
-                        updateConfig { it.copy(selectedStaticImages = listOf(presets.first())) }
-                    }
-                }
-                if (config.bgStyle == "img_filling" && config.selectedFillingImages.isEmpty()) {
-                    val presets = BgImageLoader.listPresetAssets(context, BgImageDir.FILLING)
-                    if (presets.isNotEmpty()) {
-                        updateConfig { it.copy(selectedFillingImages = listOf(presets.first())) }
-                    }
-                }
-                // 双层启用时，上层背景不允许 none（强制切回 solid+wallpaper）
-                if (config.dualLayerEnabled && config.bgStyle == "none") {
-                    updateConfig { it.copy(bgStyle = "solid", bgColorSource = "wallpaper") }
-                }
-                // 下层 img_static 空列表自动填首个预设
-                if (config.dualLayerEnabled && config.bgLayer2.style == "img_static" &&
-                    config.bgLayer2.selectedStaticImages.isEmpty()
-                ) {
-                    val presets = BgImageLoader.listPresetAssets(context, BgImageDir.STATIC)
-                    if (presets.isNotEmpty()) {
-                        updateConfig {
-                            it.copy(
-                                bgLayer2 = it.bgLayer2.copy(
-                                    selectedStaticImages = listOf(presets.first())
-                                )
-                            )
-                        }
-                    }
-                }
-                // 下层 img_filling 空列表自动填首个预设
-                if (config.dualLayerEnabled && config.bgLayer2.style == "img_filling" &&
-                    config.bgLayer2.selectedFillingImages.isEmpty()
-                ) {
-                    val presets = BgImageLoader.listPresetAssets(context, BgImageDir.FILLING)
-                    if (presets.isNotEmpty()) {
-                        updateConfig {
-                            it.copy(
-                                bgLayer2 = it.bgLayer2.copy(
-                                    selectedFillingImages = listOf(presets.first())
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        viewModelScope.launch(Dispatchers.Default) {
-            _config
-                .map { it.wallpaper }
-                .distinctUntilChanged()
-                .collect { reextractWallpaperColors() }
-        }
-        // 仅在业务字段变化时触发，忽略selectedTab变化
-        viewModelScope.launch {
-            _config
-                .map { it.copy(selectedTab = 0) }
-                .distinctUntilChanged()
-                .collect { generateLivePreview() }
-        }
-
-        // 监听上层形状变化：切换形状时内阴影默认取消选择回到关闭状态
-        viewModelScope.launch(Dispatchers.Default) {
-            _config
-                .map { it.selectedMasks }
-                .distinctUntilChanged()
-                .drop(1) // 跳过初始值，避免启动时误触发
-                .collect {
-                    _config.update { config ->
-                        if (config.innerShadow.enabled || config.innerShadow.styleName != null) {
-                            config.copy(innerShadow = InnerShadowUiState())
-                        } else config
-                    }
-                }
-        }
-
-        // 监听双层背景开关：启用双层时自动关闭内阴影（仅单层背景生效）
-        viewModelScope.launch(Dispatchers.Default) {
-            _config
-                .map { it.dualLayerEnabled }
-                .distinctUntilChanged()
-                .drop(1)
-                .filter { it } // 仅在启用双层时触发
-                .collect {
-                    _config.update { config ->
-                        if (config.innerShadow.enabled || config.innerShadow.styleName != null) {
-                            config.copy(innerShadow = InnerShadowUiState())
-                        } else config
-                    }
-                }
-        }
-
-        // 初始化时扫描 assets/shadow_baked/ 目录，构建形状 → 样式列表映射
-        innerShadowAssetScanner.scan()
-    }
 
     fun updateConfig(update: (IconConfigState) -> IconConfigState) {
         _config.value = update(_config.value)
