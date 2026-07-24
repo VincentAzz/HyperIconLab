@@ -3,7 +3,6 @@ package com.capybara.hypericonlab.modules.icon.domain.usecase
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.color.HslColorUtils
 import com.capybara.hypericonlab.core.image.BackgroundGenerator
@@ -11,6 +10,8 @@ import com.capybara.hypericonlab.core.image.GlassProcessor
 import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.modules.icon.domain.model.ColorMode
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
+import com.capybara.hypericonlab.modules.icon.domain.render.BackgroundLayerRenderer
+import com.capybara.hypericonlab.modules.icon.domain.render.DualLayerComposer
 import com.capybara.hypericonlab.modules.icon.domain.render.IconForegroundRenderer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -29,13 +30,6 @@ class IconPipelineUseCase(
     private val context: Context
 ) {
 
-    /**
-     * 双层背景图片类下层透明度策略。
-     * 图片类下层（img_static / img_filling）始终保持完全不透明，不应用 alpha。
-     */
-    private object DualLayerImgAlphaPolicy {
-        const val FORCED_ALPHA = 255
-    }
     fun executeWithFiles(
         config: IconBuildConfig,
         iconMap: Map<String, String>,
@@ -104,35 +98,16 @@ class IconPipelineUseCase(
                                     ceil(config.iconSize * (1 - config.dualLayerSizeDiff)).toInt()
                                         .coerceAtLeast(1)
                                 } else config.iconSize
-                            val upperBg = when (config.bgStyle) {
-                                "img_static" -> {
-                                    val imgRef = config.selectedStaticImages.randomOrNull()
-                                    if (imgRef != null) {
-                                        BackgroundGenerator.createStaticImageBackground(
-                                            context, imgRef, config.iconSize
-                                        )
-                                    } else null
-                                }
-
-                                "img_filling" -> {
-                                    val imgRef = config.selectedFillingImages.randomOrNull()
-                                    if (imgRef != null) {
-                                        BackgroundGenerator.createImageFillingBackground(
-                                            context = context,
-                                            imageRef = imgRef,
-                                            iconSize = config.iconSize,
-                                            maskBitmap = maskBmp,
-                                            randomRotation = config.imageFillingRandomRotation,
-                                            scaleMode = config.imageFillingScaleMode
-                                        )
-                                    } else null
-                                }
-
-                                else -> null
-                            } ?: BackgroundGenerator.createBackground(
+                            val upperBg = BackgroundLayerRenderer.renderUpperBackground(
+                                context = context,
+                                bgStyle = config.bgStyle,
                                 iconSize = config.iconSize,
-                                colorHex = fallbackColor,
-                                maskBitmap = maskBmp
+                                fallbackColorHex = fallbackColor,
+                                maskBitmap = maskBmp,
+                                imgStaticRef = config.selectedStaticImages.randomOrNull(),
+                                imgFillingRef = config.selectedFillingImages.randomOrNull(),
+                                fillingRandomRotation = config.imageFillingRandomRotation,
+                                fillingScaleMode = config.imageFillingScaleMode
                             )
 
                             // 先合成上层背景 + 内阴影 + 图标 → upperComposite（iconSize×iconSize）
@@ -200,24 +175,15 @@ class IconPipelineUseCase(
                                         colorHex = currentBg2,
                                         maskBitmap = maskBmp2
                                     )
-                                    // 上层合成图缩放到 upperRenderSize（居中放置到下层之上）
-                                    val upperScaled =
-                                        upperComposite.scale(upperRenderSize, upperRenderSize)
-                                    // 图片类下层背景始终保持完全不透明，不应用 alpha
-                                    val effectiveLowerAlpha = when (config.bgStyle2) {
-                                        "img_static", "img_filling" -> DualLayerImgAlphaPolicy.FORCED_ALPHA
-                                        else -> config.bgLayer2Alpha
-                                    }
-                                    BackgroundGenerator.mergeDualLayerBackground(
+                                    // 缩放上层 + 计算 alpha + 合并 + 回收，统一交给 DualLayerComposer
+                                    DualLayerComposer.compose(
+                                        upperComposite = upperComposite,
                                         lowerBg = lowerBg,
-                                        upperBg = upperScaled,
                                         iconSize = config.iconSize,
-                                        lowerAlpha = effectiveLowerAlpha
-                                    ).also {
-                                        lowerBg.recycle()
-                                        upperScaled.recycle()
-                                        upperComposite.recycle()
-                                    }
+                                        upperRenderSize = upperRenderSize,
+                                        bgStyle2 = config.bgStyle2,
+                                        configuredAlpha = config.bgLayer2Alpha
+                                    )
                                 } else upperComposite
 
                             val entry = ZipEntry("icons/$packageName.png")

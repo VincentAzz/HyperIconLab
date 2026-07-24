@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.image.BackgroundGenerator
@@ -16,7 +15,9 @@ import com.capybara.hypericonlab.core.preview.PreviewGenerator
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
+import com.capybara.hypericonlab.modules.icon.domain.render.BackgroundLayerRenderer
 import com.capybara.hypericonlab.modules.icon.domain.render.ConfigColorResolver
+import com.capybara.hypericonlab.modules.icon.domain.render.DualLayerComposer
 import com.capybara.hypericonlab.modules.icon.domain.render.IconForegroundRenderer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -29,14 +30,6 @@ class GeneratePreviewUseCase(private val context: Context) {
     private val filesDir = context.filesDir
     private val lawniconsBase = File(filesDir, "lawnicons")
     private val mapperBase = File(filesDir, "icon_mapper")
-
-    /**
-     * 双层背景图片类下层透明度策略。
-     * 图片类下层（img_static / img_filling）始终保持完全不透明，不应用 alpha。
-     */
-    private object DualLayerImgAlphaPolicy {
-        const val FORCED_ALPHA = 255
-    }
 
     suspend fun execute(
         config: IconConfigState,
@@ -237,48 +230,17 @@ class GeneratePreviewUseCase(private val context: Context) {
                                     .coerceAtLeast(1)
                             } else finalIconSize
 
-                        val upperBg = when (config.bgStyle) {
-                            "img_static" -> {
-                                val imgRef = config.selectedStaticImages.randomOrNull()
-                                if (imgRef != null) {
-                                    BackgroundGenerator.createStaticImageBackground(
-                                        context, imgRef, finalIconSize
-                                    )
-                                } else {
-                                    BackgroundGenerator.createBackground(
-                                        finalIconSize,
-                                        finalBg,
-                                        maskBmp
-                                    )
-                                }
-                            }
-
-                            "img_filling" -> {
-                                val imgRef = config.selectedFillingImages.randomOrNull()
-                                if (imgRef != null) {
-                                    BackgroundGenerator.createImageFillingBackground(
-                                        context = context,
-                                        imageRef = imgRef,
-                                        iconSize = finalIconSize,
-                                        maskBitmap = maskBmp,
-                                        randomRotation = config.imageFilling.randomRotation,
-                                        scaleMode = config.imageFilling.scaleMode
-                                    )
-                                } else {
-                                    BackgroundGenerator.createBackground(
-                                        finalIconSize,
-                                        finalBg,
-                                        maskBmp
-                                    )
-                                }
-                            }
-
-                            else -> BackgroundGenerator.createBackground(
-                                finalIconSize,
-                                finalBg,
-                                maskBmp
-                            )
-                        } ?: BackgroundGenerator.createBackground(finalIconSize, finalBg, maskBmp)
+                        val upperBg = BackgroundLayerRenderer.renderUpperBackground(
+                            context = context,
+                            bgStyle = config.bgStyle,
+                            iconSize = finalIconSize,
+                            fallbackColorHex = finalBg,
+                            maskBitmap = maskBmp,
+                            imgStaticRef = config.selectedStaticImages.randomOrNull(),
+                            imgFillingRef = config.selectedFillingImages.randomOrNull(),
+                            fillingRandomRotation = config.imageFilling.randomRotation,
+                            fillingScaleMode = config.imageFilling.scaleMode
+                        )
 
                         // 先合成上层背景 + 内阴影 + 图标 → upperComposite（finalIconSize×finalIconSize）
                         // 内阴影仅在单层背景生效：双层背景时 innerShadowBitmap 应为 null
@@ -338,28 +300,15 @@ class GeneratePreviewUseCase(private val context: Context) {
                                     finalIconSize, finalBg2, maskBmp2
                                 )
                             }
-                            if (lowerBg != null) {
-                                // 上层合成图缩放到 upperRenderSize（居中放置到下层之上）
-                                val upperScaled =
-                                    upperComposite.scale(upperRenderSize, upperRenderSize)
-                                // 图片类下层背景始终保持完全不透明，不应用 alpha
-                                val effectiveLowerAlpha = when (bgLayer2.style) {
-                                    "img_static", "img_filling" -> DualLayerImgAlphaPolicy.FORCED_ALPHA
-                                    else -> bgLayer2.alpha
-                                }
-                                BackgroundGenerator.mergeDualLayerBackground(
-                                    lowerBg = lowerBg,
-                                    upperBg = upperScaled,
-                                    iconSize = finalIconSize,
-                                    lowerAlpha = effectiveLowerAlpha
-                                ).also {
-                                    lowerBg.recycle()
-                                    upperScaled.recycle()
-                                    upperComposite.recycle()
-                                }
-                            } else {
-                                upperComposite // 下层生成失败，回退到上层
-                            }
+                            // 缩放上层 + 计算 alpha + 合并 + 回收，统一交给 DualLayerComposer
+                            DualLayerComposer.compose(
+                                upperComposite = upperComposite,
+                                lowerBg = lowerBg,
+                                iconSize = finalIconSize,
+                                upperRenderSize = upperRenderSize,
+                                bgStyle2 = bgLayer2.style,
+                                configuredAlpha = bgLayer2.alpha
+                            )
                         } else {
                             upperComposite
                         }
