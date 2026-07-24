@@ -13,7 +13,6 @@ import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
-import com.capybara.hypericonlab.core.image.InnerShadowAssets
 import com.capybara.hypericonlab.core.image.InnerShadowBitmapLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
@@ -39,6 +38,7 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseC
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.IconLogger
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.InnerShadowAssetScanner
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogType
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ResourceInitializer
@@ -160,10 +160,6 @@ class IconViewModel(
     val innerShadow = _config.map { it.innerShadow }
         .stateIn(viewModelScope, SharingStarted.Eagerly, InnerShadowUiState())
 
-    // 内阴影可用资源映射：形状名 → 可用样式名列表（扫描 assets/shadow_baked/ 目录）
-    private val _shadowAssetsMap = MutableStateFlow<Map<String, List<String>>>(emptyMap())
-    val shadowAssetsMap: StateFlow<Map<String, List<String>>> = _shadowAssetsMap.asStateFlow()
-
     // UI Status State
     private val _statusText = MutableStateFlow("就绪")
     val statusText: StateFlow<String> = _statusText.asStateFlow()
@@ -212,6 +208,14 @@ class IconViewModel(
     val mapperExists: StateFlow<Boolean> = resourceInitializer.mapperExists
     val appColorSchemes: Map<String, Pair<String, String>>
         get() = resourceInitializer.appColorSchemes
+
+    // 内阴影资源扫描器：扫描 assets/shadow_baked/ 构建形状 → 样式映射
+    private val innerShadowAssetScanner = InnerShadowAssetScanner(
+        context = context,
+        scope = viewModelScope
+    )
+    val shadowAssetsMap: StateFlow<Map<String, List<String>>> =
+        innerShadowAssetScanner.shadowAssetsMap
     val useStreaming = MutableStateFlow(true)
     private val _lastPackDuration = MutableStateFlow<Long?>(null)
     val lastPackDuration: StateFlow<Long?> = _lastPackDuration.asStateFlow()
@@ -390,39 +394,8 @@ class IconViewModel(
         }
 
         // 初始化时扫描 assets/shadow_baked/ 目录，构建形状 → 样式列表映射
-        viewModelScope.launch(Dispatchers.IO) {
-            _shadowAssetsMap.value = scanInnerShadowAssets()
-        }
+        innerShadowAssetScanner.scan()
     }
-
-    /**
-     * 扫描 assets/shadow_baked/ 目录，解析文件名 `<shapeName>_<styleName>_shadow_512.png`
-     * 为形状 → 样式列表的映射。
-     */
-    private suspend fun scanInnerShadowAssets(): Map<String, List<String>> =
-        withContext(Dispatchers.IO) {
-            val suffix = InnerShadowAssets.FILE_SUFFIX
-            try {
-                getApplication<Application>().assets.list(InnerShadowAssets.DIR)
-                    ?.asSequence()
-                    ?.filter { it.endsWith(suffix) }
-                    ?.mapNotNull { filename ->
-                        // oneui_3d_shadow_512.png → shapeName="oneui", styleName="3d"
-                        val core = filename.removeSuffix(suffix)
-                        val firstUnderscore = core.indexOf('_')
-                        if (firstUnderscore > 0) {
-                            val shapeName = core.substring(0, firstUnderscore)
-                            val styleName = core.substring(firstUnderscore + 1)
-                            shapeName to styleName
-                        } else null
-                    }
-                    ?.groupBy({ it.first }, { it.second })
-                    ?.mapValues { (_, styles) -> styles.sorted() }
-                    ?: emptyMap()
-            } catch (_: Exception) {
-                emptyMap()
-            }
-        }
 
     fun updateConfig(update: (IconConfigState) -> IconConfigState) {
         _config.value = update(_config.value)
