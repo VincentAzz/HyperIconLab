@@ -14,6 +14,7 @@ import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
+import com.capybara.hypericonlab.core.image.InnerShadowAssets
 import com.capybara.hypericonlab.core.image.InnerShadowProcessor
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
@@ -121,15 +122,6 @@ class IconViewModel(
         private object BuildConfig {
             // 提交任务时占位的图标数量，真实数量在 executor 解析 mapper 后更新
             const val PLACEHOLDER_ICON_COUNT = 0
-        }
-
-        // 内阴影资源关键参数集中声明
-        private object InnerShadowAssets {
-            // assets 中阴影烘焙图所在目录
-            const val DIR = "shadow_baked"
-
-            // 阴影文件后缀（含 _shadow_512.png）
-            const val FILE_SUFFIX = "_shadow_512.png"
         }
     }
 

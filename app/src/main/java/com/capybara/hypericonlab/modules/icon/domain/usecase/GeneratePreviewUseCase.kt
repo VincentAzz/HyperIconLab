@@ -13,6 +13,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
 import com.capybara.hypericonlab.core.image.BackgroundGenerator
 import com.capybara.hypericonlab.core.image.GlassProcessor
+import com.capybara.hypericonlab.core.image.InnerShadowAssets
 import com.capybara.hypericonlab.core.image.InnerShadowProcessor
 import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.core.image.StickerProcessor
@@ -549,12 +550,6 @@ class GeneratePreviewUseCase(private val context: Context) {
         } catch (_: Exception) {
             null
         }
-    }
-
-    // 内阴影资源关键参数集中声明
-    private object InnerShadowAssets {
-        const val DIR = "shadow_baked"
-        const val FILE_SUFFIX = "_shadow_512.png"
     }
 
     // 预览场景内阴影参数
