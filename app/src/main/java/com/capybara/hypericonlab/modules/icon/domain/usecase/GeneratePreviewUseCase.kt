@@ -11,15 +11,13 @@ import com.capybara.hypericonlab.core.image.BackgroundGenerator
 import com.capybara.hypericonlab.core.image.GlassProcessor
 import com.capybara.hypericonlab.core.image.InnerShadowBitmapLoader
 import com.capybara.hypericonlab.core.image.LayerMerger
-import com.capybara.hypericonlab.core.image.StickerProcessor
-import com.capybara.hypericonlab.core.image.SvgProcessor
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.preview.PreviewGenerator
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
-import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
 import com.capybara.hypericonlab.modules.icon.domain.render.ConfigColorResolver
+import com.capybara.hypericonlab.modules.icon.domain.render.IconForegroundRenderer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -193,42 +191,20 @@ class GeneratePreviewUseCase(private val context: Context) {
                     if (config.fgStyle == "hollow" || config.fgStyle == "glass") "#00000000" else currentFg
                 val finalBg = if (config.bgStyle == "none") "#00000000" else currentBg
 
-                val iconBitmap = SvgProcessor.processSvgFile(
+                val iconBitmap = IconForegroundRenderer.renderBaseSvg(
                     svgFile = svgFile,
+                    fgStyle = config.fgStyle,
                     strokeWidthRatio = config.strokeWidthRatio,
-                    fgColorHex = if (config.fgStyle == "sticker") "#FF000000" else finalFg,
+                    currentFg = currentFg,
                     iconSize = 512,
-                    iconScale = if (config.fgStyle == "sticker") 1.0f else config.iconScale
+                    iconScale = config.iconScale
                 )
 
                 if (iconBitmap != null) {
                     val processedIcon = when (config.fgStyle) {
-                        "sticker" -> {
-                            val stickerConfig = StickerConfig(
-                                fillStyle = if (config.fgColorSource == "black_white") "fill" else config.sticker.fillStyle,
-                                strokeWidth = config.sticker.strokeWidth,
-                                glowIntensity = config.sticker.glowIntensity,
-                                lineColor = if (config.fgColorSource == "custom") config.sticker.lineColor else {
-                                    if (config.fgColorSource == "black_white") "#FF000000" else currentFg
-                                },
-                                fillColor = if (config.fgColorSource == "custom") config.sticker.fillColor else {
-                                    if (config.fgColorSource == "black_white") "#FFFFFFFF" else {
-                                        try {
-                                            val base = currentFg.toColorInt()
-                                            String.format("#%02X%06X", 20, base and 0xFFFFFF)
-                                        } catch (_: Exception) {
-                                            currentBg
-                                        }
-                                    }
-                                }
-                            )
-                            StickerProcessor.process(
-                                iconBitmap,
-                                stickerConfig,
-                                drawableName,
-                                config.iconScale
-                            )
-                        }
+                        "sticker" -> IconForegroundRenderer.renderStickerFromUiState(
+                            iconBitmap, config, currentFg, currentBg, drawableName
+                        )
 
                         "glass" -> {
                             val glassThemeColor =

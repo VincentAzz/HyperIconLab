@@ -9,10 +9,9 @@ import com.capybara.hypericonlab.core.color.HslColorUtils
 import com.capybara.hypericonlab.core.image.BackgroundGenerator
 import com.capybara.hypericonlab.core.image.GlassProcessor
 import com.capybara.hypericonlab.core.image.LayerMerger
-import com.capybara.hypericonlab.core.image.StickerProcessor
-import com.capybara.hypericonlab.core.image.SvgProcessor
 import com.capybara.hypericonlab.modules.icon.domain.model.ColorMode
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
+import com.capybara.hypericonlab.modules.icon.domain.render.IconForegroundRenderer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -58,53 +57,21 @@ class IconPipelineUseCase(
                     val svgFile = File(svgDir, "$drawableName.svg")
                     val (currentFg, currentBg) = resolveColors(config, packageName, appColorSchemes)
 
-                    val iconBitmap = SvgProcessor.processSvgFile(
+                    val iconBitmap = IconForegroundRenderer.renderBaseSvg(
                         svgFile = svgFile,
+                        fgStyle = config.fgStyle,
                         strokeWidthRatio = config.strokeWidthRatio,
-                        fgColorHex = if (config.fgStyle == "sticker") "#FF000000" else {
-                            if (config.fgStyle == "hollow" || config.fgStyle == "glass") "#00000000" else currentFg
-                        },
+                        currentFg = currentFg,
                         iconSize = config.iconSize,
-                        iconScale = if (config.fgStyle == "sticker") 1.0f else config.iconScale
+                        iconScale = config.iconScale
                     )
 
                     if (iconBitmap != null) {
                         val processedIcon: Bitmap? =
                             if (config.fgStyle == "sticker" && config.stickerConfig != null) {
-                                // 自动颜色优化
-                                val finalStickerConfig =
-                                    if (config.colorMode == ColorMode.BLACK_WHITE) {
-                                        config.stickerConfig.copy(
-                                            fillStyle = "fill",
-                                            lineColor = "#FF000000",
-                                            fillColor = "#FFFFFFFF"
-                                        )
-                                    } else if (config.stickerConfig.fillColor == config.bgColorHex && config.stickerConfig.fillStyle != "none") {
-                                        try {
-                                            val base = currentFg.toColorInt()
-                                            val alpha = 20
-                                            config.stickerConfig.copy(
-                                                fillColor = String.format(
-                                                    "#%02X%06X",
-                                                    alpha,
-                                                    base and 0xFFFFFF
-                                                )
-                                            )
-                                        } catch (_: Exception) {
-                                            config.stickerConfig
-                                        }
-                                    } else {
-                                        config.stickerConfig
-                                    }
-
-                                StickerProcessor.process(
-                                    originalIcon = iconBitmap,
-                                    config = finalStickerConfig,
-                                    iconId = drawableName,
-                                    iconScale = config.iconScale
-                                ).also {
-                                    iconBitmap.recycle()
-                                }
+                                IconForegroundRenderer.renderStickerFromBuildConfig(
+                                    iconBitmap, config, currentFg, drawableName
+                                )
                             } else if (config.fgStyle == "glass" && config.glassConfig != null) {
                                 val (cFg, cBg) = resolveColors(config, packageName, appColorSchemes)
                                 val isFgWhite = resolveAlpha(cFg) > 0.9f
