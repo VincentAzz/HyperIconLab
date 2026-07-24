@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.capybara.hypericonlab.core.color.AppColorSchemesLoader
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.image.BgImageDir
@@ -42,6 +41,7 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseC
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.IconLogger
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogType
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ResourceInitializer
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.WallpaperManager
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.Dispatchers
@@ -91,10 +91,6 @@ class IconViewModel(
     // 构建任务队列与已完成列表（直接转发 BuildTaskManager 的 StateFlow）
     val activeBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.activeTasks
     val finishedBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.finishedTasks
-
-    // 可用图标集列表（assets/icon_mapper/<id>.xml，去扩展名作为 id 与展示名）
-    private val _availableIconSets = MutableStateFlow<List<IconSetInfo>>(emptyList())
-    val availableIconSets: StateFlow<List<IconSetInfo>> = _availableIconSets.asStateFlow()
 
     // Configuration State
     private val _config = MutableStateFlow(IconConfigState())
@@ -200,7 +196,22 @@ class IconViewModel(
     private val wallpaperColorScheme: StateFlow<MonetColorExtractor.WallpaperColorScheme?> =
         wallpaperManager.wallpaperColorScheme
 
-    val mapperExists = MutableStateFlow(false)
+    // 资源初始化器：管理图标集扫描/自动解压/配色加载，通过回调解耦日志与预览触发
+    private val resourceInitializer = ResourceInitializer(
+        context = context,
+        scope = viewModelScope,
+        manageResourcesUseCase = manageResourcesUseCase,
+        buildTaskManager = buildTaskManager,
+        onLog = { message, type -> addLog(message, type) },
+        onMapperReady = { },
+        onPreviewNeeded = { generateLivePreview() }
+    )
+
+    // 资源初始化器管理的状态，此处转发对外暴露
+    val availableIconSets: StateFlow<List<IconSetInfo>> = resourceInitializer.availableIconSets
+    val mapperExists: StateFlow<Boolean> = resourceInitializer.mapperExists
+    val appColorSchemes: Map<String, Pair<String, String>>
+        get() = resourceInitializer.appColorSchemes
     val useStreaming = MutableStateFlow(true)
     private val _lastPackDuration = MutableStateFlow<Long?>(null)
     val lastPackDuration: StateFlow<Long?> = _lastPackDuration.asStateFlow()
@@ -217,7 +228,6 @@ class IconViewModel(
     val logs: StateFlow<List<LogEntry>> = logger.logs
 
     private var previewJob: kotlinx.coroutines.Job? = null
-    private var appColorSchemes: Map<String, Pair<String, String>> = emptyMap()
 
     init {
         viewModelScope.launch {
@@ -235,80 +245,19 @@ class IconViewModel(
                 current.copy(previewThemeMode = if (isDark) "dark" else "light")
             }
 
-            // mapper 已直接打包在 assets/icon_mapper/，无需首启动解压，默认即就绪
-            mapperExists.value = true
-            autoInitializeResources()
+            // 资源初始化（自动解压/mapper 就绪/初始预览）由 ResourceInitializer 统一管理
+            resourceInitializer.autoInitializeResources()
         }
-        loadColorSchemes()
+        resourceInitializer.loadColorSchemes()
         observeRunningState()
         observeConfigChanges()
         loadDefaultWallpaper()
-        loadAvailableIconSets()
-    }
-
-    /**
-     * 异步加载支持的图标集列表（full / filtered / test），不展示 alt / preview。
-     * 同时解析每个 mapper 的图标数量，供 BuildOptionSheet 展示。
-     */
-    private fun loadAvailableIconSets() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val list = IconSetInfo.SUPPORTED_SETS.map { id ->
-                // 解析图标数量，失败时返回 0
-                val count = try {
-                    context.assets
-                        .open("${PipelineAssets.MAPPER_ASSET_DIR}/${IconSetInfo.mapperFileName(id)}")
-                        .use { IconMapperProcessor.parseIconMapper(it).size }
-                } catch (_: Exception) {
-                    0
-                }
-                // 中文场景下也使用英文 label，与 id 保持一致
-                IconSetInfo(id = id, label = id, iconCount = count)
-            }
-            _availableIconSets.value = list
-        }
+        resourceInitializer.loadAvailableIconSets()
     }
 
     private fun addLog(message: String, type: LogType = LogType.INFO) = logger.addLog(message, type)
 
     fun clearLogs() = logger.clearLogs()
-
-    private suspend fun autoInitializeResources() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val lawniconsBase = File(context.filesDir, "lawnicons")
-
-            if (!lawniconsBase.exists() || lawniconsBase.list()?.isEmpty() == true) {
-                addLog("检测到资源未初始化，开始自动解压...")
-                val startTime = System.currentTimeMillis()
-                try {
-                    manageResourcesUseCase.performUnzip { /* silent progress */ }
-                    val duration = System.currentTimeMillis() - startTime
-                    addLog("资源解压完成，耗时 ${duration}ms", LogType.SUCCESS)
-                } catch (e: Exception) {
-                    addLog("资源解压失败: ${e.message}", LogType.ERROR)
-                }
-            } else {
-                addLog("资源已就绪")
-            }
-
-            // mapper 已直接打包在 assets 中，无需自动生成
-            addLog("映射器已就绪")
-            mapperExists.value = true
-
-            // 资源和映射就绪后，自动生成初始预览图
-            if (mapperExists.value) {
-                addLog("自动生成初始预览图...")
-                generateLivePreview()
-            }
-        }
-    }
-
-    private fun loadColorSchemes() {
-        viewModelScope.launch(Dispatchers.IO) {
-            appColorSchemes = AppColorSchemesLoader.loadFromAssets(context)
-            // 同步给 BuildTaskManager，供 executor 执行任务时使用
-            buildTaskManager.updateAppColorSchemes(appColorSchemes)
-        }
-    }
 
     private fun observeRunningState() {
         viewModelScope.launch {
@@ -571,7 +520,14 @@ class IconViewModel(
                 )
                 _mainPreviewBitmap.value = result
                 val duration = System.currentTimeMillis() - startTime
-                if (!isLive) {
+                if (result == null) {
+                    // execute 返回 null（如 svgDir 不存在），记录失败避免误导
+                    if (!isLive) {
+                        _statusText.value = "预览错误"
+                        _isRunning.value = false
+                    }
+                    addLog("生成 $typeStr 失败：资源未就绪", LogType.ERROR)
+                } else if (!isLive) {
                     _statusText.value = "预览已生成。"
                     _currentProgress.value = 1.0f
                     _isRunning.value = false
@@ -623,7 +579,7 @@ class IconViewModel(
             result.onSuccess {
                 _statusText.value = "映射器已就绪。"
                 _currentProgress.value = 1.0f
-                mapperExists.value = true
+                resourceInitializer.mapperExists.value = true
                 addLog("手动生成映射器成功，耗时 ${duration}ms", LogType.SUCCESS)
             }.onFailure {
                 _statusText.value = "错误：${it.message}"
