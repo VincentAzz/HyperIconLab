@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.task
+package com.capybara.hypericonlab.modules.icon.ui.page.task.sections
 
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
 

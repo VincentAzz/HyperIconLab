@@ -50,6 +50,8 @@ import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
+import com.capybara.hypericonlab.modules.icon.ui.page.task.component.TaskCard
+import com.capybara.hypericonlab.modules.icon.ui.page.task.component.TaskDetailSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.layerBackdrop
@@ -239,9 +241,8 @@ fun TaskPage(
     }
 }
 
-// 任务页面关键参数集中声明，便于调参
 private object TaskPageConfig {
-    // 默认 tab 索引（0 = 进行中）
+    // 默认 tab 索引
     const val DEFAULT_TAB_INDEX = 0
 
     // 进行中 tab 索引

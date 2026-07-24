@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.task
+package com.capybara.hypericonlab.modules.icon.ui.page.task.component
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
@@ -62,19 +62,16 @@ fun TaskCard(
 ) {
     val context = LocalContext.current
 
-    // 缩略图位图：提交时已由 BuildTaskManager 持久化，所有状态均可加载
     var thumbnail by remember(task.taskId, task.status) {
         mutableStateOf<android.graphics.Bitmap?>(null)
     }
     LaunchedEffect(task.taskId, task.status) {
-        // 任务提交即持久化缩略图，此处统一异步加载
         thumbnail = withContext(Dispatchers.IO) {
             val file = File(context.filesDir, "build_thumbnails/${task.taskId}.png")
             if (file.exists()) BitmapFactory.decodeFile(file.absolutePath) else null
         }
     }
 
-    // 根据位置计算圆角：首项顶部大圆角、末项底部大圆角、中间项连接小圆角
     val smootherEnabled = isSmootherRoundedCornersEnabled()
     val cardShape = remember(isFirst, isLast, smootherEnabled) {
         val topRadius = if (isFirst) CornerRadius else ConnectionRadius
@@ -100,13 +97,11 @@ fun TaskCard(
                 .fillMaxWidth()
                 .padding(TaskCardConfig.CONTENT_PADDING)
         ) {
-            // 顶部：单张缩略图（长方形，540:320 比例）+ 任务信息
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // 单缩略图位（长方形，提交时已持久化，所有状态均显示位图或占位色块）
                 ThumbnailSlot(
                     thumbnail = thumbnail,
                     status = task.status,
@@ -117,7 +112,6 @@ fun TaskCard(
 
                 Spacer(Modifier.weight(1f))
 
-                // 任务 ID 与图标集信息（右对齐）
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -139,7 +133,6 @@ fun TaskCard(
 
             Spacer(Modifier.height(8.dp))
 
-            // chips：产物类型 + 状态（不再展示当前处理包名，意义不大）
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -151,7 +144,6 @@ fun TaskCard(
                 )
             }
 
-            // 进度条：仅 PENDING/RUNNING 显示
             if (task.status == BuildTaskStatus.PENDING ||
                 task.status == BuildTaskStatus.RUNNING
             ) {
@@ -168,7 +160,6 @@ fun TaskCard(
 
             Spacer(Modifier.height(8.dp))
 
-            // 底部：状态文案 + 提交时间
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -189,7 +180,6 @@ fun TaskCard(
     }
 }
 
-// 缩略图位：长方形（540:320 比例），Fit 显示避免裁切
 @Composable
 private fun ThumbnailSlot(
     thumbnail: android.graphics.Bitmap?,
@@ -215,14 +205,12 @@ private fun ThumbnailSlot(
                 bitmap = thumbnail.asImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
-                // Fit：按比例缩放完整显示，不裁切；图比例 540:320 = 1.6875:1，与 slot 1.5:1 不完全匹配但保证不裁切
                 contentScale = ContentScale.Fit
             )
         }
     }
 }
 
-// 状态 chip（紧凑色块 + 文本）
 @Composable
 private fun StatusChip(
     text: String,
@@ -245,7 +233,7 @@ private fun StatusChip(
     }
 }
 
-// 状态文案映射
+
 private fun statusLabel(status: BuildTaskStatus): String = when (status) {
     BuildTaskStatus.PENDING -> "等待中"
     BuildTaskStatus.RUNNING -> "构建中"
@@ -254,16 +242,15 @@ private fun statusLabel(status: BuildTaskStatus): String = when (status) {
     BuildTaskStatus.CANCELLED -> "已取消"
 }
 
-// 状态颜色映射
+
 private fun statusColor(status: BuildTaskStatus): Color = when (status) {
-    BuildTaskStatus.PENDING -> Color(0xFF9E9E9E) // 灰色
-    BuildTaskStatus.RUNNING -> Color(0xFF2196F3) // 蓝色
-    BuildTaskStatus.SUCCESS -> Color(0xFF4CAF50) // 绿色
-    BuildTaskStatus.FAILED -> Color(0xFFF44336)  // 红色
+    BuildTaskStatus.PENDING -> Color(0xFF9E9E9E)
+    BuildTaskStatus.RUNNING -> Color(0xFF2196F3)
+    BuildTaskStatus.SUCCESS -> Color(0xFF4CAF50)
+    BuildTaskStatus.FAILED -> Color(0xFFF44336)
     BuildTaskStatus.CANCELLED -> Color(0xFF9E9E9E)
 }
 
-// 状态描述文案
 private fun statusDescription(task: BuildTask): String = when (task.status) {
     BuildTaskStatus.PENDING -> "等待执行"
     BuildTaskStatus.RUNNING -> if (task.currentPackage != null) "正在处理：${task.currentPackage}" else "准备中"
@@ -272,7 +259,7 @@ private fun statusDescription(task: BuildTask): String = when (task.status) {
     BuildTaskStatus.CANCELLED -> "已取消"
 }
 
-// 时间格式化：MMdd_HHmm
+
 private fun formatTime(timestamp: Long): String {
     return SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(timestamp))
 }
