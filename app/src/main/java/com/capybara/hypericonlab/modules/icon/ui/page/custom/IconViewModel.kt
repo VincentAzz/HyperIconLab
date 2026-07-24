@@ -33,6 +33,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.WallpaperUiState
+import com.capybara.hypericonlab.modules.icon.domain.render.ConfigColorResolver
 import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
@@ -535,7 +536,7 @@ class IconViewModel(
      */
     fun switchToCustomColor(isFg: Boolean, layerIndex: Int = 0) {
         val config = _config.value
-        val resolvedColor = generatePreviewUseCase.resolveConfigColors(
+        val resolvedColor = ConfigColorResolver.resolveConfigColors(
             isFg = isFg,
             config = config,
             wallpaperColorScheme = wallpaperColorScheme.value,
@@ -830,7 +831,7 @@ class IconViewModel(
     private fun buildIconBuildConfig(configValue: IconConfigState): IconBuildConfig {
         // 预解析前景颜色（app 源由 pipeline 按 packageName 实时解析，此处跳过）
         val resolvedFgColor = if (configValue.fgColorSource != "app") {
-            generatePreviewUseCase.resolveConfigColors(
+            ConfigColorResolver.resolveConfigColors(
                 isFg = true,
                 config = configValue,
                 wallpaperColorScheme = wallpaperColorScheme.value,
@@ -840,7 +841,7 @@ class IconViewModel(
 
         // 预解析上层背景颜色（同上）
         val resolvedBgColor = if (configValue.bgColorSource != "app") {
-            generatePreviewUseCase.resolveConfigColors(
+            ConfigColorResolver.resolveConfigColors(
                 isFg = false,
                 config = configValue,
                 wallpaperColorScheme = wallpaperColorScheme.value,
@@ -852,7 +853,7 @@ class IconViewModel(
         val resolvedBgColor2 = if (configValue.dualLayerEnabled &&
             configValue.bgLayer2.colorSource != "app"
         ) {
-            generatePreviewUseCase.resolveConfigColors(
+            ConfigColorResolver.resolveConfigColors(
                 isFg = false,
                 config = configValue,
                 wallpaperColorScheme = wallpaperColorScheme.value,
