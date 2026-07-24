@@ -29,7 +29,6 @@ class GeneratePreviewUseCase(private val context: Context) {
 
     private val filesDir = context.filesDir
     private val lawniconsBase = File(filesDir, "lawnicons")
-    private val mapperBase = File(filesDir, "icon_mapper")
 
     suspend fun execute(
         config: IconConfigState,
@@ -38,17 +37,22 @@ class GeneratePreviewUseCase(private val context: Context) {
         appColorSchemes: Map<String, Pair<String, String>>,
         onStorePreviewGenerated: (Bitmap) -> Unit
     ): Bitmap? = withContext(Dispatchers.Default) {
-        val mapperFile = withContext(Dispatchers.IO) {
-            val file = ZipUtils.findFileRecursive(mapperBase, "icon_mapper_preview.xml")
-            if (file == null || !file.exists()) {
-                ZipUtils.findFileRecursive(mapperBase, "icon_mapper.xml")
-            } else file
+        // mapper 直接从 assets/icon_mapper/ 读取，优先使用 preview 版本
+        val fullMap = withContext(Dispatchers.IO) {
+            val previewStream = try {
+                context.assets.open("icon_mapper/icon_mapper_preview.xml")
+            } catch (_: Exception) {
+                null
+            }
+            previewStream?.use { IconMapperProcessor.parseIconMapper(it) }
+                ?: context.assets.open("icon_mapper/icon_mapper.xml")
+                    .use { IconMapperProcessor.parseIconMapper(it) }
         }
         val svgDir = withContext(Dispatchers.IO) {
             ZipUtils.findDirRecursive(lawniconsBase, "svgs")
         }
 
-        if (mapperFile == null || svgDir == null) return@withContext null
+        if (svgDir == null) return@withContext null
 
         val masks = config.selectedMasks
         val maskBitmaps = withContext(Dispatchers.IO) {
@@ -96,7 +100,6 @@ class GeneratePreviewUseCase(private val context: Context) {
             }
         } else null
 
-        val fullMap = IconMapperProcessor.parseIconMapper(mapperFile)
         val targets = listOf(
             "com.android.contacts.activities.TwelveKeyDialer",
             "com.google.android.apps.messaging",
