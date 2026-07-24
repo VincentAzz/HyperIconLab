@@ -42,6 +42,7 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseC
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.IconLogger
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogType
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.WallpaperManager
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -188,9 +189,16 @@ class IconViewModel(
 
     // Data State
 
-    val wallpaperBitmap = MutableStateFlow<Bitmap?>(null)
-    private val wallpaperColorScheme =
-        MutableStateFlow<MonetColorExtractor.WallpaperColorScheme?>(null)
+    // 壁纸管理器：封装壁纸位图与配色方案状态，configProvider 提供当前 wallpaper 配置，更新后触发预览重生成
+    private val wallpaperManager = WallpaperManager(
+        context = context,
+        scope = viewModelScope,
+        configProvider = { _config.value.wallpaper },
+        onWallpaperUpdated = { generateLivePreview() }
+    )
+    val wallpaperBitmap: StateFlow<Bitmap?> = wallpaperManager.wallpaperBitmap
+    private val wallpaperColorScheme: StateFlow<MonetColorExtractor.WallpaperColorScheme?> =
+        wallpaperManager.wallpaperColorScheme
 
     val mapperExists = MutableStateFlow(false)
     val useStreaming = MutableStateFlow(true)
@@ -726,44 +734,13 @@ class IconViewModel(
         }
     }
 
-    private fun loadDefaultWallpaper() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                context.assets.open("wallpapers/wallpaper_fallback.jpg").use {
-                    BitmapFactory.decodeStream(it)?.let { bmp -> updateWallpaper(bmp) }
-                }
-            } catch (_: Exception) {
-            }
-        }
-    }
+    private fun loadDefaultWallpaper() = wallpaperManager.loadDefaultWallpaper()
 
-    fun updateWallpaperFromUri(uri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                context.contentResolver.openInputStream(uri)?.use {
-                    BitmapFactory.decodeStream(it)?.let { bmp -> updateWallpaper(bmp) }
-                }
-            } catch (_: Exception) {
-            }
-        }
-    }
+    fun updateWallpaperFromUri(uri: Uri) = wallpaperManager.updateWallpaperFromUri(uri)
 
-    fun updateWallpaper(bmp: Bitmap) {
-        wallpaperBitmap.value = bmp
-        reextractWallpaperColors()
-        generateLivePreview()
-    }
+    fun updateWallpaper(bmp: Bitmap) = wallpaperManager.updateWallpaper(bmp)
 
-
-    private fun reextractWallpaperColors() {
-        val bmp = wallpaperBitmap.value ?: return
-        val wp = _config.value.wallpaper
-        wallpaperColorScheme.value = MonetColorExtractor.extractFromBitmap(
-            bitmap = bmp,
-            paletteStyle = wp.paletteStyle,
-            colorSpec = wp.colorSpec
-        )
-    }
+    private fun reextractWallpaperColors() = wallpaperManager.reextractWallpaperColors()
 
     // ========================================================================
     // 构建任务相关 API（对接 BuildTaskManager）
