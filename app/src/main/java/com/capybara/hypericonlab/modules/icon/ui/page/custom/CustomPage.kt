@@ -58,7 +58,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.toPrettyString
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.BuildOptionSheet
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.FullScreenPreview
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.FullScreenPreviewSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.PreviewSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
@@ -312,7 +312,7 @@ fun CustomPage(
         }
     }
 
-    FullScreenPreview(
+    FullScreenPreviewSheet(
         show = showFullScreenPreview,
         bitmap = mainPreviewBitmap,
         configText = previewConfigText,

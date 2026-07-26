@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 
 /**
@@ -108,7 +106,7 @@ fun PermissionCheckCard(
                             }
                         },
                         trailingContent = {
-                            PermissionGrantButton(
+                            PrimaryActionButton(
                                 text = stringResource(R.string.permission_check_grant),
                                 onClick = {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -132,7 +130,7 @@ fun PermissionCheckCard(
                             storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         },
                         trailingContent = {
-                            PermissionGrantButton(
+                            PrimaryActionButton(
                                 text = stringResource(R.string.permission_check_grant),
                                 onClick = {
                                     storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -143,17 +141,6 @@ fun PermissionCheckCard(
                 }
             }
         }
-    }
-}
-
-// "去授权"按钮（紧凑样式，配合 BaseWidget 的 trailingContent slot）
-@Composable
-private fun PermissionGrantButton(
-    text: String,
-    onClick: () -> Unit
-) {
-    TextButton(onClick = onClick) {
-        Text(text = text, style = MaterialTheme.typography.labelLarge)
     }
 }
 

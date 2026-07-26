@@ -50,7 +50,7 @@ import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FullScreenPreview(
+fun FullScreenPreviewSheet(
     show: Boolean,
     bitmap: Bitmap?,
     configText: String,

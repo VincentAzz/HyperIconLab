@@ -68,6 +68,7 @@ fun PreviewSection(
                     .aspectRatio(PreviewSectionConfig.PREVIEW_ASPECT_RATIO)
                     .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
                     .background(Color.Gray)
+                    .clickable { onExpand() }
             ) {
                 if (bitmap != null) {
                     Image(
