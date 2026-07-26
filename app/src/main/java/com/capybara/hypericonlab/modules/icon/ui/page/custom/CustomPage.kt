@@ -310,7 +310,10 @@ fun CustomPage(
     FullScreenPreview(
         show = showFullScreenPreview,
         bitmap = mainPreviewBitmap,
-        onDismiss = { showFullScreenPreview = false }
+        onDismiss = { showFullScreenPreview = false },
+        backdrop = backdrop,
+        useLiquidGlass = themeState.useLiquidGlassBottomSheet,
+        liquidGlassBlurRadius = themeState.liquidGlassBlurRadius.dp
     )
 
     // 构建选项 Sheet
