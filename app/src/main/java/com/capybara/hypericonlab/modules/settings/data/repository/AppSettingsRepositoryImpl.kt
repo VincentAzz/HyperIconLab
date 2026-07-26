@@ -1,6 +1,5 @@
 package com.capybara.hypericonlab.modules.settings.data.repository
 
-import android.os.Build
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.Preferences
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
@@ -21,53 +20,60 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 
 class AppSettingsRepositoryImpl(
-    private val appDataStore: AppDataStore,
-    appScope: CoroutineScope
+    private val appDataStore: AppDataStore, appScope: CoroutineScope
 ) : AppSettingsRepository {
 
     override val preferencesFlow: Flow<AppPreferences> = appDataStore.data.map { prefs ->
         AppPreferences(
-            useSmootherRoundedCorners = prefs[AppDataStore.UI_USE_SMOOTHER_ROUNDED_CORNERS] ?: true,
+            useSmootherRoundedCorners = prefs[AppDataStore.UI_USE_SMOOTHER_ROUNDED_CORNERS]
+                ?: true,
             useBlur = prefs[AppDataStore.UI_USE_BLUR]
-                ?: (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
+                ?: true,
             useProgressiveBlurTopAppBar = prefs[AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR]
-                ?: false,
+                ?: true,
             useTabRowCenterAlignment = prefs[AppDataStore.UI_USE_TAB_ROW_CENTER_ALIGNMENT]
-                ?: false,
+                ?: true,
             useTabRowTransparentBackground = prefs[AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND]
                 ?: false,
             useTabRowFillWidth = prefs[AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH]
                 ?: false,
             useLiquidGlassBottomSheet = prefs[AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET]
                 ?: false,
-            liquidGlassBlurRadius = prefs[AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS] ?: 24,
-            useGoogleSansFlex = prefs[AppDataStore.UI_USE_GOOGLE_SANS_FLEX] ?: false,
+            liquidGlassBlurRadius = prefs[AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS]
+                ?: 24,
+            useGoogleSansFlex = prefs[AppDataStore.UI_USE_GOOGLE_SANS_FLEX]
+                ?: true,
             themeMode = ThemeMode.fromValueOrDefault(
-                prefs[AppDataStore.THEME_MODE] ?: ThemeMode.SYSTEM.name
+                prefs[AppDataStore.THEME_MODE]
+                    ?: ThemeMode.LIGHT.name
             ),
             paletteStyle = PaletteStyle.fromValueOrDefault(
-                prefs[AppDataStore.THEME_PALETTE_STYLE] ?: PaletteStyle.TonalSpot.name
+                prefs[AppDataStore.THEME_PALETTE_STYLE]
+                    ?: PaletteStyle.Monochrome.name
             ),
             colorSpec = ThemeColorSpec.fromValueOrDefault(
-                prefs[AppDataStore.THEME_COLOR_SPEC] ?: ThemeColorSpec.SPEC_2025.name
+                prefs[AppDataStore.THEME_COLOR_SPEC]
+                    ?: ThemeColorSpec.SPEC_2025.name
             ),
-            useDynamicColor = prefs[AppDataStore.THEME_USE_DYNAMIC_COLOR] ?: true,
-            useFloatingBottomBar = prefs[AppDataStore.UI_USE_FLOATING_BOTTOM_BAR] ?: false,
-            useFloatingBottomBarBlur = prefs[AppDataStore.UI_USE_FLOATING_BOTTOM_BAR_BLUR] ?: true,
-            useFloatingBottomBarCompact = prefs[AppDataStore.UI_USE_FLOATING_BAR_COMPACT] ?: false,
+            useDynamicColor = prefs[AppDataStore.THEME_USE_DYNAMIC_COLOR]
+                ?: true,
+            useFloatingBottomBar = prefs[AppDataStore.UI_USE_FLOATING_BOTTOM_BAR]
+                ?: true,
+            useFloatingBottomBarBlur = prefs[AppDataStore.UI_USE_FLOATING_BOTTOM_BAR_BLUR]
+                ?: true,
+            useFloatingBottomBarCompact = prefs[AppDataStore.UI_USE_FLOATING_BAR_COMPACT]
+                ?: true,
             floatingBottomBarCompactType = FloatingBottomBarCompactType.fromValueOrDefault(
                 prefs[AppDataStore.UI_FLOATING_BAR_COMPACT_TYPE]
                     ?: FloatingBottomBarCompactType.MIXED_ICON.name
             ),
             seedColorInt = prefs[AppDataStore.THEME_SEED_COLOR]
                 ?: PresetColors.first().color.toArgb(),
-            lastMainPageIndex = prefs[AppDataStore.LAST_MAIN_PAGE_INDEX] ?: 3
-            //
+            lastMainPageIndex = prefs[AppDataStore.LAST_MAIN_PAGE_INDEX]
+                ?: 3
         )
     }.shareIn(
-        scope = appScope,
-        started = SharingStarted.Eagerly,
-        replay = 1
+        scope = appScope, started = SharingStarted.Eagerly, replay = 1
     )
 
     override suspend fun putString(setting: StringSetting, value: String) =
@@ -88,34 +94,31 @@ class AppSettingsRepositoryImpl(
     override fun getBoolean(setting: BooleanSetting, default: Boolean): Flow<Boolean> =
         appDataStore.getBoolean(booleanKey(setting), default)
 
-    private fun stringKey(setting: StringSetting): Preferences.Key<String> =
-        when (setting) {
-            StringSetting.ThemeMode -> AppDataStore.THEME_MODE
-            StringSetting.ThemePaletteStyle -> AppDataStore.THEME_PALETTE_STYLE
-            StringSetting.ThemeColorSpec -> AppDataStore.THEME_COLOR_SPEC
-            StringSetting.FloatingBottomBarCompactType -> AppDataStore.UI_FLOATING_BAR_COMPACT_TYPE
-        }
+    private fun stringKey(setting: StringSetting): Preferences.Key<String> = when (setting) {
+        StringSetting.ThemeMode -> AppDataStore.THEME_MODE
+        StringSetting.ThemePaletteStyle -> AppDataStore.THEME_PALETTE_STYLE
+        StringSetting.ThemeColorSpec -> AppDataStore.THEME_COLOR_SPEC
+        StringSetting.FloatingBottomBarCompactType -> AppDataStore.UI_FLOATING_BAR_COMPACT_TYPE
+    }
 
-    private fun intKey(setting: IntSetting): Preferences.Key<Int> =
-        when (setting) {
-            IntSetting.ThemeSeedColor -> AppDataStore.THEME_SEED_COLOR
-            IntSetting.LastMainPageIndex -> AppDataStore.LAST_MAIN_PAGE_INDEX
-            IntSetting.UiLiquidGlassBlurRadius -> AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS
-        }
+    private fun intKey(setting: IntSetting): Preferences.Key<Int> = when (setting) {
+        IntSetting.ThemeSeedColor -> AppDataStore.THEME_SEED_COLOR
+        IntSetting.LastMainPageIndex -> AppDataStore.LAST_MAIN_PAGE_INDEX
+        IntSetting.UiLiquidGlassBlurRadius -> AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS
+    }
 
-    private fun booleanKey(setting: BooleanSetting): Preferences.Key<Boolean> =
-        when (setting) {
-            BooleanSetting.UiUseSmootherRoundedCorners -> AppDataStore.UI_USE_SMOOTHER_ROUNDED_CORNERS
-            BooleanSetting.UiUseBlur -> AppDataStore.UI_USE_BLUR
-            BooleanSetting.UiUseLiquidGlassBottomSheet -> AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET
-            BooleanSetting.ThemeUseDynamicColor -> AppDataStore.THEME_USE_DYNAMIC_COLOR
-            BooleanSetting.UiUseFloatingBottomBar -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR
-            BooleanSetting.UiUseFloatingBottomBarBlur -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR_BLUR
-            BooleanSetting.UiUseFloatingBottomBarCompact -> AppDataStore.UI_USE_FLOATING_BAR_COMPACT
-            BooleanSetting.UiUseProgressiveBlurTopAppBar -> AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR
-            BooleanSetting.UiUseTabRowCenterAlignment -> AppDataStore.UI_USE_TAB_ROW_CENTER_ALIGNMENT
-            BooleanSetting.UiUseTabRowTransparentBackground -> AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND
-            BooleanSetting.UiUseTabRowFillWidth -> AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH
-            BooleanSetting.UiUseGoogleSansFlex -> AppDataStore.UI_USE_GOOGLE_SANS_FLEX
-        }
+    private fun booleanKey(setting: BooleanSetting): Preferences.Key<Boolean> = when (setting) {
+        BooleanSetting.UiUseSmootherRoundedCorners -> AppDataStore.UI_USE_SMOOTHER_ROUNDED_CORNERS
+        BooleanSetting.UiUseBlur -> AppDataStore.UI_USE_BLUR
+        BooleanSetting.UiUseLiquidGlassBottomSheet -> AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET
+        BooleanSetting.ThemeUseDynamicColor -> AppDataStore.THEME_USE_DYNAMIC_COLOR
+        BooleanSetting.UiUseFloatingBottomBar -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR
+        BooleanSetting.UiUseFloatingBottomBarBlur -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR_BLUR
+        BooleanSetting.UiUseFloatingBottomBarCompact -> AppDataStore.UI_USE_FLOATING_BAR_COMPACT
+        BooleanSetting.UiUseProgressiveBlurTopAppBar -> AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR
+        BooleanSetting.UiUseTabRowCenterAlignment -> AppDataStore.UI_USE_TAB_ROW_CENTER_ALIGNMENT
+        BooleanSetting.UiUseTabRowTransparentBackground -> AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND
+        BooleanSetting.UiUseTabRowFillWidth -> AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH
+        BooleanSetting.UiUseGoogleSansFlex -> AppDataStore.UI_USE_GOOGLE_SANS_FLEX
+    }
 }
