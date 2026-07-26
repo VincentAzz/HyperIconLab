@@ -1,15 +1,14 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.custom.component
 
 import android.graphics.Bitmap
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -23,15 +22,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -48,6 +46,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamil
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,8 +65,7 @@ fun FullScreenPreview(
     if (show && bitmap != null) {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val coroutineScope = rememberCoroutineScope()
-        // tab 切换：0=预览，1=参数；默认预览
-        var selectedTab by remember { mutableIntStateOf(0) }
+        val pagerState = rememberPagerState(pageCount = { 2 })
 
         FloatingBottomSheet(
             onDismiss = onDismiss,
@@ -83,8 +81,12 @@ fun FullScreenPreview(
                 title = {
                     FloatingTabRow(
                         tabs = listOf("预览", "参数"),
-                        selectedIndex = selectedTab,
-                        onSelected = { selectedTab = it },
+                        selectedIndex = pagerState.currentPage,
+                        onSelected = { index ->
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
                         barHeight = 40.dp,
                         alignment = FloatingTabRowAlignment.CENTER,
                         widthMode = FloatingTabRowWidthMode.WRAP_CONTENT,
@@ -151,45 +153,63 @@ fun FullScreenPreview(
                 }
             )
 
-            // 内容卡片：圆角与边缘间距参考 LogSheet/LawniconsBrowserSheet 内部卡片
-            // 使用 AnimatedContent 实现 tab 切换时的淡入淡出过渡
-            AnimatedContent(
-                targetState = selectedTab,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
+
+            Surface(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp, 0.dp, 8.dp, 8.dp),
-                label = "previewTabTransition"
-            ) { tab ->
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
-                    color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
-                ) {
-                    if (tab == 0) {
-                        // 预览 tab：图片裁切填满卡片
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = "全屏预览",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        // 参数 tab：等宽字体展示 IconBuildConfig 多行带缩进文本
-                        val verticalScrollState = rememberScrollState()
-                        SelectionContainer {
-                            Text(
-                                text = configText,
-                                style = MaterialTheme.typography.bodySmall,
-                                fontFamily = GoogleSansCodeFontFamily,
-                                fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                softWrap = true,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .verticalScroll(verticalScrollState)
-                                    .padding(16.dp)
-                            )
+                shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
+                color = Color.Transparent
+            ) {
+                // 禁用 overscroll effect：避免滑动力度大时到达边界页触发回弹抖动
+                CompositionLocalProvider(LocalOverscrollFactory provides null) {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp)),
+                        pageSpacing = 8.dp
+                    ) { page ->
+                        val pageOffset = (
+                                (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                                ).absoluteValue
+                        val fadeAlpha = (1f - pageOffset * 0.4f).coerceIn(0.75f, 1f)
+
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer { this.alpha = fadeAlpha },
+                            shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
+                            color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.9f)
+                        ) {
+                            when (page) {
+                                0 -> {
+                                    Image(
+                                        bitmap = bitmap.asImageBitmap(),
+                                        contentDescription = "全屏预览",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+
+                                1 -> {
+                                    val verticalScrollState = rememberScrollState()
+                                    SelectionContainer {
+                                        Text(
+                                            text = configText,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontFamily = GoogleSansCodeFontFamily,
+                                            fontWeight = FontWeight.Normal,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            softWrap = true,
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .verticalScroll(verticalScrollState)
+                                                .padding(16.dp)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -197,4 +217,5 @@ fun FullScreenPreview(
         }
     }
 }
+
 
