@@ -157,6 +157,9 @@ class BuildTaskCoordinator(
         }
     }
 
+    // 基于当前 UI 配置构造 IconBuildConfig（用于调试展示）
+    fun buildCurrentConfig(): IconBuildConfig = buildIconBuildConfig(configProvider())
+
     // 构造 IconBuildConfig
     private fun buildIconBuildConfig(configValue: IconConfigState): IconBuildConfig {
         val wallpaperColorScheme = wallpaperColorSchemeProvider()

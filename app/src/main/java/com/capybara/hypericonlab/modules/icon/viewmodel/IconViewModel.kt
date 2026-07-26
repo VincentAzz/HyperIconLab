@@ -14,6 +14,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassUiState
+import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.ImageFillingUiState
@@ -414,4 +415,6 @@ class IconViewModel(
         buildTaskCoordinator.deleteFinishedBuildTask(taskId)
 
     fun buildPermissionsMissing(): List<String> = buildTaskCoordinator.buildPermissionsMissing()
+
+    fun getCurrentBuildConfig(): IconBuildConfig = buildTaskCoordinator.buildCurrentConfig()
 }

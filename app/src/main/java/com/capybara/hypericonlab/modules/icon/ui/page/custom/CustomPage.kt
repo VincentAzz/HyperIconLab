@@ -56,8 +56,9 @@ import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCorner
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
+import com.capybara.hypericonlab.modules.icon.domain.model.toPrettyString
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.BuildOptionSheet
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.FullScreenPreview
+import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.FullScreenPreview
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.PreviewSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
@@ -84,6 +85,8 @@ fun CustomPage(
     val availableIconSets by viewModel.availableIconSets.collectAsStateWithLifecycle()
 
     var showFullScreenPreview by remember { mutableStateOf(false) }
+    // 全屏预览 sheet 打开时快照一次当前 IconBuildConfig 文本，避免 sheet 期间配置变化导致参数与预览图不一致
+    var previewConfigText by remember { mutableStateOf("") }
     var showBuildSheet by remember { mutableStateOf(false) }
 
     // Snackbar：提交构建任务后提示用户去任务 tab 查看进度
@@ -235,6 +238,8 @@ fun CustomPage(
                 onRefresh = { viewModel.refreshPreview() },
                 onExpand = {
                     viewModel.generatePreview(isLive = false)
+                    // 打开 sheet 时快照一次当前 config，sheet 期间不刷新
+                    previewConfigText = viewModel.getCurrentBuildConfig().toPrettyString()
                     showFullScreenPreview = true
                 },
                 onBuild = { showBuildSheet = true },
@@ -310,6 +315,7 @@ fun CustomPage(
     FullScreenPreview(
         show = showFullScreenPreview,
         bitmap = mainPreviewBitmap,
+        configText = previewConfigText,
         onDismiss = { showFullScreenPreview = false },
         backdrop = backdrop,
         useLiquidGlass = themeState.useLiquidGlassBottomSheet,

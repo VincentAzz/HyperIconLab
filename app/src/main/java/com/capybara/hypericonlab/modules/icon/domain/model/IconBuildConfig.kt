@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.domain.model
 
+import com.capybara.hypericonlab.core.utils.toPrettyKotlinString
 import kotlinx.serialization.Serializable
 
 // 图标构建配置
@@ -81,3 +82,6 @@ data class GlassConfig(
 enum class ColorMode {
     MONET, CUSTOM, COLORFUL, BLACK_WHITE
 }
+
+// 调试用：将 IconBuildConfig 格式化为带缩进的多行字符串
+fun IconBuildConfig.toPrettyString(): String = this.toPrettyKotlinString()
