@@ -1,13 +1,15 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.custom.component
 
 import android.graphics.Bitmap
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -21,7 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,7 +66,8 @@ fun FullScreenPreview(
     if (show && bitmap != null) {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val coroutineScope = rememberCoroutineScope()
-        val pagerState = rememberPagerState { 2 }
+        // tab 切换：0=预览，1=参数；默认预览
+        var selectedTab by remember { mutableIntStateOf(0) }
 
         FloatingBottomSheet(
             onDismiss = onDismiss,
@@ -76,12 +83,8 @@ fun FullScreenPreview(
                 title = {
                     FloatingTabRow(
                         tabs = listOf("预览", "参数"),
-                        selectedIndex = pagerState.settledPage,
-                        onSelected = { index ->
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
+                        selectedIndex = selectedTab,
+                        onSelected = { selectedTab = it },
                         barHeight = 40.dp,
                         alignment = FloatingTabRowAlignment.CENTER,
                         widthMode = FloatingTabRowWidthMode.WRAP_CONTENT,
@@ -149,19 +152,21 @@ fun FullScreenPreview(
             )
 
             // 内容卡片：圆角与边缘间距参考 LogSheet/LawniconsBrowserSheet 内部卡片
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f),
-                beyondViewportPageCount = 1
-            ) { page ->
+            // 使用 AnimatedContent 实现 tab 切换时的淡入淡出过渡
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp, 0.dp, 8.dp, 8.dp),
+                label = "previewTabTransition"
+            ) { tab ->
                 Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp, 0.dp, 8.dp, 8.dp),
+                    modifier = Modifier.fillMaxSize(),
                     shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
                     color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
                 ) {
-                    if (page == 0) {
+                    if (tab == 0) {
                         // 预览 tab：图片裁切填满卡片
                         Image(
                             bitmap = bitmap.asImageBitmap(),
@@ -170,6 +175,7 @@ fun FullScreenPreview(
                             contentScale = ContentScale.Crop
                         )
                     } else {
+                        // 参数 tab：等宽字体展示 IconBuildConfig 多行带缩进文本
                         val verticalScrollState = rememberScrollState()
                         SelectionContainer {
                             Text(
@@ -191,3 +197,4 @@ fun FullScreenPreview(
         }
     }
 }
+
