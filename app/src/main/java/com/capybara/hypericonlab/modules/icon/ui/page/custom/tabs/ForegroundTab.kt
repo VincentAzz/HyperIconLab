@@ -19,11 +19,12 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.ColorSourceSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.GlassConfigSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.StickerConfigSection
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
 @Composable
 fun ForegroundTab(
-    viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel,
+    viewModel: IconViewModel,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
     liquidGlassBlurRadius: Dp = 24.dp

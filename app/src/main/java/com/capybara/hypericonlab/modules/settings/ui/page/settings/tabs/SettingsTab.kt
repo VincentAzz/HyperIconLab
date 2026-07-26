@@ -48,9 +48,9 @@ import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompac
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.image.StickerProcessor
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreview
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsState
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel

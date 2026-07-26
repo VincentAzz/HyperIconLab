@@ -10,9 +10,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 
 @Composable
-fun GlassConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel) {
+fun GlassConfigSection(viewModel: IconViewModel) {
     val config by viewModel.config.collectAsStateWithLifecycle()
     val glassAngle = config.glass.angle
     val glassStrokeDiff = config.glass.strokeDiff

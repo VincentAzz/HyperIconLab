@@ -55,12 +55,14 @@ import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
+import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.BuildOptionSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.FullScreenPreview
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.PreviewSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.ForegroundTab
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -101,7 +103,7 @@ fun CustomPage(
     // 每次申请一个权限，系统会保持已授予状态；多权限按 missing 列表顺序逐个申请
     var pendingPermissionQueue by remember { mutableStateOf<List<String>>(emptyList()) }
     var pendingBuildArgs by remember {
-        mutableStateOf<Pair<com.capybara.hypericonlab.modules.icon.domain.model.ProductType, IconSetInfo>?>(
+        mutableStateOf<Pair<ProductType, IconSetInfo>?>(
             null
         )
     }

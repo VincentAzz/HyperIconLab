@@ -49,12 +49,13 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.CTCConfig
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreviewIcon
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ColorSourceSection(
-    viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel,
+    viewModel: IconViewModel,
     isForeground: Boolean,
     layerIndex: Int = 0,
     backdrop: LayerBackdrop? = null,

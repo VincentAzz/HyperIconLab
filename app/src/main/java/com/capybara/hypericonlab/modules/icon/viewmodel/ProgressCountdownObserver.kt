@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.custom.internal
+package com.capybara.hypericonlab.modules.icon.viewmodel
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay

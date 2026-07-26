@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.custom.internal
+package com.capybara.hypericonlab.modules.icon.viewmodel
 
 import android.graphics.Bitmap
 import com.capybara.hypericonlab.core.color.MonetColorExtractor

@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.custom
+package com.capybara.hypericonlab.modules.icon.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -27,16 +27,6 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.BuildTaskCoordinator
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ConfigSyncObserver
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.IconLogger
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.InnerShadowAssetScanner
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogEntry
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.LogType
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.PreviewCoordinator
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ProgressCountdownObserver
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.ResourceInitializer
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.internal.WallpaperManager
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

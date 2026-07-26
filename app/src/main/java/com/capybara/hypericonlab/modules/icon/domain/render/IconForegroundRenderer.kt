@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.image.StickerProcessor
 import com.capybara.hypericonlab.core.image.SvgProcessor
+import com.capybara.hypericonlab.modules.icon.domain.model.ColorMode
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
@@ -73,7 +74,7 @@ object IconForegroundRenderer {
     ): Bitmap {
         val stickerConfig = config.stickerConfig!!
         val finalStickerConfig =
-            if (config.colorMode == com.capybara.hypericonlab.modules.icon.domain.model.ColorMode.BLACK_WHITE) {
+            if (config.colorMode == ColorMode.BLACK_WHITE) {
                 stickerConfig.copy(
                     fillStyle = "fill",
                     lineColor = "#FF000000",

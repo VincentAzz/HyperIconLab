@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.custom.internal
+package com.capybara.hypericonlab.modules.icon.viewmodel
 
 import java.text.SimpleDateFormat
 import java.util.Date

@@ -38,11 +38,13 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.image.BgImageDir
 import com.capybara.hypericonlab.core.image.BgImageLoader
+import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ImagePickerSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.MaskPickerSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.MaskThumbnail
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.ColorSourceSection
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -50,7 +52,7 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BackgroundTab(
-    viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel,
+    viewModel: IconViewModel,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
     liquidGlassBlurRadius: Dp = 24.dp
@@ -451,8 +453,8 @@ fun BackgroundTab(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LowerLayerBackgroundSection(
-    viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel,
-    bgLayer2: com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState,
+    viewModel: IconViewModel,
+    bgLayer2: BgLayerUiState,
     onPickMask: () -> Unit,
     onPickStaticImage: () -> Unit,
     onPickFillingImage: () -> Unit,

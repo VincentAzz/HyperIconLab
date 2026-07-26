@@ -8,7 +8,7 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -16,12 +16,10 @@ val iconModule = module {
     factory { ManageResourcesUseCase(get()) }
     factory { GeneratePreviewUseCase(get()) }
     factory { IconPipelineUseCase(get()) }
-    // 构建任务相关：Writer 与 Store 为工厂（无状态），Executor 与 Manager 为单例（跨页面共享任务队列）
     factory { BuildArtifactWriter(get()) }
     factory { BuildTaskStore(get()) }
     factory { BuildTaskExecutor(get(), get(), get(), get()) }
     single { BuildTaskManager(get(), get(), get()) }
-    // 通知管理器为工厂（含 lastProgressTime 实例状态，每个 Manager 注入一份）
     factory { BuildNotificationManager(get()) }
     viewModelOf(::IconViewModel)
 }

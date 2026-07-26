@@ -48,7 +48,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.LargeCardRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
-import androidx.compose.ui.draw.clip
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 
 @Composable
 fun CTCColorSwatchPreviewIcon(
@@ -144,7 +144,7 @@ fun CTCColorSwatchPreviewIcon(
 }
 
 @Composable
-fun CTCConfigSection(viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel) {
+fun CTCConfigSection(viewModel: IconViewModel) {
     val config by viewModel.config.collectAsStateWithLifecycle()
     val ctcType = config.ctc.type
     val ctcVariant = config.ctc.variant

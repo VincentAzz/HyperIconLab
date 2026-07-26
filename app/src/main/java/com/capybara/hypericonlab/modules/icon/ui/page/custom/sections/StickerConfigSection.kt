@@ -35,10 +35,11 @@ import com.capybara.hypericonlab.core.designsystem.theme.SwatchPreviewCornerRadi
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 
 @Composable
 fun StickerConfigSection(
-    viewModel: com.capybara.hypericonlab.modules.icon.ui.page.custom.IconViewModel,
+    viewModel: IconViewModel,
 ) {
     val config by viewModel.config.collectAsStateWithLifecycle()
     val fillStyle = config.sticker.fillStyle
