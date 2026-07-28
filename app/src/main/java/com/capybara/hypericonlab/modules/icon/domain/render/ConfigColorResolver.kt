@@ -1,18 +1,63 @@
 package com.capybara.hypericonlab.modules.icon.domain.render
 
 import android.graphics.Color
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.color.HslColorUtils
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
+import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
+import androidx.compose.ui.graphics.Color as ComposeColor
 
 // 图标颜色解析器，按 colorSource 解析前景与背景颜色
 object ConfigColorResolver {
 
-    // 解析配置颜色，返回 hex 字符串
+    // preset scheme 缓存：避免每个图标都重新计算 dynamicColorScheme
+    // 一次预览生成中 seedColor/paletteStyle/colorSpec 不变，只有 isDark 不同，最多缓存 2 个 scheme
+    private var presetCacheKey: String? = null
+    private var presetLightScheme: ColorScheme? = null
+    private var presetDarkScheme: ColorScheme? = null
+
+    // 获取或计算 preset scheme（带缓存）
+    private fun getPresetScheme(
+        seedColor: Int,
+        paletteStyle: PaletteStyle,
+        colorSpec: ThemeColorSpec,
+        isDark: Boolean
+    ): ColorScheme {
+        val key = "${seedColor}_${paletteStyle}_${colorSpec}"
+        if (key != presetCacheKey) {
+            presetCacheKey = key
+            presetLightScheme = null
+            presetDarkScheme = null
+        }
+        if (isDark) {
+            if (presetDarkScheme == null) {
+                presetDarkScheme = dynamicColorScheme(
+                    keyColor = ComposeColor(seedColor),
+                    isDark = true,
+                    style = paletteStyle,
+                    colorSpec = colorSpec
+                )
+            }
+            return presetDarkScheme!!
+        } else {
+            if (presetLightScheme == null) {
+                presetLightScheme = dynamicColorScheme(
+                    keyColor = ComposeColor(seedColor),
+                    isDark = false,
+                    style = paletteStyle,
+                    colorSpec = colorSpec
+                )
+            }
+            return presetLightScheme!!
+        }
+    }
+
     fun resolveConfigColors(
         isFg: Boolean,
         config: IconConfigState,
@@ -37,11 +82,11 @@ object ConfigColorResolver {
         val defaultColor = if (isFg) "#FFFFFFFF" else "#FF3F51B5"
 
         if (source == "preset" && config.fgStyle == "sticker") {
-            val scheme = dynamicColorScheme(
-                keyColor = androidx.compose.ui.graphics.Color(config.preset.seedColor),
-                isDark = themeMode == "dark",
-                style = config.preset.paletteStyle,
-                colorSpec = config.preset.colorSpec
+            val scheme = getPresetScheme(
+                config.preset.seedColor,
+                config.preset.paletteStyle,
+                config.preset.colorSpec,
+                themeMode == "dark"
             )
             return if (isFg) String.format("#%08X", scheme.primary.toArgb())
             else String.format("#%08X", scheme.surfaceContainer.toArgb())
@@ -76,11 +121,11 @@ object ConfigColorResolver {
             "custom" -> customColor
             "black_white" -> if (isFg) "#FF000000" else "#FFFFFFFF"
             "preset" -> {
-                val scheme = dynamicColorScheme(
-                    keyColor = androidx.compose.ui.graphics.Color(config.preset.seedColor),
-                    isDark = themeMode == "dark",
-                    style = config.preset.paletteStyle,
-                    colorSpec = config.preset.colorSpec
+                val scheme = getPresetScheme(
+                    config.preset.seedColor,
+                    config.preset.paletteStyle,
+                    config.preset.colorSpec,
+                    themeMode == "dark"
                 )
                 if (isFg) String.format("#%08X", scheme.primary.toArgb())
                 else String.format("#%08X", scheme.surface.toArgb())
