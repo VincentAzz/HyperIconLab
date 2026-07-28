@@ -6,13 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -60,25 +61,34 @@ fun PreviewSection(
         )
     ) {
         Column {
-            // 预览图
-            Box(
+            // 预览图：按原 aspectRatio 计算高度后，窗口高度再减 16dp，
+            // 预览图本身保持原比例不变，通过 ContentScale.Crop 居中裁剪上下多余部分
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(PreviewSectionConfig.PREVIEW_INNER_PADDING)
-                    .aspectRatio(PreviewSectionConfig.PREVIEW_ASPECT_RATIO)
-                    .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
-                    .background(Color.Gray)
-                    .clickable { onExpand() }
             ) {
-                if (bitmap != null) {
-                    Image(
-                        bitmap = bitmap.asImageBitmap(),
-                        contentDescription = "预览",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                val targetHeight = maxWidth / PreviewSectionConfig.PREVIEW_ASPECT_RATIO -
+                        PreviewSectionConfig.PREVIEW_HEIGHT_REDUCTION
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(targetHeight)
+                        .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
+                        .background(Color.Gray)
+                        .clickable { onExpand() }
+                ) {
+                    if (bitmap != null) {
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "预览",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
                 }
             }
 
@@ -169,6 +179,8 @@ private object PreviewSectionConfig {
 
     // 预览图长宽比（store preview 1080×640 ≈ 1.6875:1）
     const val PREVIEW_ASPECT_RATIO = 1.6f
+
+    val PREVIEW_HEIGHT_REDUCTION = 32.dp
 
     // 按钮行内边距
     val BUTTON_ROW_PADDING = PaddingValues(8.dp, 0.dp, 8.dp, 8.dp)
