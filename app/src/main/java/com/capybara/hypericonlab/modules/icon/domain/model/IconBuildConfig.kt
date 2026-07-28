@@ -15,7 +15,7 @@ data class IconBuildConfig(
     val packMtz: Boolean = true,
     val colorMode: ColorMode = ColorMode.CUSTOM,
     val useStreaming: Boolean = true,
-    val masks: List<String> = listOf("m3_round"),
+    val masks: List<String> = listOf("hyperos3"),
     val fgStyle: String = "line",
     val bgStyle: String = "solid",
     val stickerConfig: StickerConfig? = null,
@@ -42,7 +42,7 @@ data class IconBuildConfig(
     val bgPreviewThemeMode2: String = "dark",
     // 下层图层级透明度 0~255
     val bgLayer2Alpha: Int = 255,
-    val selectedMasks2: List<String> = listOf("m3_round"),
+    val selectedMasks2: List<String> = listOf("hyperos3"),
     val selectedStaticImages2: List<String> = emptyList(),
     val selectedFillingImages2: List<String> = emptyList(),
     val imageFilling2RandomRotation: Boolean = false,

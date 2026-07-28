@@ -73,7 +73,7 @@ class IconViewModel(
     val bgStyle =
         _config.map { it.bgStyle }.stateIn(viewModelScope, SharingStarted.Eagerly, "solid")
     val selectedMasks = _config.map { it.selectedMasks }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, listOf("m3_round"))
+        .stateIn(viewModelScope, SharingStarted.Eagerly, listOf("hyperos3"))
     val previewThemeMode =
         _config.map { it.previewThemeMode }.stateIn(viewModelScope, SharingStarted.Eagerly, "dark")
 

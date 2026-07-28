@@ -2,7 +2,6 @@ package com.capybara.hypericonlab.modules.icon.domain.usecase
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
@@ -10,6 +9,7 @@ import com.capybara.hypericonlab.core.image.BackgroundGenerator
 import com.capybara.hypericonlab.core.image.GlassProcessor
 import com.capybara.hypericonlab.core.image.InnerShadowBitmapLoader
 import com.capybara.hypericonlab.core.image.LayerMerger
+import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.preview.PreviewGenerator
 import com.capybara.hypericonlab.core.utils.ZipUtils
@@ -56,28 +56,14 @@ class GeneratePreviewUseCase(private val context: Context) {
 
         val masks = config.selectedMasks
         val maskBitmaps = withContext(Dispatchers.IO) {
-            masks.mapNotNull { name ->
-                try {
-                    context.assets.open("masks/mask_${name}_512.png").use {
-                        BitmapFactory.decodeStream(it)
-                    }
-                } catch (_: Exception) {
-                    null
-                }
-            }
+            masks.mapNotNull { name -> MaskAssetLoader.loadBitmap(context, name) }
         }
 
         // 下层背景独立 mask（双层启用时加载）
         val maskBitmaps2 = if (config.dualLayerEnabled) {
             withContext(Dispatchers.IO) {
                 config.bgLayer2.selectedMasks.mapNotNull { name ->
-                    try {
-                        context.assets.open("masks/mask_${name}_512.png").use {
-                            BitmapFactory.decodeStream(it)
-                        }
-                    } catch (_: Exception) {
-                        null
-                    }
+                    MaskAssetLoader.loadBitmap(context, name)
                 }
             }
         } else emptyList()

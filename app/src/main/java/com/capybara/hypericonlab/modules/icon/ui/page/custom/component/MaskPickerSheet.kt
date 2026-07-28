@@ -1,7 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.custom.component
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -67,10 +67,39 @@ import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
+
+private val MaskDisplayNames = mapOf(
+    "hyperos3" to "HyperOS 3\n(0.281, 0.6)",
+    "ios27" to "iOS 27\n(0.258, 0.6)",
+    "coloros16" to "ColorOS 16\n(0.223, 0.6)",
+    "oneui" to "OneUI",
+    "m3_Ghost_ish" to "ghost"
+
+)
+
+private val MaskDisplayOrder = listOf(
+    "hyperos3",
+    "ios27",
+    "coloros16",
+    "oneui",
+    "m3_round",
+    "squircle",
+    "super_squircle"
+)
+
+private fun Sequence<MaskEntry>.sortedByDisplayOrder(): Sequence<MaskEntry> = sortedWith(
+    compareBy({
+        MaskDisplayOrder.indexOf(it.name).let { i -> if (i < 0) Int.MAX_VALUE else i }
+    }, { it.name })
+)
+
+// 形状条目
+private data class MaskEntry(val name: String, val isCommon: Boolean)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +116,7 @@ fun MaskPickerSheet(
 ) {
     val context = LocalContext.current
     var currentSelection by remember { mutableStateOf(selectedMasks) }
-    var allMasks by remember { mutableStateOf<List<String>>(emptyList()) }
+    var allMasks by remember { mutableStateOf<List<MaskEntry>>(emptyList()) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     val gridState = rememberLazyGridState()
@@ -105,26 +134,20 @@ fun MaskPickerSheet(
 
     LaunchedEffect(Unit) {
         val masks = withContext(Dispatchers.IO) {
-            context.assets.list("masks")
-                ?.asSequence()
-                ?.filter { it.endsWith(".png") }
-                ?.map { it.removePrefix("mask_").removeSuffix("_512.png") }
-                ?.sorted()
-                ?.toList() ?: emptyList()
+            context.assets.list("masks")?.asSequence()?.filter { it.endsWith(".png") }
+                ?.map { filename ->
+                    val withoutExt = filename.removeSuffix(".png")
+                    val isCommon = withoutExt.endsWith("_common")
+                    val name = withoutExt.removePrefix("mask_").removeSuffix("_common")
+                        .removeSuffix("_512")
+                    MaskEntry(name = name, isCommon = isCommon)
+                }?.sortedByDisplayOrder()?.toList() ?: emptyList()
         }
         allMasks = masks
     }
 
-    val commonMasks = listOf(
-        "m3_round",
-        "m3_square",
-        "oneui",
-        "super_squircle",
-        "squircle",
-        "hyper_2",
-        "hyper_3"
-    )
-    val otherMasks = allMasks.filter { it !in commonMasks }
+    val commonMasks = allMasks.filter { it.isCommon }
+    val otherMasks = allMasks.filter { !it.isCommon }
 
     FloatingBottomSheet(
         onDismiss = onDismiss,
@@ -200,8 +223,7 @@ fun MaskPickerSheet(
                         )
                     }
                 }
-            }
-        )
+            })
 
         Column(
             modifier = Modifier
@@ -225,25 +247,35 @@ fun MaskPickerSheet(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     item(span = { GridItemSpan(4) }) {
-                        Text(
-                            "常用形状 (${commonMasks.count { it in allMasks }})",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "常用形状 (${commonMasks.size})",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                "(圆角半径, 平滑圆角)",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
 
-                    items(commonMasks.filter { it in allMasks }) { mask ->
+                    items(commonMasks) { entry ->
                         MaskItem(
-                            name = mask,
-                            isSelected = mask in currentSelection,
+                            name = entry.name,
+                            isSelected = entry.name in currentSelection,
                             onClick = {
-                                currentSelection = if (mask in currentSelection) {
-                                    currentSelection - mask
+                                currentSelection = if (entry.name in currentSelection) {
+                                    currentSelection - entry.name
                                 } else {
-                                    if (currentSelection.size < 5) currentSelection + mask else currentSelection
+                                    if (currentSelection.size < 5) currentSelection + entry.name else currentSelection
                                 }
-                            }
-                        )
+                            })
                     }
 
                     item(span = { GridItemSpan(4) }) {
@@ -254,18 +286,17 @@ fun MaskPickerSheet(
                         )
                     }
 
-                    items(otherMasks) { mask ->
+                    items(otherMasks) { entry ->
                         MaskItem(
-                            name = mask,
-                            isSelected = mask in currentSelection,
+                            name = entry.name,
+                            isSelected = entry.name in currentSelection,
                             onClick = {
-                                currentSelection = if (mask in currentSelection) {
-                                    currentSelection - mask
+                                currentSelection = if (entry.name in currentSelection) {
+                                    currentSelection - entry.name
                                 } else {
-                                    if (currentSelection.size < 5) currentSelection + mask else currentSelection
+                                    if (currentSelection.size < 5) currentSelection + entry.name else currentSelection
                                 }
-                            }
-                        )
+                            })
                     }
                 }
 
@@ -300,9 +331,7 @@ fun MaskPickerSheet(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MaskItem(
-    name: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
+    name: String, isSelected: Boolean, onClick: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -310,12 +339,7 @@ fun MaskItem(
 
     LaunchedEffect(name) {
         withContext(Dispatchers.IO) {
-            try {
-                context.assets.open("masks/mask_${name}_512.png").use {
-                    bitmap = BitmapFactory.decodeStream(it)
-                }
-            } catch (_: Exception) {
-            }
+            bitmap = MaskAssetLoader.loadBitmap(context, name)
         }
     }
 
@@ -330,27 +354,21 @@ fun MaskItem(
             MaterialTheme.colorScheme.primaryContainer
         } else {
             MaterialTheme.colorScheme.surfaceContainerHighest
-        },
-        animationSpec = tween(durationMillis = 400),
-        label = "containerColor"
+        }, animationSpec = tween(durationMillis = 400), label = "containerColor"
     )
     val contentColor by animateColorAsState(
         targetValue = if (isSelected) {
             MaterialTheme.colorScheme.onPrimaryContainer
         } else {
             MaterialTheme.colorScheme.onSurface
-        },
-        animationSpec = tween(durationMillis = 400),
-        label = "contentColor"
+        }, animationSpec = tween(durationMillis = 400), label = "contentColor"
     )
 
     val shape = rememberKyantRoundedRectangleShape(cornerRadius)
     val interactionSource = remember { MutableInteractionSource() }
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .combinedClickable(
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.combinedClickable(
                 onClick = onClick,
                 onLongClick = onClick,
                 indication = null,
@@ -375,7 +393,7 @@ fun MaskItem(
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = name.replace("m3_", "").replace("_", " "),
+            text = MaskDisplayNames[name] ?: name.replace("m3_", "").replace("_", " "),
             fontSize = 10.sp,
             lineHeight = 16.sp,
             fontFamily = GoogleSansCodeFontFamily,

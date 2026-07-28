@@ -1,7 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.custom.component
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -54,6 +53,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -219,12 +219,7 @@ fun MaskThumbnail(mask: String) {
 
     LaunchedEffect(mask) {
         withContext(Dispatchers.IO) {
-            try {
-                context.assets.open("masks/mask_${mask}_512.png").use { stream ->
-                    bitmap = BitmapFactory.decodeStream(stream)
-                }
-            } catch (_: Exception) {
-            }
+            bitmap = MaskAssetLoader.loadBitmap(context, mask)
         }
     }
 

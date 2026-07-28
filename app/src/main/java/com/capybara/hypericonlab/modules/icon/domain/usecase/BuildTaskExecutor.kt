@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.capybara.hypericonlab.core.image.InnerShadowProcessor
+import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
@@ -196,14 +197,8 @@ class BuildTaskExecutor(
         }
     }
 
-    // 从 assets 加载单个 mask bitmap，失败返回 null
-    private fun loadMask(name: String): Bitmap? = try {
-        context.assets.open("${ExecutorConfig.MASKS_DIRNAME}/${ExecutorConfig.MASK_FILE_PREFIX}${name}${ExecutorConfig.MASK_FILE_SUFFIX}")
-            .use { BitmapFactory.decodeStream(it) }
-    } catch (e: Exception) {
-        Timber.tag(TAG).w(e, "Mask not found: $name")
-        null
-    }
+    // 从 assets 加载单个 mask bitmap，自动适配 _common 后缀，失败返回 null
+    private fun loadMask(name: String): Bitmap? = MaskAssetLoader.loadBitmap(context, name)
 
     // 从 assets 加载烘焙内阴影 PNG，失败返回 null
     private fun loadInnerShadow(shapeName: String, styleName: String, targetSize: Int): Bitmap? =
@@ -243,13 +238,6 @@ class BuildTaskExecutor(
 
             // lawnicons 下的 svg 目录名
             const val SVGS_DIRNAME = "svgs"
-
-            // assets 中 mask 文件所在目录
-            const val MASKS_DIRNAME = "masks"
-
-            // mask 文件名前缀与后缀（与 IconViewModel 保持一致）
-            const val MASK_FILE_PREFIX = "mask_"
-            const val MASK_FILE_SUFFIX = "_512.png"
 
             // assets 中烘焙内阴影文件所在目录（与 IconViewModel 保持一致）
             const val SHADOW_DIRNAME = "shadow_baked"

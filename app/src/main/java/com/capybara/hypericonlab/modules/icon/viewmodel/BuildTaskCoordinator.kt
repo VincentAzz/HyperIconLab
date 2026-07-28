@@ -3,11 +3,11 @@ package com.capybara.hypericonlab.modules.icon.viewmodel
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.image.InnerShadowBitmapLoader
+import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
@@ -77,23 +77,13 @@ class BuildTaskCoordinator(
                     withContext(Dispatchers.IO) { ZipUtils.findDirRecursive(lawniconsBase, "svgs") }
                 val configValue = configProvider()
                 val maskBitmaps = configValue.selectedMasks.mapNotNull { name ->
-                    try {
-                        context.assets.open("masks/mask_${name}_512.png")
-                            .use { BitmapFactory.decodeStream(it) }
-                    } catch (_: Exception) {
-                        null
-                    }
+                    MaskAssetLoader.loadBitmap(context, name)
                 }
 
                 // 下层 mask bitmaps（仅双层启用时加载）
                 val maskBitmaps2 = if (configValue.dualLayerEnabled) {
                     configValue.bgLayer2.selectedMasks.mapNotNull { name ->
-                        try {
-                            context.assets.open("masks/mask_${name}_512.png")
-                                .use { BitmapFactory.decodeStream(it) }
-                        } catch (_: Exception) {
-                            null
-                        }
+                        MaskAssetLoader.loadBitmap(context, name)
                     }
                 } else emptyList()
                 val buildConfig = buildIconBuildConfig(configValue)

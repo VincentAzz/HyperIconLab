@@ -56,7 +56,7 @@ data class IconConfigState(
     val bgStyle: String = "solid",
     val fgColorSource: String = "wallpaper",
     val bgColorSource: String = "wallpaper",
-    val selectedMasks: List<String> = listOf("m3_round"),
+    val selectedMasks: List<String> = listOf("hyperos3"),
     val previewThemeMode: String = "dark",
     val sticker: StickerUiState = StickerUiState(),
     val glass: GlassUiState = GlassUiState(),
@@ -100,7 +100,7 @@ data class BgLayerUiState(
     // 下层图层级透明度 0~255，默认不透明
     val alpha: Int = 255,
     // 形状遮罩
-    val selectedMasks: List<String> = listOf("m3_round"),
+    val selectedMasks: List<String> = listOf("hyperos3"),
     // 静态图片背景：已选图片引用列表
     val selectedStaticImages: List<String> = emptyList(),
     // 图片填充背景：已选图片引用列表
