@@ -9,7 +9,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 
-internal class ContinuousCurvatureRoundedRectangleCornerBuilder(
+class ContinuousCurvatureRoundedRectangleCornerBuilder(
     val extendedFraction: Double = 2.0 / 3.0,
     val arcFraction: Double = 0.5
 ) {

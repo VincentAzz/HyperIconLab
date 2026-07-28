@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,15 +18,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -50,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,7 +65,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
-import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
+import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
+import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
+import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidthMode
 import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
@@ -67,11 +76,13 @@ import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.image.CustomMaskGenerator
 import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
+import kotlin.math.absoluteValue
 
 private val MaskDisplayNames = mapOf(
     "hyperos3" to "HyperOS 3\n(0.281, 0.6)",
@@ -115,11 +126,19 @@ fun MaskPickerSheet(
     liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     val context = LocalContext.current
-    var currentSelection by remember { mutableStateOf(selectedMasks) }
+    // 检测初始是否为自定义形状模式
+    val initialIsCustom = selectedMasks.any { CustomMaskGenerator.isCustomMask(it) }
+    val initialParams = parseCustomMaskParams(selectedMasks)
+
+    var currentSelection by remember { mutableStateOf(if (initialIsCustom) emptyList() else selectedMasks) }
     var allMasks by remember { mutableStateOf<List<MaskEntry>>(emptyList()) }
+    var customCornerRadius by remember { mutableStateOf(initialParams.first) }
+    var customSmoothCorner by remember { mutableStateOf(initialParams.second) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     val gridState = rememberLazyGridState()
+    val pagerState =
+        rememberPagerState(pageCount = { 2 }, initialPage = if (initialIsCustom) 1 else 0)
 
     val isAtTop by remember {
         derivedStateOf {
@@ -162,7 +181,20 @@ fun MaskPickerSheet(
     ) {
         // Header
         CenterAlignedTopAppBar(
-            title = { SheetTitle("选择形状") },
+            title = {
+                FloatingTabRow(
+                    tabs = listOf("预设", "自定义"),
+                    selectedIndex = pagerState.currentPage,
+                    onSelected = { index ->
+                        coroutineScope.launch { pagerState.animateScrollToPage(index) }
+                    },
+                    barHeight = 40.dp,
+                    alignment = FloatingTabRowAlignment.CENTER,
+                    widthMode = FloatingTabRowWidthMode.WRAP_CONTENT,
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f),
+                    indicatorColor = MaterialTheme.colorScheme.primary
+                )
+            },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent
             ),
@@ -192,15 +224,26 @@ fun MaskPickerSheet(
                 }
             },
             actions = {
-                val enabled = currentSelection.isNotEmpty()
+                val enabled =
+                    if (pagerState.currentPage == 0) currentSelection.isNotEmpty() else true
                 Surface(
                     onClick = {
                         if (enabled) {
+                            val result = if (pagerState.currentPage == 0) {
+                                currentSelection
+                            } else {
+                                listOf(
+                                    CustomMaskGenerator.encode(
+                                        customCornerRadius,
+                                        customSmoothCorner
+                                    )
+                                )
+                            }
                             coroutineScope.launch {
                                 sheetState.hide()
                             }.invokeOnCompletion {
                                 if (!sheetState.isVisible) {
-                                    onMasksConfirmed(currentSelection)
+                                    onMasksConfirmed(result)
                                 }
                             }
                         }
@@ -225,102 +268,147 @@ fun MaskPickerSheet(
                 }
             })
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text(
-                text = "最多5个，多选形状将加入随机池进行生成",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+        // 禁用 overscroll effect：避免滑动力度大时到达边界页触发回弹抖动
+        CompositionLocalProvider(LocalOverscrollFactory provides null) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                pageSpacing = 8.dp
+            ) { page ->
+                val pageOffset = (
+                        (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                        ).absoluteValue
+                val fadeAlpha = (1f - pageOffset * 0.4f).coerceIn(0.75f, 1f)
 
-            Box(modifier = Modifier.weight(1f, fill = false)) {
-                LazyVerticalGrid(
-                    state = gridState,
-                    columns = GridCells.Fixed(4),
-                    contentPadding = PaddingValues(bottom = 32.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxWidth()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer { this.alpha = fadeAlpha }
                 ) {
-                    item(span = { GridItemSpan(4) }) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                "常用形状 (${commonMasks.size})",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                "(圆角半径, 平滑圆角)",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-
-                    items(commonMasks) { entry ->
-                        MaskItem(
-                            name = entry.name,
-                            isSelected = entry.name in currentSelection,
-                            onClick = {
-                                currentSelection = if (entry.name in currentSelection) {
-                                    currentSelection - entry.name
+                    when (page) {
+                        0 -> PresetMaskPage(
+                            gridState = gridState,
+                            commonMasks = commonMasks,
+                            otherMasks = otherMasks,
+                            currentSelection = currentSelection,
+                            showScrollHint = showScrollHint,
+                            onMaskClick = { maskName ->
+                                currentSelection = if (maskName in currentSelection) {
+                                    currentSelection - maskName
                                 } else {
-                                    if (currentSelection.size < 5) currentSelection + entry.name else currentSelection
+                                    if (currentSelection.size < 5) currentSelection + maskName else currentSelection
                                 }
-                            })
-                    }
+                            }
+                        )
 
-                    item(span = { GridItemSpan(4) }) {
+                        1 -> CustomMaskTab(
+                            cornerRadius = customCornerRadius,
+                            smoothCorner = customSmoothCorner,
+                            onCornerRadiusChange = { customCornerRadius = it },
+                            onSmoothCornerChange = { customSmoothCorner = it }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 预设形状页：常用形状 + 其他形状的网格列表
+@Composable
+private fun PresetMaskPage(
+    gridState: LazyGridState,
+    commonMasks: List<MaskEntry>,
+    otherMasks: List<MaskEntry>,
+    currentSelection: List<String>,
+    showScrollHint: Boolean,
+    onMaskClick: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        Text(
+            text = "最多5个，多选形状将加入随机池进行生成",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        Box(modifier = Modifier.weight(1f)) {
+            LazyVerticalGrid(
+                state = gridState,
+                columns = GridCells.Fixed(4),
+                contentPadding = PaddingValues(bottom = 32.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                item(span = { GridItemSpan(4) }) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            "Material 3 形状 (${otherMasks.size})",
+                            "常用形状 (${commonMasks.size})",
                             style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            "(圆角比例, 平滑圆角比例)",
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-
-                    items(otherMasks) { entry ->
-                        MaskItem(
-                            name = entry.name,
-                            isSelected = entry.name in currentSelection,
-                            onClick = {
-                                currentSelection = if (entry.name in currentSelection) {
-                                    currentSelection - entry.name
-                                } else {
-                                    if (currentSelection.size < 5) currentSelection + entry.name else currentSelection
-                                }
-                            })
-                    }
                 }
 
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = showScrollHint,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 8.dp)
+                items(commonMasks) { entry ->
+                    MaskItem(
+                        name = entry.name,
+                        isSelected = entry.name in currentSelection,
+                        onClick = { onMaskClick(entry.name) }
+                    )
+                }
+
+                item(span = { GridItemSpan(4) }) {
+                    Text(
+                        "其他形状 (${otherMasks.size})",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                items(otherMasks) { entry ->
+                    MaskItem(
+                        name = entry.name,
+                        isSelected = entry.name in currentSelection,
+                        onClick = { onMaskClick(entry.name) }
+                    )
+                }
+            }
+
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showScrollHint,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp)
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f),
+                    modifier = Modifier.size(36.dp),
                 ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f),
-                        modifier = Modifier.size(36.dp),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = AppMaterialSymbols.arrow_downward,
-                                contentDescription = "向下滚动",
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = AppMaterialSymbols.arrow_downward,
+                            contentDescription = "向下滚动",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f),
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 }
             }

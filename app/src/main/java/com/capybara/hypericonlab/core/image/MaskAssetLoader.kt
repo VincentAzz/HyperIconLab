@@ -13,6 +13,12 @@ object MaskAssetLoader {
     private const val MASK_SUFFIX_COMMON = "_512_common.png"
 
     fun loadBitmap(context: Context, name: String): Bitmap? {
+        // 自定义 mask：解析参数并运行时生成 bitmap
+        if (CustomMaskGenerator.isCustomMask(name)) {
+            val (cornerRadius, smooth) = CustomMaskGenerator.parseCustomMask(name) ?: return null
+            return CustomMaskGenerator.generate(cornerRadius, smooth)
+        }
+
         val paths = listOf(
             "$MASK_DIR/$MASK_PREFIX$name$MASK_SUFFIX_COMMON",
             "$MASK_DIR/$MASK_PREFIX$name$MASK_SUFFIX"
