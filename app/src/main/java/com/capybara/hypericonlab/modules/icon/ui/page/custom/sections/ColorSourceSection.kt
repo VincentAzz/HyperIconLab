@@ -145,6 +145,21 @@ fun ColorSourceSection(
         }
     }
 
+    // 当前 app/app_m3 源的"减少白色背景"开关值
+    val appReduceWhiteBg =
+        if (layerIndex == 1) bgLayer2.appReduceWhiteBg else config.appReduceWhiteBg
+
+    // 写入"减少白色背景"开关：上层写入 config.appReduceWhiteBg，下层写入 bgLayer2.appReduceWhiteBg
+    fun applyAppReduceWhiteBg(enabled: Boolean) {
+        viewModel.updateConfig {
+            if (layerIndex == 1) {
+                it.copy(bgLayer2 = it.bgLayer2.copy(appReduceWhiteBg = enabled))
+            } else {
+                it.copy(appReduceWhiteBg = enabled)
+            }
+        }
+    }
+
     var showColorPicker by remember { mutableStateOf(false) }
     var showPaletteStyleSheet by remember { mutableStateOf(false) }
     var showColorSpecSheet by remember { mutableStateOf(false) }
@@ -235,25 +250,52 @@ fun ColorSourceSection(
                             modifier = Modifier.weight(1f)
                         )
                         StyleChip(
-                            label = "基于应用",
+                            label = "基于应用-原色",
                             selected = colorSource == "app",
-                            onClick = { applyColorSource("app") },
+                            onClick = {
+                                applyColorSource("app")
+                                // 切换到 app 时默认关闭减少白色背景
+                                applyAppReduceWhiteBg(false)
+                            },
                             modifier = Modifier.weight(1f)
                         )
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        StyleChip(
+                            label = "基于应用-M3",
+                            selected = colorSource == "app_m3",
+                            onClick = {
+                                applyColorSource("app_m3")
+                                // 切换到 app_m3 时默认开启减少白色背景
+                                applyAppReduceWhiteBg(true)
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
                         StyleChip(
                             label = "Material 3 预设",
                             selected = colorSource == "preset",
                             onClick = { applyColorSource("preset") },
                             modifier = Modifier.weight(1f)
                         )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         StyleChip(
                             label = "中国传统色预设",
                             selected = colorSource == "ctc",
                             onClick = { applyColorSource("ctc") },
                             modifier = Modifier.weight(1f)
                         )
+                        // 黑白 chip 仅前景 sticker 显示；下层背景不显示
+                        if (isForeground && style == "sticker") {
+                            StyleChip(
+                                label = "黑白",
+                                selected = colorSource == "black_white",
+                                onClick = { applyColorSource("black_white") },
+                                modifier = Modifier.weight(1f)
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         StyleChip(
@@ -345,6 +387,65 @@ fun ColorSourceSection(
                     viewModel.updateConfig { it.copy(syncColorSource = enabled) }
                 }
             )
+        }
+
+        // 减少白色背景开关：app/app_m3 源时显示
+        // 启用时交换白色背景的 fg/bg，使背景变为非白色的前景色
+        item(
+            animatedVisibility = colorSource == "app" || colorSource == "app_m3",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) {
+            SwitchWidget(
+                icon = null,
+                iconPlaceholder = false,
+                title = "减少白色背景",
+                description = "反转白色背景的前景色和背景色",
+                checked = appReduceWhiteBg,
+                onCheckedChange = { enabled -> applyAppReduceWhiteBg(enabled) }
+            )
+        }
+
+        // app_m3 的 monet 变体 chips：浅色/中性/暗色（中性=交换浅色 fg/bg）
+        item(
+            animatedVisibility = colorSource == "app_m3",
+            topPadding = ListItemDefaults.SegmentedGap,
+        ) { shape ->
+            BaseItemContainer(shape = shape) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    StyleChip(
+                        label = "浅色",
+                        selected = previewThemeMode == "light",
+                        onClick = {
+                            if (layerIndex == 1) updateLowerThemeMode("light")
+                            else viewModel.updateConfig { it.copy(previewThemeMode = "light") }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    StyleChip(
+                        label = "中性",
+                        selected = previewThemeMode == "neutral",
+                        onClick = {
+                            if (layerIndex == 1) updateLowerThemeMode("neutral")
+                            else viewModel.updateConfig { it.copy(previewThemeMode = "neutral") }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    StyleChip(
+                        label = "暗色",
+                        selected = previewThemeMode == "dark",
+                        onClick = {
+                            if (layerIndex == 1) updateLowerThemeMode("dark")
+                            else viewModel.updateConfig { it.copy(previewThemeMode = "dark") }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
         }
 
         // 同步上层与下层背景颜色开关：双层启用且上层背景（非前景）时显示。
