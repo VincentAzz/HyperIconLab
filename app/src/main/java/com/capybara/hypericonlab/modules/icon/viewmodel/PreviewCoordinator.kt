@@ -35,64 +35,94 @@ class PreviewCoordinator(
     private val _mainPreviewBitmap = MutableStateFlow<Bitmap?>(null)
     val mainPreviewBitmap: StateFlow<Bitmap?> = _mainPreviewBitmap.asStateFlow()
 
+    // 预览生成状态（包含实时预览和大预览图生成过程）
+    private val _isPreviewLoading = MutableStateFlow(false)
+    val isPreviewLoading: StateFlow<Boolean> = _isPreviewLoading.asStateFlow()
+
     // 预览生成协程句柄，新请求会取消旧任务
     private var previewJob: Job? = null
 
-    // 实时预览：300ms 防抖
+    // 实时预览：300ms 防抖（防抖期间 loading 已显示，requestTime 在 delay 前记录）
     fun generateLivePreview() {
         previewJob?.cancel()
+        _isPreviewLoading.value = true
+        val requestTime = System.currentTimeMillis()
         previewJob = scope.launch {
             delay(300.milliseconds)
-            generatePreview(isLive = true)
+            generatePreviewInternal(isLive = true, requestTime = requestTime)
         }
     }
 
-    // 手动刷新：等同 generateLivePreview
+    // 手动刷新：立即生成，不防抖
     fun refreshPreview() {
-        generateLivePreview()
+        previewJob?.cancel()
+        _isPreviewLoading.value = true
+        val requestTime = System.currentTimeMillis()
+        previewJob = scope.launch {
+            generatePreviewInternal(isLive = true, requestTime = requestTime)
+        }
     }
 
-    // 生成预览图。isLive=true 为实时预览（不修改运行/进度状态），false 为大预览图
+    // 生成预览图
     fun generatePreview(isLive: Boolean = false) {
-        if (isRunningProvider() && !isLive) return
-        if (!isLive) onRunningChange(true)
+        if (isLive) {
+            generateLivePreview()
+        } else {
+            if (isRunningProvider()) return
+            onRunningChange(true)
+            scope.launch {
+                generatePreviewInternal(isLive = false)
+            }
+        }
+    }
 
+    private suspend fun generatePreviewInternal(isLive: Boolean, requestTime: Long = 0L) {
         val typeStr = if (isLive) "实时预览" else "大预览图"
         val startTime = System.currentTimeMillis()
 
-        previewJob?.cancel()
-        previewJob = scope.launch {
-            try {
-                if (!isLive) onStatusTextChange("正在加载图标...")
-                val result = generatePreviewUseCase.execute(
-                    config = configProvider(),
-                    wallpaperBitmap = wallpaperBitmapProvider(),
-                    wallpaperColorScheme = wallpaperColorSchemeProvider(),
-                    appColorSchemes = appColorSchemesProvider(),
-                    onStorePreviewGenerated = { _storePreviewBitmap.value = it }
-                )
-                _mainPreviewBitmap.value = result
-                val duration = System.currentTimeMillis() - startTime
-                if (result == null) {
-                    if (!isLive) {
-                        onStatusTextChange("预览错误")
-                        onRunningChange(false)
-                    }
-                    onLog("生成 $typeStr 失败：资源未就绪", LogType.ERROR)
-                } else if (!isLive) {
-                    onStatusTextChange("预览已生成。")
-                    onProgressChange(1.0f)
-                    onRunningChange(false)
-                    onLog("生成 $typeStr 成功，耗时 ${duration}ms", LogType.SUCCESS)
-                } else {
-                    onLog("生成 $typeStr 成功，耗时 ${duration}ms", LogType.INFO)
-                }
-            } catch (e: Exception) {
+        try {
+            if (!isLive) onStatusTextChange("正在加载图标...")
+            val result = generatePreviewUseCase.execute(
+                config = configProvider(),
+                wallpaperBitmap = wallpaperBitmapProvider(),
+                wallpaperColorScheme = wallpaperColorSchemeProvider(),
+                appColorSchemes = appColorSchemesProvider(),
+                onStorePreviewGenerated = { _storePreviewBitmap.value = it }
+            )
+            _mainPreviewBitmap.value = result
+            val duration = System.currentTimeMillis() - startTime
+            if (result == null) {
                 if (!isLive) {
                     onStatusTextChange("预览错误")
                     onRunningChange(false)
-                    onLog("生成 $typeStr 失败: ${e.message}", LogType.ERROR)
                 }
+                onLog("生成 $typeStr 失败：资源未就绪", LogType.ERROR)
+            } else if (!isLive) {
+                onStatusTextChange("预览已生成。")
+                onProgressChange(1.0f)
+                onRunningChange(false)
+                onLog("生成 $typeStr 成功，耗时 ${duration}ms", LogType.SUCCESS)
+            } else {
+                onLog("生成 $typeStr 成功，耗时 ${duration}ms", LogType.INFO)
+            }
+
+            if (isLive) {
+                // 强制至少显示 300ms loading
+                val elapsed = System.currentTimeMillis() - requestTime
+                val remainingTime = 300 - elapsed
+                if (remainingTime > 0) {
+                    delay(remainingTime.milliseconds)
+                }
+            }
+        } catch (e: Exception) {
+            if (!isLive) {
+                onStatusTextChange("预览错误")
+                onRunningChange(false)
+                onLog("生成 $typeStr 失败: ${e.message}", LogType.ERROR)
+            }
+        } finally {
+            if (isLive) {
+                _isPreviewLoading.value = false
             }
         }
     }

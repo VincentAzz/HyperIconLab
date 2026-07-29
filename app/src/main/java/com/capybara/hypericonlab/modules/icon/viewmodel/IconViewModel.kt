@@ -190,6 +190,7 @@ class IconViewModel(
     )
     val storePreviewBitmap: StateFlow<Bitmap?> = previewCoordinator.storePreviewBitmap
     val mainPreviewBitmap: StateFlow<Bitmap?> = previewCoordinator.mainPreviewBitmap
+    val isPreviewLoading: StateFlow<Boolean> = previewCoordinator.isPreviewLoading
 
     // 构建任务协调器：管理打包流程、任务提交/重试/取消/删除、权限检查
     // 通过 provider 回调解耦状态读取，通过回调解耦状态写回与配置切换

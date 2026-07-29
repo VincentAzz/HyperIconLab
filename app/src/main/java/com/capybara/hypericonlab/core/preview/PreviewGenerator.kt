@@ -16,7 +16,7 @@ object PreviewGenerator {
         wallpaper: Bitmap? = null
     ): Bitmap {
         val targetWidth = 1080
-        val targetHeight = 2400
+        val targetHeight = 2200
         val result = createBitmap(targetWidth, targetHeight)
         val canvas = Canvas(result)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -31,7 +31,7 @@ object PreviewGenerator {
 
         val rows = 8
         val cols = 4
-        val iconSize = 160
+        val iconSize = 180
         val hGap = (targetWidth - (cols * iconSize)) / (cols + 1)
         val vGap = (targetHeight - (rows * iconSize)) / (rows + 1)
 

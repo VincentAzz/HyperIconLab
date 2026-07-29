@@ -80,6 +80,7 @@ fun CustomPage(
 ) {
     val storePreviewBitmap by viewModel.storePreviewBitmap.collectAsStateWithLifecycle()
     val mainPreviewBitmap by viewModel.mainPreviewBitmap.collectAsStateWithLifecycle()
+    val isPreviewLoading by viewModel.isPreviewLoading.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val themeState by themeViewModel.state.collectAsStateWithLifecycle()
     val availableIconSets by viewModel.availableIconSets.collectAsStateWithLifecycle()
@@ -229,6 +230,7 @@ fun CustomPage(
             // 固定预览区（包含预览图与下方按钮组：壁纸/刷新/全屏 + 构建/保存预设）
             PreviewSection(
                 bitmap = storePreviewBitmap,
+                isLoading = isPreviewLoading,
                 onPickWallpaper = {
                     try {
                         wallpaperLauncher.launch("image/*")

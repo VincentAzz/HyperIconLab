@@ -1,6 +1,11 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.custom.sections
 
 import android.graphics.Bitmap
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,6 +49,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRec
 @Composable
 fun PreviewSection(
     bitmap: Bitmap?,
+    isLoading: Boolean = false,
     onPickWallpaper: () -> Unit,
     onRefresh: () -> Unit,
     onExpand: () -> Unit,
@@ -77,7 +83,7 @@ fun PreviewSection(
                         .height(targetHeight)
                         .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
                         .background(Color.Gray)
-                        .clickable { onExpand() }
+                        .clickable(enabled = !isLoading) { onExpand() }
                 ) {
                     if (bitmap != null) {
                         Image(
@@ -120,7 +126,8 @@ fun PreviewSection(
                     CircleIconButton(
                         icon = AppMaterialSymbols.open_in_full,
                         contentDescription = "全屏",
-                        onClick = onExpand
+                        onClick = onExpand,
+                        isLoading = isLoading
                     )
                     CircleIconButton(
                         icon = AppMaterialSymbols.category,
@@ -147,25 +154,48 @@ private fun CircleIconButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     contentDescription: String,
     onClick: () -> Unit,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    isLoading: Boolean = false
 ) {
     val backgroundAlpha =
-        if (enabled) PreviewSectionConfig.BUTTON_BG_ALPHA else PreviewSectionConfig.BUTTON_BG_ALPHA_DISABLED
-    val tint = if (enabled) MaterialTheme.colorScheme.onSecondaryContainer
+        if (enabled && !isLoading) PreviewSectionConfig.BUTTON_BG_ALPHA else PreviewSectionConfig.BUTTON_BG_ALPHA_DISABLED
+    val tint = if (enabled && !isLoading) MaterialTheme.colorScheme.onSecondaryContainer
     else MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = PreviewSectionConfig.BUTTON_TINT_ALPHA_DISABLED)
     Box(
         modifier = Modifier
             .size(PreviewSectionConfig.BUTTON_SIZE)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = backgroundAlpha))
-            .clickable(enabled = enabled, onClick = onClick), contentAlignment = Alignment.Center
+            .clickable(enabled = enabled && !isLoading, onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = tint,
-            modifier = Modifier.size(PreviewSectionConfig.BUTTON_ICON_SIZE)
-        )
+        AnimatedContent(
+            targetState = isLoading,
+            label = "loading_icon_switch",
+            transitionSpec = {
+                val duration = 300
+                fadeIn(animationSpec = tween(duration)) togetherWith fadeOut(
+                    animationSpec = tween(
+                        duration
+                    )
+                )
+            }
+        ) { loading ->
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(PreviewSectionConfig.BUTTON_ICON_SIZE),
+                    color = tint,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = contentDescription,
+                    tint = tint,
+                    modifier = Modifier.size(PreviewSectionConfig.BUTTON_ICON_SIZE)
+                )
+            }
+        }
     }
 }
 
