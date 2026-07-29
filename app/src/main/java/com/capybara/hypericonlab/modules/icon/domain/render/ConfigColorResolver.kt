@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.domain.render
 
+import android.content.Context
 import android.graphics.Color
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.toArgb
@@ -21,6 +22,10 @@ object ConfigColorResolver {
     private var presetCacheKey: String? = null
     private var presetLightScheme: ColorScheme? = null
     private var presetDarkScheme: ColorScheme? = null
+
+    // App-M3 默认配置（不暴露给用户，固定使用 TonalSpot + SPEC_2021）
+    private val APP_M3_PALETTE_STYLE = PaletteStyle.TonalSpot
+    private val APP_M3_COLOR_SPEC = ThemeColorSpec.SPEC_2021
 
     // 获取或计算 preset scheme（带缓存）
     private fun getPresetScheme(
@@ -64,7 +69,9 @@ object ConfigColorResolver {
         wallpaperColorScheme: MonetColorExtractor.WallpaperColorScheme?,
         appColorSchemes: Map<String, Pair<String, String>>,
         packageName: String? = null,
-        layerIndex: Int = 0
+        layerIndex: Int = 0,
+        // App-M3 缓存所需 context，仅 app_m3 源使用
+        context: Context? = null
     ): String {
         val bgLayer2 = config.bgLayer2
         val source = when {
@@ -108,14 +115,33 @@ object ConfigColorResolver {
             }
 
             "app" -> {
-                packageName?.let { pkg ->
-                    appColorSchemes[pkg]?.let { scheme ->
-                        val originalFg = scheme.first
-                        val originalBg = scheme.second
-                        if (isFg && config.bgStyle == "none" && isColorWhite(originalFg)) originalBg
-                        else if (isFg) originalFg else originalBg
-                    }
-                } ?: defaultColor
+                // 上层 reduceWhiteBg 取 config.appReduceWhiteBg；下层取 bgLayer2.appReduceWhiteBg
+                val reduceWhiteBg = if (layerIndex == 1) config.bgLayer2.appReduceWhiteBg
+                else config.appReduceWhiteBg
+                resolveAppColors(
+                    isFg = isFg,
+                    appColorSchemes = appColorSchemes,
+                    packageName = packageName,
+                    reduceWhiteBg = reduceWhiteBg,
+                    bgStyleNone = config.bgStyle == "none",
+                    defaultColor = defaultColor
+                )
+            }
+
+            "app_m3" -> {
+                // app_m3：用应用颜色作为 M3 种子色，从生成的 scheme 中取 fg/bg
+                val reduceWhiteBg = if (layerIndex == 1) config.bgLayer2.appReduceWhiteBg
+                else config.appReduceWhiteBg
+                resolveAppM3Colors(
+                    isFg = isFg,
+                    context = context,
+                    appColorSchemes = appColorSchemes,
+                    packageName = packageName,
+                    themeMode = themeMode,
+                    reduceWhiteBg = reduceWhiteBg,
+                    bgStyleNone = config.bgStyle == "none",
+                    defaultColor = defaultColor
+                )
             }
 
             "custom" -> customColor
@@ -155,7 +181,7 @@ object ConfigColorResolver {
         }.let { resolvedColor ->
             // 下层背景（layerIndex=1）同源优化：
             // 当上下层 colorSource 相同且为 app/ctc 单色源时，对下层应用亮度互补，
-            // 确保两层有可见对比度。wallpaper/preset 有完整 scheme 由用户选 monet 变体互补，不自动处理。
+            // 确保两层有可见对比度。wallpaper/preset/app_m3 有完整 scheme 由用户选 monet 变体互补，不自动处理。
             if (!isFg && layerIndex == 1 &&
                 source == config.bgColorSource && (source == "app" || source == "ctc")
             ) {
@@ -164,6 +190,107 @@ object ConfigColorResolver {
                 resolvedColor
             }
         }
+    }
+
+    // 解析"基于应用-原色"颜色
+    // reduceWhiteBg 启用时：白色背景交换 fg/bg，使背景变为非白色的前景色
+    fun resolveAppColors(
+        isFg: Boolean,
+        appColorSchemes: Map<String, Pair<String, String>>,
+        packageName: String?,
+        reduceWhiteBg: Boolean,
+        bgStyleNone: Boolean,
+        defaultColor: String
+    ): String {
+        return packageName?.let { pkg ->
+            appColorSchemes[pkg]?.let { scheme ->
+                val originalFg = scheme.first
+                val originalBg = scheme.second
+                when {
+                    // 减少白色背景：bg 为白色时交换 fg/bg
+                    reduceWhiteBg && isColorWhite(originalBg) -> {
+                        if (isFg) originalBg else originalFg
+                    }
+                    // 原逻辑：无背景且 fg 为白色时，fg 改用 bg
+                    isFg && bgStyleNone && isColorWhite(originalFg) -> originalBg
+                    isFg -> originalFg
+                    else -> originalBg
+                }
+            }
+        } ?: defaultColor
+    }
+
+    // 解析"基于应用-M3"颜色
+    // 用应用背景色作为种子色生成 M3 scheme，从 scheme 中按 monet 变体取 fg/bg
+    // reduceWhiteBg 启用时：白色背景交换 fg/bg，使背景变为非白色的前景色作为种子色
+    // 中性变体：参考"基于壁纸"，交换浅色 fg/bg
+    fun resolveAppM3Colors(
+        isFg: Boolean,
+        context: Context?,
+        appColorSchemes: Map<String, Pair<String, String>>,
+        packageName: String?,
+        themeMode: String,
+        reduceWhiteBg: Boolean,
+        bgStyleNone: Boolean,
+        defaultColor: String
+    ): String {
+        if (context == null) return defaultColor
+
+        val (seedColorHex, _) = pickAppSeedColor(
+            appColorSchemes = appColorSchemes,
+            packageName = packageName,
+            reduceWhiteBg = reduceWhiteBg,
+            defaultColor = defaultColor
+        ) ?: return defaultColor
+
+        val seedColorArgb = try {
+            seedColorHex.toColorInt()
+        } catch (_: Exception) {
+            return defaultColor
+        }
+
+        // 从缓存获取或计算 M3 关键颜色
+        val colors = AppM3ColorCache.getOrCompute(
+            context = context,
+            seedColor = seedColorArgb,
+            paletteStyle = APP_M3_PALETTE_STYLE,
+            colorSpec = APP_M3_COLOR_SPEC
+        )
+
+        // 按 monet 变体取 fg/bg，与 wallpaper 源一致
+        return when (themeMode) {
+            "light" -> if (isFg) formatHex(colors.lightPrimary) else formatHex(colors.lightPrimaryContainer)
+            "neutral" -> if (isFg) formatHex(colors.lightPrimaryContainer) else formatHex(colors.lightPrimary)
+            "dark" -> if (isFg) formatHex(colors.darkOnPrimaryContainer) else formatHex(colors.darkOnPrimary)
+            else -> defaultColor
+        }
+    }
+
+    // 提取应用的种子色：优先背景色，reduceWhiteBg 时白色背景改用前景色
+    // 返回 (seedColorHex, isSwapped)
+    private fun pickAppSeedColor(
+        appColorSchemes: Map<String, Pair<String, String>>,
+        packageName: String?,
+        reduceWhiteBg: Boolean,
+        defaultColor: String
+    ): Pair<String, Boolean>? {
+        return packageName?.let { pkg ->
+            appColorSchemes[pkg]?.let { scheme ->
+                val originalFg = scheme.first
+                val originalBg = scheme.second
+                if (reduceWhiteBg && isColorWhite(originalBg)) {
+                    // 白色背景时改用前景色作为种子色
+                    originalFg to true
+                } else {
+                    originalBg to false
+                }
+            }
+        }
+    }
+
+    // 格式化 Int 颜色值为 #AARRGGBB 字符串
+    private fun formatHex(colorInt: Int): String {
+        return String.format("#%08X", colorInt)
     }
 
     // 判断是否接近白色

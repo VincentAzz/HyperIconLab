@@ -155,7 +155,8 @@ class BuildTaskCoordinator(
         val wallpaperColorScheme = wallpaperColorSchemeProvider()
         val appColorSchemes = appColorSchemesProvider()
 
-        val resolvedFgColor = if (configValue.fgColorSource != "app") {
+        val resolvedFgColor =
+            if (configValue.fgColorSource != "app" && configValue.fgColorSource != "app_m3") {
             ConfigColorResolver.resolveConfigColors(
                 isFg = true,
                 config = configValue,
@@ -164,7 +165,8 @@ class BuildTaskCoordinator(
             )
         } else configValue.fgColor
 
-        val resolvedBgColor = if (configValue.bgColorSource != "app") {
+        val resolvedBgColor =
+            if (configValue.bgColorSource != "app" && configValue.bgColorSource != "app_m3") {
             ConfigColorResolver.resolveConfigColors(
                 isFg = false,
                 config = configValue,
@@ -174,7 +176,7 @@ class BuildTaskCoordinator(
         } else configValue.bgColor
 
         val resolvedBgColor2 = if (configValue.dualLayerEnabled &&
-            configValue.bgLayer2.colorSource != "app"
+            configValue.bgLayer2.colorSource != "app" && configValue.bgLayer2.colorSource != "app_m3"
         ) {
             ConfigColorResolver.resolveConfigColors(
                 isFg = false,
@@ -213,6 +215,7 @@ class BuildTaskCoordinator(
             bgStyle2 = configValue.bgLayer2.style,
             bgColor2 = resolvedBgColor2,
             bgColorSource2 = configValue.bgLayer2.colorSource,
+            previewThemeMode = configValue.previewThemeMode,
             bgPreviewThemeMode2 = configValue.bgLayer2.previewThemeMode,
             bgLayer2Alpha = configValue.bgLayer2.alpha,
             selectedMasks2 = configValue.bgLayer2.selectedMasks,

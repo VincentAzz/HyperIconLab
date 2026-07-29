@@ -11,6 +11,7 @@ import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.modules.icon.domain.model.ColorMode
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.render.BackgroundLayerRenderer
+import com.capybara.hypericonlab.modules.icon.domain.render.ConfigColorResolver
 import com.capybara.hypericonlab.modules.icon.domain.render.DualLayerComposer
 import com.capybara.hypericonlab.modules.icon.domain.render.IconForegroundRenderer
 import com.capybara.hypericonlab.modules.icon.domain.render.RetroStyleRenderer
@@ -126,7 +127,7 @@ class IconPipelineUseCase(
                             upperBgResult.background.recycle()
 
                             // 双层合成：上层（含图标）缩放后居中绘制到下层（铺满 iconSize）之上
-                            // 下层颜色解析：app 源按 packageName 实时解析（同源时应用 HSL 亮度互补），
+                            // 下层颜色解析：app/app_m3 源按 packageName 实时解析（app 同源时应用 HSL 亮度互补），
                             // 其余源（wallpaper/preset/ctc/custom/black_white）由 ViewModel 预解析到 config.bgColor2
                             val finalBitmap =
                                 if (config.dualLayerEnabled && config.bgStyle != "none") {
@@ -136,12 +137,30 @@ class IconPipelineUseCase(
                                         "#00000000"
                                     } else if (config.bgColorSource2 == "app") {
                                         // app 源：每个图标颜色不同，按 packageName 实时解析
-                                        val appBg =
-                                            appColorSchemes[packageName]?.second ?: config.bgColor2
+                                        val appBg = ConfigColorResolver.resolveAppColors(
+                                            isFg = false,
+                                            appColorSchemes = appColorSchemes,
+                                            packageName = packageName,
+                                            reduceWhiteBg = config.bgLayer2AppReduceWhiteBg,
+                                            bgStyleNone = false,
+                                            defaultColor = config.bgColor2
+                                        )
                                         // 同源优化：上下层均为 app 时，对下层应用亮度互补
                                         if (config.bgColorSource == "app") {
                                             HslColorUtils.adjustLuminanceForContrast(appBg)
                                         } else appBg
+                                    } else if (config.bgColorSource2 == "app_m3") {
+                                        // app_m3 源：每个图标颜色不同，按 packageName 实时解析 M3 scheme
+                                        ConfigColorResolver.resolveAppM3Colors(
+                                            isFg = false,
+                                            context = context,
+                                            appColorSchemes = appColorSchemes,
+                                            packageName = packageName,
+                                            themeMode = config.bgPreviewThemeMode2,
+                                            reduceWhiteBg = config.bgLayer2AppReduceWhiteBg,
+                                            bgStyleNone = false,
+                                            defaultColor = config.bgColor2
+                                        )
                                     } else {
                                         config.bgColor2
                                     }
@@ -235,13 +254,54 @@ class IconPipelineUseCase(
         }
         // CUSTOM 与 COLORFUL 回退分支：按 colorSource 决定颜色
         // - "app" 源：用 appColorSchemes[packageName]（每个图标颜色不同），缺失则回退到预填色
+        // - "app_m3" 源：用应用颜色作为 M3 种子色生成 scheme 取色（每个图标不同）
         // - 其他源（wallpaper/preset/ctc/custom/black_white）：使用 ViewModel 预解析后填入的 fgColorHex/bgColorHex
-        val currentFg = if (config.fgColorSource == "app") {
-            schemes[packageName]?.first ?: config.fgColorHex
-        } else config.fgColorHex
-        val currentBg = if (config.bgColorSource == "app") {
-            schemes[packageName]?.second ?: config.bgColorHex
-        } else config.bgColorHex
+        val currentFg = when (config.fgColorSource) {
+            "app" -> ConfigColorResolver.resolveAppColors(
+                isFg = true,
+                appColorSchemes = schemes,
+                packageName = packageName,
+                reduceWhiteBg = config.appReduceWhiteBg,
+                bgStyleNone = config.bgStyle == "none",
+                defaultColor = config.fgColorHex
+            )
+
+            "app_m3" -> ConfigColorResolver.resolveAppM3Colors(
+                isFg = true,
+                context = context,
+                appColorSchemes = schemes,
+                packageName = packageName,
+                themeMode = config.previewThemeMode,
+                reduceWhiteBg = config.appReduceWhiteBg,
+                bgStyleNone = config.bgStyle == "none",
+                defaultColor = config.fgColorHex
+            )
+
+            else -> config.fgColorHex
+        }
+        val currentBg = when (config.bgColorSource) {
+            "app" -> ConfigColorResolver.resolveAppColors(
+                isFg = false,
+                appColorSchemes = schemes,
+                packageName = packageName,
+                reduceWhiteBg = config.appReduceWhiteBg,
+                bgStyleNone = config.bgStyle == "none",
+                defaultColor = config.bgColorHex
+            )
+
+            "app_m3" -> ConfigColorResolver.resolveAppM3Colors(
+                isFg = false,
+                context = context,
+                appColorSchemes = schemes,
+                packageName = packageName,
+                themeMode = config.previewThemeMode,
+                reduceWhiteBg = config.appReduceWhiteBg,
+                bgStyleNone = config.bgStyle == "none",
+                defaultColor = config.bgColorHex
+            )
+
+            else -> config.bgColorHex
+        }
         return Pair(currentFg, currentBg)
     }
 

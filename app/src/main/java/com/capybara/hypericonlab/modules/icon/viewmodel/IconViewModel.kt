@@ -300,7 +300,8 @@ class IconViewModel(
             config = config,
             wallpaperColorScheme = wallpaperColorScheme.value,
             appColorSchemes = appColorSchemes,
-            layerIndex = layerIndex
+            layerIndex = layerIndex,
+            context = context
         )
         updateConfig {
             if (isFg) it.copy(fgColorSource = "custom", fgColor = resolvedColor)

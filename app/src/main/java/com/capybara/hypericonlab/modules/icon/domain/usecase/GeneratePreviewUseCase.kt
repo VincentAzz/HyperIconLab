@@ -160,14 +160,16 @@ class GeneratePreviewUseCase(private val context: Context) {
                     config,
                     wallpaperColorScheme,
                     appColorSchemes,
-                    packageName
+                    packageName,
+                    context = context
                 )
                 val currentBg = ConfigColorResolver.resolveConfigColors(
                     false,
                     config,
                     wallpaperColorScheme,
                     appColorSchemes,
-                    packageName
+                    packageName,
+                    context = context
                 )
 
                 val finalFg =
@@ -261,7 +263,8 @@ class GeneratePreviewUseCase(private val context: Context) {
                                 wallpaperColorScheme = wallpaperColorScheme,
                                 appColorSchemes = appColorSchemes,
                                 packageName = packageName,
-                                layerIndex = 1
+                                layerIndex = 1,
+                                context = context
                             )
                             val finalBg2 = if (bgLayer2.style == "none") "#00000000" else currentBg2
                             val lowerBg = when (bgLayer2.style) {

@@ -38,6 +38,8 @@ data class IconBuildConfig(
     val bgStyle2: String = "solid",
     val bgColor2: String = "#FF3F51B5",
     val bgColorSource2: String = "wallpaper",
+    // 上层 monet 变体（app_m3 源按 packageName 解析时使用）
+    val previewThemeMode: String = "dark",
     // 下层独立的 monet 变体
     val bgPreviewThemeMode2: String = "dark",
     // 下层图层级透明度 0~255
