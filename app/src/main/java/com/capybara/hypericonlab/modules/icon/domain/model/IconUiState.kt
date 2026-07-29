@@ -80,7 +80,10 @@ data class IconConfigState(
     // 双层启用时，上层颜色来源变更是否同步应用到下层（仅同步 colorSource，下层 monet 变体保持独立）
     val syncDualLayerColorSource: Boolean = false,
     // 内阴影配置（仅单层背景生效）
-    val innerShadow: InnerShadowUiState = InnerShadowUiState()
+    val innerShadow: InnerShadowUiState = InnerShadowUiState(),
+    // 基于应用颜色源的"减少白色背景"开关：启用时交换白色背景的 fg/bg
+    // 切换到 "app" 时默认 false，切换到 "app_m3" 时默认 true
+    val appReduceWhiteBg: Boolean = false
 )
 
 /**
@@ -106,7 +109,9 @@ data class BgLayerUiState(
     // 图片填充背景：已选图片引用列表
     val selectedFillingImages: List<String> = emptyList(),
     // 图片填充配置
-    val imageFilling: ImageFillingUiState = ImageFillingUiState()
+    val imageFilling: ImageFillingUiState = ImageFillingUiState(),
+    // 下层独立的"减少白色背景"开关（与上层 appReduceWhiteBg 分离）
+    val appReduceWhiteBg: Boolean = false
 )
 
 @Serializable

@@ -48,7 +48,11 @@ data class IconBuildConfig(
     val imageFilling2RandomRotation: Boolean = false,
     val imageFilling2ScaleMode: String = "scale",
     // 内阴影配置（仅单层背景生效，双层背景时 enabled 应为 false）
-    val innerShadow: InnerShadowConfig = InnerShadowConfig()
+    val innerShadow: InnerShadowConfig = InnerShadowConfig(),
+    // 上层"减少白色背景"开关（app/app_m3 源生效）
+    val appReduceWhiteBg: Boolean = false,
+    // 下层"减少白色背景"开关
+    val bgLayer2AppReduceWhiteBg: Boolean = false
 )
 
 /**

@@ -224,7 +224,9 @@ class BuildTaskCoordinator(
                 enabled = configValue.innerShadow.enabled && !configValue.dualLayerEnabled,
                 styleName = configValue.innerShadow.styleName,
                 intensityLayers = configValue.innerShadow.intensityLayers
-            )
+            ),
+            appReduceWhiteBg = configValue.appReduceWhiteBg,
+            bgLayer2AppReduceWhiteBg = configValue.bgLayer2.appReduceWhiteBg
         )
     }
 

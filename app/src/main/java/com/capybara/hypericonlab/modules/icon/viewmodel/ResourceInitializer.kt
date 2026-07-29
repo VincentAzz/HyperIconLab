@@ -2,8 +2,11 @@ package com.capybara.hypericonlab.modules.icon.viewmodel
 
 import android.content.Context
 import com.capybara.hypericonlab.core.color.AppColorSchemesLoader
+import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
+import com.capybara.hypericonlab.modules.icon.domain.render.AppM3ColorCache
 import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -91,11 +94,19 @@ class ResourceInitializer(
     }
 
     // 加载 app 配色方案并同步给 BuildTaskManager
+    // 同时加载 App-M3 持久化缓存到内存（跨启动复用）
     fun loadColorSchemes() {
         scope.launch(Dispatchers.IO) {
             appColorSchemes = AppColorSchemesLoader.loadFromAssets(context)
             // 同步给 BuildTaskManager，供 executor 执行任务时使用
             buildTaskManager.updateAppColorSchemes(appColorSchemes)
+            // 加载 App-M3 持久化缓存（使用与 WallpaperUiState 一致的默认配置）
+            // App-M3 不暴露 paletteStyle/colorSpec 配置，使用固定默认值
+            AppM3ColorCache.loadFromFile(
+                context = context,
+                paletteStyle = PaletteStyle.TonalSpot,
+                colorSpec = ThemeColorSpec.SPEC_2021
+            )
         }
     }
 }
