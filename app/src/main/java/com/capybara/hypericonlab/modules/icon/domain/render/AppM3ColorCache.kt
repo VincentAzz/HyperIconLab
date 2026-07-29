@@ -3,6 +3,8 @@ package com.capybara.hypericonlab.modules.icon.domain.render
 import android.content.Context
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
@@ -109,6 +111,30 @@ object AppM3ColorCache {
         onProgress(computed, total)
     }
 
+    // 预处理 appColorSchemes：提取所有唯一背景色作为种子色
+    // reduceWhiteBg 启用时，白色背景改用前景色作为种子色（与运行时 resolveAppM3Colors 逻辑一致）
+    suspend fun preprocessAppColorSchemes(
+        context: Context,
+        paletteStyle: PaletteStyle,
+        colorSpec: ThemeColorSpec,
+        appColorSchemes: Map<String, Pair<String, String>>,
+        reduceWhiteBg: Boolean,
+        onProgress: (computed: Int, total: Int) -> Unit
+    ) {
+        // 提取唯一种子色：reduceWhiteBg 时白色背景改用前景色
+        val seedColors = mutableSetOf<Int>()
+        appColorSchemes.values.forEach { (fgHex, bgHex) ->
+            val seedHex =
+                if (reduceWhiteBg && ConfigColorResolver.isColorWhite(bgHex)) fgHex else bgHex
+            try {
+                seedColors.add(seedHex.toColorInt())
+            } catch (_: Exception) {
+                // 非法颜色值跳过
+            }
+        }
+        preprocessAll(context, paletteStyle, colorSpec, seedColors, onProgress)
+    }
+
     // 清空内存 + 删除持久化文件（paletteStyle/colorSpec 变化时调用）
     fun clear(context: Context) {
         memoryCache.clear()
@@ -143,18 +169,29 @@ object AppM3ColorCache {
         paletteStyle: PaletteStyle,
         colorSpec: ThemeColorSpec
     ): PersistedColors {
-        val lightScheme = dynamicColorScheme(
-            keyColor = Color(seedColor),
-            isDark = false,
-            style = paletteStyle,
-            colorSpec = colorSpec
-        )
-        val darkScheme = dynamicColorScheme(
-            keyColor = Color(seedColor),
-            isDark = true,
-            style = paletteStyle,
-            colorSpec = colorSpec
-        )
+        val color = Color(seedColor)
+        val lightScheme = try {
+            dynamicColorScheme(
+                keyColor = color,
+                isDark = false,
+                style = paletteStyle,
+                colorSpec = colorSpec
+            )
+        } catch (e: Exception) {
+            dynamicColorScheme(keyColor = Color.Blue, isDark = false)
+        }
+
+        val darkScheme = try {
+            dynamicColorScheme(
+                keyColor = color,
+                isDark = true,
+                style = paletteStyle,
+                colorSpec = colorSpec
+            )
+        } catch (e: Exception) {
+            dynamicColorScheme(keyColor = Color.Blue, isDark = true)
+        }
+
         return extractKeyColors(seedColor, lightScheme, darkScheme)
     }
 
@@ -167,13 +204,13 @@ object AppM3ColorCache {
         return PersistedColors(
             seedColor = seedColor,
             // 浅色 fg / 中性 bg
-            lightPrimary = lightScheme.primary.value.toInt(),
+            lightPrimary = lightScheme.primary.toArgb(),
             // 浅色 bg / 中性 fg
-            lightPrimaryContainer = lightScheme.primaryContainer.value.toInt(),
+            lightPrimaryContainer = lightScheme.primaryContainer.toArgb(),
             // 暗色 fg
-            darkOnPrimaryContainer = darkScheme.onPrimaryContainer.value.toInt(),
+            darkOnPrimaryContainer = darkScheme.onPrimaryContainer.toArgb(),
             // 暗色 bg
-            darkOnPrimary = darkScheme.onPrimary.value.toInt()
+            darkOnPrimary = darkScheme.onPrimary.toArgb()
         )
     }
 
@@ -186,7 +223,6 @@ object AppM3ColorCache {
         const val PROGRESS_REPORT_INTERVAL = 10
     }
 
-    // 对外暴露调参常量（AppM3ColorCache 顶层访问）
     val BATCH_SIZE = PreprocessConfig.BATCH_SIZE
     val PROGRESS_REPORT_INTERVAL = PreprocessConfig.PROGRESS_REPORT_INTERVAL
 }

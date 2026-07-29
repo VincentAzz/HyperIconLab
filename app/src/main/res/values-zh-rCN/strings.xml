@@ -87,6 +87,6 @@
     <string name="permission_check_notification_desc">用于显示构建进度通知，拒绝后任务仍可执行但无通知提示</string>
     <string name="permission_check_storage_title">存储权限</string>
     <string name="permission_check_storage_desc">用于将构建产物导出到 Documents 目录（仅 Android 9 及以下需要）</string>
-    <string name="permission_check_grant">去授权</string>
+    <string name="permission_check_grant">授权</string>
     <string name="permission_check_all_granted">所有权限已授予</string>
 </resources>

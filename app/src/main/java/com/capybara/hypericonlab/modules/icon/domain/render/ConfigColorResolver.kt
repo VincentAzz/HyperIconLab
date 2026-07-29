@@ -12,6 +12,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
+import timber.log.Timber
 import androidx.compose.ui.graphics.Color as ComposeColor
 
 // 图标颜色解析器，按 colorSource 解析前景与背景颜色
@@ -250,12 +251,18 @@ object ConfigColorResolver {
         }
 
         // 从缓存获取或计算 M3 关键颜色
-        val colors = AppM3ColorCache.getOrCompute(
-            context = context,
-            seedColor = seedColorArgb,
-            paletteStyle = APP_M3_PALETTE_STYLE,
-            colorSpec = APP_M3_COLOR_SPEC
-        )
+        // 异常防护：dynamicColorScheme 可能对极端种子色抛异常，捕获后回退 defaultColor 避免预览静默失败
+        val colors = try {
+            AppM3ColorCache.getOrCompute(
+                context = context,
+                seedColor = seedColorArgb,
+                paletteStyle = APP_M3_PALETTE_STYLE,
+                colorSpec = APP_M3_COLOR_SPEC
+            )
+        } catch (e: Exception) {
+            Timber.tag("ConfigColorResolver").e(e, "App-M3 compute failed for $seedColorHex")
+            return defaultColor
+        }
 
         // 按 monet 变体取 fg/bg，与 wallpaper 源一致
         return when (themeMode) {

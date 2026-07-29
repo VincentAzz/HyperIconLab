@@ -50,6 +50,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.image.StickerProcessor
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreview
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
+import com.capybara.hypericonlab.modules.icon.viewmodel.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsState
@@ -532,7 +533,7 @@ fun StickerCacheSettings() {
         item {
             BaseWidget(
                 iconPlaceholder = false,
-                title = "清除贴纸缓存",
+                title = "清除构建缓存",
                 description = "当前占用: $cacheSize",
                 trailingContent = {
                     PrimaryActionButton(
@@ -582,16 +583,47 @@ fun StreamingModeSettings(
     viewModel: IconViewModel = koinViewModel()
 ) {
     val useStreaming by viewModel.useStreaming.collectAsStateWithLifecycle()
+    // App-M3 预处理状态
+    val preprocessState by viewModel.appM3PreprocessState.collectAsStateWithLifecycle()
     SegmentedColumn(
-        title = "图标处理"
+        title = "性能"
     ) {
         item {
             SwitchWidget(
                 iconPlaceholder = false,
-                title = "流式传输模式",
-                description = "通过流式处理图标来节省内存",
+                title = "流式打包模式",
+                description = "通过流式打包图标来节省内存",
                 checked = useStreaming,
                 onCheckedChange = { viewModel.useStreaming.value = it }
+            )
+        }
+        // App-M3 预处理：主动预热并持久化 AppColorSchemes 映射
+        item {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = "预处理'基于应用-M3'颜色映射集",
+                description = when (val state = preprocessState) {
+                    is AppM3PreprocessManager.PreprocessState.Idle ->
+                        "可加快'基于应用-M3'样式的构建速度"
+
+                    is AppM3PreprocessManager.PreprocessState.Running -> {
+                        val percent = if (state.total > 0) {
+                            (state.computed * 100 / state.total)
+                        } else 0
+                        "可加快'基于应用-M3'样式的构建速度\n已完成 $percent%"
+                    }
+
+                    AppM3PreprocessManager.PreprocessState.Done ->
+                        "可加快'基于应用-M3'样式的构建速度\n已完成 100%"
+                },
+                trailingContent = {
+                    PrimaryActionButton(
+                        text = "开始",
+                        onClick = { viewModel.startAppM3Preprocess() },
+                        enabled = preprocessState !is AppM3PreprocessManager.PreprocessState.Done &&
+                                preprocessState !is AppM3PreprocessManager.PreprocessState.Running
+                    )
+                }
             )
         }
     }

@@ -247,6 +247,20 @@ class IconViewModel(
         onScanInnerShadowAssets = { innerShadowAssetScanner.scan() }
     )
 
+    // App-M3 预处理管理器：供设置页主动触发预处理并展示进度
+    private val appM3PreprocessManager = AppM3PreprocessManager(
+        context = context,
+        scope = viewModelScope,
+        appColorSchemesProvider = { appColorSchemes }
+    )
+    val appM3PreprocessState: StateFlow<AppM3PreprocessManager.PreprocessState> =
+        appM3PreprocessManager.state
+
+    // 启动 App-M3 预处理（供设置页调用）
+    fun startAppM3Preprocess() {
+        appM3PreprocessManager.startPreprocess(reduceWhiteBg = true)
+    }
+
     init {
         viewModelScope.launch {
             // 根据应用主题模式设置默认 previewThemeMode，使自定义 tab 的

@@ -251,7 +251,7 @@ fun SettingsPage(
                         paddingValues = paddingValues,
                         outerPadding = outerPadding,
                         backdrop = backdrop,
-                        onBrowseLawnicons = { showLawniconsSheet = true }
+                        onBrowseLawnicons = { showLawniconsSheet = true },
                     )
                 }
 

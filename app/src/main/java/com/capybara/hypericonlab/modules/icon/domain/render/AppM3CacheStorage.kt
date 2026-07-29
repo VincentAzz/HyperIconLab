@@ -73,8 +73,9 @@ object AppM3CacheStorage {
                 dis.readInt()
 
                 val result = HashMap<Int, PersistedColors>()
-                // 按文件剩余字节计算记录数，避免依赖不准确的 recordCount
-                val remainingBytes = file.length() - (4 + 2 + headerKey.toByteArray().size + 4 + 4)
+                val headerKeyBytes = headerKey.toByteArray(Charsets.UTF_8).size
+                val totalHeaderSize = 4 + 2 + headerKeyBytes + 4
+                val remainingBytes = file.length() - totalHeaderSize
                 val recordCount = (remainingBytes / RECORD_BYTES).toInt()
 
                 repeat(recordCount) {
@@ -185,10 +186,11 @@ object AppM3CacheStorage {
                 val headerKey = dis.readUTF()
                 if (headerKey != buildHeaderKey(paletteStyle, colorSpec)) return emptySet()
 
-                // 文件头的 recordCount 字段（不准确，按 EOF 读取）
                 dis.readInt()
 
-                val remainingBytes = file.length() - (4 + 2 + headerKey.toByteArray().size + 4 + 4)
+                val headerKeyBytes = headerKey.toByteArray(Charsets.UTF_8).size
+                val totalHeaderSize = 4 + 2 + headerKeyBytes + 4
+                val remainingBytes = file.length() - totalHeaderSize
                 val recordCount = (remainingBytes / RECORD_BYTES).toInt()
 
                 val seeds = HashSet<Int>(recordCount)

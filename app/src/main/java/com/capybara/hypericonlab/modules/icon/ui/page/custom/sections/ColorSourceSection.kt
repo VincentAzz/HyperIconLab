@@ -285,19 +285,6 @@ fun ColorSourceSection(
                             onClick = { applyColorSource("ctc") },
                             modifier = Modifier.weight(1f)
                         )
-                        // 黑白 chip 仅前景 sticker 显示；下层背景不显示
-                        if (isForeground && style == "sticker") {
-                            StyleChip(
-                                label = "黑白",
-                                selected = colorSource == "black_white",
-                                onClick = { applyColorSource("black_white") },
-                                modifier = Modifier.weight(1f)
-                            )
-                        } else {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         StyleChip(
                             label = "自定义",
                             selected = colorSource == "custom",
@@ -306,15 +293,19 @@ fun ColorSourceSection(
                             },
                             modifier = Modifier.weight(1f)
                         )
-                        // 黑白 chip 仅前景 sticker 显示；下层背景不显示
-                        if (isForeground && style == "sticker") {
+                    }
+                    // 黑白 chip 仅前景 sticker 显示，独占一行或与其它逻辑合并
+                    if (isForeground && style == "sticker") {
+                        Row(
+                            modifier = Modifier.padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             StyleChip(
                                 label = "黑白",
                                 selected = colorSource == "black_white",
                                 onClick = { applyColorSource("black_white") },
                                 modifier = Modifier.weight(1f)
                             )
-                        } else {
                             Spacer(modifier = Modifier.weight(1f))
                         }
                     }

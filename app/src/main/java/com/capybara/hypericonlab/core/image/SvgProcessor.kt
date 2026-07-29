@@ -3,17 +3,14 @@ package com.capybara.hypericonlab.core.image
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.RectF
+import androidx.core.graphics.createBitmap
 import com.caverock.androidsvg.SVG
 import java.io.File
 
-/**
- * Handles SVG to Bitmap conversion with color and stroke width support.
- */
+// svg 处理器
 object SvgProcessor {
 
-    /**
-     * Processes SVG from a file and returns a Bitmap.
-     */
+
     fun processSvgFile(
         svgFile: File,
         strokeWidthRatio: Float = 1.0f,
@@ -25,9 +22,6 @@ object SvgProcessor {
         return processSvg(svgFile.readText(), strokeWidthRatio, fgColorHex, iconSize, iconScale)
     }
 
-    /**
-     * Processes SVG content and returns a Bitmap.
-     */
     fun processSvg(
         svgContent: String,
         strokeWidthRatio: Float = 1.0f,
@@ -38,7 +32,6 @@ object SvgProcessor {
         try {
             var processedSvg = svgContent
 
-            // 1. Handle stroke-width adjustment
             if (strokeWidthRatio != 1.0f) {
                 val regex = Regex("""stroke-width="([\d.]+)"""")
                 processedSvg = regex.replace(processedSvg) { matchResult ->
@@ -48,9 +41,9 @@ object SvgProcessor {
                 }
             }
 
-            // 2. Handle color replacement
             if (fgColorHex != null) {
-                val colorForSvg = if (fgColorHex.startsWith("#") && fgColorHex.length == 9) {
+                val hasAlpha = fgColorHex.startsWith("#") && fgColorHex.length == 9
+                val colorForSvg = if (hasAlpha) {
                     "#" + fgColorHex.substring(3)
                 } else {
                     fgColorHex
@@ -68,6 +61,21 @@ object SvgProcessor {
                     Regex("""stroke="black"""", RegexOption.IGNORE_CASE),
                     """stroke="$colorForSvg""""
                 )
+
+                if (hasAlpha) {
+                    val alphaHex = fgColorHex.substring(1, 3)
+                    val alpha = alphaHex.toInt(16) / 255f
+                    if (alpha < 0.99f) {
+                        processedSvg = processedSvg.replace(
+                            """fill="$colorForSvg"""",
+                            """fill="$colorForSvg" fill-opacity="$alpha""""
+                        )
+                        processedSvg = processedSvg.replace(
+                            """stroke="$colorForSvg"""",
+                            """stroke="$colorForSvg" stroke-opacity="$alpha""""
+                        )
+                    }
+                }
             }
 
             // 3. Render SVG
@@ -95,7 +103,7 @@ object SvgProcessor {
 
             val iconActualSize = (iconSize * iconScale).toInt()
 
-            val bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
+            val bitmap = createBitmap(iconSize, iconSize)
             val canvas = Canvas(bitmap)
 
             val offset = (iconSize - iconActualSize) / 2f
