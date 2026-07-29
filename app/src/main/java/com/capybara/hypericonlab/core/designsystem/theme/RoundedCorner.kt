@@ -17,8 +17,6 @@ val CornerRadius = 16.dp
 
 val ConnectionRadius = 6.dp
 
-val BottomSheetCornerRadius = 24.dp
-
 val CardCornerRadius = 16.dp
 
 val ChipCornerRadius = 8.dp
@@ -30,9 +28,6 @@ val SwatchPreviewCornerRadius = 4.dp
 val LargeCardRadius = 20.dp
 
 val ExtraLargeRadius = 32.dp
-
-// SelectionSheet.kt：BottomSheetCornerRadius
-// ColorPickerSheet.kt：ExtraLargeRadius
 
 object TabRowRoundedCorner {
     val TabRowIndicatorCornerRadius = 24.dp

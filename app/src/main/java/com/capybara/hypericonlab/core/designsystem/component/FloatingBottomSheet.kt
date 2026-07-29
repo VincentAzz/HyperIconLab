@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.liquidglass.liquidGlassEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
-import com.capybara.hypericonlab.core.designsystem.theme.BottomSheetCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -67,7 +67,7 @@ fun FloatingBottomSheet(
     ),
     horizontalPadding: Dp = 12.dp,
     bottomPadding: Dp = 8.dp,
-    cornerRadius: Dp = BottomSheetCornerRadius,
+    cornerRadius: Dp = ExtraLargeRadius,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     tonalElevation: Dp = 2.dp,
     scrimColor: Color = Color.Black.copy(alpha = 0.32f),

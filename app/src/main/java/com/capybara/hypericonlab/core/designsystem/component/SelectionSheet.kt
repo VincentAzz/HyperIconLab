@@ -54,6 +54,9 @@ fun <T> SelectionSheet(
         onDismiss = onDismiss,
         sheetState = sheetState,
         fillMaxHeight = false,
+        horizontalPadding = 8.dp,
+        bottomPadding = 8.dp,
+        cornerRadius = ExtraLargeRadius,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
         liquidGlassBlurRadius = liquidGlassBlurRadius
@@ -115,7 +118,12 @@ fun <T> SelectionSheet(
         )
 
         SegmentedColumn(
-            modifier = Modifier.padding(8.dp, 0.dp, 8.dp, 8.dp),
+            modifier = Modifier.padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 8.dp,
+                bottom = 16.dp
+            ),
             outerCornerRadius = CornerRadius,
             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
             containerColorAlpha = 0.8f
