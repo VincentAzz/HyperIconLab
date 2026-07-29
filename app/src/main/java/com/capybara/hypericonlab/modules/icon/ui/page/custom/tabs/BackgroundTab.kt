@@ -182,13 +182,23 @@ fun BackgroundTab(
                                 Spacer(modifier = Modifier.weight(1f))
                             }
                         }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            StyleChip(
+                                label = "复古",
+                                selected = style == "retro",
+                                onClick = { viewModel.updateConfig { it.copy(bgStyle = "retro") } },
+                                modifier = Modifier.weight(1f)
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                 }
             }
 
-            // 形状选择行：纯色和图片填充时显示
+            // 形状选择行：纯色、图片填充、复古时显示
+            // retro 时强制锁定 ios27，禁用"更改"按钮
             item(
-                animatedVisibility = style == "solid" || style == "img_filling",
+                animatedVisibility = style == "solid" || style == "img_filling" || style == "retro",
                 topPadding = ListItemDefaults.SegmentedGap,
             ) { shape ->
                 BaseItemContainer(shape = shape) {
@@ -211,9 +221,11 @@ fun BackgroundTab(
                                 MaskThumbnail(mask = mask)
                             }
                         }
+                        // retro 时暂时禁用更改按钮（形状由 ConfigSyncObserver 强制锁定为 ios27）
                         PrimaryActionButton(
                             text = "更改",
-                            onClick = { showMaskPicker = true }
+                            onClick = { showMaskPicker = true },
+                            enabled = style != "retro"
                         )
                     }
                 }
@@ -308,8 +320,8 @@ fun BackgroundTab(
             }
         }
 
-        // 上层背景颜色卡片组：纯色时显示，静态图片/图片填充不显示
-        if (style == "solid") {
+        // 上层背景颜色卡片组
+        if (style == "solid" || style == "retro") {
             ColorSourceSection(
                 viewModel = viewModel,
                 isForeground = false,
@@ -509,7 +521,7 @@ private fun LowerLayerBackgroundSection(
                             },
                             modifier = Modifier.weight(1f)
                         )
-                        // 末位空缺用 Spacer 占位，保持两列对齐
+
                         Spacer(modifier = Modifier.weight(1f))
                     }
                 }

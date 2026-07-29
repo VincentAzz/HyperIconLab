@@ -13,6 +13,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.render.BackgroundLayerRenderer
 import com.capybara.hypericonlab.modules.icon.domain.render.DualLayerComposer
 import com.capybara.hypericonlab.modules.icon.domain.render.IconForegroundRenderer
+import com.capybara.hypericonlab.modules.icon.domain.render.RetroStyleRenderer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -25,7 +26,6 @@ import kotlin.math.ceil
 
 
 // 图标生成流水线
-
 class IconPipelineUseCase(
     private val context: Context
 ) {
@@ -98,7 +98,7 @@ class IconPipelineUseCase(
                                     ceil(config.iconSize * (1 - config.dualLayerSizeDiff)).toInt()
                                         .coerceAtLeast(1)
                                 } else config.iconSize
-                            val upperBg = BackgroundLayerRenderer.renderUpperBackground(
+                            val upperBgResult = BackgroundLayerRenderer.renderUpperBackground(
                                 context = context,
                                 bgStyle = config.bgStyle,
                                 iconSize = config.iconSize,
@@ -107,21 +107,23 @@ class IconPipelineUseCase(
                                 imgStaticRef = config.selectedStaticImages.randomOrNull(),
                                 imgFillingRef = config.selectedFillingImages.randomOrNull(),
                                 fillingRandomRotation = config.imageFillingRandomRotation,
-                                fillingScaleMode = config.imageFillingScaleMode
+                                fillingScaleMode = config.imageFillingScaleMode,
+                                retroShapeName = config.masks.firstOrNull()
                             )
 
-                            // 先合成上层背景 + 内阴影 + 图标 → upperComposite（iconSize×iconSize）
+                            // 先合成上层背景 + 装饰层 + 内阴影 + 图标 → upperComposite（iconSize×iconSize）
                             // 内阴影仅在单层背景生效：双层背景时 innerShadowBitmap 应为 null
                             val upperComposite = LayerMerger.merge(
-                                background = upperBg,
+                                background = upperBgResult.background,
                                 icon = processedIcon,
+                                decorLayers = upperBgResult.decorLayers,
                                 innerShadow = innerShadowBitmap,
                                 subtractIcon = config.fgStyle == "hollow",
                                 fgAlpha = if (config.fgStyle == "glass") 1.0f else resolveAlpha(
                                     currentFg
                                 )
                             )
-                            upperBg.recycle()
+                            upperBgResult.background.recycle()
 
                             // 双层合成：上层（含图标）缩放后居中绘制到下层（铺满 iconSize）之上
                             // 下层颜色解析：app 源按 packageName 实时解析（同源时应用 HSL 亮度互补），
@@ -167,6 +169,20 @@ class IconPipelineUseCase(
                                                     scaleMode = config.imageFilling2ScaleMode
                                                 )
                                             } else null
+                                        }
+
+                                        "retro" -> {
+                                            // 下层 Retro：tint 底板 + 装饰图层扁平化为单个 bitmap
+                                            // DualLayerComposer 仅接收单个 bitmap，故装饰层在此合并
+                                            val shape =
+                                                config.selectedMasks2.firstOrNull() ?: "ios27"
+                                            RetroStyleRenderer.render(
+                                                context = context,
+                                                shapeName = shape,
+                                                iconSize = config.iconSize,
+                                                tintColorHex = currentBg2,
+                                                maskBitmap = maskBmp2
+                                            ).toFlattenedBitmap()
                                         }
 
                                         else -> null

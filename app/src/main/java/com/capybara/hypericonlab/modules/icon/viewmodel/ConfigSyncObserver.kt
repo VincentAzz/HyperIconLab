@@ -70,6 +70,10 @@ class ConfigSyncObserver(
                 if (config.dualLayerEnabled && config.bgStyle == "none") {
                     onConfigUpdate { it.copy(bgStyle = "solid", bgColorSource = "wallpaper") }
                 }
+                // retro 样式强制锁定 ios27 形状（暂仅支持 ios27，且不允许多选）
+                if (config.bgStyle == "retro" && config.selectedMasks != listOf("ios27")) {
+                    onConfigUpdate { it.copy(selectedMasks = listOf("ios27")) }
+                }
                 // 下层 img_static 空列表自动填首个预设
                 if (config.dualLayerEnabled && config.bgLayer2.style == "img_static" &&
                     config.bgLayer2.selectedStaticImages.isEmpty()
