@@ -38,9 +38,6 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
-import com.capybara.hypericonlab.core.designsystem.symbol.design_services
-import com.capybara.hypericonlab.core.designsystem.symbol.style
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
@@ -51,6 +48,12 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwat
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
+
+// 自定义 tab 调色板样式可选列表：移除 Monochrome/Fidelity/Content 三项
+// 这三项不适合用作图标配色
+private val ICON_PALETTE_STYLES: List<PaletteStyle> = PaletteStyle.entries.filter {
+    it !in setOf(PaletteStyle.Monochrome, PaletteStyle.Fidelity, PaletteStyle.Content)
+}
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -63,7 +66,6 @@ fun ColorSourceSection(
     liquidGlassBlurRadius: Dp = 24.dp
 ) {
     val config by viewModel.config.collectAsStateWithLifecycle()
-    // 下层背景读写 bgLayer2 字段；上层/前景保持原逻辑
     val bgLayer2 = config.bgLayer2
     val style = if (isForeground) config.fgStyle else config.bgStyle
     val colorSource = when {
@@ -76,10 +78,8 @@ fun ColorSourceSection(
         layerIndex == 1 -> bgLayer2.color
         else -> config.bgColor
     }
-    // 下层使用独立的 previewThemeMode；上层/前景保持原字段
     val previewThemeMode =
         if (layerIndex == 1) bgLayer2.previewThemeMode else config.previewThemeMode
-    // preset/wallpaper/ctc 是颜色生成器配置，上下层共享（仅 monet 变体由 previewThemeMode 区分）
     val presetSeedColor = config.preset.seedColor
     val presetPaletteStyle = config.preset.paletteStyle
     val presetColorSpec = config.preset.colorSpec
@@ -88,10 +88,8 @@ fun ColorSourceSection(
     val syncColorSource = config.syncColorSource
     val syncDualLayerColorSource = config.syncDualLayerColorSource
     val dualLayerEnabled = config.dualLayerEnabled
-    // 下层背景透明度（0~255），仅下层使用
     val lowerAlpha = if (layerIndex == 1) bgLayer2.alpha else 255
 
-    // 标题前缀：双层启用时上层/下层加前缀，未启用时无前缀
     val layerPrefix = when {
         layerIndex == 1 -> "下层"
         dualLayerEnabled -> "上层"
@@ -169,7 +167,7 @@ fun ColorSourceSection(
     if (showPaletteStyleSheet) {
         SelectionSheet(
             title = "调色板样式",
-            items = PaletteStyle.entries,
+            items = ICON_PALETTE_STYLES,
             selectedItem = presetPaletteStyle,
             onDismiss = { showPaletteStyleSheet = false },
             onConfirm = { style: PaletteStyle ->
@@ -201,7 +199,7 @@ fun ColorSourceSection(
     if (showWallpaperPaletteStyleSheet) {
         SelectionSheet(
             title = "调色板样式",
-            items = PaletteStyle.entries,
+            items = ICON_PALETTE_STYLES,
             selectedItem = wallpaperPaletteStyle,
             onDismiss = { showWallpaperPaletteStyleSheet = false },
             onConfirm = { style: PaletteStyle ->
@@ -502,7 +500,7 @@ fun ColorSourceSection(
             }
             item {
                 BaseWidget(
-                    icon = AppMaterialSymbols.style,
+                    iconPlaceholder = false,
                     title = "调色板样式",
                     description = wallpaperPaletteStyle.displayName,
                     onClick = { showWallpaperPaletteStyleSheet = true }
@@ -510,7 +508,7 @@ fun ColorSourceSection(
             }
             item {
                 BaseWidget(
-                    icon = AppMaterialSymbols.design_services,
+                    iconPlaceholder = false,
                     title = "色彩规格",
                     description = wallpaperColorSpec.displayName,
                     onClick = { showWallpaperColorSpecSheet = true }
@@ -568,7 +566,7 @@ fun ColorSourceSection(
             }
             item {
                 BaseWidget(
-                    icon = AppMaterialSymbols.style,
+                    iconPlaceholder = false,
                     title = "调色板样式",
                     description = presetPaletteStyle.displayName,
                     onClick = { showPaletteStyleSheet = true }
@@ -576,7 +574,7 @@ fun ColorSourceSection(
             }
             item {
                 BaseWidget(
-                    icon = AppMaterialSymbols.design_services,
+                    iconPlaceholder = false,
                     title = "色彩规格",
                     description = presetColorSpec.displayName,
                     onClick = { showColorSpecSheet = true }
@@ -665,14 +663,11 @@ fun ColorSourceSection(
     }
 }
 
-/**
- * 下层背景透明度常量（避免硬编码）。
- * 范围 0~255，步进 5%（即 13），共 20 档（含端点 0/255 由 coerce 保证）。
- */
+
 private object LowerLayerAlphaConstants {
     const val MIN = 0
     const val MAX = 255
 
-    // 0~255 共 256 个值，按 5% 步进（即每 12.75 ≈ 13），实际取 13 档步进
+    // 透明度 5% 步进
     const val STEPS = 13
 }
