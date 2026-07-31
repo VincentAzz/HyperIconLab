@@ -1,17 +1,15 @@
-name: Lawnicons 资源更新
+name: Lawnicons assets update
 
 # 触发方式：仅手动触发（workflow_dispatch）
-# 在 Actions 页面点击 "Run workflow" 运行，可指定 lawnicons 分支
 on:
   workflow_dispatch:
     inputs:
       lawnicons_ref:
-        description: 'Lawnicons 的 git ref（分支/tag/commit），默认 main'
+        description: 'Lawnicons Ref'
         required: false
-        default: 'main'
+        default: 'develop'
 
 # 并发控制：同一时刻只允许一个 lawnicons 更新任务运行
-# 避免重复手动触发导致 slot_mapping_history commit 冲突
 concurrency:
   group: lawnicons-update
   cancel-in-progress: false
@@ -34,13 +32,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # 1b. Lawnicons 上游仓库（取 svgs + appfilter.xml）
-      # 注意：请确认 lawnicons 的 GitHub 仓库地址（owner/repo）
-      # 官方 Lawnicons 仓库为 TeamFiles/Lawnicons，如使用 fork 请修改此处
+      # 默认拉取 develop 分支，可在手动触发时覆盖
       - name: Checkout Lawnicons
         uses: actions/checkout@v4
         with:
           repository: LawnchairLauncher/lawnicons
-          ref: ${{ inputs.lawnicons_ref || 'main' }}
+          ref: ${{ inputs.lawnicons_ref || 'develop' }}
           path: lawnicons
           fetch-depth: 1
 
@@ -80,7 +77,7 @@ jobs:
       - name: Commit slot_mapping_history
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: update slot_mapping_history [${{ steps.version.outputs.version }}]"
+          commit_message: "chore(ci): update slot_mapping_history [${{ steps.version.outputs.version }}]"
           file_pattern: scripts/lawnicons-pipeline/history/slot_mapping_history.json
           repository: hypericonlab
 
@@ -91,16 +88,16 @@ jobs:
           tag_name: lawnicons-v${{ steps.version.outputs.version }}
           name: Lawnicons ${{ steps.version.outputs.version }}
           body: |
-            lawnicons 资源更新 ${{ steps.version.outputs.version }}
+            Lawnicons 资源更新 ${{ steps.version.outputs.version }}
 
             - lawnicons commit: ${{ steps.version.outputs.commit }}
             - 处理时间: ${{ steps.version.outputs.version }}
 
             产物：
-            - `lawnicons_${{ steps.version.outputs.version }}.zip`：主包
-            - `manifest.json`：清单（含版本、统计）
+            - `lawnicons_${{ steps.version.outputs.version }}.zip`
+            - `manifest.json`
 
-            App 端可通过 GitHub API 拉取此 Release 更新资源。
+            HyperIconLab 通过 GitHub API 拉取此 Release 更新 Lawnicons 资源。
           files: |
             output/lawnicons_*.zip
             output/manifest.json
