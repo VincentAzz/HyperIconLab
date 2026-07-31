@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,7 @@ import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.domain.repository.BooleanSetting
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadModeSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.LawniconsBrowserSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.LogSheet
@@ -60,6 +62,7 @@ import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.Sou
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AboutTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AssetsTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.SettingsTab
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -81,10 +84,10 @@ fun SettingsPage(
     val resourceManager = koinInject<LawniconsResourceManager>()
     val appSettingsRepository = koinInject<AppSettingsRepository>()
     val currentVersion by resourceManager.currentVersion.collectAsStateWithLifecycle()
-    // 下载代理开关：在顶层持续订阅，避免 sheet 内重复订阅导致回显初始值错误
-    val useDownloadProxy by appSettingsRepository
-        .getBoolean(BooleanSetting.UiUseDownloadProxy, default = false)
-        .collectAsStateWithLifecycle(initialValue = false)
+    // 下载代理开关：在顶层持续订阅稳定的 StateFlow，避免重组时由于冷流收集导致的初始值回显错误
+    val useDownloadProxy by appSettingsRepository.useDownloadProxy.collectAsStateWithLifecycle()
+    // 页面级 scope：sheet 关闭不会取消，确保 putBoolean 协程能执行完成
+    val pageScope = rememberCoroutineScope()
 
     val settingTabs = listOf("设置", "资产", "关于")
     val settingIcons =
@@ -199,10 +202,19 @@ fun SettingsPage(
     }
 
     // 下载方式 sheet：由"下载方式"卡片触发
+    // onConfirm 用 pageScope 执行 putBoolean，避免 sheet 关闭导致协程被取消（putBoolean 是 suspend）
     if (showDownloadModeSheet) {
         DownloadModeSheet(
             currentUseProxy = useDownloadProxy,
             onDismiss = { showDownloadModeSheet = false },
+            onConfirm = { mode ->
+                pageScope.launch {
+                    appSettingsRepository.putBoolean(
+                        BooleanSetting.UiUseDownloadProxy,
+                        mode == DownloadMode.PROXY
+                    )
+                }
+            },
             backdrop = backdrop,
             useLiquidGlass = uiState.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp

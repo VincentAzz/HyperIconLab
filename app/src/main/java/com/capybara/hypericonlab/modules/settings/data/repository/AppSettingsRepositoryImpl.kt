@@ -16,8 +16,10 @@ import com.capybara.hypericonlab.modules.settings.domain.repository.StringSettin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 
 class AppSettingsRepositoryImpl(
     private val appDataStore: AppDataStore, appScope: CoroutineScope
@@ -77,6 +79,14 @@ class AppSettingsRepositoryImpl(
     }.shareIn(
         scope = appScope, started = SharingStarted.Eagerly, replay = 1
     )
+
+    override val useDownloadProxy: StateFlow<Boolean> = preferencesFlow
+        .map { it.useDownloadProxy }
+        .stateIn(
+            scope = appScope,
+            started = SharingStarted.Eagerly,
+            initialValue = false
+        )
 
     override suspend fun putString(setting: StringSetting, value: String) =
         appDataStore.putString(stringKey(setting), value)

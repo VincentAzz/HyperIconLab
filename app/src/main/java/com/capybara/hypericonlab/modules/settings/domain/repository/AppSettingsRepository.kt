@@ -2,6 +2,7 @@ package com.capybara.hypericonlab.modules.settings.domain.repository
 
 import com.capybara.hypericonlab.modules.settings.domain.model.AppPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 enum class StringSetting {
     ThemeMode,
@@ -34,6 +35,7 @@ enum class BooleanSetting {
 
 interface AppSettingsRepository {
     val preferencesFlow: Flow<AppPreferences>
+    val useDownloadProxy: StateFlow<Boolean>
 
     suspend fun putString(setting: StringSetting, value: String)
     fun getString(setting: StringSetting, default: String = ""): Flow<String>
