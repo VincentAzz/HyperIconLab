@@ -12,7 +12,7 @@ import java.io.File
 // 云端更新流程编排器：检查更新 → 下载 → 校验 → 解压 → 原子切换 → 清理旧版本
 // 状态通过 StateFlow 暴露给 UI 观察，失败时自动回滚保持旧版本
 // 代理设置从 AppSettingsRepository 读取，开启后对 github.com 资源下载加前缀加速
-// 失败时通过 notifier 发系统通知，用户离开 App 后也能看到
+// 失败时通过 notifier 发系统通知（silent 模式下不发通知，用于首次启动自动拉取）
 class LawniconsUpdateManager(
     private val context: Context,
     private val apiService: LawniconsApiService,
@@ -26,8 +26,9 @@ class LawniconsUpdateManager(
     val state: StateFlow<UpdateState> = _state.asStateFlow()
 
     // 检查更新：查询云端最新版本，与本地激活版本对比
+    // silent=true 时失败不发通知（首次启动自动拉取场景）
     // 返回 ReleaseInfo（有更新）或 null（无更新或失败，state 已反映原因）
-    suspend fun checkUpdate(): ReleaseInfo? {
+    suspend fun checkUpdate(silent: Boolean = false): ReleaseInfo? {
         val current = resourceManager.currentVersion.value
         _state.value = UpdateState.Checking(current.version)
         // 读取代理设置，开启时对 github.com 资源下载加前缀
@@ -36,13 +37,13 @@ class LawniconsUpdateManager(
         val release = try {
             apiService.getLatestRelease(proxyPrefix)
         } catch (e: LawniconsUpdateException) {
-            // ApiService 已分类异常，直接映射为 Failed 状态并发通知
-            failWith(e.reason)
+            // ApiService 已分类异常，直接映射为 Failed 状态
+            failWith(e.reason, silent)
             return null
         }
         if (release == null) {
             // 接口返回 null 表示无匹配 release（非异常），归为 UNKNOWN
-            failWith(FailureReason.UNKNOWN)
+            failWith(FailureReason.UNKNOWN, silent)
             return null
         }
         // 版本号相同视为已是最新
@@ -55,7 +56,8 @@ class LawniconsUpdateManager(
     }
 
     // 下载并安装指定 release：下载 → 校验 → 解压 → 激活 → 清理
-    suspend fun downloadAndInstall(release: ReleaseInfo) {
+    // silent=true 时失败不发通知（首次启动自动拉取场景）
+    suspend fun downloadAndInstall(release: ReleaseInfo, silent: Boolean = false) {
         // 1. 下载 zip 到 cacheDir（失败抛 LawniconsUpdateException）
         _state.value = UpdateState.Downloading(0f)
         val zipFile = try {
@@ -63,14 +65,14 @@ class LawniconsUpdateManager(
                 _state.value = UpdateState.Downloading(progress)
             }
         } catch (e: LawniconsUpdateException) {
-            failWith(e.reason)
+            failWith(e.reason, silent)
             return
         }
 
         // 2. 校验 sha256（manifest 未提供哈希时跳过校验）
         if (!downloadService.verifySha256(zipFile, release.sha256)) {
             downloadService.cleanupCache()
-            failWith(FailureReason.CORRUPTED)
+            failWith(FailureReason.CORRUPTED, silent)
             return
         }
 
@@ -88,7 +90,7 @@ class LawniconsUpdateManager(
             }
         } catch (e: LawniconsUpdateException) {
             downloadService.cleanupCache()
-            failWith(e.reason)
+            failWith(e.reason, silent)
             return
         }
 
@@ -97,7 +99,7 @@ class LawniconsUpdateManager(
         if (!switched) {
             targetDir.deleteRecursively()
             downloadService.cleanupCache()
-            failWith(FailureReason.ACTIVATE_FAILED)
+            failWith(FailureReason.ACTIVATE_FAILED, silent)
             return
         }
 
@@ -110,10 +112,16 @@ class LawniconsUpdateManager(
         _state.value = UpdateState.Success(release.version)
     }
 
-    // 一键检查并安装（便捷入口，供 UI 直接调用）
+    // 一键检查并安装（便捷入口，供 UI 直接调用，失败发通知）
     suspend fun checkAndInstall() {
         val release = checkUpdate() ?: return
         downloadAndInstall(release)
+    }
+
+    // 静默检查并安装（首次启动自动拉取用，失败不发通知，state 仍更新供 assets tab 观察）
+    suspend fun checkAndInstallSilently() {
+        val release = checkUpdate(silent = true) ?: return
+        downloadAndInstall(release, silent = true)
     }
 
     // 重置状态为 Idle（UI 退出或用户确认后调用）
@@ -121,10 +129,10 @@ class LawniconsUpdateManager(
         _state.value = UpdateState.Idle
     }
 
-    // 统一失败处理：更新 state 并触发系统通知（用户离开 App 也能看到）
-    private fun failWith(reason: FailureReason) {
+    // 统一失败处理：更新 state，非 silent 时触发系统通知
+    private fun failWith(reason: FailureReason, silent: Boolean = false) {
         _state.value = UpdateState.Failed(reason)
-        notifier.notifyFailed(reason)
+        if (!silent) notifier.notifyFailed(reason)
     }
 
     // 清理旧版本目录，保留当前激活版本

@@ -115,34 +115,31 @@ fun AssetsTab(
                 // 仅当本地来源且已有云端版本共存时隐藏（用户手动切回本地无需更新）
                 val hasCloudVersions = resourceManager.getDownloadedVersions().isNotEmpty()
                 val showUpdateEntry = version.source == ResourceSource.REMOTE || !hasCloudVersions
-                if (showUpdateEntry) {
-                    item {
-                        BaseWidget(
-                            iconPlaceholder = false,
-                            title = "检查 Lawnicons 更新",
-                            description = updateStateDescription(updateState),
-                            trailingContent = {
-                                PrimaryActionButton(
-                                    text = checkButtonText, enabled = checkEnabled, onClick = {
-                                        scope.launch { updateManager.checkAndInstall() }
-                                    })
-                            })
-                    }
+
+                item(animatedVisibility = showUpdateEntry) {
+                    BaseWidget(
+                        iconPlaceholder = false,
+                        title = "检查 Lawnicons 更新",
+                        description = updateStateDescription(updateState),
+                        trailingContent = {
+                            PrimaryActionButton(
+                                text = checkButtonText, enabled = checkEnabled, onClick = {
+                                    scope.launch { updateManager.checkAndInstall() }
+                                })
+                        })
                 }
 
                 // 下载方式：与检查更新同条件显示
-                if (showUpdateEntry) {
-                    item {
-                        BaseWidget(
-                            iconPlaceholder = false,
-                            title = "下载方式",
-                            description = "加速代理可提升 GitHub 资源下载速度",
-                            trailingContent = {
-                                PrimaryActionButton(
-                                    text = downloadModeText, onClick = onChooseDownloadMode
-                                )
-                            })
-                    }
+                item(animatedVisibility = showUpdateEntry) {
+                    BaseWidget(
+                        iconPlaceholder = false,
+                        title = "下载方式",
+                        description = "加速代理可提升 GitHub 资源下载速度",
+                        trailingContent = {
+                            PrimaryActionButton(
+                                text = downloadModeText, onClick = onChooseDownloadMode
+                            )
+                        })
                 }
 
                 // 来源：弹出选择 sheet，选项含本地与已下载云端版本

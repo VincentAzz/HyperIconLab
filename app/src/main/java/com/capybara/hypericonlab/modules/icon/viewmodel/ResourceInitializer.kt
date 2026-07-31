@@ -6,6 +6,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.render.AppM3ColorCache
 import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
@@ -18,8 +20,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.reflect.KClass
 
-// 资源初始化器：负责启动时的图标集扫描、自动解压、配色加载
+// 资源初始化器：负责启动时的图标集扫描、自动解压、配色加载、云端更新自动拉取
 // 通过 onLog/onMapperReady/onPreviewNeeded 回调解耦对 ViewModel 的依赖
 // 资源读取统一通过 LawniconsResourceManager，支持 assets/云端来源切换
 class ResourceInitializer(
@@ -28,6 +31,7 @@ class ResourceInitializer(
     private val manageResourcesUseCase: ManageResourcesUseCase,
     private val buildTaskManager: BuildTaskManager,
     private val resourceManager: LawniconsResourceManager,
+    private val updateManager: LawniconsUpdateManager,
     private val onLog: (String, LogType) -> Unit,
     private val onMapperReady: () -> Unit,
     private val onPreviewNeeded: () -> Unit
@@ -73,6 +77,7 @@ class ResourceInitializer(
     }
 
     // 自动初始化：检测 lawnicons 目录，未解压则执行解压，并标记 mapper 就绪
+    // assets 解压完成后，后台异步检查云端更新（不阻塞 mapper 就绪与预览生成）
     suspend fun autoInitializeResources() {
         scope.launch(Dispatchers.IO) {
             val lawniconsBase = File(context.filesDir, "lawnicons")
@@ -93,6 +98,9 @@ class ResourceInitializer(
                 onLog("资源已就绪", LogType.INFO)
             }
 
+            // assets 解压完成后再后台检查云端更新（独立协程，不阻塞后续初始化）
+            autoCheckCloudUpdate()
+
             // mapper 已直接打包在 assets 中，无需自动生成
             onLog("映射器已就绪", LogType.INFO)
             mapperExists.value = true
@@ -103,6 +111,50 @@ class ResourceInitializer(
                 onLog("自动生成初始预览图...", LogType.INFO)
                 onPreviewNeeded()
             }
+        }
+    }
+
+    // 后台静默检查云端更新：失败不发通知（首次启动不打扰用户），state 仍更新供 assets tab 观察
+    // 通过观察 updateManager.state 变化记录关键日志（仅状态类型切换时记录，避免进度日志爆炸）
+    private fun autoCheckCloudUpdate() {
+        scope.launch(Dispatchers.IO) {
+            onLog("开始后台检查云端更新...", LogType.INFO)
+
+            // 观察更新状态变化，在状态类型切换时记录日志
+            val observerJob = launch {
+                var lastStateClass: KClass<out UpdateState>? = null
+                updateManager.state.collect { state ->
+                    val stateClass = state::class
+                    // 仅在状态类型变化时记录日志，忽略同类进度更新（如 Downloading 0.1→0.2）
+                    if (stateClass != lastStateClass) {
+                        lastStateClass = stateClass
+                        logUpdateState(state)
+                    }
+                }
+            }
+
+            try {
+                updateManager.checkAndInstallSilently()
+            } finally {
+                observerJob.cancel()
+            }
+        }
+    }
+
+    // 将更新状态映射为日志文案
+    private fun logUpdateState(state: UpdateState) {
+        when (state) {
+            is UpdateState.Checking -> onLog("云端更新：正在检查版本...", LogType.INFO)
+            is UpdateState.Downloading -> onLog("云端更新：正在下载资源包...", LogType.INFO)
+            is UpdateState.Extracting -> onLog("云端更新：正在解压资源...", LogType.INFO)
+            is UpdateState.Success -> onLog(
+                "云端更新：已切换到版本 ${state.newVersion}",
+                LogType.SUCCESS
+            )
+
+            is UpdateState.Failed -> onLog("云端更新：失败（${state.reason}）", LogType.ERROR)
+            UpdateState.UpToDate -> onLog("云端更新：已是最新版本", LogType.INFO)
+            UpdateState.Idle -> {} // Idle 不记录
         }
     }
 

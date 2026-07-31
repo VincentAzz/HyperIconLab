@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
@@ -48,6 +49,7 @@ class IconViewModel(
     private val pipeline: IconPipelineUseCase,
     private val buildTaskManager: BuildTaskManager,
     private val resourceManager: LawniconsResourceManager,
+    private val updateManager: LawniconsUpdateManager,
     private val appSettingsRepository: AppSettingsRepository
 ) : AndroidViewModel(application) {
 
@@ -151,6 +153,7 @@ class IconViewModel(
         manageResourcesUseCase = manageResourcesUseCase,
         buildTaskManager = buildTaskManager,
         resourceManager = resourceManager,
+        updateManager = updateManager,
         onLog = { message, type -> addLog(message, type) },
         onMapperReady = { },
         onPreviewNeeded = { generateLivePreview() }

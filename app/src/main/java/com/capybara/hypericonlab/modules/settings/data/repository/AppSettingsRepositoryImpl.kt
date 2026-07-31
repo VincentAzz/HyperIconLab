@@ -72,7 +72,7 @@ class AppSettingsRepositoryImpl(
             seedColorInt = prefs[AppDataStore.THEME_SEED_COLOR]
                 ?: PresetColors.first().color.toArgb(),
             useDownloadProxy = prefs[AppDataStore.UI_USE_DOWNLOAD_PROXY]
-                ?: false,
+                ?: true,
             lastMainPageIndex = prefs[AppDataStore.LAST_MAIN_PAGE_INDEX]
                 ?: 3
         )
@@ -85,7 +85,7 @@ class AppSettingsRepositoryImpl(
         .stateIn(
             scope = appScope,
             started = SharingStarted.Eagerly,
-            initialValue = false
+            initialValue = true
         )
 
     override suspend fun putString(setting: StringSetting, value: String) =
