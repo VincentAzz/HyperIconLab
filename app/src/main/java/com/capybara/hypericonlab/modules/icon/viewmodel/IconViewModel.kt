@@ -289,6 +289,8 @@ class IconViewModel(
         configSyncObserver.observe()
         loadDefaultWallpaper()
         resourceInitializer.loadAvailableIconSets()
+        // 观察资源来源变化，切换后自动刷新图标集映射数
+        resourceInitializer.observeResourceChanges()
     }
 
     private fun addLog(message: String, type: LogType = LogType.INFO) = logger.addLog(message, type)

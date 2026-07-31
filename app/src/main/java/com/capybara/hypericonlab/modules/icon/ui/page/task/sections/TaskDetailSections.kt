@@ -115,7 +115,7 @@ fun TaskInfoSection(
                 title = "图标集",
                 trailingContent = {
                     Text(
-                        text = "${task.iconSetLabel} · ${task.iconCount} 个",
+                        text = "${task.iconSetLabel} · ${task.iconCount} 映射",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

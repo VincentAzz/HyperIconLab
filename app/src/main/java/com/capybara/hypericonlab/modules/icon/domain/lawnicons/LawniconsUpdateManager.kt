@@ -1,18 +1,22 @@
 package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 
 import android.content.Context
+import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import java.io.File
 
 // 云端更新流程编排器：检查更新 → 下载 → 校验 → 解压 → 原子切换 → 清理旧版本
 // 状态通过 StateFlow 暴露给 UI 观察，失败时自动回滚保持旧版本
+// 代理设置从 AppSettingsRepository 读取，开启后对 github.com 资源下载加前缀加速
 class LawniconsUpdateManager(
     private val context: Context,
     private val apiService: LawniconsApiService,
     private val downloadService: LawniconsDownloadService,
-    private val resourceManager: LawniconsResourceManager
+    private val resourceManager: LawniconsResourceManager,
+    private val appSettingsRepository: AppSettingsRepository
 ) {
     // 当前更新状态，供 UI 观察
     private val _state = MutableStateFlow<UpdateState>(UpdateState.Idle)
@@ -23,7 +27,10 @@ class LawniconsUpdateManager(
     suspend fun checkUpdate(): ReleaseInfo? {
         val current = resourceManager.currentVersion.value
         _state.value = UpdateState.Checking(current.version)
-        val release = apiService.getLatestRelease()
+        // 读取代理设置，开启时对 github.com 资源下载加前缀
+        val useProxy = appSettingsRepository.preferencesFlow.first().useDownloadProxy
+        val proxyPrefix = if (useProxy) UpdateConstants.PROXY_PREFIX else ""
+        val release = apiService.getLatestRelease(proxyPrefix)
         if (release == null) {
             _state.value = UpdateState.Failed(UpdateConstants.MSG_FETCH_FAILED)
             return null
@@ -113,6 +120,9 @@ class LawniconsUpdateManager(
 
     private object UpdateConstants {
         const val REMOTE_BASE_DIR = "lawnicons_remote"
+
+        // GitHub 加速代理前缀
+        const val PROXY_PREFIX = "https://ghfast.top/"
         const val MSG_FETCH_FAILED = "无法获取云端版本信息"
         const val MSG_DOWNLOAD_FAILED = "下载失败"
         const val MSG_VERIFY_FAILED = "文件校验失败"

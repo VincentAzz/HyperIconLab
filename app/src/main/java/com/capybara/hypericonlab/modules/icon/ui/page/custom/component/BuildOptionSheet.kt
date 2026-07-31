@@ -215,7 +215,7 @@ fun BuildOptionSheet(
                 Column(verticalArrangement = Arrangement.spacedBy(BuildOptionSheetConfig.CHIP_SPACING)) {
                     iconSets.forEach { iconSet ->
                         StyleChip(
-                            label = "${iconSet.label} · ${iconSet.iconCount} 个图标",
+                            label = "${iconSet.label} · ${iconSet.iconCount} 映射",
                             selected = selectedIconSet?.id == iconSet.id,
                             onClick = { selectedIconSet = iconSet },
                             modifier = Modifier.fillMaxWidth()

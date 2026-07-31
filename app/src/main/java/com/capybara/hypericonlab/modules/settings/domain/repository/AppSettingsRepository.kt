@@ -28,7 +28,8 @@ enum class BooleanSetting {
     UiUseTabRowCenterAlignment,
     UiUseTabRowTransparentBackground,
     UiUseTabRowFillWidth,
-    UiUseGoogleSansFlex
+    UiUseGoogleSansFlex,
+    UiUseDownloadProxy
 }
 
 interface AppSettingsRepository {

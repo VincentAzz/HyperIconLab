@@ -1,8 +1,11 @@
 package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -14,29 +17,50 @@ import java.net.URL
 class LawniconsApiService {
 
     // 获取最新的 lawnicons release，失败返回 null
-    suspend fun getLatestRelease(): ReleaseInfo? = withContext(Dispatchers.IO) {
-        try {
-            val releasesJson =
-                fetchJson("${ApiConstants.API_BASE}/releases?per_page=${ApiConstants.PER_PAGE}")
-            val releases =
-                releasesJson.optJSONArray(ApiConstants.RELEASES_KEY) ?: return@withContext null
-            // 遍历找到 tag 以 lawnicons-v 开头的最新 release
-            for (i in 0 until releases.length()) {
-                val release = releases.getJSONObject(i)
-                val tag = release.optString(ApiConstants.TAG_NAME_KEY, "")
-                if (tag.startsWith(ApiConstants.TAG_PREFIX)) {
-                    val version = tag.removePrefix(ApiConstants.TAG_PREFIX)
-                    return@withContext parseRelease(version, release)
+    // proxyPrefix 非空时仅对 github.com 资源下载 URL（manifest）加前缀，API 调用本身不走代理
+    suspend fun getLatestRelease(proxyPrefix: String = ""): ReleaseInfo? =
+        withContext(Dispatchers.IO) {
+            try {
+                val url = "${ApiConstants.API_BASE}/releases?per_page=${ApiConstants.PER_PAGE}"
+                Timber.tag("LawniconsApiService").d("Fetching releases from: $url")
+                val responseText = fetchRaw(url)
+                val releases = JSONArray(responseText)
+                Timber.tag("LawniconsApiService").d("Found ${releases.length()} releases")
+                // 遍历找到 tag 以 lawnicons-v 开头的最新 release
+                for (i in 0 until releases.length()) {
+                    val release = releases.getJSONObject(i)
+                    val tag = release.optString(ApiConstants.TAG_NAME_KEY, "")
+                    Timber.tag("LawniconsApiService").d("Checking release: $tag")
+                    if (tag.startsWith(ApiConstants.TAG_PREFIX)) {
+                        val version = tag.removePrefix(ApiConstants.TAG_PREFIX)
+                        val info = parseRelease(version, release, proxyPrefix)
+                        if (info != null) {
+                            Timber.tag("LawniconsApiService")
+                                .d("Successfully matched and parsed release: $tag")
+                            return@withContext info
+                        } else {
+                            Timber.tag("LawniconsApiService")
+                                .w("Matched tag $tag but failed to parse release details")
+                        }
+                    }
                 }
+                Timber.tag("LawniconsApiService")
+                    .w("No release matching prefix ${ApiConstants.TAG_PREFIX} found")
+                null
+            } catch (e: Exception) {
+                Timber.tag("LawniconsApiService").e(e, "Error fetching releases")
+                null
             }
-            null
-        } catch (_: Exception) {
-            null
         }
-    }
+
 
     // 解析单个 release：从 assets 找 zip 和 manifest.json，下载 manifest 合并信息
-    private fun parseRelease(version: String, release: JSONObject): ReleaseInfo? {
+    // proxyPrefix 非空时对 manifest 下载 URL 加前缀加速
+    private fun parseRelease(
+        version: String,
+        release: JSONObject,
+        proxyPrefix: String
+    ): ReleaseInfo? {
         val assets = release.optJSONArray(ApiConstants.ASSETS_KEY) ?: return null
         var zipUrl = ""
         var zipSize = 0L
@@ -49,11 +73,12 @@ class LawniconsApiService {
             val size = asset.optLong(ApiConstants.ASSET_SIZE_KEY, 0L)
             when {
                 name.endsWith(ApiConstants.ZIP_SUFFIX) -> {
-                    zipUrl = url
+                    // zip 下载 URL 也加代理前缀，供 DownloadService 直接使用
+                    zipUrl = applyProxy(url, proxyPrefix)
                     zipSize = size
                 }
 
-                name == ApiConstants.MANIFEST_FILE -> manifestUrl = url
+                name == ApiConstants.MANIFEST_FILE -> manifestUrl = applyProxy(url, proxyPrefix)
             }
         }
 
@@ -77,10 +102,17 @@ class LawniconsApiService {
         )
     }
 
+    // 对 github.com 的 URL 加代理前缀，非 github URL 或空前缀原样返回
+    private fun applyProxy(url: String, proxyPrefix: String): String {
+        if (proxyPrefix.isBlank() || !url.contains(ApiConstants.GITHUB_HOST)) return url
+        return proxyPrefix + url
+    }
+
     // 下载 manifest.json 并解析关键字段
     private fun parseManifest(url: String): ManifestInfo? {
         return try {
-            val json = fetchJson(url)
+            val text = fetchRaw(url)
+            val json = JSONObject(text)
             val pkg = json.optJSONObject(ApiConstants.PACKAGE_KEY)
             val stats = json.optJSONObject(ApiConstants.STATS_KEY)
             ManifestInfo(
@@ -97,8 +129,8 @@ class LawniconsApiService {
         }
     }
 
-    // 发起 GET 请求并解析 JSON 响应
-    private fun fetchJson(urlStr: String): JSONObject {
+    // 发起 GET 请求并返回原始响应文本
+    private fun fetchRaw(urlStr: String): String {
         val connection = (URL(urlStr).openConnection() as HttpURLConnection).apply {
             requestMethod = ApiConstants.METHOD_GET
             connectTimeout = ApiConstants.CONNECT_TIMEOUT_MS
@@ -106,13 +138,19 @@ class LawniconsApiService {
             setRequestProperty(ApiConstants.HEADER_USER_AGENT, ApiConstants.USER_AGENT)
             setRequestProperty(ApiConstants.HEADER_ACCEPT, ApiConstants.ACCEPT_JSON)
         }
+        val responseCode = connection.responseCode
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            val errorText = connection.errorStream?.use { it.bufferedReader().readText() } ?: ""
+            Timber.tag("LawniconsApiService").e("HTTP error $responseCode for $urlStr: $errorText")
+            throw java.io.IOException("HTTP error: $responseCode")
+        }
         return connection.inputStream.use { stream ->
-            val text = BufferedReader(InputStreamReader(stream)).use { reader ->
+            BufferedReader(InputStreamReader(stream)).use { reader ->
                 reader.readText()
             }
-            JSONObject(text)
         }
     }
+
 
     // manifest 解析结果中间结构
     private data class ManifestInfo(
@@ -128,6 +166,9 @@ class LawniconsApiService {
     private object ApiConstants {
         // GitHub API 基础地址
         const val API_BASE = "https://api.github.com/repos/VincentAzz/HyperIconLab"
+
+        // github.com 主机标识，用于判断是否需要加代理前缀
+        const val GITHUB_HOST = "github.com"
         const val PER_PAGE = 10
 
         // release tag 前缀
@@ -137,14 +178,18 @@ class LawniconsApiService {
         const val METHOD_GET = "GET"
         const val CONNECT_TIMEOUT_MS = 15000
         const val READ_TIMEOUT_MS = 60000
-        const val USER_AGENT = "HyperIconLab-Android"
+
+        // 使用更标准且具有辨识度的 User-Agent，避免被 GitHub 拦截
+        const val USER_AGENT =
+            "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36 HyperIconLab/1.0"
         const val ACCEPT_JSON = "application/vnd.github+json"
         const val HEADER_USER_AGENT = "User-Agent"
+
         const val HEADER_ACCEPT = "Accept"
 
         // JSON 字段名
-        const val RELEASES_KEY = "releases"
         const val TAG_NAME_KEY = "tag_name"
+
         const val ASSETS_KEY = "assets"
         const val ASSET_NAME_KEY = "name"
         const val ASSET_URL_KEY = "browser_download_url"

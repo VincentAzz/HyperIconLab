@@ -24,6 +24,6 @@ data class AppPreferences(
     val useFloatingBottomBarCompact: Boolean = false,
     val floatingBottomBarCompactType: FloatingBottomBarCompactType = FloatingBottomBarCompactType.MIXED_ICON,
     val seedColorInt: Int,
-    // 暂时设置tab
+    val useDownloadProxy: Boolean = false,
     val lastMainPageIndex: Int = 3
 )

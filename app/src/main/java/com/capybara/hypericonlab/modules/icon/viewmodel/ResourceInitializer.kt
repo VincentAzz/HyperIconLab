@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -58,6 +59,16 @@ class ResourceInitializer(
                 IconSetInfo(id = id, label = id, iconCount = count)
             }
             _availableIconSets.value = list
+        }
+    }
+
+    // 观察资源来源变化，切换来源后自动重新加载图标集映射数
+    fun observeResourceChanges() {
+        scope.launch {
+            // 跳过初始值，仅在来源变化时重新加载
+            resourceManager.currentVersion.drop(1).collect {
+                loadAvailableIconSets()
+            }
         }
     }
 

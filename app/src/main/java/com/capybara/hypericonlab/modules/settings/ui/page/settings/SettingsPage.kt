@@ -48,14 +48,20 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
-import com.capybara.hypericonlab.modules.icon.ui.page.home.component.LogSheet
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
+import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
+import com.capybara.hypericonlab.modules.settings.domain.repository.BooleanSetting
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadModeSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.LawniconsBrowserSheet
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.LogSheet
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.SourceOptionSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AboutTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AssetsTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.SettingsTab
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @SuppressLint("RestrictedApi")
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
@@ -70,6 +76,15 @@ fun SettingsPage(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+
+    // 资源管理器：供来源选择 sheet 读取当前版本与已下载版本列表
+    val resourceManager = koinInject<LawniconsResourceManager>()
+    val appSettingsRepository = koinInject<AppSettingsRepository>()
+    val currentVersion by resourceManager.currentVersion.collectAsStateWithLifecycle()
+    // 下载代理开关：在顶层持续订阅，避免 sheet 内重复订阅导致回显初始值错误
+    val useDownloadProxy by appSettingsRepository
+        .getBoolean(BooleanSetting.UiUseDownloadProxy, default = false)
+        .collectAsStateWithLifecycle(initialValue = false)
 
     val settingTabs = listOf("设置", "资产", "关于")
     val settingIcons =
@@ -86,6 +101,10 @@ fun SettingsPage(
     var showLogSheet by remember { mutableStateOf(false) }
     // 资产页"浏览原始图标"卡片触发的 SVG 浏览 sheet
     var showLawniconsSheet by remember { mutableStateOf(false) }
+    // 资产页"切换来源"卡片触发的来源选择 sheet
+    var showSourceSheet by remember { mutableStateOf(false) }
+    // 资产页"下载方式"卡片触发的代理选择 sheet
+    var showDownloadModeSheet by remember { mutableStateOf(false) }
 
     val backdrop = rememberMaterial3BlurBackdrop(uiState.useBlur)
 
@@ -162,6 +181,28 @@ fun SettingsPage(
     if (showLawniconsSheet) {
         LawniconsBrowserSheet(
             onDismiss = { showLawniconsSheet = false },
+            backdrop = backdrop,
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
+            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+        )
+    }
+
+    // 来源选择 sheet：由"切换来源"卡片触发
+    if (showSourceSheet) {
+        SourceOptionSheet(
+            currentVersion = currentVersion,
+            onDismiss = { showSourceSheet = false },
+            backdrop = backdrop,
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
+            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+        )
+    }
+
+    // 下载方式 sheet：由"下载方式"卡片触发
+    if (showDownloadModeSheet) {
+        DownloadModeSheet(
+            currentUseProxy = useDownloadProxy,
+            onDismiss = { showDownloadModeSheet = false },
             backdrop = backdrop,
             useLiquidGlass = uiState.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
@@ -252,6 +293,8 @@ fun SettingsPage(
                         outerPadding = outerPadding,
                         backdrop = backdrop,
                         onBrowseLawnicons = { showLawniconsSheet = true },
+                        onSwitchSource = { showSourceSheet = true },
+                        onChooseDownloadMode = { showDownloadModeSheet = true },
                     )
                 }
 

@@ -20,7 +20,7 @@ val iconModule = module {
     single { LawniconsResourceManager(get()) }
     single { LawniconsApiService() }
     single { LawniconsDownloadService(get()) }
-    single { LawniconsUpdateManager(get(), get(), get(), get()) }
+    single { LawniconsUpdateManager(get(), get(), get(), get(), get()) }
     factory { ManageResourcesUseCase(get()) }
     factory { GeneratePreviewUseCase(get(), get()) }
     factory { IconPipelineUseCase(get()) }

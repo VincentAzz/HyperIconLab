@@ -69,6 +69,8 @@ class AppSettingsRepositoryImpl(
             ),
             seedColorInt = prefs[AppDataStore.THEME_SEED_COLOR]
                 ?: PresetColors.first().color.toArgb(),
+            useDownloadProxy = prefs[AppDataStore.UI_USE_DOWNLOAD_PROXY]
+                ?: false,
             lastMainPageIndex = prefs[AppDataStore.LAST_MAIN_PAGE_INDEX]
                 ?: 3
         )
@@ -120,5 +122,6 @@ class AppSettingsRepositoryImpl(
         BooleanSetting.UiUseTabRowTransparentBackground -> AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND
         BooleanSetting.UiUseTabRowFillWidth -> AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH
         BooleanSetting.UiUseGoogleSansFlex -> AppDataStore.UI_USE_GOOGLE_SANS_FLEX
+        BooleanSetting.UiUseDownloadProxy -> AppDataStore.UI_USE_DOWNLOAD_PROXY
     }
 }

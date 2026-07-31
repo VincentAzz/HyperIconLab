@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,10 @@ fun <T> SelectionSheet(
     onDismiss: () -> Unit,
     onConfirm: (T) -> Unit,
     itemLabel: @Composable (T) -> String,
+    // 可选：每项前缀图标，返回 null 时不显示
+    itemIcon: @Composable ((T) -> ImageVector?)? = null,
+    // 可选：单项是否可选中，返回 false 时该项置灰，默认全部可选中
+    itemEnabled: ((T) -> Boolean)? = null,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
     liquidGlassBlurRadius: Dp = 24.dp
@@ -129,11 +134,14 @@ fun <T> SelectionSheet(
             containerColorAlpha = 0.8f
         ) {
             items.forEach { item ->
+                val enabled = itemEnabled?.invoke(item) ?: true
                 item(key = item) {
                     RadioButtonWidget(
                         title = itemLabel(item),
                         selected = item == currentSelection,
-                        onClick = { currentSelection = item },
+                        enabled = enabled,
+                        onClick = { if (enabled) currentSelection = item },
+                        icon = itemIcon?.invoke(item),
                         iconPlaceholder = false
                     )
                 }

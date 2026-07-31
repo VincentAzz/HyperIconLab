@@ -35,7 +35,7 @@ class AssetsResourceProvider(
             0
         }
         return LawniconsVersion(
-            version = AppVersion.LAWNICONS_VERSION,
+            version = AppVersion.LAWNICONS_VERSION.substringBefore("-"),
             source = ResourceSource.ASSETS,
             lawniconsCommit = AppVersion.LAWNICONS_VERSION.substringAfter("-", ""),
             generatedAt = "",

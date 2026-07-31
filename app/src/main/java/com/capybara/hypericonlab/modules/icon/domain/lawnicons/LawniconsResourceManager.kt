@@ -89,6 +89,28 @@ class LawniconsResourceManager(
         return remoteBase.listFiles { f -> f.isDirectory }?.map { it.name } ?: emptyList()
     }
 
+    // 获取 assets 出厂版本的版本信息（无论当前激活来源是什么）
+    fun getAssetsVersionInfo(): LawniconsVersion = assetsProvider.getVersion()
+
+    // 获取指定已下载云端版本的版本信息，目录不存在返回 null
+    fun getRemoteVersionInfo(version: String): LawniconsVersion? {
+        val remoteDir = File(
+            context.filesDir,
+            "${ManagerConstants.REMOTE_BASE_DIR}/$version"
+        )
+        if (!remoteDir.exists()) return null
+        return RemoteResourceProvider(context, version).getVersion()
+    }
+
+    // 清除所有云端下载资源并切换回 assets 出厂版本（调试用，上线前移除）
+    fun clearCloudAssets() {
+        val remoteBase = File(context.filesDir, ManagerConstants.REMOTE_BASE_DIR)
+        remoteBase.deleteRecursively()
+        writeActiveVersion(null)
+        currentProvider = assetsProvider
+        _currentVersion.value = assetsProvider.getVersion()
+    }
+
     // 读取激活版本指针，无指针或为空返回 null
     private fun readActiveVersion(): String? {
         val pointer = File(context.filesDir, ManagerConstants.ACTIVE_POINTER_FILE)

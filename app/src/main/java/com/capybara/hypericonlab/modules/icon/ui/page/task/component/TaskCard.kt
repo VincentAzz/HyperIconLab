@@ -124,7 +124,7 @@ fun TaskCard(
                         maxLines = 1
                     )
                     Text(
-                        text = "${task.iconSetLabel} · ${task.iconCount} 个图标",
+                        text = "${task.iconSetLabel} · ${task.iconCount} 映射",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

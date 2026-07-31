@@ -43,6 +43,7 @@ class AppDataStore(
         val UI_FLOATING_BAR_COMPACT_TYPE =
             stringPreferencesKey("ui_floating_bottom_bar_compact_type")
         val LAST_MAIN_PAGE_INDEX = intPreferencesKey("last_main_page_index")
+        val UI_USE_DOWNLOAD_PROXY = booleanPreferencesKey("ui_use_download_proxy")
     }
 
     suspend fun putString(key: Preferences.Key<String>, value: String) {

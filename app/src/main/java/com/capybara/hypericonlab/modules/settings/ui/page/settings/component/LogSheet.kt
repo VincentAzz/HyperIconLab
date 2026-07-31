@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.home.component
+package com.capybara.hypericonlab.modules.settings.ui.page.settings.component
 
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
