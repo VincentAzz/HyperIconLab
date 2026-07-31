@@ -1,0 +1,109 @@
+name: Lawnicons 资源更新
+
+# 触发方式：仅手动触发（workflow_dispatch）
+# 在 Actions 页面点击 "Run workflow" 运行，可指定 lawnicons 分支
+on:
+  workflow_dispatch:
+    inputs:
+      lawnicons_ref:
+        description: 'Lawnicons 的 git ref（分支/tag/commit），默认 main'
+        required: false
+        default: 'main'
+
+# 并发控制：同一时刻只允许一个 lawnicons 更新任务运行
+# 避免重复手动触发导致 slot_mapping_history commit 冲突
+concurrency:
+  group: lawnicons-update
+  cancel-in-progress: false
+
+# 需要写权限：commit history 文件 + 创建 Release
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # ========== 1. Checkout 两个仓库 ==========
+      # 1a. 当前仓库（取 Python 脚本 + history 文件）
+      - name: Checkout HyperIconLab
+        uses: actions/checkout@v4
+        with:
+          path: hypericonlab
+          # 需要写权限，以便后续 commit history 文件
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 1b. Lawnicons 上游仓库（取 svgs + appfilter.xml）
+      # 注意：请确认 lawnicons 的 GitHub 仓库地址（owner/repo）
+      # 官方 Lawnicons 仓库为 TeamFiles/Lawnicons，如使用 fork 请修改此处
+      - name: Checkout Lawnicons
+        uses: actions/checkout@v4
+        with:
+          repository: LawnchairLauncher/lawnicons
+          ref: ${{ inputs.lawnicons_ref || 'main' }}
+          path: lawnicons
+          fetch-depth: 1
+
+      # ========== 2. 环境准备 ==========
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ========== 3. 生成版本号 ==========
+      # 版本号取当日 YYYYMMDD；lawnicons commit hash 用于追溯
+      - name: Generate version
+        id: version
+        run: |
+          VERSION=$(date -u +%Y%m%d)
+          COMMIT=$(cd lawnicons && git rev-parse --short HEAD)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          echo "版本号: $VERSION, lawnicons commit: $COMMIT"
+
+      # ========== 4. 运行处理脚本 ==========
+      # data-dir 含 alt/preview/test/app_color_schemes，随仓库提交
+      - name: Run generator
+        run: |
+          python hypericonlab/scripts/lawnicons-pipeline/generator.py \
+            --lawnicons-dir lawnicons \
+            --output-dir output \
+            --data-dir hypericonlab/scripts/lawnicons-pipeline/data \
+            --history hypericonlab/scripts/lawnicons-pipeline/history/slot_mapping_history.json \
+            --version ${{ steps.version.outputs.version }} \
+            --lawnicons-commit ${{ steps.version.outputs.commit }} \
+            --pack-zip
+
+      # ========== 5. Commit 稳定槽位历史 ==========
+      # 将更新后的 slot_mapping_history.json 提交回仓库
+      # 下次 CI 运行时自动读取最新历史，保证槽位跨版本稳定
+      - name: Commit slot_mapping_history
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update slot_mapping_history [${{ steps.version.outputs.version }}]"
+          file_pattern: scripts/lawnicons-pipeline/history/slot_mapping_history.json
+          repository: hypericonlab
+
+      # ========== 6. 创建 GitHub Release ==========
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: lawnicons-v${{ steps.version.outputs.version }}
+          name: Lawnicons ${{ steps.version.outputs.version }}
+          body: |
+            lawnicons 资源更新 ${{ steps.version.outputs.version }}
+
+            - lawnicons commit: ${{ steps.version.outputs.commit }}
+            - 处理时间: ${{ steps.version.outputs.version }}
+
+            产物：
+            - `lawnicons_${{ steps.version.outputs.version }}.zip`：主包
+            - `manifest.json`：清单（含版本、统计）
+
+            App 端可通过 GitHub API 拉取此 Release 更新资源。
+          files: |
+            output/lawnicons_*.zip
+            output/manifest.json
+            output/version.txt
+          draft: false
+          prerelease: false
