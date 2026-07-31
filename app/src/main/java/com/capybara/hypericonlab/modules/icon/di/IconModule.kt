@@ -3,7 +3,10 @@ package com.capybara.hypericonlab.modules.icon.di
 import com.capybara.hypericonlab.core.notification.BuildNotificationManager
 import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsApiService
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsDownloadService
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskExecutor
 import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
@@ -15,6 +18,9 @@ import org.koin.dsl.module
 
 val iconModule = module {
     single { LawniconsResourceManager(get()) }
+    single { LawniconsApiService() }
+    single { LawniconsDownloadService(get()) }
+    single { LawniconsUpdateManager(get(), get(), get(), get()) }
     factory { ManageResourcesUseCase(get()) }
     factory { GeneratePreviewUseCase(get(), get()) }
     factory { IconPipelineUseCase(get()) }
