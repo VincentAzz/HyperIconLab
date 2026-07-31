@@ -19,12 +19,12 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.FailureReason
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
-import com.capybara.hypericonlab.modules.settings.domain.repository.BooleanSetting
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -51,10 +51,8 @@ fun AssetsTab(
     val version by resourceManager.currentVersion.collectAsStateWithLifecycle()
     // 更新流程状态（检查/下载/解压/成功/失败）
     val updateState by updateManager.state.collectAsStateWithLifecycle()
-    // 下载代理开关（默认关闭）
-    val useDownloadProxy by appSettingsRepository
-        .getBoolean(BooleanSetting.UiUseDownloadProxy, default = false)
-        .collectAsStateWithLifecycle(initialValue = false)
+    // 下载代理开关
+    val useDownloadProxy by appSettingsRepository.useDownloadProxy.collectAsStateWithLifecycle()
 
     // 版本号 + 来源统一显示：日期 (commit) - 内置/云端
     val versionDate = version.version.substringBefore("-")
@@ -77,11 +75,13 @@ fun AssetsTab(
             .fillMaxSize()
             .then(backdrop?.let { Modifier.layerBackdrop(it) } ?: Modifier),
         contentPadding = PaddingValues(
-            start = paddingValues.calculateStartPadding(layoutDirection) +
-                    outerPadding.calculateStartPadding(layoutDirection),
+            start = paddingValues.calculateStartPadding(layoutDirection) + outerPadding.calculateStartPadding(
+                layoutDirection
+            ),
             top = paddingValues.calculateTopPadding(),
-            end = paddingValues.calculateEndPadding(layoutDirection) +
-                    outerPadding.calculateEndPadding(layoutDirection),
+            end = paddingValues.calculateEndPadding(layoutDirection) + outerPadding.calculateEndPadding(
+                layoutDirection
+            ),
             bottom = outerPadding.calculateBottomPadding(),
         ),
     ) {
@@ -90,31 +90,25 @@ fun AssetsTab(
                 // 版本 + 来源合并显示：20260731 (ba36a38) - 云端
                 item {
                     BaseWidget(
-                        iconPlaceholder = false,
-                        title = "版本",
-                        trailingContent = {
+                        iconPlaceholder = false, title = "版本", trailingContent = {
                             Text(
                                 text = versionText,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontFamily = GoogleSansCodeFontFamily,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        }
-                    )
+                        })
                 }
 
                 item {
                     BaseWidget(
-                        iconPlaceholder = false,
-                        title = "图标数量",
-                        trailingContent = {
+                        iconPlaceholder = false, title = "图标数量", trailingContent = {
                             Text(
                                 text = "${version.svgCount} 图标, ${version.mapperCount} 映射",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        }
-                    )
+                        })
                 }
 
                 // 检查更新：云端来源显示，或仅有本地资产时显示（需保留更新入口）
@@ -125,18 +119,14 @@ fun AssetsTab(
                     item {
                         BaseWidget(
                             iconPlaceholder = false,
-                            title = "检查更新",
+                            title = "检查 Lawnicons 更新",
                             description = updateStateDescription(updateState),
                             trailingContent = {
                                 PrimaryActionButton(
-                                    text = checkButtonText,
-                                    enabled = checkEnabled,
-                                    onClick = {
+                                    text = checkButtonText, enabled = checkEnabled, onClick = {
                                         scope.launch { updateManager.checkAndInstall() }
-                                    }
-                                )
-                            }
-                        )
+                                    })
+                            })
                     }
                 }
 
@@ -149,11 +139,9 @@ fun AssetsTab(
                             description = "加速代理可提升 GitHub 资源下载速度",
                             trailingContent = {
                                 PrimaryActionButton(
-                                    text = downloadModeText,
-                                    onClick = onChooseDownloadMode
+                                    text = downloadModeText, onClick = onChooseDownloadMode
                                 )
-                            }
-                        )
+                            })
                     }
                 }
 
@@ -165,11 +153,9 @@ fun AssetsTab(
                         description = "在内置版本与云端版本间切换",
                         trailingContent = {
                             PrimaryActionButton(
-                                text = "选择",
-                                onClick = onSwitchSource
+                                text = "选择", onClick = onSwitchSource
                             )
-                        }
-                    )
+                        })
                 }
 
                 // 浏览原始 SVG 图标
@@ -180,11 +166,9 @@ fun AssetsTab(
                         description = "查看 Lawnicons 仓库的全部 SVG",
                         trailingContent = {
                             PrimaryActionButton(
-                                text = "浏览",
-                                onClick = onBrowseLawnicons
+                                text = "浏览", onClick = onBrowseLawnicons
                             )
-                        }
-                    )
+                        })
                 }
             }
         }
@@ -199,16 +183,13 @@ fun AssetsTab(
                         description = "删除所有云端下载的 Lawnicons 资产\n仅保留应用内置版本",
                         trailingContent = {
                             PrimaryActionButton(
-                                text = "清除",
-                                onClick = {
+                                text = "清除", onClick = {
                                     scope.launch {
                                         resourceManager.clearCloudAssets()
                                         updateManager.resetState()
                                     }
-                                }
-                            )
-                        }
-                    )
+                                })
+                        })
                 }
             }
         }
@@ -231,18 +212,50 @@ private fun updateStateToButton(state: UpdateState): Pair<String, Boolean> = whe
 }
 
 
-// 更新状态描述文本，显示在检查更新行下方
+// 更新状态描述文本
 private fun updateStateDescription(state: UpdateState): String? = when (state) {
     UpdateState.Idle -> null
     is UpdateState.Checking -> "正在检查云端版本..."
     is UpdateState.Downloading -> "正在下载资源包..."
     is UpdateState.Extracting -> "正在解压资源..."
     is UpdateState.Success -> "已切换到版本 ${state.newVersion}"
-    is UpdateState.Failed -> state.reason
+    is UpdateState.Failed -> FailureMessage.forReason(state.reason)
     UpdateState.UpToDate -> "当前已是最新版本"
+}
+
+private object FailureMessage {
+    const val RATE_LIMITED = "GitHub API 限速，请稍后重试或切换网络"
+
+    const val NETWORK_ERROR = "连接失败，请检查网络连接"
+
+    const val TIMEOUT = "连接超时，请检查网络连接"
+
+    const val HTTP_ERROR = "连接异常，请稍后重试"
+
+    const val CORRUPTED = "校验失败，请重新下载"
+
+    const val PARSE_ERROR = "解析失败"
+
+    const val EXTRACT_FAILED = "解压失败"
+
+    const val ACTIVATE_FAILED = "版本切换失败"
+
+    const val UNKNOWN = "更新失败，请重试"
+
+    fun forReason(reason: FailureReason): String = when (reason) {
+        FailureReason.RATE_LIMITED -> RATE_LIMITED
+        FailureReason.NETWORK_ERROR -> NETWORK_ERROR
+        FailureReason.TIMEOUT -> TIMEOUT
+        FailureReason.HTTP_ERROR -> HTTP_ERROR
+        FailureReason.CORRUPTED -> CORRUPTED
+        FailureReason.PARSE_ERROR -> PARSE_ERROR
+        FailureReason.EXTRACT_FAILED -> EXTRACT_FAILED
+        FailureReason.ACTIVATE_FAILED -> ACTIVATE_FAILED
+        FailureReason.UNKNOWN -> UNKNOWN
+    }
 }
 
 private object ButtonConstants {
     const val PERCENT_SCALE = 100
-    val PERCENT_FMT = "%d%%"
+    const val PERCENT_FMT = "%d%%"
 }

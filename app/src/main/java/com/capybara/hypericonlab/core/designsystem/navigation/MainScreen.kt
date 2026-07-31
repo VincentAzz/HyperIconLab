@@ -32,6 +32,9 @@ const val EXTRA_TAB_INDEX = "extra_tab_index"
 // 任务 tab 索引（与下方 tabs 列表顺序对应：home=0, custom=1, task=2, settings=3）
 const val TAB_INDEX_TASK = 2
 
+// 设置 tab 索引：点击"更新失败通知"时跳转到此 tab，并由 SettingsPage 路由到资产子页
+const val TAB_INDEX_SETTINGS = 3
+
 // 由 MainActivity 在 onCreate / onNewIntent 中更新，MainScreen 收集后调用 animateToPage 切换 tab
 // 使用 compositionLocalOf（非 static）以保证值变化能触发下游重组
 val LocalPendingTab = compositionLocalOf<Int?> { null }

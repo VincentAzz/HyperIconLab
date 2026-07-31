@@ -81,10 +81,15 @@
     <string name="build_notification_failed_fmt">%1$s 失败：%2$s</string>
     <string name="build_notification_unknown_error">未知错误</string>
 
+    <!-- Lawnicons 资源更新失败通知 -->
+    <string name="lawnicons_update_notification_channel_name">Lawnicons 更新</string>
+    <string name="lawnicons_update_notification_channel_desc">在 lawnicons 资源更新失败时发送通知</string>
+    <string name="lawnicons_update_notification_failed_title">Lawnicons 更新失败</string>
+
     <!-- 权限检查卡片 -->
     <string name="permission_check_title">权限检查</string>
     <string name="permission_check_notification_title">通知权限</string>
-    <string name="permission_check_notification_desc">用于显示构建进度通知，拒绝后任务仍可执行但无通知提示</string>
+    <string name="permission_check_notification_desc">用于显示构建进度与 lawnicons 更新失败通知，拒绝后任务仍可执行但无通知提示</string>
     <string name="permission_check_storage_title">存储权限</string>
     <string name="permission_check_storage_desc">用于将构建产物导出到 Documents 目录（仅 Android 9 及以下需要）</string>
     <string name="permission_check_grant">授权</string>

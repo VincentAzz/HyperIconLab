@@ -81,10 +81,15 @@
     <string name="build_notification_failed_fmt">%1$s failed: %2$s</string>
     <string name="build_notification_unknown_error">Unknown error</string>
 
+    <!-- Lawnicons update failure notifications -->
+    <string name="lawnicons_update_notification_channel_name">Lawnicons Updates</string>
+    <string name="lawnicons_update_notification_channel_desc">Notify when lawnicons resource update fails</string>
+    <string name="lawnicons_update_notification_failed_title">Lawnicons update failed</string>
+
 
     <string name="permission_check_title">Permission Check</string>
     <string name="permission_check_notification_title">Notification Permission</string>
-    <string name="permission_check_notification_desc">Used to show build progress notifications. Tasks still run without it, but no notifications will be displayed</string>
+    <string name="permission_check_notification_desc">Used to show build progress and lawnicons update failure notifications. Tasks still run without it, but no notifications will be displayed</string>
     <string name="permission_check_storage_title">Storage Permission</string>
     <string name="permission_check_storage_desc">Required to export build artifacts to the Documents directory (only Android 9 and below)</string>
     <string name="permission_check_grant">Grant</string>

@@ -9,15 +9,19 @@ import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
+import java.net.UnknownHostException
 
 // 云端 release 查询服务：从 GitHub Releases API 获取最新 lawnicons release
 // 解析 release JSON + 下载 manifest.json 合并出 ReleaseInfo
 // 未认证调用有 60 次/小时/IP 的速率限制，对单次检查更新足够
+// 失败时抛 LawniconsUpdateException（含 FailureReason），由 UpdateManager 捕获映射
 class LawniconsApiService {
 
-    // 获取最新的 lawnicons release，失败返回 null
+    // 获取最新的 lawnicons release
     // proxyPrefix 非空时仅对 github.com 资源下载 URL（manifest）加前缀，API 调用本身不走代理
+    // 失败抛 LawniconsUpdateException；无匹配 release 时返回 null（非错误）
     suspend fun getLatestRelease(proxyPrefix: String = ""): ReleaseInfo? =
         withContext(Dispatchers.IO) {
             try {
@@ -47,9 +51,21 @@ class LawniconsApiService {
                 Timber.tag("LawniconsApiService")
                     .w("No release matching prefix ${ApiConstants.TAG_PREFIX} found")
                 null
+            } catch (e: LawniconsUpdateException) {
+                // 已分类的异常直接向上抛
+                throw e
+            } catch (e: SocketTimeoutException) {
+                throw LawniconsUpdateException(FailureReason.TIMEOUT, e.message, e)
+            } catch (e: UnknownHostException) {
+                throw LawniconsUpdateException(FailureReason.NETWORK_ERROR, e.message, e)
+            } catch (e: org.json.JSONException) {
+                throw LawniconsUpdateException(FailureReason.PARSE_ERROR, e.message, e)
             } catch (e: Exception) {
-                Timber.tag("LawniconsApiService").e(e, "Error fetching releases")
-                null
+                // 兜底：其他 IO/运行时异常归为网络错误
+                throw LawniconsUpdateException(
+                    if (e is java.io.IOException) FailureReason.NETWORK_ERROR else FailureReason.UNKNOWN,
+                    e.message, e
+                )
             }
         }
 
@@ -109,6 +125,7 @@ class LawniconsApiService {
     }
 
     // 下载 manifest.json 并解析关键字段
+    // 解析失败抛 LawniconsUpdateException(PARSE_ERROR)
     private fun parseManifest(url: String): ManifestInfo? {
         return try {
             val text = fetchRaw(url)
@@ -124,12 +141,19 @@ class LawniconsApiService {
                 removed = stats?.optInt(ApiConstants.REMOVED_KEY, 0) ?: 0,
                 modified = stats?.optInt(ApiConstants.MODIFIED_KEY, 0) ?: 0
             )
+        } catch (e: LawniconsUpdateException) {
+            // fetchRaw 抛出的已分类异常，向上传递
+            throw e
+        } catch (e: org.json.JSONException) {
+            throw LawniconsUpdateException(FailureReason.PARSE_ERROR, e.message, e)
         } catch (_: Exception) {
+            // manifest 下载失败不阻断主流程（sha256 等字段降级为空）
             null
         }
     }
 
     // 发起 GET 请求并返回原始响应文本
+    // HTTP 403 → RATE_LIMITED；其他非 200 → HTTP_ERROR
     private fun fetchRaw(urlStr: String): String {
         val connection = (URL(urlStr).openConnection() as HttpURLConnection).apply {
             requestMethod = ApiConstants.METHOD_GET
@@ -142,7 +166,12 @@ class LawniconsApiService {
         if (responseCode != HttpURLConnection.HTTP_OK) {
             val errorText = connection.errorStream?.use { it.bufferedReader().readText() } ?: ""
             Timber.tag("LawniconsApiService").e("HTTP error $responseCode for $urlStr: $errorText")
-            throw java.io.IOException("HTTP error: $responseCode")
+            val reason = if (responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
+                FailureReason.RATE_LIMITED
+            } else {
+                FailureReason.HTTP_ERROR
+            }
+            throw LawniconsUpdateException(reason, "HTTP $responseCode")
         }
         return connection.inputStream.use { stream ->
             BufferedReader(InputStreamReader(stream)).use { reader ->

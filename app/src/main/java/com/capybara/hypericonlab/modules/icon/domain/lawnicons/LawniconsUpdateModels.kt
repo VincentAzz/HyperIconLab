@@ -15,6 +15,26 @@ data class ReleaseInfo(
     val modifiedIcons: Int        // 本次修改图标数
 )
 
+// 更新失败原因分类：供 UI 显示针对性文案、通知栏推送
+enum class FailureReason {
+    RATE_LIMITED,    // GitHub API 限速（403），提示切换网络或稍后重试
+    NETWORK_ERROR,   // 网络不可达（UnknownHost/连接失败）
+    TIMEOUT,         // 网络超时（connect/read timeout）
+    HTTP_ERROR,      // HTTP 非 200 响应（非限速）
+    CORRUPTED,       // 文件校验失败（sha256 不匹配）
+    PARSE_ERROR,     // 响应解析失败（JSON 异常）
+    EXTRACT_FAILED,  // 解压失败
+    ACTIVATE_FAILED, // 激活切换失败
+    UNKNOWN          // 未知错误
+}
+
+// 更新流程异常：携带 FailureReason，供 ApiService/DownloadService 抛出、UpdateManager 捕获
+class LawniconsUpdateException(
+    val reason: FailureReason,
+    message: String? = null,
+    cause: Throwable? = null
+) : Exception(message, cause)
+
 // 更新流程状态：供 UI 观察当前更新进度与结果
 sealed class UpdateState {
     // 空闲
@@ -32,8 +52,8 @@ sealed class UpdateState {
     // 更新成功，newVersion 为新激活版本号
     data class Success(val newVersion: String) : UpdateState()
 
-    // 更新失败，reason 为失败原因
-    data class Failed(val reason: String) : UpdateState()
+    // 更新失败，reason 为失败原因分类
+    data class Failed(val reason: FailureReason) : UpdateState()
 
     // 已是最新版本
     object UpToDate : UpdateState()
