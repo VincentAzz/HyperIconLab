@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
@@ -46,6 +47,7 @@ class IconViewModel(
     private val generatePreviewUseCase: GeneratePreviewUseCase,
     private val pipeline: IconPipelineUseCase,
     private val buildTaskManager: BuildTaskManager,
+    private val resourceManager: LawniconsResourceManager,
     private val appSettingsRepository: AppSettingsRepository
 ) : AndroidViewModel(application) {
 
@@ -148,6 +150,7 @@ class IconViewModel(
         scope = viewModelScope,
         manageResourcesUseCase = manageResourcesUseCase,
         buildTaskManager = buildTaskManager,
+        resourceManager = resourceManager,
         onLog = { message, type -> addLog(message, type) },
         onMapperReady = { },
         onPreviewNeeded = { generateLivePreview() }
@@ -199,6 +202,7 @@ class IconViewModel(
         scope = viewModelScope,
         pipeline = pipeline,
         buildTaskManager = buildTaskManager,
+        resourceManager = resourceManager,
         configProvider = { _config.value },
         wallpaperBitmapProvider = { wallpaperBitmap.value },
         wallpaperColorSchemeProvider = { wallpaperColorScheme.value },

@@ -12,7 +12,7 @@ import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.preview.PreviewGenerator
-import com.capybara.hypericonlab.core.utils.ZipUtils
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.render.BackgroundLayerRenderer
@@ -26,10 +26,10 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class GeneratePreviewUseCase(private val context: Context) {
-
-    private val filesDir = context.filesDir
-    private val lawniconsBase = File(filesDir, "lawnicons")
+class GeneratePreviewUseCase(
+    private val context: Context,
+    private val resourceManager: LawniconsResourceManager
+) {
 
     suspend fun execute(
         config: IconConfigState,
@@ -38,19 +38,20 @@ class GeneratePreviewUseCase(private val context: Context) {
         appColorSchemes: Map<String, Pair<String, String>>,
         onStorePreviewGenerated: (Bitmap) -> Unit
     ): Bitmap? = withContext(Dispatchers.Default) {
-        // mapper 直接从 assets/icon_mapper/ 读取，优先使用 preview 版本
+        // 通过 resourceManager 获取当前激活资源，优先使用 preview 版本 mapper
+        val provider = resourceManager.getProvider()
         val fullMap = withContext(Dispatchers.IO) {
             val previewStream = try {
-                context.assets.open("icon_mapper/icon_mapper_preview.xml")
+                provider.openIconMapper(PreviewConstants.PREVIEW_MAPPER_FILE)
             } catch (_: Exception) {
                 null
             }
             previewStream?.use { IconMapperProcessor.parseIconMapper(it) }
-                ?: context.assets.open("icon_mapper/icon_mapper.xml")
+                ?: provider.openIconMapper(PreviewConstants.FULL_MAPPER_FILE)
                     .use { IconMapperProcessor.parseIconMapper(it) }
         }
         val svgDir = withContext(Dispatchers.IO) {
-            ZipUtils.findDirRecursive(lawniconsBase, "svgs")
+            provider.getSvgDir()
         }
 
         if (svgDir == null) return@withContext null
@@ -334,5 +335,11 @@ class GeneratePreviewUseCase(private val context: Context) {
     private object InnerShadowPreviewConfig {
         // 预览图标尺寸（与 finalIconSize 一致）
         const val SHADOW_SIZE = 512
+    }
+
+    // mapper 文件名常量
+    private object PreviewConstants {
+        const val PREVIEW_MAPPER_FILE = "icon_mapper_preview.xml"
+        const val FULL_MAPPER_FILE = "icon_mapper.xml"
     }
 }

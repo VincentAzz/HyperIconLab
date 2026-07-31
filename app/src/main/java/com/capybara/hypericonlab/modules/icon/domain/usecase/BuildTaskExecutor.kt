@@ -6,9 +6,9 @@ import android.graphics.BitmapFactory
 import com.capybara.hypericonlab.core.image.InnerShadowProcessor
 import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import com.capybara.hypericonlab.core.utils.ZipUtils
 import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
@@ -24,8 +24,8 @@ import java.io.File
  * 完成后通过 [BuildArtifactWriter] 导出工件与预览图，并持久化缩略图与预览图。
  *
  * 执行流程：
- * 1. 从 assets 直读 mapper（icon_mapper/<iconSetId>.xml），解析为 Map
- * 2. 从 filesDir/lawnicons 查找 svgs 目录
+ * 1. 通过 [LawniconsResourceManager] 获取当前激活资源，读取 mapper 并解析为 Map
+ * 2. 通过 provider 获取 svgs 目录
  * 3. 从 assets/masks 加载上下层 mask bitmaps
  * 4. 调用 [IconPipelineUseCase.executeWithFiles]，写入临时文件 filesDir/build_temp/<taskId>.<ext>
  * 5. 消费 [IconPipelineUseCase.PipelineProgress] Flow，协作式取消 + 实时回调进度
@@ -40,7 +40,8 @@ class BuildTaskExecutor(
     private val context: Context,
     private val pipeline: IconPipelineUseCase,
     private val artifactWriter: BuildArtifactWriter,
-    private val taskStore: BuildTaskStore
+    private val taskStore: BuildTaskStore,
+    private val resourceManager: LawniconsResourceManager
 ) {
 
     suspend fun execute(
@@ -66,10 +67,10 @@ class BuildTaskExecutor(
         var result: BuildTask? = null
 
         try {
-            // 1. 从 assets 直读 mapper（iconSetId 为 full/filtered/test，需映射到实际文件名）
+            // 1. 通过 resourceManager 获取当前激活资源，读取 mapper
+            val provider = resourceManager.getProvider()
             val mapperFileName = IconSetInfo.mapperFileName(task.iconSetId)
-            val mapperMap = context.assets
-                .open("${ExecutorConfig.MAPPER_ASSET_DIR}/$mapperFileName")
+            val mapperMap = provider.openIconMapper(mapperFileName)
                 .use { stream -> IconMapperProcessor.parseIconMapper(stream) }
 
             // 解析得到真实图标数量后，立即更新 current（任务卡片可显示真实数量）
@@ -78,9 +79,8 @@ class BuildTaskExecutor(
                 onUpdate(current)
             }
 
-            // 2. 查找 svgs 目录
-            val lawniconsBase = File(context.filesDir, ExecutorConfig.LAWNICONS_DIRNAME)
-            val svgDir = ZipUtils.findDirRecursive(lawniconsBase, ExecutorConfig.SVGS_DIRNAME)
+            // 2. 通过 provider 获取 svgs 目录
+            val svgDir = provider.getSvgDir()
                 ?: throw IllegalStateException("未找到 svgs 目录，请先解压资源")
 
             // 3. 加载上层 mask bitmaps
@@ -230,15 +230,6 @@ class BuildTaskExecutor(
 
         // 执行流程关键参数集中声明，便于调参
         private object ExecutorConfig {
-            // assets 中 mapper 文件所在目录
-            const val MAPPER_ASSET_DIR = "icon_mapper"
-
-            // filesDir 中 lawnicons 解压目录名
-            const val LAWNICONS_DIRNAME = "lawnicons"
-
-            // lawnicons 下的 svg 目录名
-            const val SVGS_DIRNAME = "svgs"
-
             // assets 中烘焙内阴影文件所在目录（与 IconViewModel 保持一致）
             const val SHADOW_DIRNAME = "shadow_baked"
 

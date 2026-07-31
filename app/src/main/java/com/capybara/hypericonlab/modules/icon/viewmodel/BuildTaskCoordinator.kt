@@ -9,7 +9,7 @@ import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.image.InnerShadowBitmapLoader
 import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import com.capybara.hypericonlab.core.utils.ZipUtils
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
@@ -31,11 +31,13 @@ import java.io.File
 // 通过 provider 回调解耦对 ViewModel 配置/壁纸/预览/运行状态的读取，
 // 通过 onLog/onStatusTextChange/onProgressChange/onRunningChange/onLastPackDurationChange 回调解耦状态写回，
 // 通过 onConfigSwap/onRegeneratePreview 回调解耦 retryBuildTask 的配置切换与预览重生成
+// 资源读取统一通过 LawniconsResourceManager，支持 assets/云端来源切换
 class BuildTaskCoordinator(
     private val context: Context,
     private val scope: CoroutineScope,
     private val pipeline: IconPipelineUseCase,
     private val buildTaskManager: BuildTaskManager,
+    private val resourceManager: LawniconsResourceManager,
     private val configProvider: () -> IconConfigState,
     private val wallpaperBitmapProvider: () -> Bitmap?,
     private val wallpaperColorSchemeProvider: () -> MonetColorExtractor.WallpaperColorScheme?,
@@ -56,7 +58,7 @@ class BuildTaskCoordinator(
     val activeBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.activeTasks
     val finishedBuildTasks: StateFlow<List<BuildTask>> = buildTaskManager.finishedTasks
 
-    // 打包流程：读取 assets 中的 mapper 并执行 pipeline
+    // 打包流程：通过 resourceManager 获取当前激活资源，读取 mapper 并执行 pipeline
     fun runPipeline(mapperName: String) {
         if (isRunningProvider()) return
         onRunningChange(true)
@@ -66,15 +68,13 @@ class BuildTaskCoordinator(
             try {
                 onStatusTextChange("准备 $mapperName...")
                 val filesDir = context.filesDir
-                val lawniconsBase = File(filesDir, "lawnicons")
+                val provider = resourceManager.getProvider()
 
                 val mapperMap = withContext(Dispatchers.IO) {
-                    context.assets
-                        .open("${BuildTaskConfig.MAPPER_ASSET_DIR}/$mapperName")
+                    provider.openIconMapper(mapperName)
                         .use { stream -> IconMapperProcessor.parseIconMapper(stream) }
                 }
-                val svgDir =
-                    withContext(Dispatchers.IO) { ZipUtils.findDirRecursive(lawniconsBase, "svgs") }
+                val svgDir = withContext(Dispatchers.IO) { provider.getSvgDir() }
                 val configValue = configProvider()
                 val maskBitmaps = configValue.selectedMasks.mapNotNull { name ->
                     MaskAssetLoader.loadBitmap(context, name)
@@ -329,7 +329,6 @@ class BuildTaskCoordinator(
 
     companion object {
         private object BuildTaskConfig {
-            const val MAPPER_ASSET_DIR = "icon_mapper"
             const val PLACEHOLDER_ICON_COUNT = 0
         }
     }

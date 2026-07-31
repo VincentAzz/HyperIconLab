@@ -58,7 +58,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.Dp
@@ -78,10 +77,11 @@ import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRec
 import com.capybara.hypericonlab.core.image.SvgProcessor
 import com.capybara.hypericonlab.core.mapper.IconMapperEntry
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import com.capybara.hypericonlab.core.utils.ZipUtils
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -106,7 +106,7 @@ fun LawniconsBrowserSheet(
     useLiquidGlass: Boolean = false,
     liquidGlassBlurRadius: Dp = 24.dp,
 ) {
-    val context = LocalContext.current
+    val resourceManager = koinInject<LawniconsResourceManager>()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -118,16 +118,16 @@ fun LawniconsBrowserSheet(
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
-            // 查找解压后的 svgs 目录（lawnicons.zip 运行时解压到 filesDir/lawnicons/）
-            val base = File(context.filesDir, LawniconsSheetConstants.LAWNICONS_DIR)
-            val dir = ZipUtils.findDirRecursive(base, LawniconsSheetConstants.SVGS_DIR)
+            // 通过 resourceManager 获取当前激活资源的 svgs 目录与 mapper
+            val provider = resourceManager.getProvider()
+            val dir = provider.getSvgDir()
             if (dir == null) {
                 loadState = LawniconsLoadState.ERROR
                 return@withContext
             }
             svgDir = dir
             val entries = try {
-                context.assets.open("${LawniconsSheetConstants.MAPPER_ASSET_DIR}/${LawniconsSheetConstants.FULL_MAPPER_FILE}")
+                provider.openIconMapper(LawniconsSheetConstants.FULL_MAPPER_FILE)
                     .use { IconMapperProcessor.parseIconMapperEntries(it) }
             } catch (_: Exception) {
                 emptyList()
@@ -566,9 +566,6 @@ private fun InfoCardIcon(
 private enum class LawniconsLoadState { LOADING, READY, ERROR }
 
 private object LawniconsSheetConstants {
-    const val LAWNICONS_DIR = "lawnicons"
-    const val SVGS_DIR = "svgs"
-    const val MAPPER_ASSET_DIR = "icon_mapper"
     const val FULL_MAPPER_FILE = "icon_mapper.xml"
 
     const val DARK_FG_COLOR = "#FFFFFFFF"

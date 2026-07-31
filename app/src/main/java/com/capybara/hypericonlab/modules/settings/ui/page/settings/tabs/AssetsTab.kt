@@ -10,23 +10,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.dp
-import com.capybara.hypericonlab.core.AppVersion
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
-import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
+import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 
@@ -39,19 +33,21 @@ fun AssetsTab(
     modifier: Modifier = Modifier,
 ) {
     val layoutDirection = LocalLayoutDirection.current
-    val context = LocalContext.current
+    val resourceManager = koinInject<LawniconsResourceManager>()
 
-    var iconCount by remember { mutableIntStateOf(0) }
-    LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
-            iconCount = try {
-                context.assets
-                    .open("${AssetsConstants.MAPPER_ASSET_DIR}/${AssetsConstants.FULL_MAPPER_FILE}")
-                    .use { IconMapperProcessor.parseIconMapper(it).size }
-            } catch (_: Exception) {
-                0
-            }
-        }
+    // 当前版本信息（从 manager 观察，来源切换后自动更新）
+    val version by resourceManager.currentVersion.collectAsStateWithLifecycle()
+
+    // 版本号展示文本：云端版本显示版本号 + commit，assets 显示出厂版本
+    val versionText = when (version.source) {
+        ResourceSource.REMOTE -> "${version.version} (${version.lawniconsCommit.take(7)})"
+        ResourceSource.ASSETS -> version.version
+    }
+
+    // 来源标签
+    val sourceText = when (version.source) {
+        ResourceSource.REMOTE -> "云端"
+        ResourceSource.ASSETS -> "本地"
     }
 
     LazyColumn(
@@ -76,9 +72,23 @@ fun AssetsTab(
                         title = "版本",
                         trailingContent = {
                             Text(
-                                text = AppVersion.LAWNICONS_VERSION,
+                                text = versionText,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontFamily = GoogleSansCodeFontFamily,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    )
+                }
+
+                item {
+                    BaseWidget(
+                        iconPlaceholder = false,
+                        title = "来源",
+                        trailingContent = {
+                            Text(
+                                text = sourceText,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -91,7 +101,8 @@ fun AssetsTab(
                         title = "图标数量",
                         trailingContent = {
                             Text(
-                                text = "$iconCount 个图标",
+                                // 同时显示 svg 图标数和 mapper 映射数
+                                text = "${version.svgCount} 图标, ${version.mapperCount} 映射",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -119,13 +130,4 @@ fun AssetsTab(
             Spacer(modifier = Modifier.navigationBarsPadding())
         }
     }
-}
-
-private object AssetsConstants {
-    const val MAPPER_ASSET_DIR = "icon_mapper"
-    const val FULL_MAPPER_FILE = "icon_mapper.xml"
-}
-
-private object AssetsUiConstants {
-    val BROWSE_BUTTON_HEIGHT = 36.dp
 }

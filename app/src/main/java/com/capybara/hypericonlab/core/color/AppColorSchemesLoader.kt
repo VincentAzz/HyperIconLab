@@ -10,14 +10,21 @@ import java.io.InputStream
  */
 object AppColorSchemesLoader {
 
-    /**
-     * Loads color schemes into a Map for fast lookup.
-     */
     fun loadFromAssets(context: Context): Map<String, Pair<String, String>> {
-        val schemes = mutableMapOf<String, Pair<String, String>>()
-        try {
+        return try {
             val inputStream: InputStream =
                 context.assets.open("color_schemes/app_color_schemes.xml")
+            loadFromStream(inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyMap()
+        }
+    }
+
+    // 从任意 InputStream 解析 color_schemes（支持 assets 和云端两种来源）
+    fun loadFromStream(inputStream: InputStream): Map<String, Pair<String, String>> {
+        val schemes = mutableMapOf<String, Pair<String, String>>()
+        try {
             val parser = Xml.newPullParser()
             parser.setInput(inputStream, "UTF-8")
 
@@ -34,9 +41,13 @@ object AppColorSchemesLoader {
                 }
                 eventType = parser.next()
             }
-            inputStream.close()
         } catch (e: Exception) {
             e.printStackTrace()
+        } finally {
+            try {
+                inputStream.close()
+            } catch (_: Exception) {
+            }
         }
         return schemes
     }
