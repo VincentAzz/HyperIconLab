@@ -97,9 +97,9 @@ jobs:
             - `lawnicons_${{ steps.version.outputs.version }}.zip`
             - `manifest.json`
 
-            HyperIconLab 通过 GitHub API 拉取此 Release 更新 Lawnicons 资源。
+            HyperIconLab 通过 GitHub API 拉取此 Release 更新 Lawnicons 资源
           files: |
-            output/lawnicons_*.zip
+            lawnicons_*.zip
             output/manifest.json
             output/version.txt
           draft: false
