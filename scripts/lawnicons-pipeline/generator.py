@@ -490,6 +490,14 @@ def main():
     else:
         print(f"  [警告] 未找到 svgs 目录: {svgs_src}")
 
+    # 复制 app_color_schemes.xml 到 color_schemes
+    # 对齐 app/src/main/assets/color_schemes/
+    if color_schemes_path and color_schemes_path.exists():
+        color_schemes_dst = output_dir / "color_schemes" / "app_color_schemes.xml"
+        color_schemes_dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(color_schemes_path, color_schemes_dst)
+        print(f"  -> color_schemes/app_color_schemes.xml")
+
     # 7. version.txt + manifest.json
     print("\n[7/7] 生成 version.txt 与 manifest.json")
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
