@@ -55,6 +55,7 @@ class LawniconsResourceManager(
             _currentVersion.value = assetsProvider.getVersion()
             return true
         }
+        _currentVersion.value = assetsProvider.getVersion()
         return false
     }
 
