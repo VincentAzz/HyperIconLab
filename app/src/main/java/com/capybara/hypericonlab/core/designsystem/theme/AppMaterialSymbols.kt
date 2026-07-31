@@ -45,8 +45,8 @@ curl -o SearchSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Ro
 curl -o SearchOffSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/search_off.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 
 
-curl -o Symbol.kt ""
-curl -o Symbol.kt ""
+curl -o ArchiveSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/archive.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o CloudDownloadSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/cloud_download.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o Symbol.kt ""
 curl -o Symbol.kt ""
 curl -o Symbol.kt ""

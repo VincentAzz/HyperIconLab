@@ -29,6 +29,26 @@ data-dir 应包含（均可选，存在即处理）：
   - icon_mapper_preview.xml  原样复制到输出 icon_mapper 目录
   - icon_mapper_test.xml     原样复制到输出 icon_mapper 目录
   - app_color_schemes.xml    用于生成 icon_mapper_filtered.xml
+
+产物：
+lawnicons_<version>.zip
+    ├── color_schemes/
+    │   └── app_color_schemes.xml       ← 新增，对齐 app/src/main/assets/color_schemes/
+    ├── icon_mapper/
+    │   ├── icon_mapper.xml
+    │   ├── icon_mapper_alt.xml
+    │   ├── icon_mapper_filtered.xml
+    │   ├── icon_mapper_preview.xml
+    │   └── icon_mapper_test.xml
+    ├── iconpack_template/
+    │   ├── appfilter.xml
+    │   └── drawable.xml
+    ├── svgs/
+    │   └── *.svg
+    ├── appfilter.xml                    # 原始 lawnicons 版本（备份）
+    ├── manifest.json
+    ├── slot_mapping.json
+    └── version.txt
 """
 
 import argparse
