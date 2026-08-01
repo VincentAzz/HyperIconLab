@@ -19,4 +19,18 @@ python scripts/lawnicons-pipeline/template_generator.py `
 .\gradlew.bat -p template/iconpack-template :app:assembleRelease
 ```
 
+## 校验模板并生成索引
+
+```powershell
+$env:ANDROID_HOME = "<Android SDK 路径>"
+python scripts/lawnicons-pipeline/template_validator.py `
+  --bundle external/lawnicons/lawnicons_20260731.zip `
+  --apk template/iconpack-template/app/build/outputs/apk/release/app-release-unsigned.apk `
+  --mapper-id test `
+  --expected-application-id com.capybara.hypericonlab.generated.iconpack.test `
+  --output-index template/iconpack-template/app/build/validated/iconpack-templates-20260731.json
+```
+
+校验器直接读取 APK ZIP、`resources.arsc` 和二进制 XML，并调用 `apksigner verify` 确认模板未签名。
+
 生成资源和 APK 位于 `template/iconpack-template/app/build/`，不会提交到 Git。
