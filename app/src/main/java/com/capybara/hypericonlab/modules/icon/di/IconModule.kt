@@ -4,6 +4,8 @@ import com.capybara.hypericonlab.core.notification.BuildNotificationManager
 import com.capybara.hypericonlab.core.notification.LawniconsUpdateNotifier
 import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkAssembler
+import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkBuildService
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateArchive
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsApiService
@@ -25,6 +27,8 @@ val iconModule = module {
     single { LawniconsDownloadService(get()) }
     single { IconPackTemplateArchive() }
     single { IconPackTemplateManager(get(), get(), get(), get(), get(), get()) }
+    factory { IconPackApkAssembler() }
+    factory { IconPackApkBuildService(get(), get(), get()) }
     // Notifier 用 single：内部缓存 channelCreated 状态，避免重复创建 NotificationChannel
     single { LawniconsUpdateNotifier(get()) }
     single { LawniconsUpdateManager(get(), get(), get(), get(), get(), get()) }
