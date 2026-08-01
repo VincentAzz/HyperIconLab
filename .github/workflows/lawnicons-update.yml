@@ -8,6 +8,11 @@ on:
         description: 'Lawnicons Ref'
         required: false
         default: 'develop'
+      build_templates:
+        description: 'Build icon pack APK templates'
+        required: true
+        type: boolean
+        default: true
 
 # 并发控制：同一时刻只允许一个 lawnicons 更新任务运行
 concurrency:
@@ -47,6 +52,20 @@ jobs:
         with:
           python-version: '3.11'
 
+      # 模板构建关闭时不安装 Java 和 Gradle，保持 Bundle-only 流程轻量。
+      - name: Setup Java
+        if: ${{ inputs.build_templates == true }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        if: ${{ inputs.build_templates == true }}
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.4.1'
+
       # ========== 3. 生成版本号 ==========
       # 版本号取当日 YYYYMMDD；lawnicons commit hash 用于追溯
       - name: Generate version
@@ -71,7 +90,49 @@ jobs:
             --lawnicons-commit ${{ steps.version.outputs.commit }} \
             --pack-zip
 
-      # ========== 5. Commit 稳定槽位历史 ==========
+      # ========== 5. 构建并校验图标包模板 ==========
+      # 四种模板串行复用同一工程，避免 full 模板与其他模板并行时占用过多内存。
+      - name: Build and validate icon pack templates
+        if: ${{ inputs.build_templates == true }}
+        env:
+          RESOURCE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          BUNDLE="lawnicons_${RESOURCE_VERSION}.zip"
+          TEMPLATE_PROJECT="hypericonlab/template/iconpack-template"
+          TEMPLATE_OUTPUT="iconpack-template-output"
+          TEMPLATE_INDEX="${TEMPLATE_OUTPUT}/iconpack-templates-${RESOURCE_VERSION}.json"
+          mkdir -p "${TEMPLATE_OUTPUT}"
+
+          for MAPPER_ID in full filtered preview test; do
+            gradle -p "${TEMPLATE_PROJECT}" :app:clean
+            python hypericonlab/scripts/lawnicons-pipeline/template_generator.py \
+              --bundle "${BUNDLE}" \
+              --mapper-id "${MAPPER_ID}" \
+              --project-dir "${TEMPLATE_PROJECT}"
+            gradle -p "${TEMPLATE_PROJECT}" :app:assembleRelease \
+              -PtemplateMapperId="${MAPPER_ID}" \
+              -PtemplateResourceVersion="${RESOURCE_VERSION}"
+
+            APK_NAME="iconpack-template-${MAPPER_ID}-${RESOURCE_VERSION}.apk"
+            APK_PATH="${TEMPLATE_OUTPUT}/${APK_NAME}"
+            cp "${TEMPLATE_PROJECT}/app/build/outputs/apk/release/app-release-unsigned.apk" \
+              "${APK_PATH}"
+            python hypericonlab/scripts/lawnicons-pipeline/template_validator.py \
+              --bundle "${BUNDLE}" \
+              --apk "${APK_PATH}" \
+              --mapper-id "${MAPPER_ID}" \
+              --expected-application-id \
+                "com.capybara.hypericonlab.generated.iconpack.${MAPPER_ID}" \
+              --output-index "${TEMPLATE_INDEX}"
+          done
+
+          python hypericonlab/scripts/lawnicons-pipeline/template_packager.py \
+            --index "${TEMPLATE_INDEX}" \
+            --apk-dir "${TEMPLATE_OUTPUT}" \
+            --output "iconpack_templates_${RESOURCE_VERSION}.zip"
+
+      # ========== 6. Commit 稳定槽位历史 ==========
       # 将更新后的 slot_mapping_history.json 提交回仓库
       # 下次 CI 运行时自动读取最新历史，保证槽位跨版本稳定
       - name: Commit slot_mapping_history
@@ -81,7 +142,7 @@ jobs:
           file_pattern: scripts/lawnicons-pipeline/history/slot_mapping_history.json
           repository: hypericonlab
 
-      # ========== 6. 创建 GitHub Release ==========
+      # ========== 7. 创建 GitHub Release ==========
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -96,11 +157,14 @@ jobs:
             产物：
             - `lawnicons_${{ steps.version.outputs.version }}.zip`
             - `manifest.json`
+            - APK 模板构建：`${{ inputs.build_templates }}`
+            - `iconpack_templates_${{ steps.version.outputs.version }}.zip`（仅模板构建开启时）
 
             HyperIconLab 通过 GitHub API 拉取此 Release 更新 Lawnicons 资源
           files: |
             lawnicons_*.zip
             output/manifest.json
             output/version.txt
+            ${{ inputs.build_templates == true && format('iconpack_templates_{0}.zip', steps.version.outputs.version) || '' }}
           draft: false
           prerelease: false

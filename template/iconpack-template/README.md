@@ -2,9 +2,10 @@
 
 这是独立于主 App 的最小 Android 工程，用于在 CI 中将 mapper、appfilter 和稳定槽位编译为图标包 APK 模板。
 
-当前阶段只支持 test mapper 原型。
+支持 `full`、`filtered`、`preview`、`test` 四种 mapper。Gradle 通过
+`templateMapperId` 和 `templateResourceVersion` 属性选择生成资源与模板身份。
 
-## 生成 test 资源
+## 生成模板资源
 
 ```powershell
 python scripts/lawnicons-pipeline/template_generator.py `
@@ -16,7 +17,9 @@ python scripts/lawnicons-pipeline/template_generator.py `
 ## 编译未签名模板
 
 ```powershell
-.\gradlew.bat -p template/iconpack-template :app:assembleRelease
+.\gradlew.bat -p template/iconpack-template :app:assembleRelease `
+  -PtemplateMapperId=test `
+  -PtemplateResourceVersion=20260731
 ```
 
 ## 校验模板并生成索引
@@ -32,5 +35,14 @@ python scripts/lawnicons-pipeline/template_validator.py `
 ```
 
 校验器直接读取 APK ZIP、`resources.arsc` 和二进制 XML，并调用 `apksigner verify` 确认模板未签名。
+
+四个模板依次校验到同一索引后，使用以下命令生成独立 Release ZIP：
+
+```powershell
+python scripts/lawnicons-pipeline/template_packager.py `
+  --index <模板索引路径> `
+  --apk-dir <APK 目录> `
+  --output iconpack_templates_20260731.zip
+```
 
 生成资源和 APK 位于 `template/iconpack-template/app/build/`，不会提交到 Git。

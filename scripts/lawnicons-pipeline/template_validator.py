@@ -41,6 +41,7 @@ SDK_LINE_PATTERNS = {
 }
 RESOURCE_SLOT_PATTERN = re.compile(r"resource 0x[0-9a-fA-F]+ drawable/(slot_\d+)")
 XML_ATTRIBUTE_PATTERN = re.compile(r'^\s*A:\s+([^=]+)="(.*?)"\s+\(Raw:')
+TYPED_XML_ATTRIBUTE_PATTERN = re.compile(r"^\s*A:\s+([^=]+)=(.*?)\s*$")
 SIGNATURE_SUFFIXES = (".RSA", ".DSA", ".EC", ".SF")
 
 
@@ -117,6 +118,11 @@ def parse_binary_xml(aapt2: Path, apk: Path, xml_path: str) -> list[dict[str, st
         match = XML_ATTRIBUTE_PATTERN.match(line)
         if match:
             current[match.group(1).strip()] = match.group(2)
+            continue
+        # 纯数字名称会被 AAPT2 编译为整数，不再包含 Raw 字符串。
+        typed_match = TYPED_XML_ATTRIBUTE_PATTERN.match(line)
+        if typed_match:
+            current[typed_match.group(1).strip()] = typed_match.group(2).strip('"')
     if current is not None:
         items.append(current)
     return items
@@ -210,7 +216,7 @@ def compute_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def validate() -> dict[str, object]:
+def validate() -> tuple[dict[str, object], str]:
     args = parse_args()
     bundle = Path(args.bundle).resolve()
     apk = Path(args.apk).resolve()
@@ -323,19 +329,34 @@ def validate() -> dict[str, object]:
         "history_max_slot": bundle_inputs["history_max_slot"],
         "templates": {args.mapper_id: template_info},
     }
+    if output_index.is_file():
+        existing_index = json.loads(output_index.read_text(encoding="utf-8"))
+        metadata_keys = (
+            "schema_version",
+            "resource_version",
+            "lawnicons_commit",
+            "generated_at",
+            "history_max_slot",
+        )
+        for key in metadata_keys:
+            assert_equal(f"已有索引 {key}", existing_index.get(key), index[key])
+        existing_templates = existing_index.get("templates")
+        if not isinstance(existing_templates, dict):
+            raise ValidationError("已有模板索引的 templates 字段格式无效")
+        index["templates"] = {**existing_templates, args.mapper_id: template_info}
     output_index.parent.mkdir(parents=True, exist_ok=True)
     output_index.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return index
+    return index, args.mapper_id
 
 
 def main() -> int:
     try:
-        index = validate()
+        index, mapper_id = validate()
     except (ValidationError, KeyError, ValueError, zipfile.BadZipFile, ET.ParseError) as error:
         print(f"[模板校验失败] {error}", file=sys.stderr)
         return 1
 
-    mapper_id, template_info = next(iter(index["templates"].items()))
+    template_info = index["templates"][mapper_id]
     print("[模板校验通过]")
     print(f"  资源版本: {index['resource_version']}")
     print(f"  模板集合: {mapper_id}")

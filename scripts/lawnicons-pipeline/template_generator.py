@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""根据 Lawnicons Bundle 为图标包模板生成 Android 资源。
-
-当前步骤只开放 test mapper，用于验证二进制 appfilter、槽位资源和精简预览页。
-"""
+"""根据 Lawnicons Bundle 为图标包模板生成 Android 资源。"""
 
 from __future__ import annotations
 
@@ -19,9 +16,16 @@ from xml.dom import minidom
 
 
 MAPPER_FILES = {
+    "full": "icon_mapper/icon_mapper.xml",
+    "filtered": "icon_mapper/icon_mapper_filtered.xml",
+    "preview": "icon_mapper/icon_mapper_preview.xml",
     "test": "icon_mapper/icon_mapper_test.xml",
 }
 COMPONENT_PATTERN = re.compile(r"ComponentInfo\{([^/}]+)/([^}]+)\}")
+AAPT_TYPED_NUMBER_PATTERN = re.compile(
+    r"^[+-]?(?:0x[0-9a-fA-F]+|(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)"
+    r"(?:dp|dip|sp|px|pt|in|mm|%)?$"
+)
 
 
 def format_xml(root: ET.Element) -> bytes:
@@ -54,8 +58,15 @@ def create_placeholder_png(slot_number: int) -> bytes:
     )
 
 
+def escape_android_string(value: str) -> str:
+    """阻止 AAPT2 将纯数字、尺寸等名称推断为非字符串类型。"""
+    if AAPT_TYPED_NUMBER_PATTERN.fullmatch(value):
+        return f"\\{value}"
+    return value
+
+
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="生成图标包 test 模板资源")
+    parser = argparse.ArgumentParser(description="生成图标包 APK 模板资源")
     parser.add_argument("--bundle", required=True, help="lawnicons_<version>.zip 路径")
     parser.add_argument("--mapper-id", choices=sorted(MAPPER_FILES), default="test")
     parser.add_argument("--project-dir", required=True, help="template/iconpack-template 路径")
@@ -112,7 +123,10 @@ def main() -> None:
         output_item = ET.SubElement(generated_appfilter, "item")
         output_item.set("component", component)
         output_item.set("drawable", slot_mapping[package_name])
-        output_item.set("name", item.get("name", mapper_items[package_name]["name"]))
+        output_item.set(
+            "name",
+            escape_android_string(item.get("name", mapper_items[package_name]["name"])),
+        )
         component_count += 1
 
     selected_slots = sorted(
@@ -132,7 +146,7 @@ def main() -> None:
 
     for package_name, mapper_item in mapper_items.items():
         item = ET.SubElement(generated_preview, "item")
-        item.set("name", mapper_item["name"])
+        item.set("name", escape_android_string(mapper_item["name"]))
         item.set("package", package_name)
         item.set("drawable", slot_mapping[package_name])
 
