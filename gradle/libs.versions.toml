@@ -15,6 +15,7 @@ monetcompat = "0.4.1"
 materialKolor = "5.0.0-alpha07"
 lifecycle = "2.10.0"
 androidsvg = "1.4"
+apksig = "9.2.1"
 kotlinxSerialization = "1.7.3"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -45,6 +46,7 @@ miuix-ui = { group = "top.yukonga.miuix.kmp", name = "miuix-ui-android", version
 monetcompat = { module = "com.github.KieronQuinn:MonetCompat", version.ref = "monetcompat" }
 materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 androidsvg = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvg" }
+apksig = { group = "com.android.tools.build", name = "apksig", version.ref = "apksig" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.monetcompat)
     implementation(libs.materialKolor)
     implementation(libs.androidsvg)
+    implementation(libs.apksig)
     implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

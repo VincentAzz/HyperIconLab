@@ -4,11 +4,13 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateM
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import java.io.File
 
-// 串联模板按需获取、同版本资源读取和未签名 APK 装配，不负责最终签名与导出。
+// 串联模板按需获取、同版本资源读取、APK 装配和签名，不负责 Documents 导出。
 class IconPackApkBuildService(
     private val templateManager: IconPackTemplateManager,
     private val resourceManager: LawniconsResourceManager,
-    private val assembler: IconPackApkAssembler
+    private val assembler: IconPackApkAssembler,
+    private val keyManager: IconPackSigningKeyManager,
+    private val signer: IconPackApkSigner
 ) {
     suspend fun buildUnsignedApk(
         iconSetId: String,
@@ -33,6 +35,32 @@ class IconPackApkBuildService(
                     outputApk = outputApk
                 )
             }
+        }
+    }
+
+    suspend fun buildSignedApk(
+        iconSetId: String,
+        renderedIconsZip: File,
+        outputApk: File,
+        onTemplateDownloadProgress: (Float) -> Unit = {}
+    ): IconPackSigningResult {
+        outputApk.parentFile?.mkdirs()
+        val unsignedApk = File(outputApk.parentFile, "${outputApk.name}.unsigned")
+        unsignedApk.delete()
+        return try {
+            buildUnsignedApk(
+                iconSetId = iconSetId,
+                renderedIconsZip = renderedIconsZip,
+                outputApk = unsignedApk,
+                onTemplateDownloadProgress = onTemplateDownloadProgress
+            )
+            signer.signAndVerify(
+                unsignedApk = unsignedApk,
+                outputApk = outputApk,
+                identity = keyManager.getOrCreate()
+            )
+        } finally {
+            unsignedApk.delete()
         }
     }
 }
