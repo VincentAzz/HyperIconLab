@@ -2,8 +2,11 @@
 /.idea/
 /.kotlin/
 /.gradle/
+/.gradle-template/
 /build/
 /app/build/
+/template/iconpack-template/.gradle/
+/template/iconpack-template/app/build/
 
 # cxx
 /.cxx/
