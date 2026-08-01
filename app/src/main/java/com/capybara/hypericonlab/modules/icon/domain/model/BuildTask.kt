@@ -25,11 +25,16 @@ enum class BuildTaskStatus { PENDING, RUNNING, SUCCESS, FAILED, CANCELLED }
  * @param enabled 当前是否在 UI 中可选
  */
 @Serializable
-enum class ProductType(val label: String, val ext: String, val enabled: Boolean) {
-    ZIP_ICONS("zip (仅图标)", "zip", true),
-    MTZ("mtz (HyperOS 3)", "mtz", false),
-    ZIP_MAGISK("zip (Magisk 模块)", "zip", false),
-    APK("apk (图标包)", "apk", false)
+enum class ProductType(
+    val label: String,
+    val ext: String,
+    val mimeType: String,
+    val enabled: Boolean
+) {
+    ZIP_ICONS("zip (仅图标)", "zip", "application/zip", true),
+    MTZ("mtz (HyperOS 3)", "mtz", "application/octet-stream", false),
+    ZIP_MAGISK("zip (Magisk 模块)", "zip", "application/zip", false),
+    APK("apk (图标包)", "apk", "application/vnd.android.package-archive", true)
 }
 
 /**

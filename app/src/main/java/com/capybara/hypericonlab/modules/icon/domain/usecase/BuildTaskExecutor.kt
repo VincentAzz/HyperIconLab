@@ -8,10 +8,12 @@ import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkBuildService
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
+import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -41,7 +43,8 @@ class BuildTaskExecutor(
     private val pipeline: IconPipelineUseCase,
     private val artifactWriter: BuildArtifactWriter,
     private val taskStore: BuildTaskStore,
-    private val resourceManager: LawniconsResourceManager
+    private val resourceManager: LawniconsResourceManager,
+    private val iconPackApkBuildService: IconPackApkBuildService
 ) {
 
     suspend fun execute(
@@ -62,6 +65,11 @@ class BuildTaskExecutor(
         // 临时工件文件（位于 filesDir/build_temp/，完成后删除）
         val tempDir = File(context.filesDir, ExecutorConfig.TEMP_DIRNAME).apply { mkdirs() }
         val tempArtifact = File(tempDir, "${task.taskId}.${task.productType.ext}")
+        val renderedIconsZip = if (task.productType == ProductType.APK) {
+            File(tempDir, "${task.taskId}${ExecutorConfig.RENDERED_ICONS_SUFFIX}")
+        } else {
+            tempArtifact
+        }
 
         // 执行结果（success 或 failure 之一），由 Flow 事件设置
         var result: BuildTask? = null
@@ -117,7 +125,7 @@ class BuildTaskExecutor(
                 iconMap = mapperMap,
                 svgDir = svgDir,
                 maskBitmaps = maskBitmaps,
-                outputFile = tempArtifact,
+                outputFile = renderedIconsZip,
                 appColorSchemes = appColorSchemes,
                 maskBitmaps2 = maskBitmaps2,
                 innerShadowBitmap = innerShadowBitmap
@@ -137,6 +145,13 @@ class BuildTaskExecutor(
                     }
 
                     is IconPipelineUseCase.PipelineProgress.Complete -> {
+                        if (task.productType == ProductType.APK) {
+                            iconPackApkBuildService.buildSignedApk(
+                                iconSetId = task.iconSetId,
+                                renderedIconsZip = renderedIconsZip,
+                                outputApk = tempArtifact
+                            )
+                        }
                         // 5. 导出工件与预览图到公共 Documents
                         val artifactName =
                             "${ExecutorConfig.DEFAULT_ARTIFACT_BASENAME}.${task.productType.ext}"
@@ -145,7 +160,8 @@ class BuildTaskExecutor(
                             artifactFile = tempArtifact,
                             storePreview = storePreview,
                             mainPreview = mainPreview,
-                            artifactName = artifactName
+                            artifactName = artifactName,
+                            productType = task.productType
                         )
                         if (exportedPath == null) {
                             throw IllegalStateException("工件导出失败（可能缺少存储权限）")
@@ -194,6 +210,7 @@ class BuildTaskExecutor(
         } finally {
             // 清理临时工件文件（无论成功失败或取消）
             tempArtifact.delete()
+            if (renderedIconsZip != tempArtifact) renderedIconsZip.delete()
         }
     }
 
@@ -241,6 +258,8 @@ class BuildTaskExecutor(
 
             // 工件文件基础名（不含扩展名，扩展名由 ProductType.ext 决定）
             const val DEFAULT_ARTIFACT_BASENAME = "icons"
+
+            const val RENDERED_ICONS_SUFFIX = ".rendered-icons.zip"
 
             // 缩略图尺寸：store preview (1080×640) 的左上 1/2×1/2
             const val THUMBNAIL_WIDTH = 540

@@ -54,6 +54,10 @@ import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.toPrettyString
@@ -67,6 +71,7 @@ import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -84,6 +89,12 @@ fun CustomPage(
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val themeState by themeViewModel.state.collectAsStateWithLifecycle()
     val availableIconSets by viewModel.availableIconSets.collectAsStateWithLifecycle()
+    val resourceManager = koinInject<LawniconsResourceManager>()
+    val templateManager = koinInject<IconPackTemplateManager>()
+    val lawniconsVersion by resourceManager.currentVersion.collectAsStateWithLifecycle()
+    val templateState by templateManager.state.collectAsStateWithLifecycle()
+    val apkEnabled = lawniconsVersion.source == ResourceSource.REMOTE &&
+            (templateState as? IconPackTemplateState.Available)?.version == lawniconsVersion.version
 
     var showFullScreenPreview by remember { mutableStateOf(false) }
     // 全屏预览 sheet 打开时快照一次当前 IconBuildConfig 文本，避免 sheet 期间配置变化导致参数与预览图不一致
@@ -329,6 +340,7 @@ fun CustomPage(
         BuildOptionSheet(
             onDismiss = { showBuildSheet = false },
             iconSets = availableIconSets,
+            apkEnabled = apkEnabled,
             onConfirm = { productType, iconSet ->
                 showBuildSheet = false
                 val missing = viewModel.buildPermissionsMissing()

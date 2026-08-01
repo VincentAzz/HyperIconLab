@@ -1,13 +1,16 @@
 package com.capybara.hypericonlab.modules.icon.data
 
+import android.Manifest
 import android.content.ContentValues
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.ContextCompat
+import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import timber.log.Timber
 import java.io.File
 
@@ -44,10 +47,18 @@ class BuildArtifactWriter(private val context: Context) {
         artifactFile: File,
         storePreview: Bitmap,
         mainPreview: Bitmap,
-        artifactName: String = ExportConfig.DEFAULT_ARTIFACT_NAME
+        artifactName: String = ExportConfig.DEFAULT_ARTIFACT_NAME,
+        productType: ProductType = ProductType.ZIP_ICONS
     ): String? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            exportViaMediaStore(taskId, artifactFile, storePreview, mainPreview, artifactName)
+            exportViaMediaStore(
+                taskId,
+                artifactFile,
+                storePreview,
+                mainPreview,
+                artifactName,
+                productType.mimeType
+            )
         } else {
             exportViaDirectFile(taskId, artifactFile, storePreview, mainPreview, artifactName)
         }
@@ -59,7 +70,8 @@ class BuildArtifactWriter(private val context: Context) {
         artifactFile: File,
         storePreview: Bitmap,
         mainPreview: Bitmap,
-        artifactName: String
+        artifactName: String,
+        artifactMimeType: String
     ): String? {
         val resolver = context.contentResolver
         val collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
@@ -69,7 +81,7 @@ class BuildArtifactWriter(private val context: Context) {
         if (!insertFile(
                 collection = collection,
                 displayName = artifactName,
-                mimeType = ExportConfig.ZIP_MIME_TYPE,
+                mimeType = artifactMimeType,
                 relativePath = relativeBase,
                 sourceFile = artifactFile
             )
@@ -191,8 +203,8 @@ class BuildArtifactWriter(private val context: Context) {
     private fun hasWriteStoragePermission(): Boolean =
         ContextCompat.checkSelfPermission(
             context,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
 
     companion object {
         private const val TAG = "BuildArtifactWriter"
@@ -215,7 +227,6 @@ class BuildArtifactWriter(private val context: Context) {
             const val FULL_PREVIEW_NAME = "preview_full.png"
 
             // MIME 类型常量
-            const val ZIP_MIME_TYPE = "application/zip"
             const val PNG_MIME_TYPE = "image/png"
 
             // 图片压缩质量（PNG 无损，保留以备未来格式切换）

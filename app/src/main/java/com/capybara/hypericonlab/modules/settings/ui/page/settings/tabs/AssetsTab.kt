@@ -20,6 +20,8 @@ import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.FailureReason
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
@@ -44,6 +46,7 @@ fun AssetsTab(
     val layoutDirection = LocalLayoutDirection.current
     val resourceManager = koinInject<LawniconsResourceManager>()
     val updateManager = koinInject<LawniconsUpdateManager>()
+    val templateManager = koinInject<IconPackTemplateManager>()
     val appSettingsRepository = koinInject<AppSettingsRepository>()
     val scope = rememberCoroutineScope()
 
@@ -51,6 +54,9 @@ fun AssetsTab(
     val version by resourceManager.currentVersion.collectAsStateWithLifecycle()
     // 更新流程状态（检查/下载/解压/成功/失败）
     val updateState by updateManager.state.collectAsStateWithLifecycle()
+    val templateState by templateManager.state.collectAsStateWithLifecycle()
+    val templateAvailable =
+        (templateState as? IconPackTemplateState.Available)?.version == version.version
     // 下载代理开关
     val useDownloadProxy by appSettingsRepository.useDownloadProxy.collectAsStateWithLifecycle()
 
@@ -68,7 +74,21 @@ fun AssetsTab(
         if (useDownloadProxy) DownloadMode.PROXY.label else DownloadMode.DIRECT.label
 
     // 检查更新按钮文本与启用状态
-    val (checkButtonText, checkEnabled) = updateStateToButton(updateState)
+    val (baseCheckButtonText, baseCheckEnabled) = updateStateToButton(updateState)
+    val templateNeedsRetry = version.source == ResourceSource.REMOTE &&
+            (updateState == UpdateState.UpToDate || updateState is UpdateState.Success) &&
+            !templateAvailable &&
+            (templateState == IconPackTemplateState.Failed ||
+                    templateState == IconPackTemplateState.Unavailable)
+    val templateInProgress = templateState == IconPackTemplateState.Checking ||
+            templateState is IconPackTemplateState.Downloading
+    val checkButtonText = when {
+        templateState is IconPackTemplateState.Downloading -> "模板下载中"
+        templateState == IconPackTemplateState.Checking -> "模板检查中"
+        templateNeedsRetry -> "重试"
+        else -> baseCheckButtonText
+    }
+    val checkEnabled = if (templateInProgress) false else baseCheckEnabled || templateNeedsRetry
 
     LazyColumn(
         modifier = modifier
@@ -119,7 +139,7 @@ fun AssetsTab(
                 item(animatedVisibility = showUpdateEntry) {
                     BaseWidget(
                         iconPlaceholder = false,
-                        title = "检查 Lawnicons 更新",
+                        title = "检查资源更新",
                         description = updateStateDescription(updateState),
                         trailingContent = {
                             PrimaryActionButton(
@@ -127,6 +147,25 @@ fun AssetsTab(
                                     scope.launch { updateManager.checkAndInstall() }
                                 })
                         })
+                }
+
+                item {
+                    BaseWidget(
+                        iconPlaceholder = false,
+                        title = "APK 模板",
+                        description = "模板与云端 Lawnicons 版本严格绑定",
+                        trailingContent = {
+                            Text(
+                                text = templateStateText(
+                                    version.source,
+                                    templateState,
+                                    templateAvailable
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    )
                 }
 
                 // 下载方式：与检查更新同条件显示
@@ -211,13 +250,34 @@ private fun updateStateToButton(state: UpdateState): Pair<String, Boolean> = whe
 
 // 更新状态描述文本
 private fun updateStateDescription(state: UpdateState): String? = when (state) {
-    UpdateState.Idle -> null
+    UpdateState.Idle -> "同时检查 Lawnicons 与配套 APK 模板"
     is UpdateState.Checking -> "正在检查云端版本..."
     is UpdateState.Downloading -> "正在下载资源包..."
     is UpdateState.Extracting -> "正在解压资源..."
     is UpdateState.Success -> "已切换到版本 ${state.newVersion}"
     is UpdateState.Failed -> FailureMessage.forReason(state.reason)
     UpdateState.UpToDate -> "当前已是最新版本"
+}
+
+private fun templateStateText(
+    source: ResourceSource,
+    state: IconPackTemplateState,
+    templateAvailable: Boolean
+): String = if (source == ResourceSource.ASSETS) {
+    "内置版本不支持"
+} else if (templateAvailable) {
+    "已就绪"
+} else {
+    when (state) {
+        IconPackTemplateState.Idle -> "待检查"
+        IconPackTemplateState.Checking -> "检查中"
+        is IconPackTemplateState.Downloading ->
+            "下载中 ${ButtonConstants.PERCENT_FMT.format((state.progress * ButtonConstants.PERCENT_SCALE).toInt())}"
+
+        is IconPackTemplateState.Available -> "已就绪 (${state.version})"
+        IconPackTemplateState.Unavailable -> "当前版本未提供"
+        IconPackTemplateState.Failed -> "更新失败"
+    }
 }
 
 private object FailureMessage {

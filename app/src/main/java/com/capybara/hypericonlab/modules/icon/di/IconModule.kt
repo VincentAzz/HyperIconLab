@@ -35,13 +35,13 @@ val iconModule = module {
     factory { IconPackApkBuildService(get(), get(), get(), get(), get()) }
     // Notifier 用 single：内部缓存 channelCreated 状态，避免重复创建 NotificationChannel
     single { LawniconsUpdateNotifier(get()) }
-    single { LawniconsUpdateManager(get(), get(), get(), get(), get(), get()) }
+    single { LawniconsUpdateManager(get(), get(), get(), get(), get(), get(), get()) }
     factory { ManageResourcesUseCase(get()) }
     factory { GeneratePreviewUseCase(get(), get()) }
     factory { IconPipelineUseCase(get()) }
     factory { BuildArtifactWriter(get()) }
     factory { BuildTaskStore(get()) }
-    factory { BuildTaskExecutor(get(), get(), get(), get(), get()) }
+    factory { BuildTaskExecutor(get(), get(), get(), get(), get(), get()) }
     single { BuildTaskManager(get(), get(), get()) }
     factory { BuildNotificationManager(get()) }
     viewModelOf(::IconViewModel)

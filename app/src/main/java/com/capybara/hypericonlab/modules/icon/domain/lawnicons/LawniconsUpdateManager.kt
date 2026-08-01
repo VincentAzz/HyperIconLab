@@ -19,7 +19,8 @@ class LawniconsUpdateManager(
     private val downloadService: LawniconsDownloadService,
     private val resourceManager: LawniconsResourceManager,
     private val appSettingsRepository: AppSettingsRepository,
-    private val notifier: LawniconsUpdateNotifier
+    private val notifier: LawniconsUpdateNotifier,
+    private val templateManager: IconPackTemplateManager
 ) {
     // 当前更新状态，供 UI 观察
     private val _state = MutableStateFlow<UpdateState>(UpdateState.Idle)
@@ -47,7 +48,7 @@ class LawniconsUpdateManager(
             return null
         }
         // 版本号相同视为已是最新
-        if (release.version == current.version) {
+        if (release.version == current.version && current.source == ResourceSource.REMOTE) {
             _state.value = UpdateState.UpToDate
             return null
         }
@@ -114,14 +115,16 @@ class LawniconsUpdateManager(
 
     // 一键检查并安装（便捷入口，供 UI 直接调用，失败发通知）
     suspend fun checkAndInstall() {
-        val release = checkUpdate() ?: return
-        downloadAndInstall(release)
+        val release = checkUpdate()
+        if (release != null) downloadAndInstall(release)
+        syncTemplates()
     }
 
     // 静默检查并安装（首次启动自动拉取用，失败不发通知，state 仍更新供 assets tab 观察）
     suspend fun checkAndInstallSilently() {
-        val release = checkUpdate(silent = true) ?: return
-        downloadAndInstall(release, silent = true)
+        val release = checkUpdate(silent = true)
+        if (release != null) downloadAndInstall(release, silent = true)
+        syncTemplates()
     }
 
     // 重置状态为 Idle（UI 退出或用户确认后调用）
@@ -133,6 +136,11 @@ class LawniconsUpdateManager(
     private fun failWith(reason: FailureReason, silent: Boolean = false) {
         _state.value = UpdateState.Failed(reason)
         if (!silent) notifier.notifyFailed(reason)
+    }
+
+    // 模板与当前激活的云端 Lawnicons 版本严格绑定；内置回滚资源不下载模板。
+    private suspend fun syncTemplates() {
+        runCatching { templateManager.ensureAvailable() }
     }
 
     // 清理旧版本目录，保留当前激活版本

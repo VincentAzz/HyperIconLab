@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -85,6 +86,7 @@ private object BuildOptionSheetConfig {
 fun BuildOptionSheet(
     onDismiss: () -> Unit,
     iconSets: List<IconSetInfo>,
+    apkEnabled: Boolean,
     onConfirm: (ProductType, IconSetInfo) -> Unit,
     horizontalPadding: Dp = 8.dp,
     bottomPadding: Dp = 4.dp,
@@ -197,11 +199,20 @@ fun BuildOptionSheet(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(BuildOptionSheetConfig.CHIP_SPACING)) {
                     ProductType.entries.filter { it.enabled }.forEach { productType ->
+                        val optionEnabled = productType != ProductType.APK || apkEnabled
                         StyleChip(
                             label = productType.label,
                             selected = selectedProductType == productType,
                             onClick = { selectedProductType = productType },
+                            enabled = optionEnabled,
                             modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    if (!apkEnabled) {
+                        Text(
+                            text = "APK 仅支持已下载配套模板的云端 Lawnicons。请前往资产页检查更新。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

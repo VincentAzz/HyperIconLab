@@ -3,6 +3,9 @@ package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 import android.content.Context
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -16,32 +19,66 @@ class IconPackTemplateManager(
     private val appSettingsRepository: AppSettingsRepository,
     private val archive: IconPackTemplateArchive
 ) {
+    private val _state = MutableStateFlow<IconPackTemplateState>(IconPackTemplateState.Idle)
+    val state: StateFlow<IconPackTemplateState> = _state.asStateFlow()
+
     suspend fun ensureAvailable(onProgress: (Float) -> Unit = {}): Boolean {
         val currentVersion = resourceManager.currentVersion.value
-        if (currentVersion.source != ResourceSource.REMOTE) return false
-        require(TemplateConstants.VERSION_PATTERN.matches(currentVersion.version)) {
-            "远程资源版本格式无效"
+        if (currentVersion.source != ResourceSource.REMOTE) {
+            _state.value = IconPackTemplateState.Unavailable
+            return false
+        }
+        _state.value = IconPackTemplateState.Checking
+        if (!TemplateConstants.VERSION_PATTERN.matches(currentVersion.version)) {
+            _state.value = IconPackTemplateState.Failed
+            error("远程资源版本格式无效")
         }
 
         val finalDir = versionDir(currentVersion.version)
-        if (validateExisting(finalDir, currentVersion)) return true
+        if (validateExisting(finalDir, currentVersion)) {
+            _state.value = IconPackTemplateState.Available(currentVersion.version)
+            return true
+        }
 
         val useProxy = appSettingsRepository.preferencesFlow.first().useDownloadProxy
         val proxyPrefix = if (useProxy) TemplateConstants.PROXY_PREFIX else ""
-        val release = apiService.getRelease(currentVersion.version, proxyPrefix) ?: return false
-        val templateAsset = release.templateArchive ?: return false
-        require(
-            currentVersion.lawniconsCommit.isBlank() ||
-                    currentVersion.lawniconsCommit == release.lawniconsCommit
-        ) { "当前资源与 Release commit 不一致" }
+        val release = try {
+            apiService.getRelease(currentVersion.version, proxyPrefix)
+        } catch (e: Exception) {
+            _state.value = IconPackTemplateState.Failed
+            throw e
+        }
+        if (release == null) {
+            _state.value = IconPackTemplateState.Unavailable
+            return false
+        }
+        val templateAsset = release.templateArchive
+        if (templateAsset == null) {
+            _state.value = IconPackTemplateState.Unavailable
+            return false
+        }
+        if (
+            currentVersion.lawniconsCommit.isNotBlank() &&
+            currentVersion.lawniconsCommit != release.lawniconsCommit
+        ) {
+            _state.value = IconPackTemplateState.Failed
+            error("当前资源与 Release commit 不一致")
+        }
 
         val cacheName = "iconpack_templates_${currentVersion.version}.zip"
-        val archiveFile = downloadService.download(
-            url = templateAsset.url,
-            expectedSize = templateAsset.sizeBytes,
-            cacheFileName = cacheName,
-            onProgress = onProgress
-        )
+        val archiveFile = try {
+            downloadService.download(
+                url = templateAsset.url,
+                expectedSize = templateAsset.sizeBytes,
+                cacheFileName = cacheName
+            ) { progress ->
+                _state.value = IconPackTemplateState.Downloading(progress)
+                onProgress(progress)
+            }
+        } catch (e: Exception) {
+            _state.value = IconPackTemplateState.Failed
+            throw e
+        }
         try {
             installAtomically(
                 archiveFile = archiveFile,
@@ -49,11 +86,13 @@ class IconPackTemplateManager(
                 commit = release.lawniconsCommit
             )
         } catch (e: Exception) {
+            _state.value = IconPackTemplateState.Failed
             throw LawniconsUpdateException(FailureReason.CORRUPTED, e.message, e)
         } finally {
             downloadService.cleanupCache(cacheName)
         }
         cleanupOtherVersions(currentVersion.version)
+        _state.value = IconPackTemplateState.Available(currentVersion.version)
         return true
     }
 
@@ -110,4 +149,13 @@ class IconPackTemplateManager(
         const val PROXY_PREFIX = "https://ghfast.top/"
         val VERSION_PATTERN = Regex("^[0-9]{8}$")
     }
+}
+
+sealed class IconPackTemplateState {
+    data object Idle : IconPackTemplateState()
+    data object Checking : IconPackTemplateState()
+    data class Downloading(val progress: Float) : IconPackTemplateState()
+    data class Available(val version: String) : IconPackTemplateState()
+    data object Unavailable : IconPackTemplateState()
+    data object Failed : IconPackTemplateState()
 }
