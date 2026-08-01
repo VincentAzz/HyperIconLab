@@ -41,6 +41,15 @@ interface LawniconsResourceProvider {
     // 打开 color_schemes 目录下的文件（app_color_schemes.xml）
     fun openColorSchemes(fileName: String): InputStream
 
+    // 打开当前资源版本的稳定槽位映射；assets 版本未内置时返回 null
+    fun openSlotMapping(): InputStream?
+
+    // 打开当前版本的模板索引；尚未按需下载或 assets 不支持时返回 null
+    fun openIconPackTemplateIndex(): InputStream?
+
+    // 按集合打开未签名 APK 模板；模板尚未下载时返回 null
+    fun openIconPackTemplate(iconSetId: String): InputStream?
+
     // 获取当前版本信息
     fun getVersion(): LawniconsVersion
 

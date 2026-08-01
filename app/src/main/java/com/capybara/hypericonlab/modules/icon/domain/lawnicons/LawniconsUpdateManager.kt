@@ -143,10 +143,15 @@ class LawniconsUpdateManager(
                 dir.deleteRecursively()
             }
         }
+        val templateBase = File(context.filesDir, UpdateConstants.TEMPLATE_BASE_DIR)
+        templateBase.listFiles()?.forEach { dir ->
+            if (dir.name != keepVersion) dir.deleteRecursively()
+        }
     }
 
     private object UpdateConstants {
         const val REMOTE_BASE_DIR = "lawnicons_remote"
+        const val TEMPLATE_BASE_DIR = "lawnicons_templates"
 
         // GitHub 加速代理前缀
         const val PROXY_PREFIX = "https://ghfast.top/"

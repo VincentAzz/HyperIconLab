@@ -106,7 +106,9 @@ class LawniconsResourceManager(
     // 清除所有云端下载资源并切换回 assets 出厂版本（调试用，上线前移除）
     fun clearCloudAssets() {
         val remoteBase = File(context.filesDir, ManagerConstants.REMOTE_BASE_DIR)
+        val templateBase = File(context.filesDir, ManagerConstants.TEMPLATE_BASE_DIR)
         remoteBase.deleteRecursively()
+        templateBase.deleteRecursively()
         writeActiveVersion(null)
         currentProvider = assetsProvider
         _currentVersion.value = assetsProvider.getVersion()
@@ -132,6 +134,7 @@ class LawniconsResourceManager(
 
     private object ManagerConstants {
         const val REMOTE_BASE_DIR = "lawnicons_remote"
+        const val TEMPLATE_BASE_DIR = "lawnicons_templates"
         const val ACTIVE_POINTER_FILE = "lawnicons_active.txt"
     }
 }

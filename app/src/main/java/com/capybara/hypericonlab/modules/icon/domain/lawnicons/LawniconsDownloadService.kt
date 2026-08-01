@@ -25,9 +25,11 @@ class LawniconsDownloadService(
     suspend fun download(
         url: String,
         expectedSize: Long,
+        cacheFileName: String = DownloadConstants.BUNDLE_CACHE_FILE_NAME,
         onProgress: (Float) -> Unit
     ): File = withContext(Dispatchers.IO) {
-        val cacheFile = File(context.cacheDir, DownloadConstants.CACHE_FILE_NAME)
+        require(cacheFileName == File(cacheFileName).name) { "缓存文件名不能包含路径" }
+        val cacheFile = File(context.cacheDir, cacheFileName)
         try {
             val connection = (URL(url).openConnection() as HttpURLConnection).apply {
                 requestMethod = DownloadConstants.METHOD_GET
@@ -116,12 +118,12 @@ class LawniconsDownloadService(
     }
 
     // 清理下载缓存文件
-    fun cleanupCache() {
-        File(context.cacheDir, DownloadConstants.CACHE_FILE_NAME).delete()
+    fun cleanupCache(cacheFileName: String = DownloadConstants.BUNDLE_CACHE_FILE_NAME) {
+        File(context.cacheDir, cacheFileName).delete()
     }
 
     private object DownloadConstants {
-        const val CACHE_FILE_NAME = "lawnicons_update.zip"
+        const val BUNDLE_CACHE_FILE_NAME = "lawnicons_update.zip"
         const val METHOD_GET = "GET"
         const val CONNECT_TIMEOUT_MS = 15000
         const val READ_TIMEOUT_MS = 60000

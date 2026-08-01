@@ -12,7 +12,14 @@ data class ReleaseInfo(
     val totalIcons: Int,          // mapper item 总数（唯一 package 数）
     val addedIcons: Int,          // 本次新增图标数
     val removedIcons: Int,        // 本次删除图标数
-    val modifiedIcons: Int        // 本次修改图标数
+    val modifiedIcons: Int,       // 本次修改图标数
+    val templateArchive: ReleaseAssetInfo? // 独立模板 ZIP；Release 未构建模板时为空
+)
+
+// GitHub Release 中单个可下载资产的元数据
+data class ReleaseAssetInfo(
+    val url: String,
+    val sizeBytes: Long
 )
 
 // 更新失败原因分类：供 UI 显示针对性文案、通知栏推送

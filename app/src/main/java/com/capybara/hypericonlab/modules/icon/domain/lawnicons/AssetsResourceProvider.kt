@@ -25,6 +25,12 @@ class AssetsResourceProvider(
     override fun openColorSchemes(fileName: String): InputStream =
         context.assets.open("${ProviderConstants.COLOR_SCHEMES_DIR}/$fileName")
 
+    override fun openSlotMapping(): InputStream? = null
+
+    override fun openIconPackTemplateIndex(): InputStream? = null
+
+    override fun openIconPackTemplate(iconSetId: String): InputStream? = null
+
     // assets 版本的版本信息：svg 数从目录统计，mapper 数从 icon_mapper.xml 解析
     override fun getVersion(): LawniconsVersion {
         val svgCount = getSvgDir()?.listFiles { f -> f.extension == "svg" }?.size ?: 0

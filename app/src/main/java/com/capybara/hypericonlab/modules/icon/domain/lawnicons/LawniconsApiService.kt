@@ -4,9 +4,11 @@ package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 import java.io.BufferedReader
+import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -58,13 +60,38 @@ class LawniconsApiService {
                 throw LawniconsUpdateException(FailureReason.TIMEOUT, e.message, e)
             } catch (e: UnknownHostException) {
                 throw LawniconsUpdateException(FailureReason.NETWORK_ERROR, e.message, e)
-            } catch (e: org.json.JSONException) {
+            } catch (e: JSONException) {
                 throw LawniconsUpdateException(FailureReason.PARSE_ERROR, e.message, e)
             } catch (e: Exception) {
                 // 兜底：其他 IO/运行时异常归为网络错误
                 throw LawniconsUpdateException(
-                    if (e is java.io.IOException) FailureReason.NETWORK_ERROR else FailureReason.UNKNOWN,
+                    if (e is IOException) FailureReason.NETWORK_ERROR else FailureReason.UNKNOWN,
                     e.message, e
+                )
+            }
+        }
+
+    // 查询指定资源版本，供模板按需下载和历史 remote 版本使用。
+    suspend fun getRelease(version: String, proxyPrefix: String = ""): ReleaseInfo? =
+        withContext(Dispatchers.IO) {
+            try {
+                val tag = "${ApiConstants.TAG_PREFIX}$version"
+                val url = "${ApiConstants.API_BASE}/releases/tags/$tag"
+                parseRelease(version, JSONObject(fetchRaw(url)), proxyPrefix)
+            } catch (e: LawniconsUpdateException) {
+                throw e
+            } catch (e: SocketTimeoutException) {
+                throw LawniconsUpdateException(FailureReason.TIMEOUT, e.message, e)
+            } catch (e: UnknownHostException) {
+                throw LawniconsUpdateException(FailureReason.NETWORK_ERROR, e.message, e)
+            } catch (e: JSONException) {
+                throw LawniconsUpdateException(FailureReason.PARSE_ERROR, e.message, e)
+            } catch (e: Exception) {
+                throw LawniconsUpdateException(
+                    if (e is IOException) FailureReason.NETWORK_ERROR
+                    else FailureReason.UNKNOWN,
+                    e.message,
+                    e
                 )
             }
         }
@@ -81,6 +108,9 @@ class LawniconsApiService {
         var zipUrl = ""
         var zipSize = 0L
         var manifestUrl: String? = null
+        var templateArchive: ReleaseAssetInfo? = null
+        val bundleName = "${ApiConstants.BUNDLE_PREFIX}${version}${ApiConstants.ZIP_SUFFIX}"
+        val templateName = "${ApiConstants.TEMPLATE_PREFIX}${version}${ApiConstants.ZIP_SUFFIX}"
 
         for (i in 0 until assets.length()) {
             val asset = assets.getJSONObject(i)
@@ -88,11 +118,16 @@ class LawniconsApiService {
             val url = asset.optString(ApiConstants.ASSET_URL_KEY, "")
             val size = asset.optLong(ApiConstants.ASSET_SIZE_KEY, 0L)
             when {
-                name.endsWith(ApiConstants.ZIP_SUFFIX) -> {
+                name == bundleName -> {
                     // zip 下载 URL 也加代理前缀，供 DownloadService 直接使用
                     zipUrl = applyProxy(url, proxyPrefix)
                     zipSize = size
                 }
+
+                name == templateName -> templateArchive = ReleaseAssetInfo(
+                    url = applyProxy(url, proxyPrefix),
+                    sizeBytes = size
+                )
 
                 name == ApiConstants.MANIFEST_FILE -> manifestUrl = applyProxy(url, proxyPrefix)
             }
@@ -114,7 +149,8 @@ class LawniconsApiService {
             totalIcons = manifestInfo?.totalIcons ?: 0,
             addedIcons = manifestInfo?.added ?: 0,
             removedIcons = manifestInfo?.removed ?: 0,
-            modifiedIcons = manifestInfo?.modified ?: 0
+            modifiedIcons = manifestInfo?.modified ?: 0,
+            templateArchive = templateArchive
         )
     }
 
@@ -144,7 +180,7 @@ class LawniconsApiService {
         } catch (e: LawniconsUpdateException) {
             // fetchRaw 抛出的已分类异常，向上传递
             throw e
-        } catch (e: org.json.JSONException) {
+        } catch (e: JSONException) {
             throw LawniconsUpdateException(FailureReason.PARSE_ERROR, e.message, e)
         } catch (_: Exception) {
             // manifest 下载失败不阻断主流程（sha256 等字段降级为空）
@@ -224,6 +260,8 @@ class LawniconsApiService {
         const val ASSET_URL_KEY = "browser_download_url"
         const val ASSET_SIZE_KEY = "size"
         const val ZIP_SUFFIX = ".zip"
+        const val BUNDLE_PREFIX = "lawnicons_"
+        const val TEMPLATE_PREFIX = "iconpack_templates_"
         const val MANIFEST_FILE = "manifest.json"
         const val PACKAGE_KEY = "package"
         const val STATS_KEY = "stats"

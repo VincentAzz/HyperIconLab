@@ -15,6 +15,8 @@ class RemoteResourceProvider(
 
     // 云端版本根目录：filesDir/lawnicons_remote/<version>/
     private val baseDir = File(context.filesDir, "${ProviderConstants.REMOTE_BASE_DIR}/$version")
+    private val templateDir =
+        File(context.filesDir, "${ProviderConstants.TEMPLATE_BASE_DIR}/$version")
 
     override fun openIconMapper(fileName: String): InputStream =
         File(baseDir, "${ProviderConstants.MAPPER_DIR}/$fileName").inputStream()
@@ -24,6 +26,23 @@ class RemoteResourceProvider(
 
     override fun openColorSchemes(fileName: String): InputStream =
         File(baseDir, "${ProviderConstants.COLOR_SCHEMES_DIR}/$fileName").inputStream()
+
+    override fun openSlotMapping(): InputStream? =
+        File(baseDir, ProviderConstants.SLOT_MAPPING_FILE)
+            .takeIf { it.isFile }
+            ?.inputStream()
+
+    override fun openIconPackTemplateIndex(): InputStream? =
+        File(templateDir, "iconpack-templates-$version.json")
+            .takeIf { it.isFile }
+            ?.inputStream()
+
+    override fun openIconPackTemplate(iconSetId: String): InputStream? {
+        if (iconSetId !in ProviderConstants.TEMPLATE_IDS) return null
+        return File(templateDir, "iconpack-template-$iconSetId-$version.apk")
+            .takeIf { it.isFile }
+            ?.inputStream()
+    }
 
     // 从 manifest.json 解析版本信息，svg 数从目录实际统计，失败时回退基本版本
     override fun getVersion(): LawniconsVersion {
@@ -68,13 +87,16 @@ class RemoteResourceProvider(
 
     private object ProviderConstants {
         const val REMOTE_BASE_DIR = "lawnicons_remote"
+        const val TEMPLATE_BASE_DIR = "lawnicons_templates"
         const val MAPPER_DIR = "icon_mapper"
         const val COLOR_SCHEMES_DIR = "color_schemes"
         const val SVGS_DIR = "svgs"
         const val MANIFEST_FILE = "manifest.json"
+        const val SLOT_MAPPING_FILE = "slot_mapping.json"
         const val STATS_KEY = "stats"
         const val COMMIT_KEY = "lawnicons_commit"
         const val GENERATED_AT_KEY = "generated_at"
         const val TOTAL_ICONS_KEY = "total_icons"
+        val TEMPLATE_IDS = setOf("full", "filtered", "preview", "test")
     }
 }
