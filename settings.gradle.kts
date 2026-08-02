@@ -42,4 +42,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "HyperIconLab"
+
 include(":app")
+
+includeBuild("template/iconpack-template")

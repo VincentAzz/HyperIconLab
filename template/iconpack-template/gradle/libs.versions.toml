@@ -1,0 +1,20 @@
+[versions]
+agp = "9.2.1"
+kotlin = "2.4.0"
+composeBom = "2026.05.01"
+compose = "1.11.2"
+material3 = "1.5.0-alpha20"
+materialKolor = "5.0.0-alpha07"
+
+[libraries]
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.13.0" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
+compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics", version.ref = "compose" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

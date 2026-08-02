@@ -20,6 +20,13 @@ val templateResourceVersion = providers.gradleProperty("templateResourceVersion"
     .getOrElse(TemplateBuildConfig.DEFAULT_RESOURCE_VERSION)
 val templateApplicationId =
     "${TemplateBuildConfig.APPLICATION_ID_PREFIX}.$templateMapperId"
+val templateIconSetName = when (templateMapperId) {
+    "full" -> "完整图标集"
+    "filtered" -> "常用图标集"
+    "preview" -> "预览图标集"
+    "test" -> "测试图标集"
+    else -> templateMapperId
+}
 
 android {
     namespace = TemplateBuildConfig.NAMESPACE
@@ -31,6 +38,7 @@ android {
         targetSdk = TemplateBuildConfig.TARGET_SDK
         versionCode = TemplateBuildConfig.VERSION_CODE
         versionName = templateResourceVersion
+        resValue("string", "icon_set_name", templateIconSetName)
     }
 
     buildTypes {
@@ -41,7 +49,6 @@ android {
     }
 
     sourceSets {
-        // 资源由外部 Python 脚本在构建前生成，使用静态路径避免 Provider 来源歧义。
         getByName("main").res.directories.add(
             layout.projectDirectory.dir("build/generated/iconpack/$templateMapperId/res")
                 .asFile.absolutePath
@@ -67,13 +74,16 @@ android {
 
     buildFeatures {
         compose = true
+        resValues = true
     }
 }
 
 dependencies {
-    implementation("androidx.activity:activity-compose:1.13.0")
-    implementation(platform("androidx.compose:compose-bom:2026.05.01"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.foundation:foundation")
-    implementation("androidx.compose.material3:material3:1.5.0-alpha20")
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    implementation(libs.materialKolor)
 }

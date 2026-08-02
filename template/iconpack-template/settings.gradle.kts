@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "HyperIconLabIconPackTemplate"
 include(":app")
+// test
