@@ -4,6 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -25,9 +30,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -38,14 +47,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.iconpack.ui.component.FloatingBottomSheet
 import com.capybara.hypericonlab.iconpack.ui.component.SegmentedColumn
+import com.capybara.hypericonlab.iconpack.ui.symbol.search
+import com.capybara.hypericonlab.iconpack.ui.symbol.search_off
+import com.capybara.hypericonlab.iconpack.ui.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.iconpack.ui.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.iconpack.ui.theme.IconPackTheme
+import com.capybara.hypericonlab.iconpack.ui.theme.LargeCardRadius
 import com.capybara.hypericonlab.iconpack.ui.theme.CornerRadius as AppCornerRadius
 import com.capybara.hypericonlab.iconpack.ui.theme.rememberKyantRoundedRectangleShape
 import org.xmlpull.v1.XmlPullParser
@@ -54,7 +71,6 @@ private object PreviewRootConfig {
     const val COLUMNS = 4
     val GRID_HORIZONTAL_PADDING = 16.dp
     val GRID_VERTICAL_PADDING = 16.dp
-    val GRID_BOTTOM_PADDING = 32.dp
     val GRID_SPACING = 8.dp
     val ICON_CELL_SIZE = 56.dp
     val ICON_DISPLAY_SIZE = 40.dp
@@ -75,6 +91,16 @@ private object IconDetailConfig {
     val ROW_HORIZONTAL_PADDING = 16.dp
     val ROW_VERTICAL_PADDING = 12.dp
     val LABEL_BOTTOM_PADDING = 4.dp
+}
+
+private object SearchUiConfig {
+    val FIELD_HORIZONTAL_PADDING = 16.dp
+    val FIELD_TOP_PADDING = 16.dp
+    val FIELD_BOTTOM_PADDING = 8.dp
+    val FAB_END_PADDING = 16.dp
+    val FAB_BOTTOM_PADDING = 16.dp
+    val FAB_ICON_SIZE = 24.dp
+    val GRID_BOTTOM_PADDING_WITH_FAB = 88.dp
 }
 
 /**
@@ -123,6 +149,22 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun PreviewRoot(entries: List<IconEntry>) {
     var selectedEntry by remember { mutableStateOf<IconEntry?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val gridState = rememberLazyGridState()
+    val filteredEntries by remember(entries) {
+        derivedStateOf {
+            val query = searchQuery.trim()
+            if (query.isEmpty()) {
+                entries
+            } else {
+                entries.filter { it.matches(query) }
+            }
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -142,8 +184,26 @@ private fun PreviewRoot(entries: List<IconEntry>) {
                 )
             }
         } else {
-            IconPreviewGrid(
-                entries = entries,
+            PreviewContent(
+                entries = filteredEntries,
+                gridState = gridState,
+                searchQuery = searchQuery,
+                isSearchActive = isSearchActive,
+                focusRequester = focusRequester,
+                onSearchQueryChange = {
+                    searchQuery = it
+                    selectedEntry = null
+                },
+                onSearchToggle = {
+                    if (isSearchActive) {
+                        isSearchActive = false
+                        searchQuery = ""
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                    } else {
+                        isSearchActive = true
+                    }
+                },
                 onEntryClick = { selectedEntry = it }
             )
         }
@@ -158,25 +218,142 @@ private fun PreviewRoot(entries: List<IconEntry>) {
 }
 
 @Composable
-private fun IconPreviewGrid(
+private fun PreviewContent(
     entries: List<IconEntry>,
+    gridState: LazyGridState,
+    searchQuery: String,
+    isSearchActive: Boolean,
+    focusRequester: FocusRequester,
+    onSearchQueryChange: (String) -> Unit,
+    onSearchToggle: () -> Unit,
     onEntryClick: (IconEntry) -> Unit
 ) {
-    val gridState = rememberLazyGridState()
+    val fabShape = rememberKyantRoundedRectangleShape(LargeCardRadius)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            AnimatedVisibility(
+                visible = isSearchActive,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                PreviewSearchField(
+                    value = searchQuery,
+                    focusRequester = focusRequester,
+                    onValueChange = onSearchQueryChange
+                )
+            }
+
+            if (entries.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "未找到匹配的图标",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                IconPreviewGrid(
+                    entries = entries,
+                    state = gridState,
+                    onEntryClick = onEntryClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
+        }
+
+        FloatingActionButton(
+            onClick = onSearchToggle,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    end = SearchUiConfig.FAB_END_PADDING,
+                    bottom = SearchUiConfig.FAB_BOTTOM_PADDING
+                ),
+            shape = fabShape,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ) {
+            Icon(
+                imageVector = if (isSearchActive) {
+                    AppMaterialSymbols.search_off
+                } else {
+                    AppMaterialSymbols.search
+                },
+                contentDescription = if (isSearchActive) "关闭搜索" else "搜索",
+                modifier = Modifier.size(SearchUiConfig.FAB_ICON_SIZE)
+            )
+        }
+    }
+}
+
+@Composable
+private fun PreviewSearchField(
+    value: String,
+    focusRequester: FocusRequester,
+    onValueChange: (String) -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val fieldShape = rememberKyantRoundedRectangleShape(AppCornerRadius)
+
+    LaunchedEffect(focusRequester) {
+        focusRequester.requestFocus()
+        keyboardController?.show()
+    }
+
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = SearchUiConfig.FIELD_HORIZONTAL_PADDING,
+                top = SearchUiConfig.FIELD_TOP_PADDING,
+                end = SearchUiConfig.FIELD_HORIZONTAL_PADDING,
+                bottom = SearchUiConfig.FIELD_BOTTOM_PADDING
+            )
+            .focusRequester(focusRequester),
+        label = { Text("搜索名称、包名或 Drawable") },
+        leadingIcon = {
+            Icon(
+                imageVector = AppMaterialSymbols.search,
+                contentDescription = null
+            )
+        },
+        singleLine = true,
+        shape = fieldShape
+    )
+}
+
+@Composable
+private fun IconPreviewGrid(
+    entries: List<IconEntry>,
+    state: LazyGridState,
+    onEntryClick: (IconEntry) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+    ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(PreviewRootConfig.COLUMNS),
-            state = gridState,
+            state = state,
             contentPadding = PaddingValues(
                 start = PreviewRootConfig.GRID_HORIZONTAL_PADDING,
                 top = PreviewRootConfig.GRID_VERTICAL_PADDING,
                 end = PreviewRootConfig.GRID_HORIZONTAL_PADDING,
-                bottom = PreviewRootConfig.GRID_BOTTOM_PADDING
+                bottom = SearchUiConfig.GRID_BOTTOM_PADDING_WITH_FAB
             ),
             horizontalArrangement = Arrangement.spacedBy(PreviewRootConfig.GRID_SPACING),
             verticalArrangement = Arrangement.spacedBy(PreviewRootConfig.GRID_SPACING),
@@ -194,7 +371,7 @@ private fun IconPreviewGrid(
         }
 
         LazyGridScrollbar(
-            state = gridState,
+            state = state,
             modifier = Modifier.align(Alignment.CenterEnd)
         )
     }
@@ -410,4 +587,9 @@ data class IconEntry(
 
     val stableKey: String
         get() = "${packageName.orEmpty()}:$drawable"
+
+    fun matches(query: String): Boolean =
+        displayName.contains(query, ignoreCase = true) ||
+                packageName.orEmpty().contains(query, ignoreCase = true) ||
+                drawable.contains(query, ignoreCase = true)
 }
