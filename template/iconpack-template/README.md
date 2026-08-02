@@ -8,7 +8,11 @@
 模板预览页使用独立的 Compose Material 3 实现：Android 12 及以上跟随系统动态
 配色，旧版本跟随系统深浅色并使用 Material 3 默认配色。预览页固定显示四列图标，
 点击图标可查看名称、Drawable 和包名详情；右下角搜索按钮支持在当前列表按这些字段
-原位过滤。模板不依赖主 App 模块。
+原位过滤。模板启动器图标复用 HyperIconLab 的 adaptive icon 前景、单色和绿色背景
+语义。模板不依赖主 App 模块。
+
+模板将 JNI 原生库保持为压缩条目，确保 App 端替换槽位并重建 APK 后不会破坏
+16 KiB page alignment；不要关闭 `jniLibs.useLegacyPackaging`。
 
 ## 生成模板资源
 

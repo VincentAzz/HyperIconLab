@@ -53,6 +53,13 @@ android {
         additionalParameters += "--no-resource-deduping"
     }
 
+    packaging {
+        jniLibs {
+            // 装配器保持压缩方式；压缩原生库可避免替换槽位后破坏 16 KiB 页面对齐。
+            useLegacyPackaging = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
