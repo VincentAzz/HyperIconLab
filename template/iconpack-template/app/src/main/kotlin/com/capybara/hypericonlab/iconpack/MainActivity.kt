@@ -1,107 +1,81 @@
 package com.capybara.hypericonlab.iconpack
 
-import android.app.Activity
-import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.TypedValue
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.GridView
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.SearchView
-import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.iconpack.ui.theme.IconPackTheme
+import com.capybara.hypericonlab.iconpack.ui.theme.CornerRadius as AppCornerRadius
+import com.capybara.hypericonlab.iconpack.ui.theme.rememberKyantRoundedRectangleShape
 import org.xmlpull.v1.XmlPullParser
-import java.util.Locale
 
-private object PreviewConfig {
-    const val GRID_COLUMN_WIDTH_DP = 104
-    const val PAGE_PADDING_DP = 12
-    const val ITEM_PADDING_DP = 8
-    const val ICON_SIZE_DP = 64
-    const val LABEL_TEXT_SIZE_SP = 12f
+private object PreviewRootConfig {
+    const val COLUMNS = 4
+    val GRID_HORIZONTAL_PADDING = 16.dp
+    val GRID_VERTICAL_PADDING = 16.dp
+    val GRID_BOTTOM_PADDING = 32.dp
+    val GRID_SPACING = 8.dp
+    val ICON_CELL_SIZE = 56.dp
+    val ICON_DISPLAY_SIZE = 40.dp
+    val SCROLLBAR_WIDTH = 4.dp
+    val SCROLLBAR_END_PADDING = 4.dp
+    val SCROLLBAR_VERTICAL_PADDING = 8.dp
+    val SCROLLBAR_MIN_THUMB_HEIGHT = 40.dp
+    val SCROLLBAR_CORNER_RADIUS = 2.dp
+    const val SCROLLBAR_MIN_VISIBLE_FRACTION = 0.08f
+    const val SCROLLBAR_ALPHA = 0.55f
 }
 
 /**
- * 图标包预览页：读取 CI 生成的预览索引，展示槽位图标并提供本地搜索。
+ * 图标包预览入口：读取 CI 生成的预览索引，并交由 Compose 页面展示。
  */
-class MainActivity : Activity() {
-    private val allEntries = mutableListOf<IconEntry>()
-    private lateinit var adapter: IconAdapter
-    private lateinit var countView: TextView
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        loadEntries()
-        setContentView(createContent())
-    }
+        enableEdgeToEdge()
 
-    private fun createContent(): View {
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(
-                dp(PreviewConfig.PAGE_PADDING_DP),
-                dp(PreviewConfig.PAGE_PADDING_DP),
-                dp(PreviewConfig.PAGE_PADDING_DP),
-                0
-            )
-        }
-
-        val searchView = SearchView(this).apply {
-            isIconifiedByDefault = false
-            queryHint = getString(R.string.search_hint)
-        }
-        root.addView(
-            searchView,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-
-        countView = TextView(this).apply {
-            setPadding(
-                dp(PreviewConfig.ITEM_PADDING_DP),
-                dp(PreviewConfig.ITEM_PADDING_DP),
-                0,
-                dp(PreviewConfig.ITEM_PADDING_DP)
-            )
-        }
-        root.addView(countView)
-
-        val grid = GridView(this).apply {
-            numColumns = GridView.AUTO_FIT
-            columnWidth = dp(PreviewConfig.GRID_COLUMN_WIDTH_DP)
-            stretchMode = GridView.STRETCH_COLUMN_WIDTH
-            verticalSpacing = dp(PreviewConfig.ITEM_PADDING_DP)
-            adapter = IconAdapter(this@MainActivity, allEntries).also {
-                this@MainActivity.adapter = it
+        setContent {
+            IconPackTheme {
+                val entries = remember { loadPreviewEntries() }
+                PreviewRoot(entries)
             }
         }
-        root.addView(
-            grid,
-            LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
-        )
-
-        updateCount(allEntries.size)
-        searchView.setOnQueryTextListener(
-            object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean = false
-
-                override fun onQueryTextChange(query: String?): Boolean {
-                    updateCount(adapter.filter(query))
-                    return true
-                }
-            }
-        )
-        return root
     }
 
-    private fun loadEntries() {
+    private fun loadPreviewEntries(): List<IconEntry> = buildList {
         try {
             resources.getXml(R.xml.preview_icons).use { parser ->
                 while (parser.next() != XmlPullParser.END_DOCUMENT) {
@@ -112,108 +86,198 @@ class MainActivity : Activity() {
                     val drawableId = resources.getIdentifier(drawable, "drawable", packageName)
                     if (drawableId == 0) continue
 
-                    allEntries += IconEntry(
-                        name = parser.getAttributeValue(null, "name"),
-                        packageName = parser.getAttributeValue(null, "package"),
-                        drawable = drawable,
-                        drawableId = drawableId
+                    add(
+                        IconEntry(
+                            name = parser.getAttributeValue(null, "name"),
+                            packageName = parser.getAttributeValue(null, "package"),
+                            drawable = drawable,
+                            drawableId = drawableId
+                        )
                     )
                 }
             }
         } catch (_: Exception) {
-            // 原型预览失败时保持空列表，模板静态校验负责报告资源问题。
+            // 预览读取失败时保持空列表，模板静态校验负责报告资源问题。
         }
     }
-
-    private fun updateCount(count: Int) {
-        countView.text = getString(R.string.icon_count_format, count)
-    }
-
-    private fun dp(value: Int): Int = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP,
-        value.toFloat(),
-        resources.displayMetrics
-    ).toInt()
 }
 
-private data class IconEntry(
+@Composable
+private fun PreviewRoot(entries: List<IconEntry>) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        if (entries.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "没有可预览的图标",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            IconPreviewGrid(entries)
+        }
+    }
+}
+
+@Composable
+private fun IconPreviewGrid(entries: List<IconEntry>) {
+    val gridState = rememberLazyGridState()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(PreviewRootConfig.COLUMNS),
+            state = gridState,
+            contentPadding = PaddingValues(
+                start = PreviewRootConfig.GRID_HORIZONTAL_PADDING,
+                top = PreviewRootConfig.GRID_VERTICAL_PADDING,
+                end = PreviewRootConfig.GRID_HORIZONTAL_PADDING,
+                bottom = PreviewRootConfig.GRID_BOTTOM_PADDING
+            ),
+            horizontalArrangement = Arrangement.spacedBy(PreviewRootConfig.GRID_SPACING),
+            verticalArrangement = Arrangement.spacedBy(PreviewRootConfig.GRID_SPACING),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                count = entries.size,
+                key = { index -> entries[index].stableKey }
+            ) { index ->
+                IconPreviewItem(entries[index])
+            }
+        }
+
+        LazyGridScrollbar(
+            state = gridState,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
+    }
+}
+
+@Composable
+private fun IconPreviewItem(entry: IconEntry) {
+    val itemShape = rememberKyantRoundedRectangleShape(AppCornerRadius)
+
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            modifier = Modifier.size(PreviewRootConfig.ICON_CELL_SIZE),
+            shape = itemShape,
+            color = MaterialTheme.colorScheme.surfaceContainer
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(entry.drawableId),
+                    contentDescription = entry.displayName,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(PreviewRootConfig.ICON_DISPLAY_SIZE)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LazyGridScrollbar(
+    state: LazyGridState,
+    modifier: Modifier = Modifier
+) {
+    val scrollbarState by remember(state) {
+        derivedStateOf {
+            val layoutInfo = state.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val visibleItems = layoutInfo.visibleItemsInfo.size
+            val totalRows =
+                (totalItems + PreviewRootConfig.COLUMNS - 1) / PreviewRootConfig.COLUMNS
+            val visibleRows =
+                (visibleItems + PreviewRootConfig.COLUMNS - 1) / PreviewRootConfig.COLUMNS
+            if (totalItems == 0 || visibleRows >= totalRows) {
+                ScrollbarState.Hidden
+            } else {
+                val firstVisibleRow = state.firstVisibleItemIndex / PreviewRootConfig.COLUMNS
+                val scrollableRows = (totalRows - visibleRows).coerceAtLeast(1)
+                val firstItemHeight = layoutInfo.visibleItemsInfo.firstOrNull()?.size?.height ?: 0
+                val rowExtent = (firstItemHeight + layoutInfo.mainAxisItemSpacing).coerceAtLeast(1)
+                val rowOffsetFraction =
+                    state.firstVisibleItemScrollOffset.toFloat() / rowExtent.toFloat()
+                ScrollbarState.Visible(
+                    positionFraction =
+                        (firstVisibleRow + rowOffsetFraction) / scrollableRows.toFloat(),
+                    visibleFraction =
+                        (visibleRows.toFloat() / totalRows.toFloat()).coerceAtLeast(
+                            PreviewRootConfig.SCROLLBAR_MIN_VISIBLE_FRACTION
+                        )
+                )
+            }
+        }
+    }
+    val thumbColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+        alpha = PreviewRootConfig.SCROLLBAR_ALPHA
+    )
+
+    if (scrollbarState is ScrollbarState.Visible) {
+        val visibleState = scrollbarState as ScrollbarState.Visible
+        Canvas(
+            modifier = modifier
+                .fillMaxHeight()
+                .padding(end = PreviewRootConfig.SCROLLBAR_END_PADDING)
+                .width(PreviewRootConfig.SCROLLBAR_WIDTH)
+        ) {
+            val verticalPadding = PreviewRootConfig.SCROLLBAR_VERTICAL_PADDING.toPx()
+            val availableHeight = (size.height - verticalPadding * 2).coerceAtLeast(0f)
+            val minThumbHeight = PreviewRootConfig.SCROLLBAR_MIN_THUMB_HEIGHT.toPx()
+            val thumbHeight = (availableHeight * visibleState.visibleFraction)
+                .coerceIn(minThumbHeight.coerceAtMost(availableHeight), availableHeight)
+            val thumbTravel = (availableHeight - thumbHeight).coerceAtLeast(0f)
+            val thumbTop = verticalPadding +
+                    thumbTravel * visibleState.positionFraction.coerceIn(0f, 1f)
+
+            drawRoundRect(
+                color = thumbColor,
+                topLeft = Offset(
+                    x = 0f,
+                    y = thumbTop
+                ),
+                size = Size(width = size.width, height = thumbHeight),
+                cornerRadius = CornerRadius(
+                    x = PreviewRootConfig.SCROLLBAR_CORNER_RADIUS.toPx(),
+                    y = PreviewRootConfig.SCROLLBAR_CORNER_RADIUS.toPx()
+                )
+            )
+        }
+    }
+}
+
+private sealed interface ScrollbarState {
+    data object Hidden : ScrollbarState
+
+    data class Visible(
+        val positionFraction: Float,
+        val visibleFraction: Float
+    ) : ScrollbarState
+}
+
+data class IconEntry(
     val name: String?,
     val packageName: String?,
     val drawable: String,
     val drawableId: Int
 ) {
-    val searchableText: String
-        get() = "${name.orEmpty()} ${packageName.orEmpty()} $drawable".lowercase(Locale.ROOT)
-}
+    val displayName: String
+        get() = name?.takeIf { it.isNotBlank() } ?: drawable
 
-private class IconAdapter(
-    private val context: Context,
-    private val source: List<IconEntry>
-) : BaseAdapter() {
-    private val visible = source.toMutableList()
-
-    fun filter(query: String?): Int {
-        val keyword = query.orEmpty().trim().lowercase(Locale.ROOT)
-        visible.clear()
-        visible += source.filter { keyword.isEmpty() || keyword in it.searchableText }
-        notifyDataSetChanged()
-        return visible.size
-    }
-
-    override fun getCount(): Int = visible.size
-
-    override fun getItem(position: Int): IconEntry = visible[position]
-
-    override fun getItemId(position: Int): Long = position.toLong()
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val entry = getItem(position)
-        return LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            val padding = context.dp(PreviewConfig.ITEM_PADDING_DP)
-            setPadding(padding, padding, padding, padding)
-
-            addView(
-                ImageView(context).apply {
-                    setImageResource(entry.drawableId)
-                    scaleType = ImageView.ScaleType.FIT_CENTER
-                },
-                LinearLayout.LayoutParams(
-                    context.dp(PreviewConfig.ICON_SIZE_DP),
-                    context.dp(PreviewConfig.ICON_SIZE_DP)
-                )
-            )
-
-            addView(
-                TextView(context).apply {
-                    text = entry.name.takeUnless { it.isNullOrEmpty() } ?: entry.drawable
-                    textSize = PreviewConfig.LABEL_TEXT_SIZE_SP
-                    setTextColor(context.resolvePrimaryTextColor())
-                    gravity = Gravity.CENTER
-                    maxLines = 2
-                    ellipsize = TextUtils.TruncateAt.END
-                },
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-        }
-    }
-}
-
-private fun Context.dp(value: Int): Int = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP,
-    value.toFloat(),
-    resources.displayMetrics
-).toInt()
-
-private fun Context.resolvePrimaryTextColor(): Int {
-    val value = TypedValue()
-    return if (theme.resolveAttribute(android.R.attr.textColorPrimary, value, true)) {
-        value.data
-    } else {
-        Color.DKGRAY
-    }
+    val stableKey: String
+        get() = "${packageName.orEmpty()}:$drawable"
 }

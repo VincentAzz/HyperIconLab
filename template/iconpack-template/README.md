@@ -5,6 +5,9 @@
 支持 `full`、`filtered`、`preview`、`test` 四种 mapper。Gradle 通过
 `templateMapperId` 和 `templateResourceVersion` 属性选择生成资源与模板身份。
 
+模板预览页使用独立的 Compose Material 3 实现：Android 12 及以上跟随系统动态
+配色，旧版本跟随系统深浅色并使用 Material 3 默认配色。模板不依赖主 App 模块。
+
 ## 生成模板资源
 
 ```powershell
