@@ -8,7 +8,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
@@ -26,17 +28,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.iconpack.ui.component.FloatingBottomSheet
+import com.capybara.hypericonlab.iconpack.ui.component.SegmentedColumn
+import com.capybara.hypericonlab.iconpack.ui.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.iconpack.ui.theme.IconPackTheme
 import com.capybara.hypericonlab.iconpack.ui.theme.CornerRadius as AppCornerRadius
 import com.capybara.hypericonlab.iconpack.ui.theme.rememberKyantRoundedRectangleShape
@@ -57,6 +65,16 @@ private object PreviewRootConfig {
     val SCROLLBAR_CORNER_RADIUS = 2.dp
     const val SCROLLBAR_MIN_VISIBLE_FRACTION = 0.08f
     const val SCROLLBAR_ALPHA = 0.55f
+}
+
+private object IconDetailConfig {
+    val TOP_PADDING = 24.dp
+    val ICON_CONTAINER_SIZE = 112.dp
+    val ICON_SIZE = 80.dp
+    val ICON_BOTTOM_SPACING = 8.dp
+    val ROW_HORIZONTAL_PADDING = 16.dp
+    val ROW_VERTICAL_PADDING = 12.dp
+    val LABEL_BOTTOM_PADDING = 4.dp
 }
 
 /**
@@ -104,6 +122,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun PreviewRoot(entries: List<IconEntry>) {
+    var selectedEntry by remember { mutableStateOf<IconEntry?>(null) }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -122,13 +142,26 @@ private fun PreviewRoot(entries: List<IconEntry>) {
                 )
             }
         } else {
-            IconPreviewGrid(entries)
+            IconPreviewGrid(
+                entries = entries,
+                onEntryClick = { selectedEntry = it }
+            )
         }
+    }
+
+    selectedEntry?.let { entry ->
+        IconDetailSheet(
+            entry = entry,
+            onDismiss = { selectedEntry = null }
+        )
     }
 }
 
 @Composable
-private fun IconPreviewGrid(entries: List<IconEntry>) {
+private fun IconPreviewGrid(
+    entries: List<IconEntry>,
+    onEntryClick: (IconEntry) -> Unit
+) {
     val gridState = rememberLazyGridState()
 
     Box(
@@ -153,7 +186,10 @@ private fun IconPreviewGrid(entries: List<IconEntry>) {
                 count = entries.size,
                 key = { index -> entries[index].stableKey }
             ) { index ->
-                IconPreviewItem(entries[index])
+                IconPreviewItem(
+                    entry = entries[index],
+                    onClick = { onEntryClick(entries[index]) }
+                )
             }
         }
 
@@ -165,7 +201,10 @@ private fun IconPreviewGrid(entries: List<IconEntry>) {
 }
 
 @Composable
-private fun IconPreviewItem(entry: IconEntry) {
+private fun IconPreviewItem(
+    entry: IconEntry,
+    onClick: () -> Unit
+) {
     val itemShape = rememberKyantRoundedRectangleShape(AppCornerRadius)
 
     Box(
@@ -173,6 +212,7 @@ private fun IconPreviewItem(entry: IconEntry) {
         contentAlignment = Alignment.Center
     ) {
         Surface(
+            onClick = onClick,
             modifier = Modifier.size(PreviewRootConfig.ICON_CELL_SIZE),
             shape = itemShape,
             color = MaterialTheme.colorScheme.surfaceContainer
@@ -185,6 +225,96 @@ private fun IconPreviewItem(entry: IconEntry) {
                     modifier = Modifier.size(PreviewRootConfig.ICON_DISPLAY_SIZE)
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun IconDetailSheet(
+    entry: IconEntry,
+    onDismiss: () -> Unit
+) {
+    val iconShape = rememberKyantRoundedRectangleShape(ExtraLargeRadius)
+
+    FloatingBottomSheet(onDismiss = onDismiss) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Surface(
+                modifier = Modifier
+                    .padding(top = IconDetailConfig.TOP_PADDING)
+                    .size(IconDetailConfig.ICON_CONTAINER_SIZE),
+                shape = iconShape,
+                color = MaterialTheme.colorScheme.surfaceContainer
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(entry.drawableId),
+                        contentDescription = entry.displayName,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(IconDetailConfig.ICON_SIZE)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.size(IconDetailConfig.ICON_BOTTOM_SPACING))
+
+            SegmentedColumn(modifier = Modifier.fillMaxWidth()) {
+                item(key = "name") {
+                    IconDetailRow(
+                        label = "名称",
+                        value = entry.displayName,
+                        shape = it
+                    )
+                }
+                item(key = "drawable") {
+                    IconDetailRow(
+                        label = "Drawable",
+                        value = entry.drawable,
+                        shape = it
+                    )
+                }
+                item(key = "package") {
+                    IconDetailRow(
+                        label = "包名",
+                        value = entry.packageName?.takeIf(String::isNotBlank) ?: "未关联应用",
+                        shape = it
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun IconDetailRow(
+    label: String,
+    value: String,
+    shape: Shape
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = shape,
+        color = MaterialTheme.colorScheme.surfaceContainer
+    ) {
+        Column(
+            modifier = Modifier.padding(
+                horizontal = IconDetailConfig.ROW_HORIZONTAL_PADDING,
+                vertical = IconDetailConfig.ROW_VERTICAL_PADDING
+            )
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = IconDetailConfig.LABEL_BOTTOM_PADDING)
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
