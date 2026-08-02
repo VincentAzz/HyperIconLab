@@ -3,4 +3,5 @@
     <string name="app_name">HyperIconLab · Test</string>
     <string name="search_hint">搜索图标</string>
     <string name="icon_count_format">%1$d 个图标</string>
+    <string name="filtered_icon_count_format">%1$d / %2$d 个图标</string>
 </resources>

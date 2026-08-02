@@ -5,11 +5,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.iconpack.ui.shape.Capsule
 import com.capybara.hypericonlab.iconpack.ui.shape.RoundedCornerStyle
 import com.capybara.hypericonlab.iconpack.ui.shape.RoundedRectangle
 import com.capybara.hypericonlab.iconpack.ui.shape.UnevenRoundedRectangle
 
-// 与 HyperIconLab 主应用保持一致的圆角参数。
 val CornerRadius = 16.dp
 val ConnectionRadius = 6.dp
 val CardCornerRadius = 16.dp
@@ -19,31 +19,28 @@ val SwatchPreviewCornerRadius = 4.dp
 val LargeCardRadius = 20.dp
 val ExtraLargeRadius = 32.dp
 
-/**
- * 创建与主应用一致的连续曲率圆角矩形。
- */
+
 @Composable
 fun rememberKyantRoundedRectangleShape(
-    cornerRadius: Dp,
-    style: RoundedCornerStyle = RoundedCornerStyle.Continuous
+    cornerRadius: Dp, style: RoundedCornerStyle = RoundedCornerStyle.Continuous
 ): Shape = remember(cornerRadius, style) {
     RoundedRectangle(cornerRadius = cornerRadius, style = style)
 }
 
-/**
- * 创建用于分段容器的连续曲率非等距圆角。
- */
+
+@Composable
+fun rememberKyantCapsuleShape(
+    style: RoundedCornerStyle = RoundedCornerStyle.Continuous
+): Shape = remember(style) {
+    Capsule(style = style)
+}
+
+
 @Composable
 fun rememberKyantUnevenRoundedRectangleShape(
-    topStart: Dp,
-    topEnd: Dp,
-    bottomEnd: Dp,
-    bottomStart: Dp
+    topStart: Dp, topEnd: Dp, bottomEnd: Dp, bottomStart: Dp
 ): Shape = remember(topStart, topEnd, bottomEnd, bottomStart) {
     UnevenRoundedRectangle(
-        topStart = topStart,
-        topEnd = topEnd,
-        bottomEnd = bottomEnd,
-        bottomStart = bottomStart
+        topStart = topStart, topEnd = topEnd, bottomEnd = bottomEnd, bottomStart = bottomStart
     )
 }

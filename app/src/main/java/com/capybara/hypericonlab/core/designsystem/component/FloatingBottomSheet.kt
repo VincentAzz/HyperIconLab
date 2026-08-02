@@ -84,7 +84,6 @@ fun FloatingBottomSheet(
         }
     }
 
-    // Liquid glass requires a CornerBasedShape (lens SDF); smoother rounded corner paths are incompatible.
     val shape = if (useLiquidGlass && backdrop != null) {
         RoundedCornerShape(cornerRadius)
     } else {
