@@ -9,6 +9,8 @@
 /template/iconpack-template/.gradle/
 /template/iconpack-template/.kotlin/
 /template/iconpack-template/app/build/
+/template/iconpack-template/build/
+/template/iconpack-template/local.properties
 
 # cxx
 /.cxx/
