@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.image
+package com.capybara.hypericonlab.modules.iconrender.image
 
 import android.graphics.Bitmap
 

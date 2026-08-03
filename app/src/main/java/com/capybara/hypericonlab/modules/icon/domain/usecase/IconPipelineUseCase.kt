@@ -5,9 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.color.HslColorUtils
-import com.capybara.hypericonlab.core.image.BackgroundGenerator
-import com.capybara.hypericonlab.core.image.GlassProcessor
-import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.modules.icon.domain.model.ColorMode
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.iconrender.BackgroundLayerRenderer
@@ -15,6 +12,9 @@ import com.capybara.hypericonlab.modules.iconrender.ConfigColorResolver
 import com.capybara.hypericonlab.modules.iconrender.DualLayerComposer
 import com.capybara.hypericonlab.modules.iconrender.IconForegroundRenderer
 import com.capybara.hypericonlab.modules.iconrender.RetroStyleRenderer
+import com.capybara.hypericonlab.modules.iconrender.image.BackgroundGenerator
+import com.capybara.hypericonlab.modules.iconrender.image.GlassProcessor
+import com.capybara.hypericonlab.modules.iconrender.image.LayerMerger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

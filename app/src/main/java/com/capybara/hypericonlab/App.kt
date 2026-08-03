@@ -1,8 +1,8 @@
 package com.capybara.hypericonlab
 
 import android.app.Application
-import com.capybara.hypericonlab.core.image.StickerProcessor
 import com.capybara.hypericonlab.modules.icon.di.iconModule
+import com.capybara.hypericonlab.modules.iconrender.image.StickerProcessor
 import com.capybara.hypericonlab.modules.settings.di.settingsModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

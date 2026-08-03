@@ -66,8 +66,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
-import com.capybara.hypericonlab.core.image.BgImageDir
-import com.capybara.hypericonlab.core.image.BgImageLoader
+import com.capybara.hypericonlab.modules.iconrender.image.BgImageDir
+import com.capybara.hypericonlab.modules.iconrender.image.BgImageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -2,8 +2,8 @@ package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 
 import android.content.Context
 import com.capybara.hypericonlab.core.AppVersion
-import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.utils.ZipUtils
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
 import java.io.File
 import java.io.InputStream
 

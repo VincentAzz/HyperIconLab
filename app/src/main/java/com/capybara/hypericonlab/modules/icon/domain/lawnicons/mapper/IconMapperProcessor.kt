@@ -1,6 +1,7 @@
-package com.capybara.hypericonlab.core.mapper
+package com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper
 
 import android.util.Xml
+import com.capybara.hypericonlab.modules.icon.domain.model.IconMapperEntry
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlSerializer
 import timber.log.Timber
@@ -10,16 +11,7 @@ import java.io.InputStream
 import java.io.StringWriter
 import java.util.regex.Pattern
 
-/**
- * icon_mapper 条目完整信息（含应用名、包名、drawable），用于资产浏览与搜索。
- */
-data class IconMapperEntry(
-    val name: String,
-    val packageName: String,
-    val drawable: String
-)
-
-// mapper处理器
+// 解析、合并和生成 Lawnicons mapper XML
 object IconMapperProcessor {
 
     private const val TAG = "IconMapperProcessor"
@@ -137,9 +129,7 @@ object IconMapperProcessor {
         }
     }
 
-    /**
-     * Parses the icon_mapper.xml into a Map<PackageName, DrawableName>.
-     */
+    // 解析 icon_mapper.xml 为包名到 drawable 的映射
     fun parseIconMapper(xmlFile: File): Map<String, String> {
         val mapper = mutableMapOf<String, String>()
         if (!xmlFile.exists()) {
@@ -156,10 +146,7 @@ object IconMapperProcessor {
         return mapper
     }
 
-    /**
-     * 从 [InputStream] 直接解析 icon_mapper.xml，避免落盘。
-     * 调用方负责关闭流。
-     */
+    // 从流解析 icon_mapper.xml，调用方负责关闭流
     fun parseIconMapper(inputStream: InputStream): Map<String, String> {
         val mapper = mutableMapOf<String, String>()
         try {
@@ -170,7 +157,7 @@ object IconMapperProcessor {
         return mapper
     }
 
-    // 解析 mapper XML 内部实现，由 File/InputStream 重载共用
+    // File/InputStream 重载共用的 XML 解析逻辑
     private fun parseIconMapperInternal(
         stream: InputStream,
         nameForLog: String,
@@ -192,10 +179,7 @@ object IconMapperProcessor {
         Timber.tag(TAG).d("Parsed ${mapper.size} items from $nameForLog")
     }
 
-    /**
-     * 从 [InputStream] 解析 icon_mapper.xml，返回保留应用名的完整条目列表。
-     * 供资产浏览页使用（需通过应用名/包名搜索）。调用方负责关闭流。
-     */
+    // 解析带应用名的条目，供资产浏览和搜索使用
     fun parseIconMapperEntries(inputStream: InputStream): List<IconMapperEntry> {
         val entries = mutableListOf<IconMapperEntry>()
         try {

@@ -20,7 +20,7 @@ import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.shape.RoundedCornerStyle
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
-import com.capybara.hypericonlab.core.image.CustomMaskGenerator
+import com.capybara.hypericonlab.modules.iconrender.image.CustomMaskGenerator
 
 // 自定义形状默认参数（默认 HyperOS 3）
 private const val DEFAULT_CORNER_RADIUS = 0.281f

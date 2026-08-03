@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.image
+package com.capybara.hypericonlab.modules.iconrender.image
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.PorterDuffXfermode
-import com.capybara.hypericonlab.core.image.BlendModePainter.drawWithBlendMode
+import com.capybara.hypericonlab.modules.iconrender.image.BlendModePainter.drawWithBlendMode
 
 /** 装饰图层描述：bitmap + 混合模式 + 可选着色 + 整体透明度。 */
 data class BlendLayer(

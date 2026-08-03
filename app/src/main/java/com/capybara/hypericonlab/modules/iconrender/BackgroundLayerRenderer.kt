@@ -2,8 +2,8 @@ package com.capybara.hypericonlab.modules.iconrender
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.capybara.hypericonlab.core.image.BackgroundGenerator
-import com.capybara.hypericonlab.core.image.BlendLayer
+import com.capybara.hypericonlab.modules.iconrender.image.BackgroundGenerator
+import com.capybara.hypericonlab.modules.iconrender.image.BlendLayer
 
 // 背景图层渲染器：渲染上层复杂背景
 object BackgroundLayerRenderer {

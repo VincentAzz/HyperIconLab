@@ -74,10 +74,10 @@ import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.MiuixThemeBridge
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
-import com.capybara.hypericonlab.core.image.SvgProcessor
-import com.capybara.hypericonlab.core.mapper.IconMapperEntry
-import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
+import com.capybara.hypericonlab.modules.icon.domain.model.IconMapperEntry
+import com.capybara.hypericonlab.modules.iconrender.image.SvgProcessor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

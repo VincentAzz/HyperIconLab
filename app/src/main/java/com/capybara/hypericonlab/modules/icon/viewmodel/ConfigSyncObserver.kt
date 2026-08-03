@@ -1,10 +1,10 @@
 package com.capybara.hypericonlab.modules.icon.viewmodel
 
 import android.content.Context
-import com.capybara.hypericonlab.core.image.BgImageDir
-import com.capybara.hypericonlab.core.image.BgImageLoader
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowUiState
+import com.capybara.hypericonlab.modules.iconrender.image.BgImageDir
+import com.capybara.hypericonlab.modules.iconrender.image.BgImageLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
