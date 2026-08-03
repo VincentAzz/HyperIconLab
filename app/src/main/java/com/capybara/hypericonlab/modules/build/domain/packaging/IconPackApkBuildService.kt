@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.iconpack.domain.packaging
+package com.capybara.hypericonlab.modules.build.domain.packaging
 
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import java.io.File

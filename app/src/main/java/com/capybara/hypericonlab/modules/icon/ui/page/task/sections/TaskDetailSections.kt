@@ -30,10 +30,10 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ConfigCard
 import com.capybara.hypericonlab.modules.icon.ui.page.task.component.TaskDetailSheetConfig
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
 
 // 任务详情各分段卡片
 @Composable

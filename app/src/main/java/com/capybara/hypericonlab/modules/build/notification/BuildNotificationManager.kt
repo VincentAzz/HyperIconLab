@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.iconpack.notification
+package com.capybara.hypericonlab.modules.build.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -12,9 +12,9 @@ import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_INSTALL_APK_URI
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_TAB_INDEX
 import com.capybara.hypericonlab.core.designsystem.navigation.TAB_INDEX_TASK
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
-import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.build.domain.model.ProductType
 
 // 构建通知管理器
 class BuildNotificationManager(private val context: Context) {

@@ -10,6 +10,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.ProductType
+import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
@@ -25,9 +28,6 @@ import com.capybara.hypericonlab.modules.icon.domain.model.WallpaperUiState
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
-import com.capybara.hypericonlab.modules.iconpack.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.iconrender.ConfigColorResolver
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,12 +1,12 @@
-package com.capybara.hypericonlab.modules.iconpack.notification
+package com.capybara.hypericonlab.modules.build.notification
 
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
-import com.capybara.hypericonlab.modules.iconpack.domain.usecase.BuildTaskManager
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

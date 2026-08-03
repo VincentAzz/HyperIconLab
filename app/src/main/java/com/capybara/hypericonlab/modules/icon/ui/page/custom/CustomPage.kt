@@ -54,6 +54,7 @@ import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
+import com.capybara.hypericonlab.modules.build.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
@@ -66,7 +67,6 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.ForegroundTab
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
-import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

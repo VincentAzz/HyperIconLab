@@ -1,15 +1,15 @@
-package com.capybara.hypericonlab.modules.iconpack.domain.usecase
+package com.capybara.hypericonlab.modules.build.domain.usecase
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
+import com.capybara.hypericonlab.modules.build.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.build.domain.model.ProductType
+import com.capybara.hypericonlab.modules.build.notification.BuildForegroundService
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
-import com.capybara.hypericonlab.modules.iconpack.data.local.BuildTaskStore
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
-import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
-import com.capybara.hypericonlab.modules.iconpack.notification.BuildForegroundService
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

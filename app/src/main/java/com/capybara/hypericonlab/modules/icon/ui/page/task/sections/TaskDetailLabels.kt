@@ -1,6 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.task.sections
 
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
 
 // 预览图占位文案
 fun previewPlaceholder(status: BuildTaskStatus): String = when (status) {

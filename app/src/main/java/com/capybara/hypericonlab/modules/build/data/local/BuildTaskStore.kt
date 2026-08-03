@@ -1,8 +1,8 @@
-package com.capybara.hypericonlab.modules.iconpack.data.local
+package com.capybara.hypericonlab.modules.build.data.local
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer

@@ -33,11 +33,11 @@ import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.ui.page.task.sections.ConfirmDialog
 import com.capybara.hypericonlab.modules.icon.ui.page.task.sections.DetailBottomActions
 import com.capybara.hypericonlab.modules.icon.ui.page.task.sections.DetailContent
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 

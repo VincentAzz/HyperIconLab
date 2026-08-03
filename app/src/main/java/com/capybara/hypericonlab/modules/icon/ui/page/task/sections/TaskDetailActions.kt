@@ -23,9 +23,9 @@ import com.capybara.hypericonlab.core.designsystem.symbol.category
 import com.capybara.hypericonlab.core.designsystem.symbol.delete
 import com.capybara.hypericonlab.core.designsystem.symbol.refresh
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.ui.page.task.component.TaskDetailSheetConfig
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
 
 // 任务详情底部操作按钮区与二次确认对话框
 @Composable

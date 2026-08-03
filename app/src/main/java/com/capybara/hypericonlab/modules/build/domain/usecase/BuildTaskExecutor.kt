@@ -1,18 +1,18 @@
-package com.capybara.hypericonlab.modules.iconpack.domain.usecase
+package com.capybara.hypericonlab.modules.build.domain.usecase
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.capybara.hypericonlab.modules.build.data.BuildArtifactWriter
+import com.capybara.hypericonlab.modules.build.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.build.domain.model.ProductType
+import com.capybara.hypericonlab.modules.build.domain.packaging.IconPackApkBuildService
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
-import com.capybara.hypericonlab.modules.iconpack.data.BuildArtifactWriter
-import com.capybara.hypericonlab.modules.iconpack.data.local.BuildTaskStore
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
-import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
-import com.capybara.hypericonlab.modules.iconpack.domain.packaging.IconPackApkBuildService
 import com.capybara.hypericonlab.modules.iconrender.image.InnerShadowProcessor
 import com.capybara.hypericonlab.modules.iconrender.image.MaskAssetLoader
 import kotlinx.coroutines.Dispatchers

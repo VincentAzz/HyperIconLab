@@ -42,8 +42,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

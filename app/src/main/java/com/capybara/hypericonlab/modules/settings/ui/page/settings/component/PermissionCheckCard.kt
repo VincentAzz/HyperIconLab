@@ -33,7 +33,7 @@ import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
-import com.capybara.hypericonlab.modules.iconpack.domain.packaging.ApkInstallFacade
+import com.capybara.hypericonlab.modules.build.domain.packaging.ApkInstallFacade
 import org.koin.compose.koinInject
 
 

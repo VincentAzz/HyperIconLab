@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.iconpack.domain.packaging
+package com.capybara.hypericonlab.modules.build.domain.packaging
 
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertArrayEquals
