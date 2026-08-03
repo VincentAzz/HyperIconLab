@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
+    <!-- 只允许共享安装器专用缓存目录，避免暴露应用其他文件。 -->
     <cache-path
-        name="internal_cache_logs"
-        path="logs/" />
-    <external-cache-path
-        name="external_cache"
-        path="." />
-    <root-path
-        name="root"
-        path="." />
+        name="apk_install"
+        path="apk-install/" />
 </paths>

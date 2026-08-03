@@ -76,6 +76,7 @@
     <string name="build_notification_preparing">准备中：%1$s</string>
     <string name="build_notification_progress_fmt">当前：%1$s (%2$d/%3$d)</string>
     <string name="build_notification_success_title">构建完成</string>
+    <string name="build_notification_install">安装</string>
     <string name="build_notification_success_fmt">%1$s · %2$d 个图标 · 耗时 %3$.1f 秒</string>
     <string name="build_notification_failed_title">构建失败</string>
     <string name="build_notification_failed_fmt">%1$s 失败：%2$s</string>
@@ -89,9 +90,11 @@
     <!-- 权限检查卡片 -->
     <string name="permission_check_title">权限检查</string>
     <string name="permission_check_notification_title">通知权限</string>
-    <string name="permission_check_notification_desc">用于显示构建进度与 lawnicons 更新失败通知，拒绝后任务仍可执行但无通知提示</string>
+    <string name="permission_check_notification_desc">用于显示构建进度与资产更新通知，拒绝后任务仍可执行但无通知提示</string>
     <string name="permission_check_storage_title">存储权限</string>
     <string name="permission_check_storage_desc">用于将构建产物导出到 Documents 目录（仅 Android 9 及以下需要）</string>
+    <string name="permission_check_install_title">安装应用权限</string>
+    <string name="permission_check_install_desc">允许 HyperIconLab 拉起系统安装器，安装构建生成的图标包 APK</string>
     <string name="permission_check_grant">授权</string>
     <string name="permission_check_all_granted">所有权限已授予</string>
 </resources>

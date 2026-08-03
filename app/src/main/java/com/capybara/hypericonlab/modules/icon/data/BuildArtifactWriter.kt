@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import timber.log.Timber
 import java.io.File
@@ -33,6 +34,17 @@ import java.io.File
 class BuildArtifactWriter(private val context: Context) {
 
     /**
+     * 构建产物导出结果。
+     *
+     * [displayPath] 用于任务详情展示；[artifactUri] 用于后续跨应用打开 APK。
+     * Android 9 以下通过步骤 13.2 的 FileProvider 生成安装器 Uri。
+     */
+    data class ExportResult(
+        val displayPath: String,
+        val artifactUri: Uri?
+    )
+
+    /**
      * 导出工件与预览图到公共 Documents 目录。
      *
      * @param taskId 任务 id，作为子目录名
@@ -40,7 +52,7 @@ class BuildArtifactWriter(private val context: Context) {
      * @param storePreview 8 图标预览图
      * @param mainPreview 全屏预览图
      * @param artifactName 工件文件名（含扩展名，如 "icons.zip"）
-     * @return 导出目录路径字符串（如 "Documents/HyperIconLabArtifacts/<taskId>"），失败时返回 null
+     * @return 导出结果，失败时返回 null
      */
     fun export(
         taskId: String,
@@ -49,7 +61,7 @@ class BuildArtifactWriter(private val context: Context) {
         mainPreview: Bitmap,
         artifactName: String = ExportConfig.DEFAULT_ARTIFACT_NAME,
         productType: ProductType = ProductType.ZIP_ICONS
-    ): String? {
+    ): ExportResult? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             exportViaMediaStore(
                 taskId,
@@ -60,7 +72,14 @@ class BuildArtifactWriter(private val context: Context) {
                 productType.mimeType
             )
         } else {
-            exportViaDirectFile(taskId, artifactFile, storePreview, mainPreview, artifactName)
+            exportViaDirectFile(
+                taskId,
+                artifactFile,
+                storePreview,
+                mainPreview,
+                artifactName,
+                productType
+            )
         }
     }
 
@@ -72,22 +91,19 @@ class BuildArtifactWriter(private val context: Context) {
         mainPreview: Bitmap,
         artifactName: String,
         artifactMimeType: String
-    ): String? {
+    ): ExportResult? {
         val resolver = context.contentResolver
         val collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
         val relativeBase = "${ExportConfig.PUBLIC_ROOT_DIR}/$taskId/"
 
-        // 工件文件
-        if (!insertFile(
+        // 工件文件：保留 MediaStore 返回的 Uri，供后续 APK 安装器使用
+        val artifactUri = insertFile(
                 collection = collection,
                 displayName = artifactName,
                 mimeType = artifactMimeType,
                 relativePath = relativeBase,
                 sourceFile = artifactFile
-            )
-        ) {
-            return null
-        }
+        ) ?: return null
 
         // 8 图标预览图
         insertBitmap(
@@ -107,7 +123,10 @@ class BuildArtifactWriter(private val context: Context) {
             bitmap = mainPreview
         )
 
-        return "${ExportConfig.PUBLIC_ROOT_DIR}/$taskId"
+        return ExportResult(
+            displayPath = "${ExportConfig.PUBLIC_ROOT_DIR}/$taskId",
+            artifactUri = artifactUri
+        )
     }
 
     // API 26-28：直接写文件路径，需 WRITE_EXTERNAL_STORAGE 权限
@@ -116,8 +135,9 @@ class BuildArtifactWriter(private val context: Context) {
         artifactFile: File,
         storePreview: Bitmap,
         mainPreview: Bitmap,
-        artifactName: String
-    ): String? {
+        artifactName: String,
+        productType: ProductType
+    ): ExportResult? {
         if (!hasWriteStoragePermission()) {
             Timber.tag(TAG)
                 .e("WRITE_EXTERNAL_STORAGE not granted, cannot export to public Documents")
@@ -146,31 +166,67 @@ class BuildArtifactWriter(private val context: Context) {
             return null
         }
 
-        return "${ExportConfig.PUBLIC_ROOT_DIR}/$taskId"
+        val artifactUri = if (productType == ProductType.APK) {
+            createApkShareUri(taskId, artifactFile, artifactName) ?: return null
+        } else {
+            null
+        }
+        return ExportResult(
+            displayPath = "${ExportConfig.PUBLIC_ROOT_DIR}/$taskId",
+            artifactUri = artifactUri
+        )
     }
 
-    // 向 MediaStore 插入普通文件并写入内容，成功返回 true
+    // 将 APK 复制到受 FileProvider 限制的缓存目录，供安装器临时读取。
+    private fun createApkShareUri(
+        taskId: String,
+        artifactFile: File,
+        artifactName: String
+    ): Uri? {
+        val cacheDir = File(context.cacheDir, ExportConfig.APK_INSTALL_CACHE_DIRNAME)
+        val shareFile = File(cacheDir, "${taskId}_$artifactName")
+        return try {
+            cacheDir.mkdirs()
+            artifactFile.copyTo(shareFile, overwrite = true)
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}${ExportConfig.FILE_PROVIDER_SUFFIX}",
+                shareFile
+            )
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Failed to prepare APK share Uri for $taskId")
+            shareFile.delete()
+            null
+        }
+    }
+
+    // 向 MediaStore 插入普通文件并写入内容，成功返回 Uri
     private fun insertFile(
         collection: Uri,
         displayName: String,
         mimeType: String,
         relativePath: String,
         sourceFile: File
-    ): Boolean {
+    ): Uri? {
         val values = ContentValues().apply {
             put(MediaStore.Files.FileColumns.DISPLAY_NAME, displayName)
             put(MediaStore.Files.FileColumns.MIME_TYPE, mimeType)
             put(MediaStore.Files.FileColumns.RELATIVE_PATH, relativePath)
         }
         return try {
-            val uri = context.contentResolver.insert(collection, values) ?: return false
-            context.contentResolver.openOutputStream(uri)?.use { out ->
+            val uri = context.contentResolver.insert(collection, values) ?: return null
+            val output = context.contentResolver.openOutputStream(uri)
+            if (output == null) {
+                context.contentResolver.delete(uri, null, null)
+                return null
+            }
+            output.use { out ->
                 sourceFile.inputStream().use { it.copyTo(out) }
-            } ?: return false
-            true
+            }
+            uri
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Failed to insert file $displayName")
-            false
+            null
         }
     }
 
@@ -231,6 +287,12 @@ class BuildArtifactWriter(private val context: Context) {
 
             // 图片压缩质量（PNG 无损，保留以备未来格式切换）
             const val IMAGE_QUALITY = 100
+
+            // FileProvider 允许共享的 APK 缓存目录
+            const val APK_INSTALL_CACHE_DIRNAME = "apk-install"
+
+            // FileProvider authority 后缀
+            const val FILE_PROVIDER_SUFFIX = ".fileprovider"
         }
     }
 }

@@ -29,6 +29,9 @@ val LocalThemeState = staticCompositionLocalOf { ThemeState() }
 // 通知 Intent extras key：用于从通知 PendingIntent 传递目标 tab 索引到 Compose 层
 const val EXTRA_TAB_INDEX = "extra_tab_index"
 
+// 构建成功通知携带的 APK content Uri
+const val EXTRA_INSTALL_APK_URI = "extra_install_apk_uri"
+
 // 任务 tab 索引（与下方 tabs 列表顺序对应：home=0, custom=1, task=2, settings=3）
 const val TAB_INDEX_TASK = 2
 

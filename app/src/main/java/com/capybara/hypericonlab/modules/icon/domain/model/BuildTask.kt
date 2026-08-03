@@ -61,6 +61,7 @@ enum class ProductType(
  * @param currentPackage 当前正在处理的包名（用于通知与详情显示）
  * @param errorMessage 失败时的错误信息
  * @param artifactPath 导出后的目录 URI（Documents/HyperIconLabArtifacts/<taskId>/）
+ * @param artifactUri APK 导出文件的 content URI，供后续系统安装器使用
  */
 @Serializable
 data class BuildTask(
@@ -80,7 +81,8 @@ data class BuildTask(
     val progress: Float = 0f,
     val currentPackage: String? = null,
     val errorMessage: String? = null,
-    val artifactPath: String? = null
+    val artifactPath: String? = null,
+    val artifactUri: String? = null
 ) {
     companion object {
         // 任务 ID 时间戳格式（文件管理器按时间排序友好）

@@ -155,15 +155,14 @@ class BuildTaskExecutor(
                         // 5. 导出工件与预览图到公共 Documents
                         val artifactName =
                             "${ExecutorConfig.DEFAULT_ARTIFACT_BASENAME}.${task.productType.ext}"
-                        val exportedPath = artifactWriter.export(
+                        val exported = artifactWriter.export(
                             taskId = task.taskId,
                             artifactFile = tempArtifact,
                             storePreview = storePreview,
                             mainPreview = mainPreview,
                             artifactName = artifactName,
                             productType = task.productType
-                        )
-                        if (exportedPath == null) {
+                        ) ?: run {
                             throw IllegalStateException("工件导出失败（可能缺少存储权限）")
                         }
 
@@ -176,7 +175,12 @@ class BuildTaskExecutor(
                             currentPackage = null,
                             finishedAt = finishedAt,
                             durationMs = finishedAt - startedAt,
-                            artifactPath = exportedPath
+                            artifactPath = exported.displayPath,
+                            artifactUri = if (task.productType == ProductType.APK) {
+                                exported.artifactUri?.toString()
+                            } else {
+                                null
+                            }
                         )
                         onUpdate(successTask)
                         result = successTask

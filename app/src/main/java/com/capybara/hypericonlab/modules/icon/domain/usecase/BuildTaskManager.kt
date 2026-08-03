@@ -16,8 +16,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -52,6 +55,12 @@ class BuildTaskManager(
     private val taskStore: BuildTaskStore
 ) {
 
+    /** 构建成功后请求前台应用拉起 APK 安装器。 */
+    data class ApkInstallRequest(
+        val taskId: String,
+        val artifactUri: String
+    )
+
     // 活动任务（PENDING + RUNNING），内存中，不持久化
     private val _activeTasks = MutableStateFlow<List<BuildTask>>(emptyList())
     val activeTasks: StateFlow<List<BuildTask>> = _activeTasks.asStateFlow()
@@ -59,6 +68,12 @@ class BuildTaskManager(
     // 已完成任务（SUCCESS + FAILED），持久化
     private val _finishedTasks = MutableStateFlow<List<BuildTask>>(emptyList())
     val finishedTasks: StateFlow<List<BuildTask>> = _finishedTasks.asStateFlow()
+
+    private val _installRequests = MutableSharedFlow<ApkInstallRequest>(
+        extraBufferCapacity = ManagerConfig.INSTALL_REQUEST_BUFFER_CAPACITY,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val installRequests = _installRequests.asSharedFlow()
 
     // 任务协程 Job（仅当前正在执行的任务，串行执行下同时只有一个）
     private var currentJob: Job? = null
@@ -284,6 +299,18 @@ class BuildTaskManager(
                     taskStore.saveFinishedTasks(_finishedTasks.value)
                 }
             }
+            if (result.status == BuildTaskStatus.SUCCESS &&
+                result.productType == ProductType.APK
+            ) {
+                result.artifactUri?.let { uri ->
+                    _installRequests.tryEmit(
+                        ApkInstallRequest(
+                            taskId = result.taskId,
+                            artifactUri = uri
+                        )
+                    )
+                }
+            }
         } catch (e: CancellationException) {
             // 任务被取消：从 activeTasks 移除，CANCELLED 不进入 finishedTasks
             _activeTasks.value = _activeTasks.value.filterNot { it.taskId == task.taskId }
@@ -317,5 +344,9 @@ class BuildTaskManager(
 
     companion object {
         private const val TAG = "BuildTaskManager"
+
+        private object ManagerConfig {
+            const val INSTALL_REQUEST_BUFFER_CAPACITY = 4
+        }
     }
 }

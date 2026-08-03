@@ -9,11 +9,13 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.capybara.hypericonlab.MainActivity
 import com.capybara.hypericonlab.R
+import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_INSTALL_APK_URI
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_TAB_INDEX
 import com.capybara.hypericonlab.core.designsystem.navigation.TAB_INDEX_TASK
 import com.capybara.hypericonlab.core.notification.BuildNotificationManager.Companion.RUNNING_NOTIFICATION_ID
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 
 /**
  * 构建通知管理器：负责 NotificationChannel 创建、进度通知构建与更新、终态通知切换。
@@ -140,6 +142,18 @@ class BuildNotificationManager(private val context: Context) {
             .setAutoCancel(true)
             .setContentIntent(buildContentIntent())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .apply {
+                if (task.status == BuildTaskStatus.SUCCESS &&
+                    task.productType == ProductType.APK &&
+                    task.artifactUri != null
+                ) {
+                    addAction(
+                        android.R.drawable.stat_sys_download_done,
+                        context.getString(R.string.build_notification_install),
+                        buildInstallPendingIntent(task)
+                    )
+                }
+            }
             .build()
 
         notificationManager.notify(task.taskId.hashCode(), notification)
@@ -164,6 +178,23 @@ class BuildNotificationManager(private val context: Context) {
             ContentIntentConfig.REQUEST_CODE,
             intent,
             // FLAG_UPDATE_CURRENT：extras 变化时复用同一个 PendingIntent 并更新其 extras
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
+    // 成功通知中的安装操作：由 MainActivity 检查权限后再拉起系统安装器。
+    private fun buildInstallPendingIntent(task: BuildTask): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(EXTRA_TAB_INDEX, TAB_INDEX_TASK)
+            putExtra(EXTRA_INSTALL_APK_URI, task.artifactUri)
+        }
+        return PendingIntent.getActivity(
+            context,
+            task.taskId.hashCode(),
+            intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
