@@ -16,6 +16,9 @@ interface LawniconsAssetFacade {
     // 获取当前资源提供者
     fun getProvider(): LawniconsResourceProvider
 
+    // 重新检测激活资源
+    fun refresh(): Boolean
+
     // 获取已下载的云端版本
     fun getDownloadedVersions(): List<String>
 
@@ -63,6 +66,8 @@ class DefaultLawniconsAssetFacade(
         get() = templateManager.state
 
     override fun getProvider(): LawniconsResourceProvider = resourceManager.getProvider()
+
+    override fun refresh(): Boolean = resourceManager.refresh()
 
     override fun getDownloadedVersions(): List<String> = resourceManager.getDownloadedVersions()
 

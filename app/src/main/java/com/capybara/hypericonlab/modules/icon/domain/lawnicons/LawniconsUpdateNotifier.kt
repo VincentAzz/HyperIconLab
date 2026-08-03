@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.notification
+package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -10,22 +10,8 @@ import com.capybara.hypericonlab.MainActivity
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_TAB_INDEX
 import com.capybara.hypericonlab.core.designsystem.navigation.TAB_INDEX_SETTINGS
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.FailureReason
 
-/**
- * 云端资源更新失败通知器：在 [LawniconsUpdateManager] 检测到失败时推送系统通知。
- *
- * 通知策略：
- * - **失败**：固定 id（[NotificationConfig.NOTIFICATION_ID]）的通知，文案按 [FailureReason] 分类，
- *   点击跳转 [MainActivity] 的设置 tab（资产页入口），自动取消
- * - **成功**：不发通知（避免打扰，仅资产页 UI 可见）
- *
- * 通知重要性：IMPORTANCE_DEFAULT（首次会响铃/弹出，后续仅状态栏），符合"失败提醒"场景
- * 通知渠道：独立 [NotificationConfig.CHANNEL_ID]，与构建任务通知互不干扰
- *
- * Android 13+ 需 [android.Manifest.permission.POST_NOTIFICATIONS] 运行时授权；
- * 用户拒绝时 notify 调用静默失败，不影响更新流程本身（state 仍会更新到 Failed）。
- */
+// 云端资源更新失败通知器
 class LawniconsUpdateNotifier(private val context: Context) {
 
     private val notificationManager =

@@ -10,18 +10,26 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.core.net.toUri
 
-class ApkInstaller(private val context: Context) {
+interface ApkInstallFacade {
     sealed interface LaunchResult {
         data object Launched : LaunchResult
         data object UnknownSourcesPermissionRequired : LaunchResult
         data class Failed(val message: String) : LaunchResult
     }
 
-    fun canInstallUnknownSources(): Boolean {
+    fun canInstallUnknownSources(): Boolean
+
+    fun openUnknownSourcesSettings(): Boolean
+
+    fun launchInstaller(apkUri: Uri): LaunchResult
+}
+
+class ApkInstaller(private val context: Context) : ApkInstallFacade {
+    override fun canInstallUnknownSources(): Boolean {
         return context.packageManager.canRequestPackageInstalls()
     }
 
-    fun openUnknownSourcesSettings(): Boolean {
+    override fun openUnknownSourcesSettings(): Boolean {
         val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
             data = "package:${context.packageName}".toUri()
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -29,12 +37,12 @@ class ApkInstaller(private val context: Context) {
         return startActivitySafely(intent)
     }
 
-    fun launchInstaller(apkUri: Uri): LaunchResult {
+    override fun launchInstaller(apkUri: Uri): ApkInstallFacade.LaunchResult {
         if (!canInstallUnknownSources()) {
-            return LaunchResult.UnknownSourcesPermissionRequired
+            return ApkInstallFacade.LaunchResult.UnknownSourcesPermissionRequired
         }
         if (apkUri.scheme != ContentResolver.SCHEME_CONTENT) {
-            return LaunchResult.Failed("APK Uri 必须是 content:// Uri")
+            return ApkInstallFacade.LaunchResult.Failed("APK Uri 必须是 content:// Uri")
         }
 
         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -47,13 +55,13 @@ class ApkInstaller(private val context: Context) {
                 intent, PackageManager.MATCH_DEFAULT_ONLY
             ) == null
         ) {
-            return LaunchResult.Failed("系统没有可处理 APK 安装的应用")
+            return ApkInstallFacade.LaunchResult.Failed("系统没有可处理 APK 安装的应用")
         }
 
         return if (startActivitySafely(intent)) {
-            LaunchResult.Launched
+            ApkInstallFacade.LaunchResult.Launched
         } else {
-            LaunchResult.Failed("无法启动系统安装器")
+            ApkInstallFacade.LaunchResult.Failed("无法启动系统安装器")
         }
     }
 

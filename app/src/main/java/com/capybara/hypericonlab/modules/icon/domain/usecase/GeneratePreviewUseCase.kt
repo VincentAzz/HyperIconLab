@@ -12,7 +12,7 @@ import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.core.preview.PreviewGenerator
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.iconrender.BackgroundLayerRenderer
@@ -28,7 +28,7 @@ import java.io.File
 
 class GeneratePreviewUseCase(
     private val context: Context,
-    private val resourceManager: LawniconsResourceManager
+    private val assetsFacade: LawniconsAssetFacade
 ) {
 
     suspend fun execute(
@@ -38,8 +38,8 @@ class GeneratePreviewUseCase(
         appColorSchemes: Map<String, Pair<String, String>>,
         onStorePreviewGenerated: (Bitmap) -> Unit
     ): Bitmap? = withContext(Dispatchers.Default) {
-        // 通过 resourceManager 获取当前激活资源，优先使用 preview 版本 mapper
-        val provider = resourceManager.getProvider()
+        // 获取当前资源，优先使用 preview mapper
+        val provider = assetsFacade.getProvider()
         val fullMap = withContext(Dispatchers.IO) {
             val previewStream = try {
                 provider.openIconMapper(PreviewConstants.PREVIEW_MAPPER_FILE)

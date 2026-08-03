@@ -54,9 +54,8 @@ import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.toPrettyString
@@ -89,10 +88,9 @@ fun CustomPage(
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val themeState by themeViewModel.state.collectAsStateWithLifecycle()
     val availableIconSets by viewModel.availableIconSets.collectAsStateWithLifecycle()
-    val resourceManager = koinInject<LawniconsResourceManager>()
-    val templateManager = koinInject<IconPackTemplateManager>()
-    val lawniconsVersion by resourceManager.currentVersion.collectAsStateWithLifecycle()
-    val templateState by templateManager.state.collectAsStateWithLifecycle()
+    val assetsFacade = koinInject<LawniconsAssetFacade>()
+    val lawniconsVersion by assetsFacade.currentVersion.collectAsStateWithLifecycle()
+    val templateState by assetsFacade.templateState.collectAsStateWithLifecycle()
     val apkEnabled = lawniconsVersion.source == ResourceSource.REMOTE &&
             (templateState as? IconPackTemplateState.Available)?.version == lawniconsVersion.version
 

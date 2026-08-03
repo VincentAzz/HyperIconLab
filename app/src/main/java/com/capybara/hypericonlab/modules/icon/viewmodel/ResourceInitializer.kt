@@ -5,8 +5,7 @@ import com.capybara.hypericonlab.core.color.AppColorSchemesLoader
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
@@ -24,14 +23,13 @@ import kotlin.reflect.KClass
 
 // 资源初始化器：负责启动时的图标集扫描、自动解压、配色加载、云端更新自动拉取
 // 通过 onLog/onMapperReady/onPreviewNeeded 回调解耦对 ViewModel 的依赖
-// 资源读取统一通过 LawniconsResourceManager，支持 assets/云端来源切换
+// 资源读取统一通过 LawniconsAssetFacade，支持 assets/云端来源切换
 class ResourceInitializer(
     private val context: Context,
     private val scope: CoroutineScope,
     private val manageResourcesUseCase: ManageResourcesUseCase,
     private val buildTaskManager: BuildTaskManager,
-    private val resourceManager: LawniconsResourceManager,
-    private val updateManager: LawniconsUpdateManager,
+    private val assetsFacade: LawniconsAssetFacade,
     private val onLog: (String, LogType) -> Unit,
     private val onMapperReady: () -> Unit,
     private val onPreviewNeeded: () -> Unit
@@ -50,7 +48,7 @@ class ResourceInitializer(
     // 扫描当前激活资源下支持的图标集，解析每个图标集的图标数量
     fun loadAvailableIconSets() {
         scope.launch(Dispatchers.IO) {
-            val provider = resourceManager.getProvider()
+            val provider = assetsFacade.getProvider()
             val list = IconSetInfo.SUPPORTED_SETS.map { id ->
                 // 解析图标数量，失败时返回 0
                 val count = try {
@@ -70,7 +68,7 @@ class ResourceInitializer(
     fun observeResourceChanges() {
         scope.launch {
             // 跳过初始值，仅在来源变化时重新加载
-            resourceManager.currentVersion.drop(1).collect {
+            assetsFacade.currentVersion.drop(1).collect {
                 loadAvailableIconSets()
             }
         }
@@ -90,7 +88,7 @@ class ResourceInitializer(
                     val duration = System.currentTimeMillis() - startTime
                     onLog("资源解压完成，耗时 ${duration}ms", LogType.SUCCESS)
                     // 解压完成后刷新 manager，使其检测到已解压的 svgs
-                    resourceManager.refresh()
+                    assetsFacade.refresh()
                 } catch (e: Exception) {
                     onLog("资源解压失败: ${e.message}", LogType.ERROR)
                 }
@@ -115,7 +113,7 @@ class ResourceInitializer(
     }
 
     // 后台静默检查云端更新：失败不发通知（首次启动不打扰用户），state 仍更新供 assets tab 观察
-    // 通过观察 updateManager.state 变化记录关键日志（仅状态类型切换时记录，避免进度日志爆炸）
+    // 观察更新状态并记录关键日志
     private fun autoCheckCloudUpdate() {
         scope.launch(Dispatchers.IO) {
             onLog("开始后台检查云端更新...", LogType.INFO)
@@ -123,7 +121,7 @@ class ResourceInitializer(
             // 观察更新状态变化，在状态类型切换时记录日志
             val observerJob = launch {
                 var lastStateClass: KClass<out UpdateState>? = null
-                updateManager.state.collect { state ->
+                assetsFacade.updateState.collect { state ->
                     val stateClass = state::class
                     // 仅在状态类型变化时记录日志，忽略同类进度更新（如 Downloading 0.1→0.2）
                     if (stateClass != lastStateClass) {
@@ -134,7 +132,7 @@ class ResourceInitializer(
             }
 
             try {
-                updateManager.checkAndInstallSilently()
+                assetsFacade.checkAndInstallSilently()
             } finally {
                 observerJob.cancel()
             }
@@ -159,11 +157,11 @@ class ResourceInitializer(
     }
 
     // 加载 app 配色方案并同步给 BuildTaskManager
-    // 通过 resourceManager 获取当前激活资源的 color_schemes
+    // 获取当前资源的 color_schemes
     // 同时加载 App-M3 持久化缓存到内存（跨启动复用）
     fun loadColorSchemes() {
         scope.launch(Dispatchers.IO) {
-            val provider = resourceManager.getProvider()
+            val provider = assetsFacade.getProvider()
             appColorSchemes = try {
                 provider.openColorSchemes("app_color_schemes.xml")
                     .use { AppColorSchemesLoader.loadFromStream(it) }

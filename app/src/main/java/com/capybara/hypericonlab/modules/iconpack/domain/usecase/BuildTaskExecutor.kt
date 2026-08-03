@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory
 import com.capybara.hypericonlab.core.image.InnerShadowProcessor
 import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.iconpack.data.BuildArtifactWriter
@@ -44,7 +44,7 @@ class BuildTaskExecutor(
     private val pipeline: IconPipelineUseCase,
     private val artifactWriter: BuildArtifactWriter,
     private val taskStore: BuildTaskStore,
-    private val resourceManager: LawniconsResourceManager,
+    private val assetsFacade: LawniconsAssetFacade,
     private val iconPackApkBuildService: IconPackApkBuildService
 ) {
 
@@ -74,7 +74,7 @@ class BuildTaskExecutor(
         var result: BuildTask? = null
 
         try {
-            val provider = resourceManager.getProvider()
+            val provider = assetsFacade.getProvider()
             val mapperFileName = IconSetInfo.mapperFileName(task.iconSetId)
             val mapperMap = provider.openIconMapper(mapperFileName)
                 .use { stream -> IconMapperProcessor.parseIconMapper(stream) }

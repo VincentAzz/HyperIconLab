@@ -24,7 +24,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.LocalSmootherRoundedCor
 import com.capybara.hypericonlab.core.designsystem.theme.LocalUseGoogleSansFlex
 import com.capybara.hypericonlab.core.designsystem.util.LocalWindowLayoutInfo
 import com.capybara.hypericonlab.core.designsystem.util.rememberWindowLayoutInfo
-import com.capybara.hypericonlab.modules.iconpack.domain.packaging.ApkInstaller
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.ApkInstallFacade
 import com.capybara.hypericonlab.modules.iconpack.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
@@ -34,7 +34,7 @@ import org.koin.core.component.inject
 
 class MainActivity : ComponentActivity(), KoinComponent {
     private val themeStateProvider by inject<ThemeStateProvider>()
-    private val apkInstaller by inject<ApkInstaller>()
+    private val apkInstaller by inject<ApkInstallFacade>()
     private val buildTaskManager by inject<BuildTaskManager>()
 
     // 通知 PendingIntent 携带的目标 tab 索引（null 表示无请求）
@@ -142,8 +142,8 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
     private fun launchApkInstaller(uri: Uri) {
         when (apkInstaller.launchInstaller(uri)) {
-            ApkInstaller.LaunchResult.Launched -> Unit
-            ApkInstaller.LaunchResult.UnknownSourcesPermissionRequired -> {
+            ApkInstallFacade.LaunchResult.Launched -> Unit
+            ApkInstallFacade.LaunchResult.UnknownSourcesPermissionRequired -> {
                 pendingInstallUri = uri
                 if (!unknownSourcesSettingsOpened) {
                     unknownSourcesSettingsOpened = true
@@ -154,7 +154,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
                 }
             }
 
-            is ApkInstaller.LaunchResult.Failed -> Unit
+            is ApkInstallFacade.LaunchResult.Failed -> Unit
         }
     }
 }

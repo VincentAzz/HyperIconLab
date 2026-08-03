@@ -1,6 +1,5 @@
 package com.capybara.hypericonlab.modules.icon.di
 
-import com.capybara.hypericonlab.core.notification.LawniconsUpdateNotifier
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.DefaultLawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateArchive
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
@@ -9,12 +8,14 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFac
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsDownloadService
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateNotifier
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.iconpack.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.iconpack.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.ApkInstallFacade
 import com.capybara.hypericonlab.modules.iconpack.domain.packaging.ApkInstaller
 import com.capybara.hypericonlab.modules.iconpack.domain.packaging.IconPackApkAssembler
 import com.capybara.hypericonlab.modules.iconpack.domain.packaging.IconPackApkBuildService
@@ -37,7 +38,7 @@ val iconModule = module {
     single { IconPackSigningKeyManager() }
     factory { IconPackApkSigner() }
     factory { IconPackApkBuildService(get(), get(), get(), get()) }
-    single { ApkInstaller(get()) }
+    single<ApkInstallFacade> { ApkInstaller(get()) }
     // Notifier 用 single：内部缓存 channelCreated 状态，避免重复创建 NotificationChannel
     single { LawniconsUpdateNotifier(get()) }
     single { LawniconsUpdateManager(get(), get(), get(), get(), get(), get(), get()) }

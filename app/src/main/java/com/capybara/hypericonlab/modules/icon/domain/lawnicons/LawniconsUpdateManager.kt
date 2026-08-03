@@ -1,7 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 
 import android.content.Context
-import com.capybara.hypericonlab.core.notification.LawniconsUpdateNotifier
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
