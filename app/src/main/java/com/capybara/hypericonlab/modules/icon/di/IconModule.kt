@@ -9,9 +9,11 @@ import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkAssembl
 import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkBuildService
 import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkSigner
 import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackSigningKeyManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.DefaultLawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateArchive
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsApiService
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsDownloadService
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
@@ -30,10 +32,11 @@ val iconModule = module {
     single { LawniconsDownloadService(get()) }
     single { IconPackTemplateArchive() }
     single { IconPackTemplateManager(get(), get(), get(), get(), get(), get()) }
+    single<LawniconsAssetFacade> { DefaultLawniconsAssetFacade(get(), get(), get()) }
     factory { IconPackApkAssembler() }
     single { IconPackSigningKeyManager() }
     factory { IconPackApkSigner() }
-    factory { IconPackApkBuildService(get(), get(), get(), get(), get()) }
+    factory { IconPackApkBuildService(get(), get(), get(), get()) }
     single { ApkInstaller(get()) }
     // Notifier 用 single：内部缓存 channelCreated 状态，避免重复创建 NotificationChannel
     single { LawniconsUpdateNotifier(get()) }

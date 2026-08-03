@@ -77,7 +77,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRec
 import com.capybara.hypericonlab.core.image.SvgProcessor
 import com.capybara.hypericonlab.core.mapper.IconMapperEntry
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -106,7 +106,7 @@ fun LawniconsBrowserSheet(
     useLiquidGlass: Boolean = false,
     liquidGlassBlurRadius: Dp = 24.dp,
 ) {
-    val resourceManager = koinInject<LawniconsResourceManager>()
+    val assetsFacade = koinInject<LawniconsAssetFacade>()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -118,8 +118,8 @@ fun LawniconsBrowserSheet(
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
-            // 通过 resourceManager 获取当前激活资源的 svgs 目录与 mapper
-            val provider = resourceManager.getProvider()
+            // 通过 Facade 获取当前激活资源的 svgs 目录与 mapper
+            val provider = assetsFacade.getProvider()
             val dir = provider.getSvgDir()
             if (dir == null) {
                 loadState = LawniconsLoadState.ERROR

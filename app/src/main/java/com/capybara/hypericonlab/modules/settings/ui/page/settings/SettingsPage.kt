@@ -49,7 +49,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
@@ -80,10 +80,10 @@ fun SettingsPage(
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
 
-    // 资源管理器：供来源选择 sheet 读取当前版本与已下载版本列表
-    val resourceManager = koinInject<LawniconsResourceManager>()
+    // Lawnicons Facade：供来源选择 sheet 读取当前版本与已下载版本列表
+    val assetsFacade = koinInject<LawniconsAssetFacade>()
     val appSettingsRepository = koinInject<AppSettingsRepository>()
-    val currentVersion by resourceManager.currentVersion.collectAsStateWithLifecycle()
+    val currentVersion by assetsFacade.currentVersion.collectAsStateWithLifecycle()
     // 下载代理开关：在顶层持续订阅稳定的 StateFlow，避免重组时由于冷流收集导致的初始值回显错误
     val useDownloadProxy by appSettingsRepository.useDownloadProxy.collectAsStateWithLifecycle()
     // 页面级 scope：sheet 关闭不会取消，确保 putBoolean 协程能执行完成

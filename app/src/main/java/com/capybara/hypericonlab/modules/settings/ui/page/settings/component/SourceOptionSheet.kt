@@ -8,7 +8,7 @@ import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.symbol.archive
 import com.capybara.hypericonlab.core.designsystem.symbol.cloud_download
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsVersion
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import org.koin.compose.koinInject
@@ -28,7 +28,7 @@ sealed class SourceOption {
 
 // 资源来源选择 sheet：始终显示本地 + 云端两项
 // 云端有已下载版本时显示版本号，未下载时显示"待检查更新"
-// 内部注入 LawniconsResourceManager 读取版本信息，SettingsPage 仅需传递状态控制参数
+// 内部注入 Lawnicons Facade 读取版本信息，SettingsPage 仅需传递状态控制参数
 @Composable
 fun SourceOptionSheet(
     currentVersion: LawniconsVersion,
@@ -37,10 +37,10 @@ fun SourceOptionSheet(
     useLiquidGlass: Boolean = false,
     liquidGlassBlurRadius: Dp = 24.dp,
 ) {
-    val resourceManager = koinInject<LawniconsResourceManager>()
+    val assetsFacade = koinInject<LawniconsAssetFacade>()
 
     // 始终显示本地 + 云端两项：云端有已下载版本时取最新版本，否则显示占位
-    val downloadedVersions = resourceManager.getDownloadedVersions()
+    val downloadedVersions = assetsFacade.getDownloadedVersions()
     val latestRemoteVersion = downloadedVersions.maxByOrNull { it }
     val sourceOptions = buildList {
         add(SourceOption.Assets)
@@ -64,13 +64,13 @@ fun SourceOptionSheet(
         onDismiss = onDismiss,
         onConfirm = { option ->
             when (option) {
-                SourceOption.Assets -> resourceManager.switchToAssets()
-                is SourceOption.Remote -> resourceManager.switchToRemote(option.version)
+                SourceOption.Assets -> assetsFacade.switchToAssets()
+                is SourceOption.Remote -> assetsFacade.switchToRemote(option.version)
                 // 云端未下载时不切换，用户需先检查更新下载
                 SourceOption.RemotePending -> {}
             }
         },
-        itemLabel = { option -> formatSourceLabel(option, resourceManager) },
+        itemLabel = { option -> formatSourceLabel(option, assetsFacade) },
         itemIcon = { option -> sourceOptionIcon(option) },
         // 云端未下载时置灰，仅允许选中本地
         itemEnabled = { option -> option !is SourceOption.RemotePending },
@@ -83,10 +83,10 @@ fun SourceOptionSheet(
 // 统一格式：(来源标签) 日期 (commit)，云端未下载显示"待检查更新"
 private fun formatSourceLabel(
     option: SourceOption,
-    resourceManager: LawniconsResourceManager
+    assetsFacade: LawniconsAssetFacade
 ): String {
     val label = sourceLabel(option)
-    val info = versionInfoOf(option, resourceManager)
+    val info = versionInfoOf(option, assetsFacade)
     return if (info != null) {
         val date = info.version.substringBefore("-")
         val commit = info.lawniconsCommit.take(7)
@@ -99,10 +99,10 @@ private fun formatSourceLabel(
 // 获取各选项的版本信息用于统一显示
 private fun versionInfoOf(
     option: SourceOption,
-    resourceManager: LawniconsResourceManager
+    assetsFacade: LawniconsAssetFacade
 ): LawniconsVersion? = when (option) {
-    SourceOption.Assets -> resourceManager.getAssetsVersionInfo()
-    is SourceOption.Remote -> resourceManager.getRemoteVersionInfo(option.version)
+    SourceOption.Assets -> assetsFacade.getAssetsVersionInfo()
+    is SourceOption.Remote -> assetsFacade.getRemoteVersionInfo(option.version)
     SourceOption.RemotePending -> null
 }
 

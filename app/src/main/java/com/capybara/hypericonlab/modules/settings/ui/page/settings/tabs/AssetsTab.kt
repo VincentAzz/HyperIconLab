@@ -20,10 +20,8 @@ import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.FailureReason
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
@@ -44,17 +42,15 @@ fun AssetsTab(
     modifier: Modifier = Modifier,
 ) {
     val layoutDirection = LocalLayoutDirection.current
-    val resourceManager = koinInject<LawniconsResourceManager>()
-    val updateManager = koinInject<LawniconsUpdateManager>()
-    val templateManager = koinInject<IconPackTemplateManager>()
+    val assetsFacade = koinInject<LawniconsAssetFacade>()
     val appSettingsRepository = koinInject<AppSettingsRepository>()
     val scope = rememberCoroutineScope()
 
-    // 当前版本信息（从 manager 观察，来源切换后自动更新）
-    val version by resourceManager.currentVersion.collectAsStateWithLifecycle()
+    // 当前版本信息（从 Facade 观察，来源切换后自动更新）
+    val version by assetsFacade.currentVersion.collectAsStateWithLifecycle()
     // 更新流程状态（检查/下载/解压/成功/失败）
-    val updateState by updateManager.state.collectAsStateWithLifecycle()
-    val templateState by templateManager.state.collectAsStateWithLifecycle()
+    val updateState by assetsFacade.updateState.collectAsStateWithLifecycle()
+    val templateState by assetsFacade.templateState.collectAsStateWithLifecycle()
     val templateAvailable =
         (templateState as? IconPackTemplateState.Available)?.version == version.version
     // 下载代理开关
@@ -133,7 +129,7 @@ fun AssetsTab(
 
                 // 检查更新：云端来源显示，或仅有本地资产时显示（需保留更新入口）
                 // 仅当本地来源且已有云端版本共存时隐藏（用户手动切回本地无需更新）
-                val hasCloudVersions = resourceManager.getDownloadedVersions().isNotEmpty()
+                val hasCloudVersions = assetsFacade.getDownloadedVersions().isNotEmpty()
                 val showUpdateEntry = version.source == ResourceSource.REMOTE || !hasCloudVersions
 
                 item(animatedVisibility = showUpdateEntry) {
@@ -144,7 +140,7 @@ fun AssetsTab(
                         trailingContent = {
                             PrimaryActionButton(
                                 text = checkButtonText, enabled = checkEnabled, onClick = {
-                                    scope.launch { updateManager.checkAndInstall() }
+                                    scope.launch { assetsFacade.checkAndInstall() }
                                 })
                         })
                 }
@@ -221,8 +217,8 @@ fun AssetsTab(
                             PrimaryActionButton(
                                 text = "清除", onClick = {
                                     scope.launch {
-                                        resourceManager.clearCloudAssets()
-                                        updateManager.resetState()
+                                        assetsFacade.clearCloudAssets()
+                                        assetsFacade.resetUpdateState()
                                     }
                                 })
                         })

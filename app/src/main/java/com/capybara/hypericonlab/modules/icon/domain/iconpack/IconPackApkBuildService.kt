@@ -1,13 +1,11 @@
 package com.capybara.hypericonlab.modules.icon.domain.iconpack
 
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import java.io.File
 
 // 串联模板按需获取、同版本资源读取、APK 装配和签名，不负责 Documents 导出。
 class IconPackApkBuildService(
-    private val templateManager: IconPackTemplateManager,
-    private val resourceManager: LawniconsResourceManager,
+    private val assetsFacade: LawniconsAssetFacade,
     private val assembler: IconPackApkAssembler,
     private val keyManager: IconPackSigningKeyManager,
     private val signer: IconPackApkSigner
@@ -18,10 +16,10 @@ class IconPackApkBuildService(
         outputApk: File,
         onTemplateDownloadProgress: (Float) -> Unit = {}
     ): IconPackAssemblyResult {
-        check(templateManager.ensureAvailable(onTemplateDownloadProgress)) {
+        check(assetsFacade.ensureTemplateAvailable(onTemplateDownloadProgress)) {
             "当前 Lawnicons 资源版本没有可用的 APK 模板"
         }
-        val provider = resourceManager.getProvider()
+        val provider = assetsFacade.getProvider()
         val templateApk = provider.openIconPackTemplate(iconSetId)
             ?: error("未找到 $iconSetId APK 模板")
         val slotMapping = provider.openSlotMapping()
