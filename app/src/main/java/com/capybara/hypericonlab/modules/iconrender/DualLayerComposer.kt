@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.domain.render
+package com.capybara.hypericonlab.modules.iconrender
 
 import android.graphics.Bitmap
 import androidx.core.graphics.scale

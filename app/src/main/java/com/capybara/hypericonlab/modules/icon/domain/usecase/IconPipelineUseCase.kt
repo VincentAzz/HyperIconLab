@@ -10,11 +10,11 @@ import com.capybara.hypericonlab.core.image.GlassProcessor
 import com.capybara.hypericonlab.core.image.LayerMerger
 import com.capybara.hypericonlab.modules.icon.domain.model.ColorMode
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
-import com.capybara.hypericonlab.modules.icon.domain.render.BackgroundLayerRenderer
-import com.capybara.hypericonlab.modules.icon.domain.render.ConfigColorResolver
-import com.capybara.hypericonlab.modules.icon.domain.render.DualLayerComposer
-import com.capybara.hypericonlab.modules.icon.domain.render.IconForegroundRenderer
-import com.capybara.hypericonlab.modules.icon.domain.render.RetroStyleRenderer
+import com.capybara.hypericonlab.modules.iconrender.BackgroundLayerRenderer
+import com.capybara.hypericonlab.modules.iconrender.ConfigColorResolver
+import com.capybara.hypericonlab.modules.iconrender.DualLayerComposer
+import com.capybara.hypericonlab.modules.iconrender.IconForegroundRenderer
+import com.capybara.hypericonlab.modules.iconrender.RetroStyleRenderer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

@@ -14,12 +14,12 @@ import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
-import com.capybara.hypericonlab.modules.icon.domain.render.ConfigColorResolver
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
 import com.capybara.hypericonlab.modules.iconpack.domain.usecase.BuildTaskManager
+import com.capybara.hypericonlab.modules.iconrender.ConfigColorResolver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow

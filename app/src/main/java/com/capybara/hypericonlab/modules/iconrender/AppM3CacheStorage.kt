@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.domain.render
+package com.capybara.hypericonlab.modules.iconrender
 
 import android.content.Context
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
