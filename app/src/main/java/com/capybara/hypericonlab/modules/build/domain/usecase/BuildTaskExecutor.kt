@@ -13,8 +13,8 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFac
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
-import com.capybara.hypericonlab.modules.iconrender.image.InnerShadowProcessor
-import com.capybara.hypericonlab.modules.iconrender.image.MaskAssetLoader
+import com.capybara.hypericonlab.modules.render.image.InnerShadowProcessor
+import com.capybara.hypericonlab.modules.render.image.MaskAssetLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive

@@ -43,8 +43,8 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.MaskThumb
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.ColorSourceSection
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
-import com.capybara.hypericonlab.modules.iconrender.image.BgImageDir
-import com.capybara.hypericonlab.modules.iconrender.image.BgImageLoader
+import com.capybara.hypericonlab.modules.render.image.BgImageDir
+import com.capybara.hypericonlab.modules.render.image.BgImageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import top.yukonga.miuix.kmp.blur.LayerBackdrop

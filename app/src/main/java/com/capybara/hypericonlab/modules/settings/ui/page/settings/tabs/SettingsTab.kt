@@ -51,7 +51,7 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwat
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.viewmodel.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
-import com.capybara.hypericonlab.modules.iconrender.image.StickerProcessor
+import com.capybara.hypericonlab.modules.render.image.StickerProcessor
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsState
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel

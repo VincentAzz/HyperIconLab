@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.iconrender
+package com.capybara.hypericonlab.modules.render
 
 import android.content.Context
 import android.graphics.Color

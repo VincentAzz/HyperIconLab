@@ -1,8 +1,8 @@
-package com.capybara.hypericonlab.modules.iconrender
+package com.capybara.hypericonlab.modules.render
 
 import android.graphics.Bitmap
 import androidx.core.graphics.scale
-import com.capybara.hypericonlab.modules.iconrender.image.BackgroundGenerator
+import com.capybara.hypericonlab.modules.render.image.BackgroundGenerator
 
 // 双层背景合成器
 object DualLayerComposer {

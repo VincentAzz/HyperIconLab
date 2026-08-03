@@ -10,7 +10,7 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
-import com.capybara.hypericonlab.modules.iconrender.AppM3ColorCache
+import com.capybara.hypericonlab.modules.render.AppM3ColorCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

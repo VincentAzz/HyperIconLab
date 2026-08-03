@@ -1,13 +1,13 @@
-package com.capybara.hypericonlab.modules.iconrender
+package com.capybara.hypericonlab.modules.render
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.PorterDuff
-import com.capybara.hypericonlab.modules.iconrender.image.BackgroundGenerator
-import com.capybara.hypericonlab.modules.iconrender.image.BlendLayer
-import com.capybara.hypericonlab.modules.iconrender.image.BlendModePainter
+import com.capybara.hypericonlab.modules.render.image.BackgroundGenerator
+import com.capybara.hypericonlab.modules.render.image.BlendLayer
+import com.capybara.hypericonlab.modules.render.image.BlendModePainter
 
 object RetroAssets {
     const val DIR = "style_baked/retro"

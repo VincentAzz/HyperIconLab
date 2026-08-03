@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.iconrender.image
+package com.capybara.hypericonlab.modules.render.image
 
 // 内阴影烘焙资产路径
 object InnerShadowAssets {

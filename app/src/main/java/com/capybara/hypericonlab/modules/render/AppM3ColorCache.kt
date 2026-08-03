@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.iconrender
+package com.capybara.hypericonlab.modules.render
 
 import android.content.Context
 import androidx.compose.material3.ColorScheme
@@ -8,7 +8,7 @@ import androidx.core.graphics.toColorInt
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
-import com.capybara.hypericonlab.modules.iconrender.AppM3CacheStorage.PersistedColors
+import com.capybara.hypericonlab.modules.render.AppM3CacheStorage.PersistedColors
 import kotlinx.coroutines.yield
 import java.util.concurrent.ConcurrentHashMap
 

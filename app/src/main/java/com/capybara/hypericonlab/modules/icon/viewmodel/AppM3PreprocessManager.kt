@@ -3,7 +3,7 @@ package com.capybara.hypericonlab.modules.icon.viewmodel
 import android.content.Context
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
-import com.capybara.hypericonlab.modules.iconrender.AppM3ColorCache
+import com.capybara.hypericonlab.modules.render.AppM3ColorCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

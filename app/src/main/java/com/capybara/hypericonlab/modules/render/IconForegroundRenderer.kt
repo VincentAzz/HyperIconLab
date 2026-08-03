@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.iconrender
+package com.capybara.hypericonlab.modules.render
 
 import android.graphics.Bitmap
 import androidx.core.graphics.toColorInt
@@ -6,8 +6,8 @@ import com.capybara.hypericonlab.modules.icon.domain.model.ColorMode
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
-import com.capybara.hypericonlab.modules.iconrender.image.StickerProcessor
-import com.capybara.hypericonlab.modules.iconrender.image.SvgProcessor
+import com.capybara.hypericonlab.modules.render.image.StickerProcessor
+import com.capybara.hypericonlab.modules.render.image.SvgProcessor
 import java.io.File
 
 // 图标前景渲染器，统一 SVG 基础渲染与前景色决策

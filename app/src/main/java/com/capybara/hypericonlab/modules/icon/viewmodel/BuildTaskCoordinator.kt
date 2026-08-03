@@ -17,9 +17,9 @@ import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerConfig
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
-import com.capybara.hypericonlab.modules.iconrender.ConfigColorResolver
-import com.capybara.hypericonlab.modules.iconrender.image.InnerShadowBitmapLoader
-import com.capybara.hypericonlab.modules.iconrender.image.MaskAssetLoader
+import com.capybara.hypericonlab.modules.render.ConfigColorResolver
+import com.capybara.hypericonlab.modules.render.image.InnerShadowBitmapLoader
+import com.capybara.hypericonlab.modules.render.image.MaskAssetLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow

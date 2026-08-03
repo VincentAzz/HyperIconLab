@@ -77,7 +77,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRec
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.model.IconMapperEntry
-import com.capybara.hypericonlab.modules.iconrender.image.SvgProcessor
+import com.capybara.hypericonlab.modules.render.image.SvgProcessor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
