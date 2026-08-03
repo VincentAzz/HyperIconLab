@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.data
+package com.capybara.hypericonlab.modules.iconpack.data
 
 import android.Manifest
 import android.content.ContentValues
@@ -11,20 +11,11 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
+import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
 import timber.log.Timber
 import java.io.File
 
-/**
- * 构建产物导出器：将工件与预览图写入公共 Documents 目录。
- *
- * - Android 10+（API 29+）：使用 [MediaStore.Files] API，按 [RELATIVE_PATH] 写入
- *   `Documents/HyperIconLabArtifacts/<taskId>/`，无需运行时存储权限。
- * - Android 9 及以下（API 26-28）：直接写 [Environment.getExternalStoragePublicDirectory]
- *   下的 DOCUMENTS 子目录，需 [android.Manifest.permission.WRITE_EXTERNAL_STORAGE] 运行时授权。
- *
- * 导出目录结构（与文档第 6.1 节一致）：
- * ```
+/**`
  * Documents/HyperIconLabArtifacts/<taskId>/
  * ├── icons.zip              # 工件（按 ProductType.ext 命名）
  * ├── preview_store.png      # 8 图标预览（1080×640）
@@ -33,12 +24,6 @@ import java.io.File
  */
 class BuildArtifactWriter(private val context: Context) {
 
-    /**
-     * 构建产物导出结果。
-     *
-     * [displayPath] 用于任务详情展示；[artifactUri] 用于后续跨应用打开 APK。
-     * Android 9 以下通过步骤 13.2 的 FileProvider 生成安装器 Uri。
-     */
     data class ExportResult(
         val displayPath: String,
         val artifactUri: Uri?
@@ -83,7 +68,6 @@ class BuildArtifactWriter(private val context: Context) {
         }
     }
 
-    // API 29+：通过 MediaStore 写入，无需运行时存储权限
     private fun exportViaMediaStore(
         taskId: String,
         artifactFile: File,
@@ -98,11 +82,11 @@ class BuildArtifactWriter(private val context: Context) {
 
         // 工件文件：保留 MediaStore 返回的 Uri，供后续 APK 安装器使用
         val artifactUri = insertFile(
-                collection = collection,
-                displayName = artifactName,
-                mimeType = artifactMimeType,
-                relativePath = relativeBase,
-                sourceFile = artifactFile
+            collection = collection,
+            displayName = artifactName,
+            mimeType = artifactMimeType,
+            relativePath = relativeBase,
+            sourceFile = artifactFile
         ) ?: return null
 
         // 8 图标预览图

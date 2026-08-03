@@ -1,14 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.di
 
-import com.capybara.hypericonlab.core.notification.BuildNotificationManager
 import com.capybara.hypericonlab.core.notification.LawniconsUpdateNotifier
-import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
-import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
-import com.capybara.hypericonlab.modules.icon.domain.iconpack.ApkInstaller
-import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkAssembler
-import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkBuildService
-import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkSigner
-import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackSigningKeyManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.DefaultLawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateArchive
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
@@ -17,12 +9,20 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFac
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsDownloadService
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
-import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskExecutor
-import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
+import com.capybara.hypericonlab.modules.iconpack.data.BuildArtifactWriter
+import com.capybara.hypericonlab.modules.iconpack.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.ApkInstaller
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.IconPackApkAssembler
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.IconPackApkBuildService
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.IconPackApkSigner
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.IconPackSigningKeyManager
+import com.capybara.hypericonlab.modules.iconpack.domain.usecase.BuildTaskExecutor
+import com.capybara.hypericonlab.modules.iconpack.domain.usecase.BuildTaskManager
+import com.capybara.hypericonlab.modules.iconpack.notification.BuildNotificationManager
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 

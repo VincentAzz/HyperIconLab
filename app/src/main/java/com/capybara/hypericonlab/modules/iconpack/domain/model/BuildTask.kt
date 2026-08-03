@@ -1,5 +1,7 @@
-package com.capybara.hypericonlab.modules.icon.domain.model
+package com.capybara.hypericonlab.modules.iconpack.domain.model
 
+import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
+import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import kotlinx.serialization.Serializable
 
 /**

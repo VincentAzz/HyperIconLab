@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.notification
+package com.capybara.hypericonlab.modules.iconpack.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -12,33 +12,17 @@ import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_INSTALL_APK_URI
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_TAB_INDEX
 import com.capybara.hypericonlab.core.designsystem.navigation.TAB_INDEX_TASK
-import com.capybara.hypericonlab.core.notification.BuildNotificationManager.Companion.RUNNING_NOTIFICATION_ID
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
-import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
+import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
 
-/**
- * 构建通知管理器：负责 NotificationChannel 创建、进度通知构建与更新、终态通知切换。
- *
- * 通知策略：
- * - **运行中**：固定 id（[RUNNING_NOTIFICATION_ID]）的进度通知，带 ProgressBar，500ms 节流更新
- * - **终态**（成功/失败）：使用任务 hashCode 作为通知 id，显示结果摘要，自动取消
- * - 点击通知跳转 [MainActivity]
- *
- * 通知重要性：IMPORTANCE_LOW（不发声，仅状态栏+下拉通知），符合构建进度场景
- *
- * Android 13+ 需 [android.Manifest.permission.POST_NOTIFICATIONS] 运行时授权；
- * 用户拒绝时所有 notify 调用静默失败，不影响任务执行。
- */
+// 构建通知管理器
 class BuildNotificationManager(private val context: Context) {
 
     private val notificationManager =
         context.getSystemService(NotificationManager::class.java)
 
-    /**
-     * 创建 NotificationChannel（Android 8.0+ 必须）。
-     * 幂等：重复调用安全。
-     */
+
     fun createChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
@@ -52,12 +36,7 @@ class BuildNotificationManager(private val context: Context) {
         notificationManager.createNotificationChannel(channel)
     }
 
-    /**
-     * 显示或更新运行中任务的进度通知。
-     * 内部 500ms 节流：两次 [updateProgress] 间隔小于 500ms 时忽略。
-     *
-     * @param task 当前任务状态（RUNNING）
-     */
+
     fun updateProgress(task: BuildTask) {
         if (task.status != BuildTaskStatus.RUNNING) return
         val now = System.currentTimeMillis()
@@ -95,12 +74,7 @@ class BuildNotificationManager(private val context: Context) {
         notificationManager.notify(RUNNING_NOTIFICATION_ID, notification)
     }
 
-    /**
-     * 显示任务终态通知（成功/失败），并取消运行中通知。
-     * 每个任务使用独立的通知 id（基于 taskId hashCode），避免覆盖其他任务的结果。
-     *
-     * @param task 终态任务（SUCCESS 或 FAILED）
-     */
+
     fun showTerminal(task: BuildTask) {
         // 取消运行中通知
         notificationManager.cancel(RUNNING_NOTIFICATION_ID)
@@ -159,30 +133,23 @@ class BuildNotificationManager(private val context: Context) {
         notificationManager.notify(task.taskId.hashCode(), notification)
     }
 
-    /**
-     * 取消运行中通知（任务被取消时调用）。
-     */
     fun cancelRunning() {
         notificationManager.cancel(RUNNING_NOTIFICATION_ID)
     }
 
-    // 构建点击通知跳转 Intent（跳转到 MainActivity 并携带目标 tab 索引，由 MainScreen 路由到任务页）
     private fun buildContentIntent(): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            // 携带目标 tab 索引：MainActivity 通过 onNewIntent / onCreate 读取并透传到 MainScreen
             putExtra(EXTRA_TAB_INDEX, TAB_INDEX_TASK)
         }
         return PendingIntent.getActivity(
             context,
             ContentIntentConfig.REQUEST_CODE,
             intent,
-            // FLAG_UPDATE_CURRENT：extras 变化时复用同一个 PendingIntent 并更新其 extras
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 
-    // 成功通知中的安装操作：由 MainActivity 检查权限后再拉起系统安装器。
     private fun buildInstallPendingIntent(task: BuildTask): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -200,10 +167,8 @@ class BuildNotificationManager(private val context: Context) {
     }
 
     companion object {
-        // 运行中通知的固定 id（同时只执行一个任务，固定 id 便于更新）
         const val RUNNING_NOTIFICATION_ID = 1001
 
-        // 通知关键参数集中声明，便于调参
         private object NotificationConfig {
             // NotificationChannel id
             const val CHANNEL_ID = "build_task_channel"
@@ -212,13 +177,10 @@ class BuildNotificationManager(private val context: Context) {
             const val PROGRESS_THROTTLE_MS = 500L
         }
 
-        // 内容 Intent 相关参数
         private object ContentIntentConfig {
-            // PendingIntent requestCode（固定值，避免重复创建）
             const val REQUEST_CODE = 0
         }
     }
 
-    // 上次进度更新时间戳（用于节流，注意：实例级状态，BuildNotificationManager 为 factory 注入）
     private var lastProgressTime: Long = 0L
 }

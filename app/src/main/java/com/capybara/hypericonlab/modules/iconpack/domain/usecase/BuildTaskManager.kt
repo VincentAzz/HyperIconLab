@@ -1,15 +1,15 @@
-package com.capybara.hypericonlab.modules.icon.domain.usecase
+package com.capybara.hypericonlab.modules.iconpack.domain.usecase
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
-import com.capybara.hypericonlab.core.notification.BuildForegroundService
-import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
-import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
+import com.capybara.hypericonlab.modules.iconpack.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
+import com.capybara.hypericonlab.modules.iconpack.notification.BuildForegroundService
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -55,7 +55,6 @@ class BuildTaskManager(
     private val taskStore: BuildTaskStore
 ) {
 
-    /** 构建成功后请求前台应用拉起 APK 安装器。 */
     data class ApkInstallRequest(
         val taskId: String,
         val artifactUri: String
@@ -137,21 +136,12 @@ class BuildTaskManager(
         }
     }
 
-    /**
-     * 更新 appColorSchemes 缓存。由 IconViewModel 在加载完成后调用。
-     */
+    // 更新 appColorSchemes 缓存
     fun updateAppColorSchemes(schemes: Map<String, Pair<String, String>>) {
         appColorSchemes = schemes
     }
 
-    /**
-     * 提交构建任务。
-     *
-     * 提交时立即持久化预览图与缩略图（裁切自 storePreview），任务卡片在 PENDING 状态即可显示。
-     * 任务执行时 [BuildTaskExecutor] 不再重复保存图片。
-     *
-     * @return 创建的 [BuildTask]（PENDING 状态），用于 UI 反馈
-     */
+    // 提交构建任务
     fun submit(
         config: IconBuildConfig,
         configSnapshot: IconConfigState,
@@ -184,16 +174,12 @@ class BuildTaskManager(
             taskStore.savePreview(taskId, storePreview)
             if (thumbnail !== storePreview) thumbnail.recycle()
         }
-        _activeTasks.value = _activeTasks.value + task
+        _activeTasks.value += task
         scheduleNext()
         return task
     }
 
-    /**
-     * 取消任务。
-     * - RUNNING：取消执行协程，状态置 CANCELLED，从 activeTasks 移除（不进 finishedTasks）
-     * - PENDING：直接从队列移除，不执行
-     */
+    // 取消任务
     fun cancel(taskId: String) {
         val task = _activeTasks.value.find { it.taskId == taskId } ?: return
         if (task.status == BuildTaskStatus.RUNNING) {
@@ -205,16 +191,7 @@ class BuildTaskManager(
         }
     }
 
-    /**
-     * 重试失败任务。
-     * - 从 finishedTasks 移除原 FAILED 任务（同步清理其图片文件）
-     * - 用原配置创建新任务（新 taskId），需要调用方提供新的预览图
-     *
-     * @param originalTaskId 原 FAILED 任务 id
-     * @param storePreview 新的 store 预览图（基于 configSnapshot 重新生成）
-     * @param mainPreview 新的 main 预览图
-     * @return 新创建的 [BuildTask]（PENDING 状态），原任务不存在或非 FAILED 时返回 null
-     */
+    // 重试失败任务
     fun retry(
         originalTaskId: String,
         storePreview: Bitmap,
@@ -251,9 +228,8 @@ class BuildTaskManager(
         return newTask
     }
 
-    /**
-     * 删除已完成任务（同时清理其缩略图与预览图文件）。
-     */
+
+    // 删除已完成任务
     fun deleteFinished(taskId: String) {
         scope.launch {
             val updated = taskStore.deleteTask(taskId, _finishedTasks.value)
@@ -262,7 +238,7 @@ class BuildTaskManager(
         }
     }
 
-    // 调度下一个 PENDING 任务执行（串行：仅当没有正在执行的任务时才启动）
+    // 调度下一个 PENDING 任务执行
     private fun scheduleNext() {
         if (currentJob != null && currentJob?.isActive == true) return
         val nextTask = _activeTasks.value.find { it.status == BuildTaskStatus.PENDING } ?: return
@@ -271,7 +247,7 @@ class BuildTaskManager(
         }
     }
 
-    // 执行单个任务（在 buildDispatcher 单线程上）
+    // 执行单个任务
     private suspend fun executeTask(task: BuildTask) {
         val bundle = previewCache[task.taskId]
         if (bundle == null) {

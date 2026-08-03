@@ -24,8 +24,8 @@ import com.capybara.hypericonlab.core.designsystem.theme.LocalSmootherRoundedCor
 import com.capybara.hypericonlab.core.designsystem.theme.LocalUseGoogleSansFlex
 import com.capybara.hypericonlab.core.designsystem.util.LocalWindowLayoutInfo
 import com.capybara.hypericonlab.core.designsystem.util.rememberWindowLayoutInfo
-import com.capybara.hypericonlab.modules.icon.domain.iconpack.ApkInstaller
-import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.ApkInstaller
+import com.capybara.hypericonlab.modules.iconpack.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
 import kotlinx.coroutines.launch

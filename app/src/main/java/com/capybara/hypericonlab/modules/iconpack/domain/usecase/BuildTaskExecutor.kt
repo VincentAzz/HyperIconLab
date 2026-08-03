@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.domain.usecase
+package com.capybara.hypericonlab.modules.iconpack.domain.usecase
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -6,14 +6,15 @@ import android.graphics.BitmapFactory
 import com.capybara.hypericonlab.core.image.InnerShadowProcessor
 import com.capybara.hypericonlab.core.image.MaskAssetLoader
 import com.capybara.hypericonlab.core.mapper.IconMapperProcessor
-import com.capybara.hypericonlab.modules.icon.data.BuildArtifactWriter
-import com.capybara.hypericonlab.modules.icon.data.local.BuildTaskStore
-import com.capybara.hypericonlab.modules.icon.domain.iconpack.IconPackApkBuildService
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
-import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
+import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
+import com.capybara.hypericonlab.modules.iconpack.data.BuildArtifactWriter
+import com.capybara.hypericonlab.modules.iconpack.data.local.BuildTaskStore
+import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTaskStatus
+import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
+import com.capybara.hypericonlab.modules.iconpack.domain.packaging.IconPackApkBuildService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -62,7 +63,6 @@ class BuildTaskExecutor(
         )
         onUpdate(current)
 
-        // 临时工件文件（位于 filesDir/build_temp/，完成后删除）
         val tempDir = File(context.filesDir, ExecutorConfig.TEMP_DIRNAME).apply { mkdirs() }
         val tempArtifact = File(tempDir, "${task.taskId}.${task.productType.ext}")
         val renderedIconsZip = if (task.productType == ProductType.APK) {
@@ -71,34 +71,27 @@ class BuildTaskExecutor(
             tempArtifact
         }
 
-        // 执行结果（success 或 failure 之一），由 Flow 事件设置
         var result: BuildTask? = null
 
         try {
-            // 1. 通过 resourceManager 获取当前激活资源，读取 mapper
             val provider = resourceManager.getProvider()
             val mapperFileName = IconSetInfo.mapperFileName(task.iconSetId)
             val mapperMap = provider.openIconMapper(mapperFileName)
                 .use { stream -> IconMapperProcessor.parseIconMapper(stream) }
 
-            // 解析得到真实图标数量后，立即更新 current（任务卡片可显示真实数量）
             if (current.iconCount != mapperMap.size) {
                 current = current.copy(iconCount = mapperMap.size)
                 onUpdate(current)
             }
 
-            // 2. 通过 provider 获取 svgs 目录
             val svgDir = provider.getSvgDir()
                 ?: throw IllegalStateException("未找到 svgs 目录，请先解压资源")
 
-            // 3. 加载上层 mask bitmaps
             val maskBitmaps = task.config.masks.mapNotNull { loadMask(it) }
-            // 3.1 加载下层 mask bitmaps（仅双层启用时）
             val maskBitmaps2 = if (task.config.dualLayerEnabled) {
                 task.config.selectedMasks2.mapNotNull { loadMask(it) }
             } else emptyList()
 
-            // 3.2 加载内阴影 bitmap 并预合并多层强度（仅单层背景且启用内阴影时）
             val innerShadowBitmap =
                 if (task.config.innerShadow.enabled && !task.config.dualLayerEnabled) {
                     task.config.innerShadow.styleName?.let { styleName ->
@@ -119,7 +112,6 @@ class BuildTaskExecutor(
                     }
                 } else null
 
-            // 4. 调用流水线，写入临时文件
             pipeline.executeWithFiles(
                 config = task.config,
                 iconMap = mapperMap,
@@ -130,7 +122,6 @@ class BuildTaskExecutor(
                 maskBitmaps2 = maskBitmaps2,
                 innerShadowBitmap = innerShadowBitmap
             ).collect { state ->
-                // 协作式取消检查：在每个进度事件时响应取消
                 currentCoroutineContext().ensureActive()
                 when (state) {
                     is IconPipelineUseCase.PipelineProgress.Processing -> {
@@ -152,7 +143,6 @@ class BuildTaskExecutor(
                                 outputApk = tempArtifact
                             )
                         }
-                        // 5. 导出工件与预览图到公共 Documents
                         val artifactName =
                             "${ExecutorConfig.DEFAULT_ARTIFACT_BASENAME}.${task.productType.ext}"
                         val exported = artifactWriter.export(
@@ -165,8 +155,6 @@ class BuildTaskExecutor(
                         ) ?: run {
                             throw IllegalStateException("工件导出失败（可能缺少存储权限）")
                         }
-
-                        // 注：缩略图与预览图已由 BuildTaskManager.submit 提交时持久化，此处不再重复保存
 
                         val finishedAt = System.currentTimeMillis()
                         val successTask = current.copy(
@@ -200,7 +188,6 @@ class BuildTaskExecutor(
                 errorMessage = "流水线异常结束"
             )
         } catch (e: kotlinx.coroutines.CancellationException) {
-            // 协程取消：重新抛出，保持取消语义，由 BuildTaskManager 设置 CANCELLED 状态
             throw e
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Build task ${task.taskId} failed")
@@ -249,7 +236,6 @@ class BuildTaskExecutor(
     companion object {
         private const val TAG = "BuildTaskExecutor"
 
-        // 执行流程关键参数集中声明，便于调参
         private object ExecutorConfig {
             // assets 中烘焙内阴影文件所在目录（与 IconViewModel 保持一致）
             const val SHADOW_DIRNAME = "shadow_baked"

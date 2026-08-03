@@ -59,7 +59,6 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateS
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
-import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.toPrettyString
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.BuildOptionSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.FullScreenPreviewSheet
@@ -68,6 +67,7 @@ import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BackgroundTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.BorderTab
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs.ForegroundTab
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
+import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

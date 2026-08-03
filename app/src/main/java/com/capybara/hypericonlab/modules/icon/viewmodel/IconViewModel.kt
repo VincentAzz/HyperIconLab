@@ -13,7 +13,6 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
 import com.capybara.hypericonlab.modules.icon.domain.model.BgLayerUiState
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.icon.domain.model.CtcUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
@@ -22,14 +21,15 @@ import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import com.capybara.hypericonlab.modules.icon.domain.model.ImageFillingUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.PresetUiState
-import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.WallpaperUiState
 import com.capybara.hypericonlab.modules.icon.domain.render.ConfigColorResolver
-import com.capybara.hypericonlab.modules.icon.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
+import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
+import com.capybara.hypericonlab.modules.iconpack.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

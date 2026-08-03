@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.domain.iconpack
+package com.capybara.hypericonlab.modules.iconpack.domain.packaging
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties

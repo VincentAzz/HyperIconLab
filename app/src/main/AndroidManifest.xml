@@ -39,7 +39,7 @@
 
         <!-- 构建任务前台服务：dataSync 类型，承载构建进度通知，降低后台被杀概率 -->
         <service
-            android:name=".core.notification.BuildForegroundService"
+            android:name=".modules.iconpack.notification.BuildForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 

@@ -1,8 +1,8 @@
-package com.capybara.hypericonlab.modules.icon.data.local
+package com.capybara.hypericonlab.modules.iconpack.data.local
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.capybara.hypericonlab.modules.icon.domain.model.BuildTask
+import com.capybara.hypericonlab.modules.iconpack.domain.model.BuildTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
@@ -38,10 +38,8 @@ class BuildTaskStore(private val context: Context) {
     // List<BuildTask> 序列化器（泛型类型显式指定，避免 encode/decode 重载推断失败）
     private val taskListSerializer = ListSerializer(BuildTask.serializer())
 
-    /**
-     * 异步加载已完成任务列表。
-     * 读取失败（如 JSON 损坏）时返回空列表并删除损坏文件，避免后续反复失败。
-     */
+
+    // 异步加载已完成任务列表
     suspend fun loadFinishedTasks(): List<BuildTask> = withContext(Dispatchers.IO) {
         if (!taskListFile.exists()) return@withContext emptyList()
         try {
@@ -54,10 +52,8 @@ class BuildTaskStore(private val context: Context) {
         }
     }
 
-    /**
-     * 异步持久化已完成任务列表，自动应用容量上限。
-     * 超出上限时按 finishedAt 升序删除最旧任务的记录与图片文件。
-     */
+
+    // 异步持久化已完成任务列表，自动应用容量上限
     suspend fun saveFinishedTasks(tasks: List<BuildTask>) = withContext(Dispatchers.IO) {
         val trimmed = applyCapacityLimit(tasks)
         try {
@@ -68,9 +64,8 @@ class BuildTaskStore(private val context: Context) {
         }
     }
 
-    /**
-     * 保存任务缩略图（2 图标）为 PNG。
-     */
+
+    // 保存任务缩略图（2 图标）为 PNG
     suspend fun saveThumbnail(taskId: String, bitmap: Bitmap) = withContext(Dispatchers.IO) {
         thumbnailDir.mkdirs()
         val file = File(thumbnailDir, "$taskId${StoreConfig.IMAGE_EXT}")
@@ -83,9 +78,8 @@ class BuildTaskStore(private val context: Context) {
         }
     }
 
-    /**
-     * 保存任务预览图（8 图标）为 PNG。
-     */
+
+    // 保存任务预览图（8 图标）为 PNG
     suspend fun savePreview(taskId: String, bitmap: Bitmap) = withContext(Dispatchers.IO) {
         previewDir.mkdirs()
         val file = File(previewDir, "$taskId${StoreConfig.IMAGE_EXT}")
@@ -98,26 +92,22 @@ class BuildTaskStore(private val context: Context) {
         }
     }
 
-    /**
-     * 读取任务缩略图文件，不存在返回 null。
-     */
+
+    // 读取任务缩略图文件，不存在返回 null
     suspend fun loadThumbnail(taskId: String): File? = withContext(Dispatchers.IO) {
         val file = File(thumbnailDir, "$taskId${StoreConfig.IMAGE_EXT}")
         if (file.exists()) file else null
     }
 
-    /**
-     * 读取任务预览图文件，不存在返回 null。
-     */
+
+    // 读取任务预览图文件，不存在返回 null
     suspend fun loadPreview(taskId: String): File? = withContext(Dispatchers.IO) {
         val file = File(previewDir, "$taskId${StoreConfig.IMAGE_EXT}")
         if (file.exists()) file else null
     }
 
-    /**
-     * 删除单条任务：返回新列表（已移除该任务），并清理其缩略图与预览图文件。
-     * 调用方负责将返回值再次调用 [saveFinishedTasks] 持久化。
-     */
+
+    // 删除单条任务：返回新列表
     suspend fun deleteTask(
         taskId: String,
         currentList: List<BuildTask>
@@ -143,21 +133,20 @@ class BuildTaskStore(private val context: Context) {
     companion object {
         private const val TAG = "BuildTaskStore"
 
-        // 持久化关键参数集中声明，便于调参
         private object StoreConfig {
             // 已完成任务列表 JSON 文件名（位于 filesDir 根下）
             const val TASK_LIST_FILENAME = "build_tasks.json"
 
-            // 缩略图目录名（位于 filesDir 根下）
+            // 缩略图目录名
             const val THUMBNAIL_DIRNAME = "build_thumbnails"
 
-            // 预览图目录名（位于 filesDir 根下）
+            // 预览图目录名
             const val PREVIEW_DIRNAME = "build_previews"
 
             // 图片文件扩展名
             const val IMAGE_EXT = ".png"
 
-            // 图片压缩质量（PNG 无损，参数仅对 JPEG 生效，保留以备未来格式切换）
+            // 图片压缩质量
             const val IMAGE_QUALITY = 100
 
             // 已完成列表上限，超出时按完成时间删除最旧的

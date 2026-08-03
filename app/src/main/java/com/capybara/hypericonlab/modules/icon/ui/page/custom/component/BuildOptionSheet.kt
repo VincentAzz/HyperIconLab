@@ -34,7 +34,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
-import com.capybara.hypericonlab.modules.icon.domain.model.ProductType
+import com.capybara.hypericonlab.modules.iconpack.domain.model.ProductType
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
@@ -65,22 +65,7 @@ private object BuildOptionSheetConfig {
 }
 
 
-/**
- * 构建选项 Sheet：选择产物类型与图标集，确认后回调 [onConfirm]。
- *
- * 风格：复用 [FloatingBottomSheet] + [SheetTitle] + [ConfigCard] + [StyleChip]，
- * 与自定义页面（前景/背景 tab）的卡片+chip 风格保持一致。
- *
- * - 产物类型：仅展示 [ProductType.enabled] = true 的项；单选；一行一个
- * - 图标集：展示 [iconSets] 列表（full/filtered/test），单选；一行一个
- * - 确认按钮：未选中任一项时禁用（alpha=0.38）
- *
- * 一行一个 chip 的原因：产物类型与图标集文本较长（如 "zip (仅图标)"、"filtered · N 个图标"），
- * 一行两个会换行或截断，改为 fillMaxWidth 单列展示，间距与圆角参考 ForegroundTab。
- *
- * @param iconSets 可用图标集列表（由 IconViewModel.availableIconSets 提供）
- * @param onConfirm 回调参数为 (产物类型, 图标集)
- */
+// 构建选项 Sheet
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuildOptionSheet(
