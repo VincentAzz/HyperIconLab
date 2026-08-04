@@ -1,10 +1,9 @@
-package com.capybara.hypericonlab.modules.icon.viewmodel
+package com.capybara.hypericonlab.core.logging
 
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// 日志类型
 enum class LogType { INFO, ERROR, SUCCESS }
 
 data class LogEntry(
@@ -14,7 +13,5 @@ data class LogEntry(
     val duration: String? = null
 ) {
     val formattedTime: String
-        get() = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault()).format(
-            Date(timestamp)
-        )
+        get() = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault()).format(Date(timestamp))
 }

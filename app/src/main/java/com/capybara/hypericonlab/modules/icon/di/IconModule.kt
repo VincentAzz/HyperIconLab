@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.di
 
+import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.modules.build.data.BuildArtifactWriter
 import com.capybara.hypericonlab.modules.build.data.local.BuildTaskStore
 import com.capybara.hypericonlab.modules.build.domain.packaging.ApkInstallFacade
@@ -33,6 +34,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val iconModule = module {
+    single { AppLogStore() }
     single<InitializationStateRepository> { InitializationStateRepositoryImpl(get()) }
     single { AppM3PreprocessManager(get(), get(named("AppScope"))) }
     single {
@@ -43,7 +45,8 @@ val iconModule = module {
             buildTaskManager = get(),
             assetsFacade = get(),
             appM3PreprocessManager = get(),
-            stateRepository = get()
+            stateRepository = get(),
+            appLogStore = get()
         )
     }
     single { LawniconsResourceManager(get()) }
@@ -59,7 +62,7 @@ val iconModule = module {
     single<ApkInstallFacade> { ApkInstaller(get()) }
     // Notifier 用 single：内部缓存 channelCreated 状态，避免重复创建 NotificationChannel
     single { LawniconsUpdateNotifier(get()) }
-    single { LawniconsUpdateManager(get(), get(), get(), get(), get(), get(), get()) }
+    single { LawniconsUpdateManager(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory { ManageResourcesUseCase(get()) }
     factory { GeneratePreviewUseCase(get(), get()) }
     factory { IconPipelineUseCase(get()) }

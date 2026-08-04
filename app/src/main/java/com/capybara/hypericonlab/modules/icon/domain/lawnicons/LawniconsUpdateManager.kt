@@ -1,6 +1,8 @@
 package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 
 import android.content.Context
+import com.capybara.hypericonlab.core.logging.AppLogStore
+import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +21,8 @@ class LawniconsUpdateManager(
     private val resourceManager: LawniconsResourceManager,
     private val appSettingsRepository: AppSettingsRepository,
     private val notifier: LawniconsUpdateNotifier,
-    private val templateManager: IconPackTemplateManager
+    private val templateManager: IconPackTemplateManager,
+    private val appLogStore: AppLogStore
 ) {
     // 当前更新状态，供 UI 观察
     private val _state = MutableStateFlow<UpdateState>(UpdateState.Idle)
@@ -125,15 +128,48 @@ class LawniconsUpdateManager(
     }
 
     suspend fun checkAndInstallLawnicons(): Boolean {
+        appLogStore.add("资源更新：开始检查 Lawnicons 版本", LogType.INFO)
         val release = checkUpdate()
-        if (release != null) downloadAndInstall(release)
-        return state.value !is UpdateState.Failed
+        if (release != null) {
+            downloadAndInstall(release)
+        }
+        return logResourceUpdateResult()
     }
 
     suspend fun checkAndInstallLawniconsSilently(): Boolean {
+        appLogStore.add("初始化：开始检查 Lawnicons 版本", LogType.INFO)
         val release = checkUpdate(silent = true)
-        if (release != null) downloadAndInstall(release, silent = true)
-        return state.value !is UpdateState.Failed
+        if (release != null) {
+            downloadAndInstall(release, silent = true)
+        }
+        return logResourceUpdateResult()
+    }
+
+    private fun logResourceUpdateResult(): Boolean {
+        return when (val currentState = state.value) {
+            is UpdateState.Success -> {
+                appLogStore.add(
+                    "资源更新：已切换到 Lawnicons ${currentState.newVersion}",
+                    LogType.SUCCESS
+                )
+                true
+            }
+
+            UpdateState.UpToDate -> {
+                appLogStore.add("资源更新：Lawnicons 已是最新版本", LogType.INFO)
+                true
+            }
+
+            is UpdateState.Failed -> {
+                appLogStore.add(
+                    "资源更新：Lawnicons 更新失败（${currentState.reason}）",
+                    LogType.ERROR
+                )
+                false
+            }
+
+            else -> state.value !is UpdateState.Failed
+        }
     }
 
     // 重置状态为 Idle（UI 退出或用户确认后调用）
@@ -149,7 +185,15 @@ class LawniconsUpdateManager(
 
     // 模板与当前激活的云端 Lawnicons 版本严格绑定；内置回滚资源不下载模板。
     private suspend fun syncTemplates() {
-        runCatching { templateManager.ensureAvailable() }
+        appLogStore.add("资源更新：开始检查图标包 APK 模板", LogType.INFO)
+        val available = runCatching { templateManager.ensureAvailable() }.getOrDefault(false)
+        if (available) {
+            appLogStore.add("资源更新：图标包 APK 模板已准备完成", LogType.SUCCESS)
+        } else if (resourceManager.currentVersion.value.source == ResourceSource.REMOTE) {
+            appLogStore.add("资源更新：图标包 APK 模板不可用，APK 打包已禁用", LogType.ERROR)
+        } else {
+            appLogStore.add("资源更新：当前使用内置资源，跳过 APK 模板", LogType.INFO)
+        }
     }
 
     // 清理旧版本目录，保留当前激活版本
