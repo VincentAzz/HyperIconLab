@@ -47,9 +47,9 @@ import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreview
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
-import com.capybara.hypericonlab.modules.icon.viewmodel.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.render.image.StickerProcessor
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction

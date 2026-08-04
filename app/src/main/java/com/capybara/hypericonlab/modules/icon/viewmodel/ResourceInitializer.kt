@@ -32,7 +32,8 @@ class ResourceInitializer(
     private val assetsFacade: LawniconsAssetFacade,
     private val onLog: (String, LogType) -> Unit,
     private val onMapperReady: () -> Unit,
-    private val onPreviewNeeded: () -> Unit
+    private val onPreviewNeeded: () -> Unit,
+    private val onColorSchemesLoaded: (Map<String, Pair<String, String>>) -> Unit = {}
 ) {
     // 可用图标集列表
     private val _availableIconSets = MutableStateFlow<List<IconSetInfo>>(emptyList())
@@ -170,6 +171,7 @@ class ResourceInitializer(
             }
             // 同步给 BuildTaskManager，供 executor 执行任务时使用
             buildTaskManager.updateAppColorSchemes(appColorSchemes)
+            onColorSchemesLoaded(appColorSchemes)
             // 加载 App-M3 持久化缓存（使用与 WallpaperUiState 一致的默认配置）
             // App-M3 不暴露 paletteStyle/colorSpec 配置，使用固定默认值
             AppM3ColorCache.loadFromFile(

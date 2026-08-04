@@ -43,6 +43,9 @@ interface LawniconsAssetFacade {
     // 静默检查并安装 Lawnicons 与模板
     suspend fun checkAndInstallSilently()
 
+    // 仅静默检查并安装 Lawnicons 资源
+    suspend fun checkAndInstallLawniconsSilently(): Boolean
+
     // 重置主资源更新状态
     fun resetUpdateState()
 
@@ -93,6 +96,9 @@ class DefaultLawniconsAssetFacade(
     override suspend fun checkAndInstallSilently() {
         updateManager.checkAndInstallSilently()
     }
+
+    override suspend fun checkAndInstallLawniconsSilently(): Boolean =
+        updateManager.checkAndInstallLawniconsSilently()
 
     override fun resetUpdateState() {
         updateManager.resetState()

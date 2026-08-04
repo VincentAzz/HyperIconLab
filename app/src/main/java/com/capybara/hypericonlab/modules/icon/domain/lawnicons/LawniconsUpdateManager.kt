@@ -114,16 +114,26 @@ class LawniconsUpdateManager(
 
     // 一键检查并安装（便捷入口，供 UI 直接调用，失败发通知）
     suspend fun checkAndInstall() {
-        val release = checkUpdate()
-        if (release != null) downloadAndInstall(release)
+        checkAndInstallLawnicons()
         syncTemplates()
     }
 
     // 静默检查并安装（首次启动自动拉取用，失败不发通知，state 仍更新供 assets tab 观察）
     suspend fun checkAndInstallSilently() {
+        checkAndInstallLawniconsSilently()
+        syncTemplates()
+    }
+
+    suspend fun checkAndInstallLawnicons(): Boolean {
+        val release = checkUpdate()
+        if (release != null) downloadAndInstall(release)
+        return state.value !is UpdateState.Failed
+    }
+
+    suspend fun checkAndInstallLawniconsSilently(): Boolean {
         val release = checkUpdate(silent = true)
         if (release != null) downloadAndInstall(release, silent = true)
-        syncTemplates()
+        return state.value !is UpdateState.Failed
     }
 
     // 重置状态为 Idle（UI 退出或用户确认后调用）

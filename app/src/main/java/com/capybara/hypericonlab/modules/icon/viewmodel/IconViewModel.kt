@@ -25,6 +25,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.InnerShadowUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.PresetUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.StickerUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.WallpaperUiState
+import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
@@ -48,7 +49,8 @@ class IconViewModel(
     private val pipeline: IconPipelineUseCase,
     private val buildTaskManager: BuildTaskManager,
     private val assetsFacade: LawniconsAssetFacade,
-    private val appSettingsRepository: AppSettingsRepository
+    private val appSettingsRepository: AppSettingsRepository,
+    private val appM3PreprocessManager: AppM3PreprocessManager
 ) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
@@ -153,7 +155,8 @@ class IconViewModel(
         assetsFacade = assetsFacade,
         onLog = { message, type -> addLog(message, type) },
         onMapperReady = { },
-        onPreviewNeeded = { generateLivePreview() }
+        onPreviewNeeded = { generateLivePreview() },
+        onColorSchemesLoaded = appM3PreprocessManager::updateAppColorSchemes
     )
 
     // 资源初始化器管理的状态，此处转发对外暴露
@@ -251,12 +254,7 @@ class IconViewModel(
         onScanInnerShadowAssets = { innerShadowAssetScanner.scan() }
     )
 
-    // App-M3 预处理管理器：供设置页主动触发预处理并展示进度
-    private val appM3PreprocessManager = AppM3PreprocessManager(
-        context = context,
-        scope = viewModelScope,
-        appColorSchemesProvider = { appColorSchemes }
-    )
+    // App-M3 预处理管理器：由应用级作用域维护，供设置页主动触发预处理
     val appM3PreprocessState: StateFlow<AppM3PreprocessManager.PreprocessState> =
         appM3PreprocessManager.state
 

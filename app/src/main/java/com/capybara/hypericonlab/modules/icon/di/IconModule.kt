@@ -22,15 +22,30 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateNotifier
 import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationStateRepository
+import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
+import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val iconModule = module {
     single<InitializationStateRepository> { InitializationStateRepositoryImpl(get()) }
+    single { AppM3PreprocessManager(get(), get(named("AppScope"))) }
+    single {
+        InitializationCoordinator(
+            context = get(),
+            scope = get(named("AppScope")),
+            manageResourcesUseCase = get(),
+            buildTaskManager = get(),
+            assetsFacade = get(),
+            appM3PreprocessManager = get(),
+            stateRepository = get()
+        )
+    }
     single { LawniconsResourceManager(get()) }
     single { LawniconsApiService() }
     single { LawniconsDownloadService(get()) }
