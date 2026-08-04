@@ -56,10 +56,16 @@ fun InitializationCard(
     val hasStarted = remember(state.tasks) {
         state.tasks.any { it.status != InitializationTaskStatus.PENDING }
     }
-    val progressTask = state.tasks.firstOrNull { it.task == state.activeTask }
-    val progress = progressTask?.progress?.coerceIn(0f, 1f) ?: 0f
+    val activeTaskState = state.tasks.firstOrNull {
+        it.status == InitializationTaskStatus.RUNNING
+    }
+    val fallbackTaskState = state.tasks.lastOrNull {
+        it.status == InitializationTaskStatus.COMPLETED
+    }
+    val displayTaskState = activeTaskState ?: fallbackTaskState
+    val progress = displayTaskState?.progress?.coerceIn(0f, 1f) ?: 0f
 
-    val isRunning = state.activeTask != null && hasStarted && !hasFailure && !state.isCompleted
+    val isRunning = displayTaskState != null && hasStarted && !hasFailure && !state.isCompleted
     val isAssetUpdate = state.resourceVersion != null || state.templateVersion != null
 
     SegmentedColumn(
@@ -199,7 +205,6 @@ private fun RunningHeaderContent(
     state: InitializationState,
     progress: Float
 ) {
-    val task = state.activeTask
     val runningTaskTitle =
         state.tasks.firstOrNull { it.status == InitializationTaskStatus.RUNNING }?.task?.let {
             when (it) {
@@ -207,7 +212,10 @@ private fun RunningHeaderContent(
                 InitializationTask.APK_TEMPLATE -> "从仓库拉取图标包 APK 模板"
                 InitializationTask.APP_M3_CACHE -> "生成颜色映射缓存"
             }
-        } ?: "正在初始化..."
+        } ?: state.activeTask?.let { taskTitle(it) }
+        ?: state.tasks.lastOrNull { it.status == InitializationTaskStatus.COMPLETED }
+            ?.task?.let { taskTitle(it) }
+        ?: "正在初始化..."
 
     Column {
         Row(
@@ -245,4 +253,10 @@ private fun RunningHeaderContent(
             )
         }
     }
+}
+
+private fun taskTitle(task: InitializationTask): String = when (task) {
+    InitializationTask.LAWNICONS -> "从仓库拉取 Lawnicons 资源"
+    InitializationTask.APK_TEMPLATE -> "从仓库拉取图标包 APK 模板"
+    InitializationTask.APP_M3_CACHE -> "生成颜色映射缓存"
 }
