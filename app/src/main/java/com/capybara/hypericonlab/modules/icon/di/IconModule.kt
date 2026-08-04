@@ -11,6 +11,7 @@ import com.capybara.hypericonlab.modules.build.domain.packaging.IconPackSigningK
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskExecutor
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.build.notification.BuildNotificationManager
+import com.capybara.hypericonlab.modules.icon.data.repository.InitializationStateRepositoryImpl
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.DefaultLawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateArchive
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateManager
@@ -20,6 +21,7 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsDownload
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateNotifier
+import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationStateRepository
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
@@ -28,6 +30,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val iconModule = module {
+    single<InitializationStateRepository> { InitializationStateRepositoryImpl(get()) }
     single { LawniconsResourceManager(get()) }
     single { LawniconsApiService() }
     single { LawniconsDownloadService(get()) }

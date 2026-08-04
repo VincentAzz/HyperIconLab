@@ -1,10 +1,12 @@
 package com.capybara.hypericonlab.modules.settings.data.local
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -44,6 +46,21 @@ class AppDataStore(
             stringPreferencesKey("ui_floating_bottom_bar_compact_type")
         val LAST_MAIN_PAGE_INDEX = intPreferencesKey("last_main_page_index")
         val UI_USE_DOWNLOAD_PROXY = booleanPreferencesKey("ui_use_download_proxy")
+        val INITIALIZATION_COMPLETED = booleanPreferencesKey("initialization_completed")
+        val INITIALIZATION_COMPLETED_TASKS = stringPreferencesKey("initialization_completed_tasks")
+        val INITIALIZATION_ACTIVE_TASK = stringPreferencesKey("initialization_active_task")
+        val INITIALIZATION_RESOURCE_VERSION =
+            stringPreferencesKey("initialization_resource_version")
+        val INITIALIZATION_TEMPLATE_VERSION =
+            stringPreferencesKey("initialization_template_version")
+        val INITIALIZATION_CACHE_SOURCE_VERSION =
+            stringPreferencesKey("initialization_cache_source_version")
+        val INITIALIZATION_CACHE_CONFIG_VERSION =
+            stringPreferencesKey("initialization_cache_config_version")
+        val INITIALIZATION_FAILED_TASK = stringPreferencesKey("initialization_failed_task")
+        val INITIALIZATION_FAILURE_MESSAGE =
+            stringPreferencesKey("initialization_failure_message")
+        val INITIALIZATION_FAILURE_AT = longPreferencesKey("initialization_failure_at")
     }
 
     suspend fun putString(key: Preferences.Key<String>, value: String) {
@@ -66,4 +83,8 @@ class AppDataStore(
 
     fun getBoolean(key: Preferences.Key<Boolean>, default: Boolean = false): Flow<Boolean> =
         dataStore.data.map { it[key] ?: default }
+
+    suspend fun edit(transform: suspend (MutablePreferences) -> Unit) {
+        dataStore.edit(transform)
+    }
 }
