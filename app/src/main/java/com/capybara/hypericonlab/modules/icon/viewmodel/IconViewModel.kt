@@ -166,6 +166,10 @@ class IconViewModel(
     val appColorSchemes: Map<String, Pair<String, String>>
         get() = initializationCoordinator.appColorSchemes.value
 
+    fun startInitialization() {
+        initializationCoordinator.startInitialization()
+    }
+
     // 内阴影资源扫描器：扫描 assets/shadow_baked/ 构建形状 → 样式映射
     private val innerShadowAssetScanner = InnerShadowAssetScanner(
         context = context,

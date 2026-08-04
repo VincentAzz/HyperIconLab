@@ -24,6 +24,7 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateS
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
+import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
 import kotlinx.coroutines.launch
@@ -43,6 +44,7 @@ fun AssetsTab(
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val assetsFacade = koinInject<LawniconsAssetFacade>()
+    val initializationCoordinator = koinInject<InitializationCoordinator>()
     val appSettingsRepository = koinInject<AppSettingsRepository>()
     val scope = rememberCoroutineScope()
 
@@ -219,6 +221,7 @@ fun AssetsTab(
                                     scope.launch {
                                         assetsFacade.clearCloudAssets()
                                         assetsFacade.resetUpdateState()
+                                        initializationCoordinator.resetForManualInitialization()
                                     }
                                 })
                         })

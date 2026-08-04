@@ -1,6 +1,7 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.home
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -17,7 +20,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
@@ -25,20 +34,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.modules.icon.ui.page.home.component.InitializationCard
+import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 
-/**
- * 主页：已清空为空白页，保留 Scaffold + TopAppBar 框架，后续作为预设页面容器。
- *
- * 已移除内容：
- * - 状态文本、生成预览图按钮、生成测试包按钮、生成常用包按钮
- * - 日志 IconButton 与 LogSheet 调用（LogSheet 组件文件保留备用）
- *
- * @param outerPadding 外层 Scaffold 提供的 padding
- * @param windowInsetsSides 可选窗口Insets侧边过滤
- */
+private object HomePageDefaults {
+    val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+}
+
 @OptIn(
     ExperimentalMaterial3ExpressiveApi::class,
     ExperimentalMaterial3Api::class
@@ -47,10 +52,27 @@ import top.yukonga.miuix.kmp.blur.layerBackdrop
 fun HomePage(
     modifier: Modifier = Modifier,
     themeViewModel: SettingsViewModel = koinViewModel(),
+    iconViewModel: IconViewModel = koinViewModel(),
     outerPadding: PaddingValues = PaddingValues(0.dp),
     windowInsetsSides: WindowInsetsSides? = null
 ) {
     val themeState by themeViewModel.state.collectAsStateWithLifecycle()
+    val initializationState by iconViewModel.initializationState.collectAsStateWithLifecycle()
+    var completedCardVisible by rememberSaveable { mutableStateOf(true) }
+    val latestInitializationState by rememberUpdatedState(initializationState)
+
+    LaunchedEffect(initializationState.isCompleted) {
+        if (!initializationState.isCompleted) {
+            completedCardVisible = true
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            if (latestInitializationState.isCompleted) {
+                completedCardVisible = false
+            }
+        }
+    }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val backdrop = rememberMaterial3BlurBackdrop(themeState.useBlur)
@@ -76,11 +98,6 @@ fun HomePage(
             )
         }
     ) { paddingValues ->
-        // 空白内容区，后续接入预设卡片
-        // 关键：参照设置页实现，layerBackdrop 放在最外层（不带 padding），
-        // 让 backdrop 捕获区域覆盖整个 Scaffold content（含 TopAppBar 下方位置），
-        // TopAppBar 通过 appBarBlurEffect 采样 backdrop 时才能取到内容；
-        // padding 放到内层 Box，不挤占 backdrop 捕获区域。
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -99,7 +116,22 @@ fun HomePage(
                         ),
                         bottom = outerPadding.calculateBottomPadding()
                     )
-            )
+            ) {
+                if (!initializationState.isCompleted || completedCardVisible) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(HomePageDefaults.ContentPadding)
+                    ) {
+                        InitializationCard(
+                            state = initializationState,
+                            onStart = iconViewModel::startInitialization,
+                            onRetry = iconViewModel::startInitialization
+                        )
+                    }
+                }
+            }
         }
     }
 }

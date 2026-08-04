@@ -22,6 +22,7 @@ import com.capybara.hypericonlab.modules.render.AppM3ColorCache
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,12 +51,15 @@ class InitializationCoordinator(
     val resourcesReadyVersion: StateFlow<String?> = _resourcesReadyVersion.asStateFlow()
 
     private var initializationJob: Job? = null
+    private var resetJob: Job? = null
 
     @Synchronized
     fun startInitialization(): Job {
         initializationJob?.takeIf { it.isActive }?.let { return it }
         return scope.launch {
             try {
+                resetJob?.join()
+                resetJob = null
                 runInitialization()
             } finally {
                 synchronized(this@InitializationCoordinator) {
@@ -67,6 +71,15 @@ class InitializationCoordinator(
 
     fun cancelInitialization() {
         initializationJob?.cancel()
+    }
+
+    fun resetForManualInitialization() {
+        initializationJob?.cancel()
+        _state.value = InitializationState()
+        appLogStore.add("初始化已重置，等待手动开始", LogType.INFO)
+        resetJob = scope.launch {
+            stateRepository.clear()
+        }
     }
 
     private suspend fun runInitialization() {
@@ -109,8 +122,15 @@ class InitializationCoordinator(
         val observer = scope.launch {
             assetsFacade.updateState.collect { updateState ->
                 val progress = when (updateState) {
-                    is UpdateState.Downloading -> updateState.progress
-                    is UpdateState.Extracting -> updateState.progress
+                    is UpdateState.Downloading ->
+                        updateState.progress * LAWNICONS_DOWNLOAD_WEIGHT
+
+                    is UpdateState.Extracting ->
+                        LAWNICONS_DOWNLOAD_WEIGHT +
+                                updateState.progress * LAWNICONS_EXTRACT_WEIGHT
+
+                    UpdateState.UpToDate,
+                    is UpdateState.Success -> 1f
                     else -> 0f
                 }
                 markTask(InitializationTask.LAWNICONS, InitializationTaskStatus.RUNNING, progress)
@@ -120,6 +140,7 @@ class InitializationCoordinator(
             ensureBuiltInResources()
             val installed = assetsFacade.checkAndInstallLawniconsSilently()
             if (!installed) {
+                observer.cancelAndJoin()
                 assetsFacade.switchToAssets()
                 loadCurrentColorSchemes()
                 publishResourcesReady()
@@ -130,6 +151,7 @@ class InitializationCoordinator(
                 appLogStore.add("初始化：Lawnicons 拉取失败，已切换至内置资源", LogType.ERROR)
                 return
             }
+            observer.cancelAndJoin()
             completeTask(
                 task = InitializationTask.LAWNICONS,
                 message = "Lawnicons 资源已准备完成",
@@ -141,6 +163,7 @@ class InitializationCoordinator(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            observer.cancelAndJoin()
             assetsFacade.switchToAssets()
             loadCurrentColorSchemes()
             publishResourcesReady()
@@ -150,7 +173,7 @@ class InitializationCoordinator(
             )
             appLogStore.add("初始化：Lawnicons 资源准备失败，已切换至内置资源", LogType.ERROR)
         } finally {
-            observer.cancel()
+            observer.cancelAndJoin()
         }
     }
 
@@ -222,6 +245,7 @@ class InitializationCoordinator(
         try {
             loadCurrentColorSchemes()
             appM3PreprocessManager.preprocessNow()
+            observer.cancelAndJoin()
             completeTask(
                 task = InitializationTask.APP_M3_CACHE,
                 message = "颜色映射缓存已生成",
@@ -232,20 +256,21 @@ class InitializationCoordinator(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            observer.cancelAndJoin()
             failTask(
                 task = InitializationTask.APP_M3_CACHE,
                 message = e.message ?: "颜色映射缓存生成失败"
             )
             appLogStore.add("初始化：App-M3 颜色映射缓存生成失败", LogType.ERROR)
         } finally {
-            observer.cancel()
+            observer.cancelAndJoin()
         }
     }
 
     private suspend fun ensureBuiltInResources() {
         val lawniconsDir = File(context.filesDir, RESOURCE_DIRECTORY)
         if (!lawniconsDir.exists() || lawniconsDir.list()?.isEmpty() == true) {
-            manageResourcesUseCase.performUnzip()
+            manageResourcesUseCase.performUnzip { }
         }
         assetsFacade.refresh()
         loadCurrentColorSchemes()
@@ -396,5 +421,7 @@ class InitializationCoordinator(
     private companion object {
         const val RESOURCE_DIRECTORY = "lawnicons"
         const val COLOR_SCHEMES_FILE = "app_color_schemes.xml"
+        const val LAWNICONS_DOWNLOAD_WEIGHT = 0.5f
+        const val LAWNICONS_EXTRACT_WEIGHT = 0.5f
     }
 }
