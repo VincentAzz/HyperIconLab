@@ -43,14 +43,13 @@ curl -o CategorySymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+
 curl -o DeleteSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/delete.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o SearchSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/search.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o SearchOffSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/search_off.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
-
-
 curl -o ArchiveSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/archive.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o CloudDownloadSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/cloud_download.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
-curl -o Symbol.kt ""
-curl -o Symbol.kt ""
-curl -o Symbol.kt ""
-curl -o Symbol.kt ""
+
+curl -o ArrowRightAltSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/arrow_right_alt.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o ErrorSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/error.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o CheckCircleSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/check_circle.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o CircleSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/circle.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o Symbol.kt ""
 curl -o Symbol.kt ""
 curl -o Symbol.kt ""
