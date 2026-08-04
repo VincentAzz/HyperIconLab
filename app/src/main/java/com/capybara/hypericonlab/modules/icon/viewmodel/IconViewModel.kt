@@ -10,6 +10,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.core.logging.AppLogStore
+import com.capybara.hypericonlab.core.logging.LogEntry
+import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.build.domain.model.ProductType
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
@@ -28,6 +31,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.WallpaperUiState
 import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
 import com.capybara.hypericonlab.modules.icon.domain.usecase.IconPipelineUseCase
+import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import com.capybara.hypericonlab.modules.icon.domain.usecase.ManageResourcesUseCase
 import com.capybara.hypericonlab.modules.render.ConfigColorResolver
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
@@ -50,7 +54,9 @@ class IconViewModel(
     private val buildTaskManager: BuildTaskManager,
     private val assetsFacade: LawniconsAssetFacade,
     private val appSettingsRepository: AppSettingsRepository,
-    private val appM3PreprocessManager: AppM3PreprocessManager
+    private val appM3PreprocessManager: AppM3PreprocessManager,
+    private val initializationCoordinator: InitializationCoordinator,
+    private val appLogStore: AppLogStore
 ) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
@@ -146,24 +152,19 @@ class IconViewModel(
     private val wallpaperColorScheme: StateFlow<MonetColorExtractor.WallpaperColorScheme?> =
         wallpaperManager.wallpaperColorScheme
 
-    // 资源初始化器：管理图标集扫描/自动解压/配色加载，通过回调解耦日志与预览触发
+    // 资源初始化器：扫描图标集并在协调器准备资源后触发预览
     private val resourceInitializer = ResourceInitializer(
-        context = context,
         scope = viewModelScope,
-        manageResourcesUseCase = manageResourcesUseCase,
-        buildTaskManager = buildTaskManager,
         assetsFacade = assetsFacade,
-        onLog = { message, type -> addLog(message, type) },
-        onMapperReady = { },
-        onPreviewNeeded = { generateLivePreview() },
-        onColorSchemesLoaded = appM3PreprocessManager::updateAppColorSchemes
+        onPreviewNeeded = { generateLivePreview() }
     )
 
     // 资源初始化器管理的状态，此处转发对外暴露
     val availableIconSets: StateFlow<List<IconSetInfo>> = resourceInitializer.availableIconSets
     val mapperExists: StateFlow<Boolean> = resourceInitializer.mapperExists
+    val initializationState = initializationCoordinator.state
     val appColorSchemes: Map<String, Pair<String, String>>
-        get() = resourceInitializer.appColorSchemes
+        get() = initializationCoordinator.appColorSchemes.value
 
     // 内阴影资源扫描器：扫描 assets/shadow_baked/ 构建形状 → 样式映射
     private val innerShadowAssetScanner = InnerShadowAssetScanner(
@@ -177,8 +178,7 @@ class IconViewModel(
     val lastPackDuration: StateFlow<Long?> = _lastPackDuration.asStateFlow()
 
     // 日志管理器：封装日志状态流与添加/清空，ViewModel 转发对外暴露
-    private val logger = IconLogger()
-    val logs: StateFlow<List<LogEntry>> = logger.logs
+    val logs: StateFlow<List<LogEntry>> = appLogStore.logs
 
     // 预览协调器：管理 store/main 预览位图与生成流程，通过 provider/回调解耦 ViewModel 状态
     private val previewCoordinator = PreviewCoordinator(
@@ -279,10 +279,16 @@ class IconViewModel(
                 current.copy(previewThemeMode = if (isDark) "dark" else "light")
             }
 
-            // 资源初始化（自动解压/mapper 就绪/初始预览）由 ResourceInitializer 统一管理
-            resourceInitializer.autoInitializeResources()
+            initializationCoordinator.startInitialization()
         }
-        resourceInitializer.loadColorSchemes()
+        viewModelScope.launch {
+            initializationCoordinator.resourcesReadyVersion.collect { version ->
+                if (version != null) {
+                    resourceInitializer.markResourcesReady()
+                    resourceInitializer.loadAvailableIconSets()
+                }
+            }
+        }
         progressCountdownObserver.observe()
         configSyncObserver.observe()
         loadDefaultWallpaper()
@@ -291,9 +297,10 @@ class IconViewModel(
         resourceInitializer.observeResourceChanges()
     }
 
-    private fun addLog(message: String, type: LogType = LogType.INFO) = logger.addLog(message, type)
+    private fun addLog(message: String, type: LogType = LogType.INFO) =
+        appLogStore.add(message, type)
 
-    fun clearLogs() = logger.clearLogs()
+    fun clearLogs() = appLogStore.clear()
 
     fun updateConfig(update: (IconConfigState) -> IconConfigState) {
         _config.value = update(_config.value)

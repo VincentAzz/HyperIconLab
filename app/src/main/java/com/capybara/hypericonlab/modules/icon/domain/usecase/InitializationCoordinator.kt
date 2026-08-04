@@ -4,6 +4,8 @@ import android.content.Context
 import com.capybara.hypericonlab.core.color.AppColorSchemesLoader
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.logging.AppLogStore
+import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
@@ -34,10 +36,18 @@ class InitializationCoordinator(
     private val buildTaskManager: BuildTaskManager,
     private val assetsFacade: LawniconsAssetFacade,
     private val appM3PreprocessManager: AppM3PreprocessManager,
-    private val stateRepository: InitializationStateRepository
+    private val stateRepository: InitializationStateRepository,
+    private val appLogStore: AppLogStore
 ) {
     private val _state = MutableStateFlow(InitializationState())
     val state: StateFlow<InitializationState> = _state.asStateFlow()
+
+    private val _appColorSchemes = MutableStateFlow<Map<String, Pair<String, String>>>(emptyMap())
+    val appColorSchemes: StateFlow<Map<String, Pair<String, String>>> =
+        _appColorSchemes.asStateFlow()
+
+    private val _resourcesReadyVersion = MutableStateFlow<String?>(null)
+    val resourcesReadyVersion: StateFlow<String?> = _resourcesReadyVersion.asStateFlow()
 
     private var initializationJob: Job? = null
 
@@ -62,8 +72,20 @@ class InitializationCoordinator(
     private suspend fun runInitialization() {
         val persisted = stateRepository.state.first()
         val validCompletedTasks = validCompletedTasks(persisted)
+        val wasCompleted = persisted.isCompleted &&
+                validCompletedTasks.size == InitializationTask.entries.size
+        if (validCompletedTasks.isEmpty()) {
+            appLogStore.add("开始初始化资源", LogType.INFO)
+        } else if (validCompletedTasks.size < InitializationTask.entries.size) {
+            appLogStore.add("继续未完成的初始化任务", LogType.INFO)
+        }
         _state.value = restoreState(persisted, validCompletedTasks)
         persistCurrentState()
+
+        if (InitializationTask.LAWNICONS in validCompletedTasks) {
+            loadCurrentColorSchemes()
+            publishResourcesReady()
+        }
 
         if (InitializationTask.LAWNICONS !in validCompletedTasks) {
             runLawniconsTask()
@@ -76,9 +98,13 @@ class InitializationCoordinator(
         }
 
         persistCurrentState()
+        if (_state.value.isCompleted && !wasCompleted) {
+            appLogStore.add("初始化完成", LogType.SUCCESS)
+        }
     }
 
     private suspend fun runLawniconsTask() {
+        appLogStore.add("初始化：开始准备 Lawnicons 资源", LogType.INFO)
         markTask(InitializationTask.LAWNICONS, InitializationTaskStatus.RUNNING)
         val observer = scope.launch {
             assetsFacade.updateState.collect { updateState ->
@@ -95,10 +121,13 @@ class InitializationCoordinator(
             val installed = assetsFacade.checkAndInstallLawniconsSilently()
             if (!installed) {
                 assetsFacade.switchToAssets()
+                loadCurrentColorSchemes()
+                publishResourcesReady()
                 failTask(
                     task = InitializationTask.LAWNICONS,
                     message = "云端 Lawnicons 资源拉取失败，已切换至内置资源"
                 )
+                appLogStore.add("初始化：Lawnicons 拉取失败，已切换至内置资源", LogType.ERROR)
                 return
             }
             completeTask(
@@ -106,14 +135,20 @@ class InitializationCoordinator(
                 message = "Lawnicons 资源已准备完成",
                 resourceVersion = assetsFacade.currentVersion.value.version
             )
+            loadCurrentColorSchemes()
+            publishResourcesReady()
+            appLogStore.add("初始化：Lawnicons 资源准备完成", LogType.SUCCESS)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             assetsFacade.switchToAssets()
+            loadCurrentColorSchemes()
+            publishResourcesReady()
             failTask(
                 task = InitializationTask.LAWNICONS,
                 message = e.message ?: "Lawnicons 资源准备失败，已切换至内置资源"
             )
+            appLogStore.add("初始化：Lawnicons 资源准备失败，已切换至内置资源", LogType.ERROR)
         } finally {
             observer.cancel()
         }
@@ -126,9 +161,11 @@ class InitializationCoordinator(
                 status = InitializationTaskStatus.SKIPPED,
                 message = "当前使用内置资源，无需图标包 APK 模板"
             )
+            appLogStore.add("初始化：当前使用内置资源，跳过 APK 模板", LogType.INFO)
             return
         }
 
+        appLogStore.add("初始化：开始准备图标包 APK 模板", LogType.INFO)
         markTask(InitializationTask.APK_TEMPLATE, InitializationTaskStatus.RUNNING)
         try {
             val available = assetsFacade.ensureTemplateAvailable { progress ->
@@ -150,6 +187,7 @@ class InitializationCoordinator(
                 message = "图标包 APK 模板已准备完成",
                 templateVersion = assetsFacade.currentVersion.value.version
             )
+            appLogStore.add("初始化：图标包 APK 模板准备完成", LogType.SUCCESS)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -157,10 +195,12 @@ class InitializationCoordinator(
                 task = InitializationTask.APK_TEMPLATE,
                 message = e.message ?: "图标包 APK 模板准备失败，APK 打包已禁用"
             )
+            appLogStore.add("初始化：图标包 APK 模板准备失败，APK 打包已禁用", LogType.ERROR)
         }
     }
 
     private suspend fun runAppM3Task() {
+        appLogStore.add("初始化：开始生成 App-M3 颜色映射缓存", LogType.INFO)
         markTask(InitializationTask.APP_M3_CACHE, InitializationTaskStatus.RUNNING)
         val observer = scope.launch {
             appM3PreprocessManager.state.collect { preprocessState ->
@@ -180,9 +220,7 @@ class InitializationCoordinator(
             }
         }
         try {
-            val schemes = loadColorSchemes()
-            buildTaskManager.updateAppColorSchemes(schemes)
-            appM3PreprocessManager.updateAppColorSchemes(schemes)
+            loadCurrentColorSchemes()
             appM3PreprocessManager.preprocessNow()
             completeTask(
                 task = InitializationTask.APP_M3_CACHE,
@@ -190,6 +228,7 @@ class InitializationCoordinator(
                 cacheSourceVersion = assetsFacade.currentVersion.value.version,
                 cacheConfigVersion = InitializationCacheConfig.VERSION
             )
+            appLogStore.add("初始化：App-M3 颜色映射缓存生成完成", LogType.SUCCESS)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -197,6 +236,7 @@ class InitializationCoordinator(
                 task = InitializationTask.APP_M3_CACHE,
                 message = e.message ?: "颜色映射缓存生成失败"
             )
+            appLogStore.add("初始化：App-M3 颜色映射缓存生成失败", LogType.ERROR)
         } finally {
             observer.cancel()
         }
@@ -208,9 +248,11 @@ class InitializationCoordinator(
             manageResourcesUseCase.performUnzip()
         }
         assetsFacade.refresh()
+        loadCurrentColorSchemes()
+        publishResourcesReady()
     }
 
-    private suspend fun loadColorSchemes(): Map<String, Pair<String, String>> {
+    private suspend fun loadCurrentColorSchemes() {
         val schemes = runCatching {
             assetsFacade.getProvider()
                 .openColorSchemes(COLOR_SCHEMES_FILE)
@@ -221,7 +263,13 @@ class InitializationCoordinator(
             paletteStyle = PaletteStyle.TonalSpot,
             colorSpec = ThemeColorSpec.SPEC_2021
         )
-        return schemes
+        _appColorSchemes.value = schemes
+        buildTaskManager.updateAppColorSchemes(schemes)
+        appM3PreprocessManager.updateAppColorSchemes(schemes)
+    }
+
+    private fun publishResourcesReady() {
+        _resourcesReadyVersion.value = assetsFacade.currentVersion.value.version
     }
 
     private fun completedTasks(): Set<InitializationTask> = _state.value.tasks
