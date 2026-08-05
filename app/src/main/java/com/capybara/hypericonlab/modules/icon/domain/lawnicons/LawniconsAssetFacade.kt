@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 
+import com.capybara.hypericonlab.modules.icon.domain.repository.AssetUpdateCheckTrigger
 import kotlinx.coroutines.flow.StateFlow
 
 // Lawnicons 资源对应用层的统一入口
@@ -12,6 +13,12 @@ interface LawniconsAssetFacade {
 
     // 纯检查阶段的资产更新状态
     val assetCheckState: StateFlow<AssetUpdateCheckState>
+
+    // 上次自动检查时间
+    val lastAutomaticAssetCheckAt: StateFlow<Long?>
+
+    // 上次手动检查时间
+    val lastManualAssetCheckAt: StateFlow<Long?>
 
     // 图标包模板状态
     val templateState: StateFlow<IconPackTemplateState>
@@ -44,7 +51,21 @@ interface LawniconsAssetFacade {
     suspend fun checkAndInstall()
 
     // 仅检查 Lawnicons 与 APK 模板更新，不执行下载
-    suspend fun checkForAssetUpdates(): AssetUpdateCheckState
+    suspend fun checkForAssetUpdates(
+        trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL
+    ): AssetUpdateCheckState
+
+    // 判断指定类型的检查是否已结束冷却
+    fun canCheckForAssetUpdates(
+        trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL,
+        now: Long = System.currentTimeMillis()
+    ): Boolean
+
+    // 获取指定类型检查的剩余冷却时间
+    fun assetCheckCooldownRemainingMs(
+        trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL,
+        now: Long = System.currentTimeMillis()
+    ): Long
 
     // 静默检查并安装 Lawnicons 与模板
     suspend fun checkAndInstallSilently()
@@ -77,6 +98,12 @@ class DefaultLawniconsAssetFacade(
     override val assetCheckState: StateFlow<AssetUpdateCheckState>
         get() = updateManager.assetCheckState
 
+    override val lastAutomaticAssetCheckAt: StateFlow<Long?>
+        get() = updateManager.lastAutomaticAssetCheckAt
+
+    override val lastManualAssetCheckAt: StateFlow<Long?>
+        get() = updateManager.lastManualAssetCheckAt
+
     override val templateState: StateFlow<IconPackTemplateState>
         get() = templateManager.state
 
@@ -105,8 +132,19 @@ class DefaultLawniconsAssetFacade(
         updateManager.checkAndInstall()
     }
 
-    override suspend fun checkForAssetUpdates(): AssetUpdateCheckState =
-        updateManager.checkForAssetUpdates()
+    override suspend fun checkForAssetUpdates(
+        trigger: AssetUpdateCheckTrigger
+    ): AssetUpdateCheckState = updateManager.checkForAssetUpdates(trigger)
+
+    override fun canCheckForAssetUpdates(
+        trigger: AssetUpdateCheckTrigger,
+        now: Long
+    ): Boolean = updateManager.canCheckForAssetUpdates(trigger, now)
+
+    override fun assetCheckCooldownRemainingMs(
+        trigger: AssetUpdateCheckTrigger,
+        now: Long
+    ): Long = updateManager.assetCheckCooldownRemainingMs(trigger, now)
 
     override suspend fun checkAndInstallSilently() {
         updateManager.checkAndInstallSilently()

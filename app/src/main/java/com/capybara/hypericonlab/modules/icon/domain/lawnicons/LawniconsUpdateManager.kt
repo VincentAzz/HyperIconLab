@@ -3,12 +3,17 @@ package com.capybara.hypericonlab.modules.icon.domain.lawnicons
 import android.content.Context
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogType
+import com.capybara.hypericonlab.modules.icon.domain.repository.AssetUpdateCheckRecord
+import com.capybara.hypericonlab.modules.icon.domain.repository.AssetUpdateCheckRepository
+import com.capybara.hypericonlab.modules.icon.domain.repository.AssetUpdateCheckTrigger
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -24,7 +29,9 @@ class LawniconsUpdateManager(
     private val appSettingsRepository: AppSettingsRepository,
     private val notifier: LawniconsUpdateNotifier,
     private val templateManager: IconPackTemplateManager,
-    private val appLogStore: AppLogStore
+    private val appLogStore: AppLogStore,
+    private val assetCheckRepository: AssetUpdateCheckRepository,
+    appScope: CoroutineScope
 ) {
     // 当前更新状态，供 UI 观察
     private val _state = MutableStateFlow<UpdateState>(UpdateState.Idle)
@@ -34,6 +41,18 @@ class LawniconsUpdateManager(
         AssetUpdateCheckState.Idle
     )
     val assetCheckState: StateFlow<AssetUpdateCheckState> = _assetCheckState.asStateFlow()
+
+    private val _lastAutomaticAssetCheckAt = MutableStateFlow<Long?>(null)
+    val lastAutomaticAssetCheckAt: StateFlow<Long?> = _lastAutomaticAssetCheckAt.asStateFlow()
+
+    private val _lastManualAssetCheckAt = MutableStateFlow<Long?>(null)
+    val lastManualAssetCheckAt: StateFlow<Long?> = _lastManualAssetCheckAt.asStateFlow()
+
+    init {
+        appScope.launch {
+            restoreAssetCheckRecord(assetCheckRepository.read())
+        }
+    }
 
     // 检查更新：查询云端最新版本，与本地激活版本对比
     // silent=true 时失败不发通知（首次启动自动拉取场景）
@@ -63,7 +82,16 @@ class LawniconsUpdateManager(
     }
 
     // 仅检查 Lawnicons 与 APK 模板更新，不下载或切换本地资源
-    suspend fun checkForAssetUpdates(): AssetUpdateCheckState {
+    suspend fun checkForAssetUpdates(
+        trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL,
+        now: Long = System.currentTimeMillis()
+    ): AssetUpdateCheckState {
+        restoreAssetCheckRecord(assetCheckRepository.read())
+        if (!isCheckAllowed(trigger, now)) {
+            appLogStore.add("资源更新：${trigger.logName}检查仍在冷却期", LogType.INFO)
+            return _assetCheckState.value
+        }
+
         val current = resourceManager.currentVersion.value
         _assetCheckState.value = AssetUpdateCheckState.Checking(current.version)
         appLogStore.add("资源更新：开始检查可用版本", LogType.INFO)
@@ -73,6 +101,7 @@ class LawniconsUpdateManager(
         } catch (e: LawniconsUpdateException) {
             val failed = AssetUpdateCheckState.Failed(e.reason)
             _assetCheckState.value = failed
+            saveCheckRecord(trigger, now, failed)
             appLogStore.add("资源更新：版本检查失败（${e.reason}）", LogType.ERROR)
             return failed
         }
@@ -80,6 +109,7 @@ class LawniconsUpdateManager(
         if (release == null) {
             val failed = AssetUpdateCheckState.Failed(FailureReason.UNKNOWN)
             _assetCheckState.value = failed
+            saveCheckRecord(trigger, now, failed)
             appLogStore.add("资源更新：未找到可用 Release", LogType.ERROR)
             return failed
         }
@@ -104,6 +134,7 @@ class LawniconsUpdateManager(
             AssetUpdateCheckState.UpToDate(current.version)
         }
         _assetCheckState.value = result
+        saveCheckRecord(trigger, now, result)
         appLogStore.add(
             if (result is AssetUpdateCheckState.Available) {
                 "资源更新：发现可用版本 ${release.version}"
@@ -113,6 +144,66 @@ class LawniconsUpdateManager(
             LogType.INFO
         )
         return result
+    }
+
+    private suspend fun saveCheckRecord(
+        trigger: AssetUpdateCheckTrigger,
+        checkedAt: Long,
+        state: AssetUpdateCheckState
+    ) {
+        val record = AssetUpdateCheckRecord(
+            lastAutomaticCheckAt = if (trigger == AssetUpdateCheckTrigger.AUTOMATIC) {
+                checkedAt
+            } else {
+                _lastAutomaticAssetCheckAt.value
+            },
+            lastManualCheckAt = if (trigger == AssetUpdateCheckTrigger.MANUAL) {
+                checkedAt
+            } else {
+                _lastManualAssetCheckAt.value
+            },
+            state = state
+        )
+        assetCheckRepository.save(record)
+        restoreAssetCheckRecord(record)
+    }
+
+    private suspend fun restoreAssetCheckRecord(record: AssetUpdateCheckRecord) {
+        _lastAutomaticAssetCheckAt.value = record.lastAutomaticCheckAt
+        _lastManualAssetCheckAt.value = record.lastManualCheckAt
+        _assetCheckState.value = record.state
+    }
+
+    private fun isCheckAllowed(trigger: AssetUpdateCheckTrigger, now: Long): Boolean {
+        val lastCheckedAt = when (trigger) {
+            AssetUpdateCheckTrigger.AUTOMATIC -> _lastAutomaticAssetCheckAt.value
+            AssetUpdateCheckTrigger.MANUAL -> _lastManualAssetCheckAt.value
+        } ?: return true
+        val cooldown = when (trigger) {
+            AssetUpdateCheckTrigger.AUTOMATIC -> UpdateConstants.AUTOMATIC_CHECK_COOLDOWN_MS
+            AssetUpdateCheckTrigger.MANUAL -> UpdateConstants.MANUAL_CHECK_COOLDOWN_MS
+        }
+        return now - lastCheckedAt >= cooldown
+    }
+
+    fun canCheckForAssetUpdates(
+        trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL,
+        now: Long = System.currentTimeMillis()
+    ): Boolean = isCheckAllowed(trigger, now)
+
+    fun assetCheckCooldownRemainingMs(
+        trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL,
+        now: Long = System.currentTimeMillis()
+    ): Long {
+        val lastCheckedAt = when (trigger) {
+            AssetUpdateCheckTrigger.AUTOMATIC -> _lastAutomaticAssetCheckAt.value
+            AssetUpdateCheckTrigger.MANUAL -> _lastManualAssetCheckAt.value
+        } ?: return 0L
+        val cooldown = when (trigger) {
+            AssetUpdateCheckTrigger.AUTOMATIC -> UpdateConstants.AUTOMATIC_CHECK_COOLDOWN_MS
+            AssetUpdateCheckTrigger.MANUAL -> UpdateConstants.MANUAL_CHECK_COOLDOWN_MS
+        }
+        return (lastCheckedAt + cooldown - now).coerceAtLeast(0L)
     }
 
     // 下载并安装指定 release：下载 → 校验 → 解压 → 激活 → 清理
@@ -280,5 +371,14 @@ class LawniconsUpdateManager(
 
         // GitHub 加速代理前缀
         const val PROXY_PREFIX = "https://ghfast.top/"
+
+        const val AUTOMATIC_CHECK_COOLDOWN_MS = 24 * 60 * 60 * 1000L
+        const val MANUAL_CHECK_COOLDOWN_MS = 6 * 60 * 60 * 1000L
     }
 }
+
+private val AssetUpdateCheckTrigger.logName: String
+    get() = when (this) {
+        AssetUpdateCheckTrigger.AUTOMATIC -> "自动"
+        AssetUpdateCheckTrigger.MANUAL -> "手动"
+    }

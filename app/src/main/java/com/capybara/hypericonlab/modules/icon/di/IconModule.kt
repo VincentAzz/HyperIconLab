@@ -12,6 +12,7 @@ import com.capybara.hypericonlab.modules.build.domain.packaging.IconPackSigningK
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskExecutor
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.build.notification.BuildNotificationManager
+import com.capybara.hypericonlab.modules.icon.data.repository.AssetUpdateCheckRepositoryImpl
 import com.capybara.hypericonlab.modules.icon.data.repository.InitializationStateRepositoryImpl
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.DefaultLawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateArchive
@@ -22,6 +23,7 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsDownload
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsResourceManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsUpdateNotifier
+import com.capybara.hypericonlab.modules.icon.domain.repository.AssetUpdateCheckRepository
 import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationStateRepository
 import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase
@@ -36,6 +38,7 @@ import org.koin.dsl.module
 val iconModule = module {
     single { AppLogStore() }
     single<InitializationStateRepository> { InitializationStateRepositoryImpl(get()) }
+    single<AssetUpdateCheckRepository> { AssetUpdateCheckRepositoryImpl(get()) }
     single { AppM3PreprocessManager(get(), get(named("AppScope"))) }
     single {
         InitializationCoordinator(
@@ -63,7 +66,11 @@ val iconModule = module {
     single<ApkInstallFacade> { ApkInstaller(get()) }
     // Notifier 用 single：内部缓存 channelCreated 状态，避免重复创建 NotificationChannel
     single { LawniconsUpdateNotifier(get()) }
-    single { LawniconsUpdateManager(get(), get(), get(), get(), get(), get(), get(), get()) }
+    single {
+        LawniconsUpdateManager(
+            get(), get(), get(), get(), get(), get(), get(), get(), get(), get(named("AppScope"))
+        )
+    }
     factory { ManageResourcesUseCase(get()) }
     factory { GeneratePreviewUseCase(get(), get()) }
     factory { IconPipelineUseCase(get()) }
