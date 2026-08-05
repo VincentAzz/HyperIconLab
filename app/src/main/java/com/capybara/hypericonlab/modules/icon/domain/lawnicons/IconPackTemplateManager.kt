@@ -99,7 +99,11 @@ class IconPackTemplateManager(
     fun isAvailable(): Boolean {
         val currentVersion = resourceManager.currentVersion.value
         if (currentVersion.source != ResourceSource.REMOTE) return false
-        return validateExisting(versionDir(currentVersion.version), currentVersion)
+        val available = validateExisting(versionDir(currentVersion.version), currentVersion)
+        if (available) {
+            _state.value = IconPackTemplateState.Available(currentVersion.version)
+        }
+        return available
     }
 
     private fun validateExisting(directory: File, version: LawniconsVersion): Boolean {
