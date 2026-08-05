@@ -146,6 +146,13 @@ class LawniconsUpdateManager(
         return result
     }
 
+    suspend fun markAssetUpdateCompleted() {
+        val record = assetCheckRepository.read()
+        val completed = AssetUpdateCheckState.UpToDate(resourceManager.currentVersion.value.version)
+        assetCheckRepository.save(record.copy(state = completed))
+        restoreAssetCheckRecord(record.copy(state = completed))
+    }
+
     private suspend fun saveCheckRecord(
         trigger: AssetUpdateCheckTrigger,
         checkedAt: Long,

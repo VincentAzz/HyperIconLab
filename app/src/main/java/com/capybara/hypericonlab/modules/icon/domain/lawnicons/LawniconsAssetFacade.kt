@@ -55,6 +55,9 @@ interface LawniconsAssetFacade {
         trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL
     ): AssetUpdateCheckState
 
+    // 标记资产更新及其缓存流程已完成
+    suspend fun markAssetUpdateCompleted()
+
     // 判断指定类型的检查是否已结束冷却
     fun canCheckForAssetUpdates(
         trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL,
@@ -135,6 +138,10 @@ class DefaultLawniconsAssetFacade(
     override suspend fun checkForAssetUpdates(
         trigger: AssetUpdateCheckTrigger
     ): AssetUpdateCheckState = updateManager.checkForAssetUpdates(trigger)
+
+    override suspend fun markAssetUpdateCompleted() {
+        updateManager.markAssetUpdateCompleted()
+    }
 
     override fun canCheckForAssetUpdates(
         trigger: AssetUpdateCheckTrigger,

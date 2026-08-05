@@ -12,7 +12,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,6 +27,7 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateS
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
+import com.capybara.hypericonlab.modules.icon.domain.repository.AssetUpdateCheckTrigger
 import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
@@ -32,6 +35,7 @@ import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.Dow
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.InitializationCard
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.AssetCleanupSection
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.LawniconsOverviewSection
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -39,6 +43,7 @@ import top.yukonga.miuix.kmp.blur.layerBackdrop
 
 private object AssetsTabDefaults {
     val InitializationHorizontalPadding = 16.dp
+    const val CooldownTickerIntervalMs = 60_000L
 }
 
 @Composable
@@ -61,6 +66,9 @@ fun AssetsTab(
     // 当前版本信息（从 Facade 观察，来源切换后自动更新）
     val version by assetsFacade.currentVersion.collectAsStateWithLifecycle()
     val initializationState by initializationCoordinator.state.collectAsStateWithLifecycle()
+    val assetCheckState by assetsFacade.assetCheckState.collectAsStateWithLifecycle()
+    val assetUpdateRunning by initializationCoordinator.assetUpdateRunning.collectAsStateWithLifecycle()
+    val lastManualAssetCheckAt by assetsFacade.lastManualAssetCheckAt.collectAsStateWithLifecycle()
     val templateState by assetsFacade.templateState.collectAsStateWithLifecycle()
     val cacheAvailable by appM3PreprocessManager.cacheAvailable.collectAsStateWithLifecycle()
     val hasDownloadedAssets = assetsFacade.getDownloadedVersions().isNotEmpty()
@@ -68,6 +76,25 @@ fun AssetsTab(
     val useDownloadProxy by appSettingsRepository.useDownloadProxy.collectAsStateWithLifecycle()
     var showClearCacheDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
+    var currentTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
+    LaunchedEffect(lastManualAssetCheckAt, assetCheckState, assetUpdateRunning) {
+        while (true) {
+            currentTime = System.currentTimeMillis()
+            if (assetsFacade.assetCheckCooldownRemainingMs(
+                    AssetUpdateCheckTrigger.MANUAL,
+                    currentTime
+                ) == 0L
+            ) {
+                break
+            }
+            delay(AssetsTabDefaults.CooldownTickerIntervalMs)
+        }
+    }
+    val canCheckAssets = assetsFacade.canCheckForAssetUpdates(
+        trigger = AssetUpdateCheckTrigger.MANUAL,
+        now = currentTime
+    )
 
     // 版本号 + 来源统一显示：日期 (commit) - 内置/云端
     val versionDate = version.version.substringBefore("-")
@@ -113,10 +140,19 @@ fun AssetsTab(
                 versionText = versionText,
                 iconCountText = "${version.svgCount} 图标, ${version.mapperCount} 映射",
                 templateVersionText = templateVersionText,
+                assetUpdateState = assetCheckState,
+                assetUpdateRunning = assetUpdateRunning,
+                canCheckAssetUpdates = canCheckAssets,
                 downloadModeText = downloadModeText,
                 onChooseDownloadMode = onChooseDownloadMode,
                 onSwitchSource = onSwitchSource,
-                onBrowseLawnicons = onBrowseLawnicons
+                onBrowseLawnicons = onBrowseLawnicons,
+                onCheckAssetUpdates = {
+                    scope.launch {
+                        assetsFacade.checkForAssetUpdates(AssetUpdateCheckTrigger.MANUAL)
+                    }
+                },
+                onUpdateAssets = { initializationCoordinator.startManualAssetUpdate() }
             )
         }
 

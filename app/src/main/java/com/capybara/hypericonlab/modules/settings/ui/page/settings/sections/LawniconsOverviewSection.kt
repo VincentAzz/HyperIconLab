@@ -7,16 +7,22 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
 
 @Composable
 fun LawniconsOverviewSection(
     versionText: String,
     iconCountText: String,
     templateVersionText: String,
+    assetUpdateState: AssetUpdateCheckState,
+    assetUpdateRunning: Boolean,
+    canCheckAssetUpdates: Boolean,
     downloadModeText: String,
     onChooseDownloadMode: () -> Unit,
     onSwitchSource: () -> Unit,
-    onBrowseLawnicons: () -> Unit
+    onBrowseLawnicons: () -> Unit,
+    onCheckAssetUpdates: () -> Unit,
+    onUpdateAssets: () -> Unit
 ) {
     SegmentedColumn(title = "Lawnicons") {
         item {
@@ -46,6 +52,16 @@ fun LawniconsOverviewSection(
                 trailingContent = {
                     OverviewValueText(text = templateVersionText, useCodeFont = true)
                 }
+            )
+        }
+
+        item {
+            AssetUpdateCheckSection(
+                state = assetUpdateState,
+                isUpdating = assetUpdateRunning,
+                canCheck = canCheckAssetUpdates,
+                onCheck = onCheckAssetUpdates,
+                onUpdate = onUpdateAssets
             )
         }
 

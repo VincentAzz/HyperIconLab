@@ -8,6 +8,7 @@ import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
@@ -53,6 +54,9 @@ class InitializationCoordinator(
     private val _resourcesReadyVersion = MutableStateFlow<String?>(null)
     val resourcesReadyVersion: StateFlow<String?> = _resourcesReadyVersion.asStateFlow()
 
+    private val _assetUpdateRunning = MutableStateFlow(false)
+    val assetUpdateRunning: StateFlow<Boolean> = _assetUpdateRunning.asStateFlow()
+
     private var initializationJob: Job? = null
     private var resetJob: Job? = null
     private var assetUpdateJob: Job? = null
@@ -83,6 +87,7 @@ class InitializationCoordinator(
     fun startManualAssetUpdate(): Job {
         assetUpdateJob?.takeIf { it.isActive }?.let { return it }
         return scope.launch {
+            _assetUpdateRunning.value = true
             try {
                 appLogStore.add("资源更新：开始执行手动资产更新", LogType.INFO)
                 assetsFacade.resetUpdateState()
@@ -93,8 +98,13 @@ class InitializationCoordinator(
                     appM3PreprocessManager.clearCache()
                 }
                 loadCurrentColorSchemes()
-                appM3PreprocessManager.startPreprocess()
-                appLogStore.add("资源更新：已开始生成 App-M3 颜色映射缓存", LogType.INFO)
+                appM3PreprocessManager.preprocessNow()
+                if (assetsFacade.updateState.value !is UpdateState.Failed &&
+                    assetsFacade.templateState.value !is IconPackTemplateState.Failed
+                ) {
+                    assetsFacade.markAssetUpdateCompleted()
+                }
+                appLogStore.add("资源更新：App-M3 颜色映射缓存生成完成", LogType.SUCCESS)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -103,6 +113,7 @@ class InitializationCoordinator(
                     LogType.ERROR
                 )
             } finally {
+                _assetUpdateRunning.value = false
                 synchronized(this@InitializationCoordinator) {
                     assetUpdateJob = null
                 }
