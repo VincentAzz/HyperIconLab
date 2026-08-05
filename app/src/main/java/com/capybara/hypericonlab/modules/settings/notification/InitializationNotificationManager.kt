@@ -25,7 +25,7 @@ class InitializationNotificationManager(
     fun createChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
-            NotificationConfig.CHANNEL_ID,
+            CHANNEL_ID,
             context.getString(R.string.initialization_notification_channel_name),
             NotificationManager.IMPORTANCE_LOW
         ).apply {
@@ -40,15 +40,15 @@ class InitializationNotificationManager(
             it.status == InitializationTaskStatus.RUNNING
         } ?: return
         val now = System.currentTimeMillis()
-        if (now - lastProgressTime < NotificationConfig.PROGRESS_THROTTLE_MS) return
+        if (now - lastProgressTime < PROGRESS_THROTTLE_MS) return
         lastProgressTime = now
 
-        val progress = (runningTask.progress * NotificationConfig.PROGRESS_MAX)
+        val progress = (runningTask.progress * PROGRESS_MAX)
             .toInt()
-            .coerceIn(0, NotificationConfig.PROGRESS_MAX)
+            .coerceIn(0, PROGRESS_MAX)
         val notification = NotificationCompat.Builder(
             context,
-            NotificationConfig.CHANNEL_ID
+            CHANNEL_ID
         )
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setContentTitle(context.getString(R.string.initialization_notification_title))
@@ -59,32 +59,33 @@ class InitializationNotificationManager(
                     progress
                 )
             )
-            .setProgress(NotificationConfig.PROGRESS_MAX, progress, false)
+            .setProgress(PROGRESS_MAX, progress, false)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(buildContentIntent())
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
-        notificationManager.notify(NotificationConfig.RUNNING_NOTIFICATION_ID, notification)
+        notificationManager.notify(RUNNING_NOTIFICATION_ID, notification)
     }
 
     fun showTerminal(state: InitializationState) {
-        notificationManager.cancel(NotificationConfig.RUNNING_NOTIFICATION_ID)
+        notificationManager.cancel(RUNNING_NOTIFICATION_ID)
+        val failedTask = state.failedTask
         val (titleRes, textRes) = when {
             state.isCompleted ->
                 R.string.initialization_notification_completed_title to
                         R.string.initialization_notification_completed_text
 
-            state.failedTask != null ->
+            failedTask != null ->
                 R.string.initialization_notification_failed_title to
                         R.string.initialization_notification_failed_text
 
             else -> return
         }
-        val contentText = if (state.failedTask != null && !state.isCompleted) {
+        val contentText = if (failedTask != null && !state.isCompleted) {
             context.getString(
                 textRes,
-                taskLabel(state.failedTask),
+                taskLabel(failedTask),
                 state.failureMessage ?: context.getString(
                     R.string.initialization_notification_unknown_error
                 )
@@ -94,7 +95,7 @@ class InitializationNotificationManager(
         }
         val notification = NotificationCompat.Builder(
             context,
-            NotificationConfig.CHANNEL_ID
+            CHANNEL_ID
         )
             .setSmallIcon(
                 if (state.isCompleted) {
@@ -109,11 +110,11 @@ class InitializationNotificationManager(
             .setContentIntent(buildContentIntent())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
-        notificationManager.notify(NotificationConfig.TERMINAL_NOTIFICATION_ID, notification)
+        notificationManager.notify(TERMINAL_NOTIFICATION_ID, notification)
     }
 
     fun cancelRunning() {
-        notificationManager.cancel(NotificationConfig.RUNNING_NOTIFICATION_ID)
+        notificationManager.cancel(RUNNING_NOTIFICATION_ID)
     }
 
     private fun taskLabel(task: InitializationTask): String = when (task) {
@@ -128,18 +129,19 @@ class InitializationNotificationManager(
         }
         return PendingIntent.getActivity(
             context,
-            NotificationConfig.CONTENT_REQUEST_CODE,
+            CONTENT_REQUEST_CODE,
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 
-    private object NotificationConfig {
+    companion object {
         const val CHANNEL_ID = "initialization_channel"
         const val RUNNING_NOTIFICATION_ID = 3001
-        const val TERMINAL_NOTIFICATION_ID = 3002
-        const val CONTENT_REQUEST_CODE = 3000
-        const val PROGRESS_MAX = 100
-        const val PROGRESS_THROTTLE_MS = 500L
+
+        private const val TERMINAL_NOTIFICATION_ID = 3002
+        private const val CONTENT_REQUEST_CODE = 3000
+        private const val PROGRESS_MAX = 100
+        private const val PROGRESS_THROTTLE_MS = 500L
     }
 }

@@ -89,6 +89,7 @@
     <string name="initialization_notification_channel_name">初始化任务</string>
     <string name="initialization_notification_channel_desc">显示初始化资源的进度和结果</string>
     <string name="initialization_notification_title">正在初始化资源</string>
+    <string name="initialization_notification_preparing">准备初始化任务</string>
     <string name="initialization_notification_progress">%1$s：%2$d%%</string>
     <string name="initialization_notification_completed_title">初始化完成</string>
     <string name="initialization_notification_completed_text">Lawnicons、APK 模板和颜色缓存已准备完成</string>

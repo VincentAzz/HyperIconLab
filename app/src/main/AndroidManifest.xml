@@ -43,6 +43,12 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <!-- 初始化前台服务：承载资源准备期间的进度通知 -->
+        <service
+            android:name=".modules.settings.notification.InitializationForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
         <!-- 仅向系统安装器临时共享应用缓存中的 APK -->
         <provider
             android:name="androidx.core.content.FileProvider"
