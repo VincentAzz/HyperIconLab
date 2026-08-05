@@ -7,6 +7,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
@@ -16,6 +17,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.InitializationState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskStatus
+import com.capybara.hypericonlab.modules.icon.domain.repository.AssetUpdateCheckTrigger
 import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationServiceController
 import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationStateRepository
 import com.capybara.hypericonlab.modules.render.AppM3ColorCache
@@ -190,6 +192,38 @@ class InitializationCoordinator(
         persistCurrentState()
         if (_state.value.isCompleted && !wasCompleted) {
             appLogStore.add("初始化完成", LogType.SUCCESS)
+        }
+        if (wasCompleted && !manualStart && assetUpdateJob?.isActive != true) {
+            runAutomaticAssetCheck()
+        }
+    }
+
+    // 非首次启动仅检查远程资产，不自动下载或切换资源。
+    private suspend fun runAutomaticAssetCheck() {
+        if (!assetsFacade.canCheckForAssetUpdates(AssetUpdateCheckTrigger.AUTOMATIC)) {
+            appLogStore.add("启动检查：自动检查处于冷却期，保留已有结果", LogType.INFO)
+            return
+        }
+        val result = assetsFacade.checkForAssetUpdates(AssetUpdateCheckTrigger.AUTOMATIC)
+        when (result) {
+            is AssetUpdateCheckState.Available -> appLogStore.add(
+                "启动检查：发现资产更新 ${result.currentVersion.version} → " +
+                        result.availableRelease.version,
+                LogType.INFO
+            )
+
+            is AssetUpdateCheckState.UpToDate -> appLogStore.add(
+                "启动检查：资产已是最新版本 ${result.currentVersion}",
+                LogType.INFO
+            )
+
+            is AssetUpdateCheckState.Failed -> appLogStore.add(
+                "启动检查：资产更新检查失败（${result.reason}）",
+                LogType.ERROR
+            )
+
+            AssetUpdateCheckState.Idle,
+            is AssetUpdateCheckState.Checking -> Unit
         }
     }
 
