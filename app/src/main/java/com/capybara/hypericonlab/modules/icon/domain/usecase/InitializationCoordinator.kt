@@ -479,17 +479,22 @@ class InitializationCoordinator(
     private fun validCompletedTasks(
         persisted: InitializationPersistenceState
     ): Set<InitializationTask> {
-        val currentVersion = assetsFacade.currentVersion.value.version
+        val currentVersionInfo = assetsFacade.currentVersion.value
+        val currentVersion = currentVersionInfo.version
+        val usingBuiltInAssets = currentVersionInfo.source == ResourceSource.ASSETS
         return persisted.completedTasks.filterTo(mutableSetOf()) { task ->
             when (task) {
-                InitializationTask.LAWNICONS -> persisted.resourceVersion == currentVersion
+                InitializationTask.LAWNICONS -> usingBuiltInAssets ||
+                        persisted.resourceVersion == currentVersion
+
                 InitializationTask.APK_TEMPLATE ->
-                    persisted.templateVersion == currentVersion &&
-                            assetsFacade.templateState.value is IconPackTemplateState.Available
+                    usingBuiltInAssets ||
+                            (persisted.templateVersion == currentVersion &&
+                                    assetsFacade.templateState.value is IconPackTemplateState.Available)
 
                 InitializationTask.APP_M3_CACHE ->
                     persisted.isCacheConfigCurrent() &&
-                            (persisted.cacheSourceVersion == currentVersion ||
+                            (usingBuiltInAssets || persisted.cacheSourceVersion == currentVersion ||
                                     InitializationTask.LAWNICONS !in persisted.completedTasks)
             }
         }
