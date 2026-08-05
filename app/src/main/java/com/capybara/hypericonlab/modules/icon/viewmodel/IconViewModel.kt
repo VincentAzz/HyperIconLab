@@ -282,8 +282,6 @@ class IconViewModel(
             _config.update { current ->
                 current.copy(previewThemeMode = if (isDark) "dark" else "light")
             }
-
-            initializationCoordinator.startInitialization()
         }
         viewModelScope.launch {
             initializationCoordinator.resourcesReadyVersion.collect { version ->

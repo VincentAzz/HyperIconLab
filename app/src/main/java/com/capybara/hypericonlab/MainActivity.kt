@@ -1,15 +1,23 @@
 package com.capybara.hypericonlab
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,8 +34,11 @@ import com.capybara.hypericonlab.core.designsystem.util.LocalWindowLayoutInfo
 import com.capybara.hypericonlab.core.designsystem.util.rememberWindowLayoutInfo
 import com.capybara.hypericonlab.modules.build.domain.packaging.ApkInstallFacade
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
+import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationStateRepository
+import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -36,6 +47,8 @@ class MainActivity : ComponentActivity(), KoinComponent {
     private val themeStateProvider by inject<ThemeStateProvider>()
     private val apkInstaller by inject<ApkInstallFacade>()
     private val buildTaskManager by inject<BuildTaskManager>()
+    private val initializationCoordinator by inject<InitializationCoordinator>()
+    private val initializationStateRepository by inject<InitializationStateRepository>()
 
     // 通知 PendingIntent 携带的目标 tab 索引（null 表示无请求）
     // 由 onCreate / onNewIntent 更新，通过 LocalPendingTab 透传到 MainScreen 触发 animateToPage
@@ -46,6 +59,14 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
     // 标记是否已经打开未知来源设置页，避免返回时重复拉起设置页
     private var unknownSourcesSettingsOpened = false
+
+    private var initializationStartupChecked = false
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        initializationCoordinator.startInitialization()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -105,6 +126,41 @@ class MainActivity : ComponentActivity(), KoinComponent {
         processPendingInstall()
     }
 
+    override fun onPostResume() {
+        super.onPostResume()
+        if (initializationStartupChecked) return
+        initializationStartupChecked = true
+        lifecycleScope.launch {
+            startInitializationAfterPermissionCheck()
+        }
+    }
+
+    private suspend fun startInitializationAfterPermissionCheck() {
+        val persistedState = initializationStateRepository.state.first()
+        val shouldRequestPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                !persistedState.isCompleted &&
+                !isNotificationPermissionGranted() &&
+                !getPreferences(MODE_PRIVATE).getBoolean(
+                    StartupConfig.NOTIFICATION_PERMISSION_REQUESTED,
+                    false
+                )
+        if (shouldRequestPermission) {
+            getPreferences(MODE_PRIVATE).edit {
+                putBoolean(StartupConfig.NOTIFICATION_PERMISSION_REQUESTED, true)
+            }
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            initializationCoordinator.startInitialization()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun isNotificationPermissionGranted(): Boolean =
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+
     private fun processPendingInstall() {
         pendingInstallUri?.let { uri ->
             if (apkInstaller.canInstallUnknownSources()) {
@@ -134,7 +190,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 buildTaskManager.installRequests.collect { request ->
-                    launchApkInstaller(Uri.parse(request.artifactUri))
+                    launchApkInstaller(request.artifactUri.toUri())
                 }
             }
         }
@@ -156,5 +212,9 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
             is ApkInstallFacade.LaunchResult.Failed -> Unit
         }
+    }
+
+    private object StartupConfig {
+        const val NOTIFICATION_PERMISSION_REQUESTED = "notification_permission_requested"
     }
 }
