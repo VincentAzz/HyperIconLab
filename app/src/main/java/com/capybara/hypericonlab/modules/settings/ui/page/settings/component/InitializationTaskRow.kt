@@ -201,14 +201,15 @@ fun AssetUpdateTaskRow(
 ) {
     val isRunning = status == InitializationTaskStatus.RUNNING
 
-    val icon = if (status == InitializationTaskStatus.COMPLETED) {
-        AppMaterialSymbols.check_circle
-    } else {
-        AppMaterialSymbols.circle
+    val icon = when (status) {
+        InitializationTaskStatus.COMPLETED -> AppMaterialSymbols.check_circle
+        InitializationTaskStatus.FAILED -> AppMaterialSymbols.error
+        else -> AppMaterialSymbols.circle
     }
 
     val iconColor = when (status) {
         InitializationTaskStatus.COMPLETED -> MaterialTheme.colorScheme.primary
+        InitializationTaskStatus.FAILED -> MaterialTheme.colorScheme.error
         InitializationTaskStatus.PENDING -> MaterialTheme.colorScheme.outlineVariant
         else -> MaterialTheme.colorScheme.onSurface
     }

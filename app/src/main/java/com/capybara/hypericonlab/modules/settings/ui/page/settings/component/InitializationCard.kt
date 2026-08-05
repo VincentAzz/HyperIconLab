@@ -37,8 +37,11 @@ import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.symbol.check_circle
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
+import com.capybara.hypericonlab.modules.icon.domain.model.AssetUpdateUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
+import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskStatus
 import kotlin.math.roundToInt
 
@@ -61,27 +64,33 @@ fun InitializationCard(
     state: InitializationState,
     onStart: () -> Unit,
     onRetry: () -> Unit,
+    assetCheckState: AssetUpdateCheckState = AssetUpdateCheckState.Idle,
+    assetUpdateState: AssetUpdateUiState? = null,
+    onAssetUpdate: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val hasFailure = remember(state.tasks) {
-        state.tasks.any { it.status == InitializationTaskStatus.FAILED }
+    val assetTasks = assetUpdateState?.tasks ?: assetCheckState.assetTasksOrNull()
+    val displayTasks = assetTasks ?: state.tasks
+    val hasFailure = remember(state.tasks, assetTasks) {
+        displayTasks.any { it.status == InitializationTaskStatus.FAILED }
     }
     val hasStarted = remember(state.tasks) {
         state.tasks.any { it.status != InitializationTaskStatus.PENDING }
     }
-    val activeTaskState = state.tasks.firstOrNull {
+    val activeTaskState = displayTasks.firstOrNull {
         it.status == InitializationTaskStatus.RUNNING
     }
-    val fallbackTaskState = state.tasks.lastOrNull {
+    val fallbackTaskState = displayTasks.lastOrNull {
         it.status == InitializationTaskStatus.COMPLETED
     }
     val displayTaskState = activeTaskState ?: fallbackTaskState
     val progress = displayTaskState?.progress?.coerceIn(0f, 1f) ?: 0f
 
-    val isRunning = !state.requiresManualStart &&
+    val isRunning = assetUpdateState?.isRunning == true || (!state.requiresManualStart &&
             displayTaskState != null && hasStarted && !hasFailure && !state.isCompleted
-    val isAssetUpdate = !state.requiresManualStart &&
-            (state.resourceVersion != null || state.templateVersion != null)
+            )
+    val isAssetUpdate = assetUpdateState != null ||
+            assetCheckState is AssetUpdateCheckState.Available
 
     SegmentedColumn(
         modifier = modifier.fillMaxWidth(),
@@ -91,12 +100,15 @@ fun InitializationCard(
         item(key = "header") {
             InitializationHeader(
                 state = state,
+                tasks = displayTasks,
                 hasFailure = hasFailure,
                 progress = progress,
                 isRunning = isRunning,
                 isAssetUpdate = isAssetUpdate,
                 onStart = onStart,
-                onRetry = onRetry
+                onRetry = onRetry,
+                onAssetUpdate = onAssetUpdate ?: onStart,
+                assetUpdateRunning = assetUpdateState?.isRunning == true
             )
         }
 
@@ -112,11 +124,23 @@ fun InitializationCard(
                         bottom = InitializationCardDefaults.TaskListBottomPadding
                     )
                 ) {
-                    state.tasks.forEach { taskState ->
-                        InitializationTaskRow(
-                            taskState = taskState,
-                            onRetry = onRetry
-                        )
+                    if (isAssetUpdate) {
+                        displayTasks.forEach { taskState ->
+                            AssetUpdateTaskRow(
+                                title = taskTitle(taskState.task),
+                                oldVersion = assetCheckState.oldVersionFor(taskState.task),
+                                newVersion = assetCheckState.newVersionFor(taskState.task),
+                                status = taskState.status,
+                                description = assetTaskDescription(taskState)
+                            )
+                        }
+                    } else {
+                        displayTasks.forEach { taskState ->
+                            InitializationTaskRow(
+                                taskState = taskState,
+                                onRetry = onRetry
+                            )
+                        }
                     }
                 }
             }
@@ -127,18 +151,23 @@ fun InitializationCard(
 @Composable
 private fun InitializationHeader(
     state: InitializationState,
+    tasks: List<InitializationTaskState>,
     hasFailure: Boolean,
     progress: Float,
     isRunning: Boolean,
     isAssetUpdate: Boolean,
     onStart: () -> Unit,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onAssetUpdate: () -> Unit,
+    assetUpdateRunning: Boolean
 ) {
     val headerState = when {
+        isAssetUpdate && hasFailure -> HeaderState.Failure
+        isAssetUpdate && assetUpdateRunning -> HeaderState.Running
+        isAssetUpdate -> HeaderState.AssetUpdate
         state.isCompleted -> HeaderState.Completed
         hasFailure -> HeaderState.Failure
         isRunning -> HeaderState.Running
-        isAssetUpdate -> HeaderState.AssetUpdate
         else -> HeaderState.Ready
     }
 
@@ -173,16 +202,17 @@ private fun InitializationHeader(
 
                     HeaderState.Failure -> {
                         SummaryHeaderContent(
-                            title = "初始化未完成",
-                            actionText = "重试",
-                            onAction = onRetry
+                            title = if (isAssetUpdate) "资产更新未完成" else "初始化未完成",
+                            actionText = if (isAssetUpdate) "更新" else "重试",
+                            onAction = if (isAssetUpdate) onAssetUpdate else onRetry
                         )
                     }
 
                     HeaderState.Running -> {
                         RunningHeaderContent(
                             state = state,
-                            progress = progress
+                            progress = progress,
+                            tasks = tasks
                         )
                     }
 
@@ -190,7 +220,7 @@ private fun InitializationHeader(
                         SummaryHeaderContent(
                             title = "资产更新",
                             actionText = "更新",
-                            onAction = onStart
+                            onAction = onAssetUpdate
                         )
                     }
 
@@ -242,13 +272,14 @@ private fun SummaryHeaderContent(
 @Composable
 private fun RunningHeaderContent(
     state: InitializationState,
-    progress: Float
+    progress: Float,
+    tasks: List<InitializationTaskState> = state.tasks
 ) {
     val runningTaskTitle =
-        state.tasks.firstOrNull { it.status == InitializationTaskStatus.RUNNING }?.task?.let {
+        tasks.firstOrNull { it.status == InitializationTaskStatus.RUNNING }?.task?.let {
             taskTitle(it)
         } ?: state.activeTask?.let { taskTitle(it) }
-        ?: state.tasks.lastOrNull { it.status == InitializationTaskStatus.COMPLETED }
+        ?: tasks.lastOrNull { it.status == InitializationTaskStatus.COMPLETED }
             ?.task?.let { taskTitle(it) }
         ?: "正在初始化..."
 
@@ -307,3 +338,39 @@ private fun taskTitle(task: InitializationTask): String = when (task) {
     InitializationTask.APK_TEMPLATE -> "从仓库拉取图标包 APK 模板"
     InitializationTask.APP_M3_CACHE -> "生成颜色映射缓存"
 }
+
+private fun AssetUpdateCheckState.assetTasksOrNull(): List<InitializationTaskState>? =
+    if (this !is AssetUpdateCheckState.Available) {
+        null
+    } else {
+        InitializationTask.entries.map { task ->
+            InitializationTaskState(task = task)
+        }
+    }
+
+private fun AssetUpdateCheckState.oldVersionFor(task: InitializationTask): String? =
+    (this as? AssetUpdateCheckState.Available)?.let { available ->
+        val required = when (task) {
+            InitializationTask.LAWNICONS -> available.resourceUpdateRequired
+            InitializationTask.APK_TEMPLATE -> available.templateUpdateRequired
+            InitializationTask.APP_M3_CACHE -> false
+        }
+        available.currentVersion.version.takeIf { required }
+    }
+
+private fun AssetUpdateCheckState.newVersionFor(task: InitializationTask): String? =
+    (this as? AssetUpdateCheckState.Available)?.let { available ->
+        val required = when (task) {
+            InitializationTask.LAWNICONS -> available.resourceUpdateRequired
+            InitializationTask.APK_TEMPLATE -> available.templateUpdateRequired
+            InitializationTask.APP_M3_CACHE -> false
+        }
+        available.availableRelease.version.takeIf { required }
+    }
+
+private fun assetTaskDescription(taskState: InitializationTaskState): String =
+    taskState.message ?: when (taskState.task) {
+        InitializationTask.LAWNICONS -> "从 HyperIconLab/releases 获取 Lawnicons SVG 资源"
+        InitializationTask.APK_TEMPLATE -> "从 HyperIconLab/releases 获取图标包 APK 模板"
+        InitializationTask.APP_M3_CACHE -> "重新生成颜色映射缓存"
+    }

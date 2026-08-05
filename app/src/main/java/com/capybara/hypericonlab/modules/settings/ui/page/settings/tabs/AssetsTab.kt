@@ -68,6 +68,7 @@ fun AssetsTab(
     val initializationState by initializationCoordinator.state.collectAsStateWithLifecycle()
     val assetCheckState by assetsFacade.assetCheckState.collectAsStateWithLifecycle()
     val assetUpdateRunning by initializationCoordinator.assetUpdateRunning.collectAsStateWithLifecycle()
+    val assetUpdateState by initializationCoordinator.assetUpdateState.collectAsStateWithLifecycle()
     val lastManualAssetCheckAt by assetsFacade.lastManualAssetCheckAt.collectAsStateWithLifecycle()
     val templateState by assetsFacade.templateState.collectAsStateWithLifecycle()
     val cacheAvailable by appM3PreprocessManager.cacheAvailable.collectAsStateWithLifecycle()
@@ -131,7 +132,10 @@ fun AssetsTab(
                 modifier = Modifier.padding(horizontal = AssetsTabDefaults.InitializationHorizontalPadding),
                 state = initializationState,
                 onStart = { initializationCoordinator.startInitialization(manualStart = true) },
-                onRetry = { initializationCoordinator.startInitialization(manualStart = true) }
+                onRetry = { initializationCoordinator.startInitialization(manualStart = true) },
+                assetCheckState = assetCheckState,
+                assetUpdateState = assetUpdateState,
+                onAssetUpdate = { initializationCoordinator.startManualAssetUpdate() }
             )
         }
 

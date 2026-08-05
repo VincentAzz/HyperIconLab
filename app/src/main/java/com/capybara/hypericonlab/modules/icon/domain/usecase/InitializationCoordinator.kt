@@ -12,6 +12,7 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateS
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
+import com.capybara.hypericonlab.modules.icon.domain.model.AssetUpdateUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationCacheConfig
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationPersistenceState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationState
@@ -57,6 +58,9 @@ class InitializationCoordinator(
     private val _assetUpdateRunning = MutableStateFlow(false)
     val assetUpdateRunning: StateFlow<Boolean> = _assetUpdateRunning.asStateFlow()
 
+    private val _assetUpdateState = MutableStateFlow<AssetUpdateUiState?>(null)
+    val assetUpdateState: StateFlow<AssetUpdateUiState?> = _assetUpdateState.asStateFlow()
+
     private var initializationJob: Job? = null
     private var resetJob: Job? = null
     private var assetUpdateJob: Job? = null
@@ -88,21 +92,46 @@ class InitializationCoordinator(
         assetUpdateJob?.takeIf { it.isActive }?.let { return it }
         return scope.launch {
             _assetUpdateRunning.value = true
+            val available = assetsFacade.assetCheckState.value as? AssetUpdateCheckState.Available
+            _assetUpdateState.value = createAssetUpdateState(available)
+            val observer = scope.launch {
+                launch {
+                    assetsFacade.updateState.collect { updateState ->
+                        updateAssetResourceTask(updateState)
+                    }
+                }
+                launch {
+                    assetsFacade.templateState.collect { templateState ->
+                        updateAssetTemplateTask(templateState)
+                    }
+                }
+            }
             try {
                 appLogStore.add("资源更新：开始执行手动资产更新", LogType.INFO)
                 assetsFacade.resetUpdateState()
                 assetsFacade.checkAndInstall()
                 val resourceUpdated = assetsFacade.updateState.value is UpdateState.Success
+                if (assetsFacade.updateState.value !is UpdateState.Failed) {
+                    completeAssetUpdateTask(InitializationTask.LAWNICONS)
+                }
+                completeAssetTemplateTask()
                 assetsFacade.refresh()
                 if (resourceUpdated) {
                     appM3PreprocessManager.clearCache()
                 }
                 loadCurrentColorSchemes()
+                markAssetUpdateTask(
+                    task = InitializationTask.APP_M3_CACHE,
+                    status = InitializationTaskStatus.RUNNING
+                )
                 appM3PreprocessManager.preprocessNow()
-                if (assetsFacade.updateState.value !is UpdateState.Failed &&
-                    assetsFacade.templateState.value !is IconPackTemplateState.Failed
+                completeAssetUpdateTask(InitializationTask.APP_M3_CACHE)
+                if (_assetUpdateState.value?.tasks?.none {
+                        it.status == InitializationTaskStatus.FAILED
+                    } == true
                 ) {
                     assetsFacade.markAssetUpdateCompleted()
+                    _assetUpdateState.value = null
                 }
                 appLogStore.add("资源更新：App-M3 颜色映射缓存生成完成", LogType.SUCCESS)
             } catch (e: CancellationException) {
@@ -113,12 +142,139 @@ class InitializationCoordinator(
                     LogType.ERROR
                 )
             } finally {
+                observer.cancelAndJoin()
+                _assetUpdateState.value = _assetUpdateState.value?.copy(isRunning = false)
                 _assetUpdateRunning.value = false
                 synchronized(this@InitializationCoordinator) {
                     assetUpdateJob = null
                 }
             }
         }.also { assetUpdateJob = it }
+    }
+
+    private fun createAssetUpdateState(
+        available: AssetUpdateCheckState.Available?
+    ): AssetUpdateUiState {
+        val currentVersion = available?.currentVersion?.version
+            ?: assetsFacade.currentVersion.value.version
+        val availableVersion = available?.availableRelease?.version ?: currentVersion
+        val resourceStatus = if (available?.resourceUpdateRequired == false) {
+            InitializationTaskStatus.COMPLETED
+        } else {
+            InitializationTaskStatus.RUNNING
+        }
+        val templateStatus = if (available?.templateUpdateRequired == false) {
+            InitializationTaskStatus.COMPLETED
+        } else {
+            InitializationTaskStatus.PENDING
+        }
+        return AssetUpdateUiState(
+            currentVersion = currentVersion,
+            availableVersion = availableVersion,
+            tasks = InitializationTask.entries.map { task ->
+                InitializationTaskState(
+                    task = task,
+                    status = when (task) {
+                        InitializationTask.LAWNICONS -> resourceStatus
+                        InitializationTask.APK_TEMPLATE -> templateStatus
+                        InitializationTask.APP_M3_CACHE -> InitializationTaskStatus.PENDING
+                    },
+                    progress = if (task == InitializationTask.LAWNICONS &&
+                        resourceStatus == InitializationTaskStatus.COMPLETED
+                    ) 1f else 0f
+                )
+            }
+        )
+    }
+
+    private fun updateAssetResourceTask(updateState: UpdateState) {
+        when (updateState) {
+            is UpdateState.Checking -> markAssetUpdateTask(
+                InitializationTask.LAWNICONS,
+                InitializationTaskStatus.RUNNING
+            )
+
+            is UpdateState.Downloading -> markAssetUpdateTask(
+                InitializationTask.LAWNICONS,
+                InitializationTaskStatus.RUNNING,
+                updateState.progress
+            )
+
+            is UpdateState.Extracting -> markAssetUpdateTask(
+                InitializationTask.LAWNICONS,
+                InitializationTaskStatus.RUNNING,
+                updateState.progress
+            )
+
+            UpdateState.UpToDate,
+            is UpdateState.Success -> completeAssetUpdateTask(InitializationTask.LAWNICONS)
+
+            is UpdateState.Failed -> markAssetUpdateTask(
+                InitializationTask.LAWNICONS,
+                InitializationTaskStatus.FAILED,
+                message = "Lawnicons 资源更新失败"
+            )
+
+            UpdateState.Idle -> Unit
+        }
+    }
+
+    private fun updateAssetTemplateTask(templateState: IconPackTemplateState) {
+        when (templateState) {
+            IconPackTemplateState.Checking -> markAssetUpdateTask(
+                InitializationTask.APK_TEMPLATE,
+                InitializationTaskStatus.RUNNING
+            )
+
+            is IconPackTemplateState.Downloading -> markAssetUpdateTask(
+                InitializationTask.APK_TEMPLATE,
+                InitializationTaskStatus.RUNNING,
+                templateState.progress
+            )
+
+            is IconPackTemplateState.Available -> completeAssetTemplateTask()
+            IconPackTemplateState.Unavailable,
+            IconPackTemplateState.Failed -> markAssetUpdateTask(
+                InitializationTask.APK_TEMPLATE,
+                InitializationTaskStatus.FAILED,
+                message = "图标包 APK 模板更新失败"
+            )
+
+            IconPackTemplateState.Idle -> Unit
+        }
+    }
+
+    private fun completeAssetTemplateTask() {
+        if (assetsFacade.currentVersion.value.source == ResourceSource.REMOTE &&
+            assetsFacade.templateState.value is IconPackTemplateState.Available
+        ) {
+            completeAssetUpdateTask(InitializationTask.APK_TEMPLATE)
+        }
+    }
+
+    private fun completeAssetUpdateTask(task: InitializationTask) {
+        markAssetUpdateTask(task, InitializationTaskStatus.COMPLETED, 1f)
+    }
+
+    private fun markAssetUpdateTask(
+        task: InitializationTask,
+        status: InitializationTaskStatus,
+        progress: Float = 0f,
+        message: String? = null
+    ) {
+        val current = _assetUpdateState.value ?: return
+        val tasks = current.tasks.map { taskState ->
+            if (taskState.task == task) {
+                taskState.copy(
+                    status = status,
+                    progress = progress.coerceIn(0f, 1f),
+                    message = message
+                )
+            } else {
+                taskState
+            }
+        }
+        _assetUpdateState.value = current.copy(tasks = tasks)
     }
 
     fun resetForManualInitialization(

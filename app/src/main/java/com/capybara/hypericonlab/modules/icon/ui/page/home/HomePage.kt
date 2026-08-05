@@ -34,10 +34,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
+import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.InitializationCard
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 
 private object HomePageDefaults {
@@ -58,6 +62,12 @@ fun HomePage(
 ) {
     val themeState by themeViewModel.state.collectAsStateWithLifecycle()
     val initializationState by iconViewModel.initializationState.collectAsStateWithLifecycle()
+    val assetsFacade = koinInject<LawniconsAssetFacade>()
+    val initializationCoordinator = koinInject<InitializationCoordinator>()
+    val assetCheckState by assetsFacade.assetCheckState.collectAsStateWithLifecycle()
+    val assetUpdateState by initializationCoordinator.assetUpdateState.collectAsStateWithLifecycle()
+    val hasAssetUpdate = assetUpdateState != null ||
+            assetCheckState is AssetUpdateCheckState.Available
     var completedCardVisible by rememberSaveable { mutableStateOf(true) }
     val latestInitializationState by rememberUpdatedState(initializationState)
 
@@ -117,7 +127,7 @@ fun HomePage(
                         bottom = outerPadding.calculateBottomPadding()
                     )
             ) {
-                if (!initializationState.isCompleted || completedCardVisible) {
+                if (hasAssetUpdate || !initializationState.isCompleted || completedCardVisible) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -127,7 +137,10 @@ fun HomePage(
                         InitializationCard(
                             state = initializationState,
                             onStart = iconViewModel::startInitialization,
-                            onRetry = iconViewModel::startInitialization
+                            onRetry = iconViewModel::startInitialization,
+                            assetCheckState = assetCheckState,
+                            assetUpdateState = assetUpdateState,
+                            onAssetUpdate = { initializationCoordinator.startManualAssetUpdate() }
                         )
                     }
                 }

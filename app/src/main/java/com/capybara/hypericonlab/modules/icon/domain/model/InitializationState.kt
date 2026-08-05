@@ -25,6 +25,13 @@ data class InitializationTaskState(
     val message: String? = null
 )
 
+data class AssetUpdateUiState(
+    val currentVersion: String,
+    val availableVersion: String,
+    val tasks: List<InitializationTaskState>,
+    val isRunning: Boolean = true
+)
+
 data class InitializationState(
     val tasks: List<InitializationTaskState> = InitializationTask.entries.map {
         InitializationTaskState(task = it)
