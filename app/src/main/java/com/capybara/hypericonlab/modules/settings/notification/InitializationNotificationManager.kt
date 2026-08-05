@@ -9,13 +9,16 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.capybara.hypericonlab.MainActivity
 import com.capybara.hypericonlab.R
+import com.capybara.hypericonlab.core.logging.AppLogStore
+import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskStatus
 
 // 初始化任务通知管理器
 class InitializationNotificationManager(
-    private val context: Context
+    private val context: Context,
+    private val appLogStore: AppLogStore
 ) {
     private val notificationManager =
         context.getSystemService(NotificationManager::class.java)
@@ -111,6 +114,14 @@ class InitializationNotificationManager(
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
         notificationManager.notify(TERMINAL_NOTIFICATION_ID, notification)
+        appLogStore.add(
+            if (state.isCompleted) {
+                "初始化通知：已发送完成通知"
+            } else {
+                "初始化通知：已发送失败通知"
+            },
+            if (state.isCompleted) LogType.SUCCESS else LogType.ERROR
+        )
     }
 
     fun cancelRunning() {

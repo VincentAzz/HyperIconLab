@@ -9,6 +9,8 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.capybara.hypericonlab.R
+import com.capybara.hypericonlab.core.logging.AppLogStore
+import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import kotlinx.coroutines.CoroutineScope
@@ -31,11 +33,15 @@ class InitializationForegroundService : Service() {
     private val notificationManager: InitializationNotificationManager by lazy {
         GlobalContext.get().get()
     }
+    private val appLogStore: AppLogStore by lazy {
+        GlobalContext.get().get()
+    }
 
     override fun onCreate() {
         super.onCreate()
         notificationManager.createChannel()
         startForegroundInternal(buildPlaceholderNotification())
+        appLogStore.add("初始化通知：前台服务已启动", LogType.INFO)
         observeInitialization()
     }
 
@@ -48,6 +54,7 @@ class InitializationForegroundService : Service() {
         observeJob?.cancel()
         scope.cancel()
         notificationManager.cancelRunning()
+        appLogStore.add("初始化通知：前台服务已停止", LogType.INFO)
         super.onDestroy()
     }
 
