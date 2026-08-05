@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -22,10 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
-import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
-import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
-import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
@@ -35,6 +30,8 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoord
 import com.capybara.hypericonlab.modules.icon.ui.page.home.component.InitializationCard
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.AssetCleanupSection
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.LawniconsOverviewSection
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -112,123 +109,25 @@ fun AssetsTab(
         }
 
         item(key = "lawnicons") {
-            SegmentedColumn(title = "Lawnicons") {
-                // 版本 + 来源合并显示：20260731 (ba36a38) - 云端
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "版本",
-                        trailingContent = {
-                            Text(
-                                text = versionText,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontFamily = GoogleSansCodeFontFamily,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        })
-                }
-
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "图标数量",
-                        trailingContent = {
-                            Text(
-                                text = "${version.svgCount} 图标, ${version.mapperCount} 映射",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        })
-                }
-
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "APK 模板",
-                        // description = "模板与 Lawnicons 资源版本绑定",
-                        trailingContent = {
-                            Text(
-                                text = templateVersionText,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontFamily = GoogleSansCodeFontFamily,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                }
-
-                // 下载方式
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "下载方式",
-                        description = "加速代理可提升 GitHub 资源下载速度",
-                        trailingContent = {
-                            PrimaryActionButton(
-                                text = downloadModeText, onClick = onChooseDownloadMode
-                            )
-                        })
-                }
-
-                // 来源：弹出选择 sheet，选项含本地与已下载云端版本
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "来源",
-                        description = "在内置版本与云端版本间切换",
-                        trailingContent = {
-                            PrimaryActionButton(
-                                text = "选择", onClick = onSwitchSource
-                            )
-                        })
-                }
-
-                // 浏览原始 SVG 图标
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "浏览SVG图标",
-                        description = "查看 Lawnicons 仓库的全部 SVG",
-                        trailingContent = {
-                            PrimaryActionButton(
-                                text = "浏览", onClick = onBrowseLawnicons
-                            )
-                        })
-                }
-            }
+            LawniconsOverviewSection(
+                versionText = versionText,
+                iconCountText = "${version.svgCount} 图标, ${version.mapperCount} 映射",
+                templateVersionText = templateVersionText,
+                downloadModeText = downloadModeText,
+                onChooseDownloadMode = onChooseDownloadMode,
+                onSwitchSource = onSwitchSource,
+                onBrowseLawnicons = onBrowseLawnicons
+            )
         }
 
         // 清除资产缓存：删除所有云端下载资源并切回本地（调试用，上线前移除）
         item(key = "clearCache") {
-            SegmentedColumn(title = "调试") {
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "清除已下载资产",
-                        description = "删除所有云端下载的 Lawnicons 资产\n仅保留应用内置版本",
-                        trailingContent = {
-                            PrimaryActionButton(
-                                text = if (hasDownloadedAssets) "清除" else "已清除",
-                                enabled = hasDownloadedAssets,
-                                onClick = { showResetDialog = true }
-                            )
-                        })
-                }
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "清除颜色映射缓存",
-                        description = "删除 App-M3 颜色映射缓存，下次可重新生成",
-                        trailingContent = {
-                            PrimaryActionButton(
-                                text = if (cacheAvailable) "清除" else "已清除",
-                                enabled = cacheAvailable,
-                                onClick = { showClearCacheDialog = true }
-                            )
-                        }
-                    )
-                }
-            }
+            AssetCleanupSection(
+                hasDownloadedAssets = hasDownloadedAssets,
+                cacheAvailable = cacheAvailable,
+                onClearAssets = { showResetDialog = true },
+                onClearColorCache = { showClearCacheDialog = true }
+            )
         }
 
         item(key = "navPadding") {
