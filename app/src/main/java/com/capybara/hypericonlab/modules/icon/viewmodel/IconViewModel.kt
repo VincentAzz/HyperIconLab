@@ -192,7 +192,7 @@ class IconViewModel(
         wallpaperBitmapProvider = { wallpaperBitmap.value },
         wallpaperColorSchemeProvider = { wallpaperColorScheme.value },
         appColorSchemesProvider = { appColorSchemes },
-        resourcesReadyProvider = { resourceInitializer.mapperExists.value },
+        resourcesReadyProvider = { initializationCoordinator.resourcesReadyVersion.value != null },
         isRunningProvider = { _isRunning.value },
         onLog = { message, type -> addLog(message, type) },
         onStatusTextChange = { _statusText.value = it },
