@@ -86,6 +86,18 @@
     <string name="lawnicons_update_notification_channel_name">Lawnicons Updates</string>
     <string name="lawnicons_update_notification_channel_desc">Notify when lawnicons resource update fails</string>
     <string name="lawnicons_update_notification_failed_title">Lawnicons update failed</string>
+    <string name="initialization_notification_channel_name">初始化任务</string>
+    <string name="initialization_notification_channel_desc">显示初始化资源的进度和结果</string>
+    <string name="initialization_notification_title">正在初始化资源</string>
+    <string name="initialization_notification_progress">%1$s：%2$d%%</string>
+    <string name="initialization_notification_completed_title">初始化完成</string>
+    <string name="initialization_notification_completed_text">Lawnicons、APK 模板和颜色缓存已准备完成</string>
+    <string name="initialization_notification_failed_title">初始化未完成</string>
+    <string name="initialization_notification_failed_text">%1$s：%2$s</string>
+    <string name="initialization_notification_unknown_error">未知错误</string>
+    <string name="initialization_task_lawnicons">Lawnicons 资源</string>
+    <string name="initialization_task_template">APK 模板</string>
+    <string name="initialization_task_app_m3">App-M3 颜色缓存</string>
 
 
     <string name="permission_check_title">Permission Check</string>

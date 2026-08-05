@@ -12,6 +12,7 @@ import com.capybara.hypericonlab.modules.settings.domain.provider.SystemEnvProvi
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.domain.usecase.UpdateSettingUseCase
+import com.capybara.hypericonlab.modules.settings.notification.InitializationNotificationManager
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsSharedViewModel
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
@@ -25,6 +26,8 @@ import org.koin.dsl.module
 private const val APP_SETTINGS_DATASTORE_NAME = "app_settings"
 
 val settingsModule = module {
+    singleOf(::InitializationNotificationManager)
+
     single<DataStore<Preferences>> {
         PreferenceDataStoreFactory.create {
             androidContext().preferencesDataStoreFile(APP_SETTINGS_DATASTORE_NAME)
