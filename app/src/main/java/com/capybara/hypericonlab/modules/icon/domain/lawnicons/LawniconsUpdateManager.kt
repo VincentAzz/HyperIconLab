@@ -153,6 +153,50 @@ class LawniconsUpdateManager(
         restoreAssetCheckRecord(record.copy(state = completed))
     }
 
+    fun simulateAssetUpdate() {
+        val current = resourceManager.currentVersion.value
+        val virtualCurrent = current.copy(
+            version = SimulationConstants.CURRENT_VERSION,
+            source = ResourceSource.REMOTE
+        )
+        val virtualRelease = ReleaseInfo(
+            version = SimulationConstants.AVAILABLE_VERSION,
+            zipUrl = SimulationConstants.VIRTUAL_URL,
+            zipSizeBytes = 0L,
+            sha256 = "",
+            lawniconsCommit = current.lawniconsCommit,
+            generatedAt = SimulationConstants.AVAILABLE_VERSION,
+            totalIcons = current.mapperCount,
+            addedIcons = 0,
+            removedIcons = 0,
+            modifiedIcons = 0,
+            templateArchive = ReleaseAssetInfo(
+                url = SimulationConstants.VIRTUAL_URL,
+                sizeBytes = 0L
+            )
+        )
+        _assetCheckState.value = AssetUpdateCheckState.Available(
+            currentVersion = virtualCurrent,
+            availableRelease = virtualRelease,
+            resourceUpdateRequired = true,
+            templateUpdateRequired = true,
+            cacheRebuildRequired = true,
+            isSimulated = true
+        )
+        appLogStore.add(
+            "调试：已注入虚拟资产更新 ${SimulationConstants.CURRENT_VERSION} → " +
+                    SimulationConstants.AVAILABLE_VERSION,
+            LogType.INFO
+        )
+    }
+
+    fun finishSimulatedAssetUpdate() {
+        _assetCheckState.value = AssetUpdateCheckState.UpToDate(
+            SimulationConstants.AVAILABLE_VERSION
+        )
+        appLogStore.add("调试：虚拟资产更新流程已完成", LogType.SUCCESS)
+    }
+
     private suspend fun saveCheckRecord(
         trigger: AssetUpdateCheckTrigger,
         checkedAt: Long,
@@ -382,6 +426,12 @@ class LawniconsUpdateManager(
         const val AUTOMATIC_CHECK_COOLDOWN_MS = 24 * 60 * 60 * 1000L
         const val MANUAL_CHECK_COOLDOWN_MS = 6 * 60 * 60 * 1000L
     }
+}
+
+private object SimulationConstants {
+    const val CURRENT_VERSION = "20260806"
+    const val AVAILABLE_VERSION = "20770101"
+    const val VIRTUAL_URL = "debug://asset-update"
 }
 
 private val AssetUpdateCheckTrigger.logName: String

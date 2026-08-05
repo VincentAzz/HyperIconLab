@@ -27,6 +27,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -90,9 +91,12 @@ class InitializationCoordinator(
     @Synchronized
     fun startManualAssetUpdate(): Job {
         assetUpdateJob?.takeIf { it.isActive }?.let { return it }
+        val available = assetsFacade.assetCheckState.value as? AssetUpdateCheckState.Available
+        if (available?.isSimulated == true) {
+            return startSimulatedAssetUpdate(available)
+        }
         return scope.launch {
             _assetUpdateRunning.value = true
-            val available = assetsFacade.assetCheckState.value as? AssetUpdateCheckState.Available
             _assetUpdateState.value = createAssetUpdateState(available)
             val observer = scope.launch {
                 launch {
@@ -169,6 +173,46 @@ class InitializationCoordinator(
                 }
             }
         }.also { assetUpdateJob = it }
+    }
+
+    private fun startSimulatedAssetUpdate(
+        available: AssetUpdateCheckState.Available
+    ): Job = scope.launch {
+        _assetUpdateRunning.value = true
+        _assetUpdateState.value = createAssetUpdateState(available)
+        try {
+            runCatching { serviceController.start() }
+                .onFailure {
+                    appLogStore.add("调试通知：前台服务启动失败，继续模拟更新", LogType.ERROR)
+                }
+            appLogStore.add("调试：开始模拟资产更新", LogType.INFO)
+            runSimulatedTask(InitializationTask.LAWNICONS)
+            runSimulatedTask(InitializationTask.APK_TEMPLATE)
+            runSimulatedTask(InitializationTask.APP_M3_CACHE)
+            assetsFacade.finishSimulatedAssetUpdate()
+            _assetUpdateState.value = null
+            appLogStore.add("调试：模拟资产更新完成", LogType.SUCCESS)
+        } finally {
+            _assetUpdateState.value = _assetUpdateState.value?.copy(isRunning = false)
+            _assetUpdateRunning.value = false
+            serviceController.stop()
+            synchronized(this@InitializationCoordinator) {
+                assetUpdateJob = null
+            }
+        }
+    }.also { assetUpdateJob = it }
+
+    private suspend fun runSimulatedTask(task: InitializationTask) {
+        markAssetUpdateTask(task, InitializationTaskStatus.RUNNING)
+        repeat(SimulationDefaults.TASK_STEPS) { step ->
+            delay(SimulationDefaults.TASK_STEP_DELAY_MS)
+            markAssetUpdateTask(
+                task = task,
+                status = InitializationTaskStatus.RUNNING,
+                progress = (step + 1).toFloat() / SimulationDefaults.TASK_STEPS
+            )
+        }
+        completeAssetUpdateTask(task)
     }
 
     private fun createAssetUpdateState(
@@ -729,4 +773,9 @@ class InitializationCoordinator(
         const val LAWNICONS_DOWNLOAD_WEIGHT = 0.5f
         const val LAWNICONS_EXTRACT_WEIGHT = 0.5f
     }
+}
+
+private object SimulationDefaults {
+    const val TASK_STEPS = 20
+    const val TASK_STEP_DELAY_MS = 100L
 }

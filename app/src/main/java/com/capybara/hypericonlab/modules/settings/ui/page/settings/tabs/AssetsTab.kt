@@ -165,8 +165,10 @@ fun AssetsTab(
             AssetCleanupSection(
                 hasDownloadedAssets = hasDownloadedAssets,
                 cacheAvailable = cacheAvailable,
+                isAssetUpdateRunning = assetUpdateRunning,
                 onClearAssets = { showResetDialog = true },
-                onClearColorCache = { showClearCacheDialog = true }
+                onClearColorCache = { showClearCacheDialog = true },
+                onSimulateAssetUpdate = assetsFacade::simulateAssetUpdate
             )
         }
 

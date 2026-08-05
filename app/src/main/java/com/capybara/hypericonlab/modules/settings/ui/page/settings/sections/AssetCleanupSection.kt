@@ -1,6 +1,7 @@
 package com.capybara.hypericonlab.modules.settings.ui.page.settings.sections
 
 import androidx.compose.runtime.Composable
+import com.capybara.hypericonlab.BuildConfig
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
@@ -9,8 +10,10 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 fun AssetCleanupSection(
     hasDownloadedAssets: Boolean,
     cacheAvailable: Boolean,
+    isAssetUpdateRunning: Boolean,
     onClearAssets: () -> Unit,
-    onClearColorCache: () -> Unit
+    onClearColorCache: () -> Unit,
+    onSimulateAssetUpdate: () -> Unit
 ) {
     SegmentedColumn(title = "调试") {
         item {
@@ -41,6 +44,23 @@ fun AssetCleanupSection(
                     )
                 }
             )
+        }
+
+        if (BuildConfig.DEBUG) {
+            item {
+                BaseWidget(
+                    iconPlaceholder = false,
+                    title = "模拟资产更新",
+                    description = "注入虚拟更新，不变更数据\n20260806 → 20770101\n测试资产更新流程",
+                    trailingContent = {
+                        PrimaryActionButton(
+                            text = "模拟更新",
+                            enabled = !isAssetUpdateRunning,
+                            onClick = onSimulateAssetUpdate
+                        )
+                    }
+                )
+            }
         }
     }
 }

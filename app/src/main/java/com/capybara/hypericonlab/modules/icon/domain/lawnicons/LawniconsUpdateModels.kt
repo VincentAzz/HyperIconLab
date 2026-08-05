@@ -39,7 +39,8 @@ sealed class AssetUpdateCheckState {
         val availableRelease: ReleaseInfo,
         val resourceUpdateRequired: Boolean,
         val templateUpdateRequired: Boolean,
-        val cacheRebuildRequired: Boolean
+        val cacheRebuildRequired: Boolean,
+        val isSimulated: Boolean = false
     ) : AssetUpdateCheckState()
 
     data class Failed(

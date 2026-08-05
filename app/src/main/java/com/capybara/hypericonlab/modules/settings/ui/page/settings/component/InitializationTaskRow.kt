@@ -57,7 +57,7 @@ private fun InitializationTaskItem(
     isRunning: Boolean = false,
     isError: Boolean = false,
     onClick: (() -> Unit)? = null,
-    trailingContent: @Composable (() -> Unit)? = null,
+    secondaryContent: @Composable (() -> Unit)? = null,
     shape: Shape = LocalSegmentedItemShape.current
 ) {
     val titleColor = MaterialTheme.colorScheme.onSurface
@@ -120,11 +120,10 @@ private fun InitializationTaskItem(
                     color = titleColor,
                     fontWeight = FontWeight.Normal
                 )
-                if (trailingContent != null) {
-                    trailingContent()
-                }
             }
-            if (description != null) {
+            if (secondaryContent != null) {
+                secondaryContent()
+            } else if (description != null) {
                 Text(
                     text = description,
                     // style = MaterialTheme.typography.bodyMedium,
@@ -216,16 +215,24 @@ fun AssetUpdateTaskRow(
 
     InitializationTaskItem(
         title = title,
-        description = description,
+        description = description.takeUnless {
+            oldVersion != null && newVersion != null
+        },
         icon = icon,
         iconColor = iconColor,
         isRunning = isRunning,
-        trailingContent = {
-            if (oldVersion != null && newVersion != null) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+        secondaryContent = if (oldVersion != null && newVersion != null) {
+            {
+                Row(
+                    modifier = Modifier.padding(
+                        top = InitializationTaskRowDefaults.TextLineGap
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
                     Text(
                         text = oldVersion,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         fontFamily = GoogleSansCodeFontFamily,
                         color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
                     )
@@ -239,12 +246,14 @@ fun AssetUpdateTaskRow(
                     )
                     Text(
                         text = newVersion,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         fontFamily = GoogleSansCodeFontFamily,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
+        } else {
+            null
         }
     )
 }

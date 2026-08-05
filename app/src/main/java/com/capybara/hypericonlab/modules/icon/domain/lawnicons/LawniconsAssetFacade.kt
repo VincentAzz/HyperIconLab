@@ -58,6 +58,12 @@ interface LawniconsAssetFacade {
     // 标记资产更新及其缓存流程已完成
     suspend fun markAssetUpdateCompleted()
 
+    // 仅调试构建：注入虚拟资产更新状态
+    fun simulateAssetUpdate()
+
+    // 仅调试构建：结束虚拟资产更新，不写入持久化资源状态
+    fun finishSimulatedAssetUpdate()
+
     // 判断指定类型的检查是否已结束冷却
     fun canCheckForAssetUpdates(
         trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL,
@@ -141,6 +147,14 @@ class DefaultLawniconsAssetFacade(
 
     override suspend fun markAssetUpdateCompleted() {
         updateManager.markAssetUpdateCompleted()
+    }
+
+    override fun simulateAssetUpdate() {
+        updateManager.simulateAssetUpdate()
+    }
+
+    override fun finishSimulatedAssetUpdate() {
+        updateManager.finishSimulatedAssetUpdate()
     }
 
     override fun canCheckForAssetUpdates(
