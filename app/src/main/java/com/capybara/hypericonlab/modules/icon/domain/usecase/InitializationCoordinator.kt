@@ -7,7 +7,6 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
@@ -494,7 +493,7 @@ class InitializationCoordinator(
                 InitializationTask.APK_TEMPLATE ->
                     usingBuiltInAssets ||
                             (persisted.templateVersion == currentVersion &&
-                                    assetsFacade.templateState.value is IconPackTemplateState.Available)
+                                    assetsFacade.isTemplateAvailable())
 
                 InitializationTask.APP_M3_CACHE ->
                     persisted.isCacheConfigCurrent() &&

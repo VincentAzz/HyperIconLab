@@ -22,6 +22,7 @@ class PreviewCoordinator(
     private val wallpaperBitmapProvider: () -> Bitmap?,
     private val wallpaperColorSchemeProvider: () -> MonetColorExtractor.WallpaperColorScheme?,
     private val appColorSchemesProvider: () -> Map<String, Pair<String, String>>,
+    private val resourcesReadyProvider: () -> Boolean,
     private val isRunningProvider: () -> Boolean,
     private val onLog: (String, LogType) -> Unit,
     private val onStatusTextChange: (String) -> Unit,
@@ -82,6 +83,13 @@ class PreviewCoordinator(
         val startTime = System.currentTimeMillis()
 
         try {
+            if (!resourcesReadyProvider()) {
+                if (!isLive) {
+                    onStatusTextChange("资源未就绪")
+                    onRunningChange(false)
+                }
+                return
+            }
             if (!isLive) onStatusTextChange("正在加载图标...")
             val result = generatePreviewUseCase.execute(
                 config = configProvider(),

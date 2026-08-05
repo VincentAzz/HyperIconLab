@@ -51,6 +51,9 @@ interface LawniconsAssetFacade {
 
     // 确保当前远程模板可用
     suspend fun ensureTemplateAvailable(onProgress: (Float) -> Unit = {}): Boolean
+
+    // 校验当前远程模板目录是否已经准备完成
+    fun isTemplateAvailable(): Boolean
 }
 
 // LawniconsAssetFacade 默认实现
@@ -106,4 +109,6 @@ class DefaultLawniconsAssetFacade(
 
     override suspend fun ensureTemplateAvailable(onProgress: (Float) -> Unit): Boolean =
         templateManager.ensureAvailable(onProgress)
+
+    override fun isTemplateAvailable(): Boolean = templateManager.isAvailable()
 }
