@@ -11,8 +11,10 @@ import com.capybara.hypericonlab.MainActivity
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogType
+import com.capybara.hypericonlab.modules.icon.domain.model.AssetUpdateUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
+import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskStatus
 
 // 初始化任务通知管理器
@@ -42,6 +44,17 @@ class InitializationNotificationManager(
         val runningTask = state.tasks.firstOrNull {
             it.status == InitializationTaskStatus.RUNNING
         } ?: return
+        updateProgress(runningTask)
+    }
+
+    fun updateProgress(state: AssetUpdateUiState) {
+        val runningTask = state.tasks.firstOrNull {
+            it.status == InitializationTaskStatus.RUNNING
+        } ?: return
+        updateProgress(runningTask)
+    }
+
+    private fun updateProgress(runningTask: InitializationTaskState) {
         val now = System.currentTimeMillis()
         if (now - lastProgressTime < PROGRESS_THROTTLE_MS) return
         lastProgressTime = now

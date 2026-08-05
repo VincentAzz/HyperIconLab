@@ -107,6 +107,10 @@ class InitializationCoordinator(
                 }
             }
             try {
+                runCatching { serviceController.start() }
+                    .onFailure {
+                        appLogStore.add("资源更新通知：前台服务启动失败，继续执行更新", LogType.ERROR)
+                    }
                 appLogStore.add("资源更新：开始执行手动资产更新", LogType.INFO)
                 assetsFacade.resetUpdateState()
                 assetsFacade.checkAndInstall()
@@ -130,6 +134,20 @@ class InitializationCoordinator(
                         it.status == InitializationTaskStatus.FAILED
                     } == true
                 ) {
+                    _state.value = _state.value.copy(
+                        resourceVersion = assetsFacade.currentVersion.value.version,
+                        templateVersion = if (
+                            assetsFacade.currentVersion.value.source == ResourceSource.REMOTE &&
+                            assetsFacade.templateState.value is IconPackTemplateState.Available
+                        ) {
+                            assetsFacade.currentVersion.value.version
+                        } else {
+                            _state.value.templateVersion
+                        },
+                        cacheSourceVersion = assetsFacade.currentVersion.value.version,
+                        cacheConfigVersion = InitializationCacheConfig.VERSION
+                    )
+                    persistCurrentState()
                     assetsFacade.markAssetUpdateCompleted()
                     _assetUpdateState.value = null
                 }
@@ -145,6 +163,7 @@ class InitializationCoordinator(
                 observer.cancelAndJoin()
                 _assetUpdateState.value = _assetUpdateState.value?.copy(isRunning = false)
                 _assetUpdateRunning.value = false
+                serviceController.stop()
                 synchronized(this@InitializationCoordinator) {
                     assetUpdateJob = null
                 }

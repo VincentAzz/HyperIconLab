@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogType
+import com.capybara.hypericonlab.modules.icon.domain.model.InitializationState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskStatus
 import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import kotlinx.coroutines.CoroutineScope
@@ -60,23 +61,50 @@ class InitializationForegroundService : Service() {
 
     private fun observeInitialization() {
         observeJob = scope.launch {
-            initializationCoordinator.state.collectLatest { state ->
-                val isRunning = state.tasks.any {
-                    it.status == InitializationTaskStatus.RUNNING
-                }
-                val hasPendingTasks = state.tasks.any {
-                    it.status == InitializationTaskStatus.PENDING
-                }
-                val isTerminalState = !isRunning && !hasPendingTasks
-                val isTerminalFailure = state.failedTask != null && isTerminalState
-                when {
-                    isRunning -> notificationManager.updateProgress(state)
-                    state.isCompleted || isTerminalFailure -> {
-                        notificationManager.showTerminal(state)
-                        stopSelf()
+            launch {
+                initializationCoordinator.state.collectLatest { state ->
+                    if (initializationCoordinator.assetUpdateState.value != null) return@collectLatest
+                    val isRunning = state.tasks.any {
+                        it.status == InitializationTaskStatus.RUNNING
                     }
+                    val hasPendingTasks = state.tasks.any {
+                        it.status == InitializationTaskStatus.PENDING
+                    }
+                    val isTerminalState = !isRunning && !hasPendingTasks
+                    val isTerminalFailure = state.failedTask != null && isTerminalState
+                    when {
+                        isRunning -> notificationManager.updateProgress(state)
+                        state.isCompleted || isTerminalFailure -> {
+                            notificationManager.showTerminal(state)
+                            stopSelf()
+                        }
 
-                    state.requiresManualStart || isTerminalState -> stopSelf()
+                        state.requiresManualStart || isTerminalState -> stopSelf()
+                    }
+                }
+            }
+            launch {
+                initializationCoordinator.assetUpdateState.collectLatest { assetState ->
+                    if (assetState == null) return@collectLatest
+                    val running = assetState.tasks.any {
+                        it.status == InitializationTaskStatus.RUNNING
+                    }
+                    val failedTask = assetState.tasks.firstOrNull {
+                        it.status == InitializationTaskStatus.FAILED
+                    }
+                    when {
+                        running -> notificationManager.updateProgress(assetState)
+                        failedTask != null -> {
+                            notificationManager.showTerminal(
+                                InitializationState(
+                                    tasks = assetState.tasks,
+                                    failedTask = failedTask.task,
+                                    failureMessage = failedTask.message
+                                )
+                            )
+                            stopSelf()
+                        }
+                    }
                 }
             }
         }
