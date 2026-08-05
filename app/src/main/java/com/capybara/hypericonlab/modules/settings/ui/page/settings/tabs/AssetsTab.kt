@@ -27,9 +27,9 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
 import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
-import com.capybara.hypericonlab.modules.icon.ui.page.home.component.InitializationCard
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.InitializationCard
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.AssetCleanupSection
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.LawniconsOverviewSection
 import kotlinx.coroutines.launch

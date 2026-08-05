@@ -34,9 +34,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
 import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
-import com.capybara.hypericonlab.modules.icon.ui.page.home.component.InitializationCard
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.InitializationCard
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 

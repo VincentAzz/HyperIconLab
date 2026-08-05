@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.home.component
+package com.capybara.hypericonlab.modules.settings.ui.page.settings.component
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -48,6 +48,8 @@ private object InitializationCardDefaults {
     val HeaderGap = 8.dp
     val ProgressHeight = 4.dp
     val ProgressDotSize = 4.dp
+    val TaskListTopPadding = 8.dp
+    val TaskListBottomPadding = 8.dp
 }
 
 private enum class HeaderState {
@@ -104,7 +106,12 @@ fun InitializationCard(
                 shape = LocalSegmentedItemShape.current,
                 color = MaterialTheme.colorScheme.surfaceBright
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.padding(
+                        top = InitializationCardDefaults.TaskListTopPadding,
+                        bottom = InitializationCardDefaults.TaskListBottomPadding
+                    )
+                ) {
                     state.tasks.forEach { taskState ->
                         InitializationTaskRow(
                             taskState = taskState,
@@ -226,7 +233,7 @@ private fun SummaryHeaderContent(
             Icon(
                 imageVector = trailingIcon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }

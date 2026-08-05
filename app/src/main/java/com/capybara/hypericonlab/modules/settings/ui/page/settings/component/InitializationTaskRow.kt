@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.modules.icon.ui.page.home.component
+package com.capybara.hypericonlab.modules.settings.ui.page.settings.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,14 +38,13 @@ import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskSta
 object InitializationTaskRowDefaults {
     val IconSize = 24.dp
     val IndicatorSize = 18.dp
-    val HorizontalPadding = 12.dp
-    val VerticalPadding = 12.dp
-    val IconToTextGap = 12.dp
-    val TextLineGap = 0.dp
+    val HorizontalPadding = 16.dp
+    val VerticalPadding = 8.dp
+    val IconToTextGap = 16.dp
+    val TextLineGap = 2.dp
 
-    // 偏移量：用于微调对齐首行文本顶部
-    val IndicatorTopOffset = 0.dp
-    val IconTopOffset = 0.dp // 静态图标的额外顶部偏移量
+    // val IndicatorTopOffset = 0.dp
+    // val IconTopOffset = 0.dp
 }
 
 
@@ -84,7 +83,7 @@ private fun InitializationTaskItem(
             if (isRunning) {
                 CircularProgressIndicator(
                     modifier = Modifier
-                        .padding(top = InitializationTaskRowDefaults.IndicatorTopOffset)
+                        // .padding(top = InitializationTaskRowDefaults.IndicatorTopOffset)
                         .size(InitializationTaskRowDefaults.IndicatorSize),
                     color = MaterialTheme.colorScheme.onSurface,
                     strokeWidth = 2.dp,
@@ -96,7 +95,7 @@ private fun InitializationTaskItem(
                     contentDescription = null,
                     tint = iconColor,
                     modifier = Modifier
-                        .padding(top = InitializationTaskRowDefaults.IconTopOffset)
+                        // .padding(top = InitializationTaskRowDefaults.IconTopOffset)
                         .size(InitializationTaskRowDefaults.IconSize)
                 )
             }
@@ -154,7 +153,7 @@ fun InitializationTaskRow(
     }
 
     val iconColor = when (taskState.status) {
-        InitializationTaskStatus.COMPLETED -> MaterialTheme.colorScheme.onSurface
+        InitializationTaskStatus.COMPLETED -> MaterialTheme.colorScheme.primary
         InitializationTaskStatus.FAILED -> MaterialTheme.colorScheme.error
         InitializationTaskStatus.PENDING -> MaterialTheme.colorScheme.outlineVariant
         else -> MaterialTheme.colorScheme.onSurface
@@ -174,8 +173,8 @@ fun InitializationTaskRow(
         }
     } else {
         when (taskState.task) {
-            InitializationTask.LAWNICONS -> "从 HyperIconLab/releases 获取 Lawnicons SVG 以生成图标"
-            InitializationTask.APK_TEMPLATE -> "从 HyperIconLab/releases 获取模板以构建可安装的图标包 APK 产物"
+            InitializationTask.LAWNICONS -> "从 HyperIconLab/releases 获取 Lawnicons SVG\n用于生成图标"
+            InitializationTask.APK_TEMPLATE -> "从 HyperIconLab/releases 获取模板\n用于构建可安装的图标包 APK 产物"
             InitializationTask.APP_M3_CACHE -> "加快预览和构建速度"
         }
     }
@@ -209,7 +208,7 @@ fun AssetUpdateTaskRow(
     }
 
     val iconColor = when (status) {
-        InitializationTaskStatus.COMPLETED -> MaterialTheme.colorScheme.onSurface
+        InitializationTaskStatus.COMPLETED -> MaterialTheme.colorScheme.primary
         InitializationTaskStatus.PENDING -> MaterialTheme.colorScheme.outlineVariant
         else -> MaterialTheme.colorScheme.onSurface
     }
