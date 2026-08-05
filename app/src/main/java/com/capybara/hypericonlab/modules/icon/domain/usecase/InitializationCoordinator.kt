@@ -17,6 +17,7 @@ import com.capybara.hypericonlab.modules.icon.domain.model.InitializationState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskStatus
+import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationServiceController
 import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationStateRepository
 import com.capybara.hypericonlab.modules.render.AppM3ColorCache
 import kotlinx.coroutines.CancellationException
@@ -38,7 +39,8 @@ class InitializationCoordinator(
     private val assetsFacade: LawniconsAssetFacade,
     private val appM3PreprocessManager: AppM3PreprocessManager,
     private val stateRepository: InitializationStateRepository,
-    private val appLogStore: AppLogStore
+    private val appLogStore: AppLogStore,
+    private val serviceController: InitializationServiceController
 ) {
     private val _state = MutableStateFlow(InitializationState())
     val state: StateFlow<InitializationState> = _state.asStateFlow()
@@ -72,6 +74,7 @@ class InitializationCoordinator(
 
     fun cancelInitialization() {
         initializationJob?.cancel()
+        serviceController.stop()
     }
 
     /** 按资源、模板、颜色缓存顺序执行资产页的手动更新。 */
@@ -168,6 +171,7 @@ class InitializationCoordinator(
         }
         _state.value = _state.value.copy(requiresManualStart = false)
         persistCurrentState()
+        serviceController.start()
 
         if (InitializationTask.LAWNICONS in validCompletedTasks) {
             loadCurrentColorSchemes()

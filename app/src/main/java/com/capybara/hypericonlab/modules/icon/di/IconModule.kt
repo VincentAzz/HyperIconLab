@@ -46,7 +46,8 @@ val iconModule = module {
             assetsFacade = get(),
             appM3PreprocessManager = get(),
             stateRepository = get(),
-            appLogStore = get()
+            appLogStore = get(),
+            serviceController = get()
         )
     }
     single { LawniconsResourceManager(get()) }

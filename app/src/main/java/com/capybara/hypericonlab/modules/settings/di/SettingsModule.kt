@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.capybara.hypericonlab.modules.icon.domain.repository.InitializationServiceController
 import com.capybara.hypericonlab.modules.settings.data.local.AppDataStore
 import com.capybara.hypericonlab.modules.settings.data.provider.SystemEnvProviderImpl
 import com.capybara.hypericonlab.modules.settings.data.provider.ThemeStateProviderImpl
@@ -12,6 +13,7 @@ import com.capybara.hypericonlab.modules.settings.domain.provider.SystemEnvProvi
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.domain.usecase.UpdateSettingUseCase
+import com.capybara.hypericonlab.modules.settings.notification.InitializationForegroundServiceController
 import com.capybara.hypericonlab.modules.settings.notification.InitializationNotificationManager
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsSharedViewModel
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
@@ -27,6 +29,9 @@ private const val APP_SETTINGS_DATASTORE_NAME = "app_settings"
 
 val settingsModule = module {
     singleOf(::InitializationNotificationManager)
+    single<InitializationServiceController> {
+        InitializationForegroundServiceController(androidContext())
+    }
 
     single<DataStore<Preferences>> {
         PreferenceDataStoreFactory.create {

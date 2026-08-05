@@ -57,14 +57,19 @@ class InitializationForegroundService : Service() {
                 val isRunning = state.tasks.any {
                     it.status == InitializationTaskStatus.RUNNING
                 }
+                val hasPendingTasks = state.tasks.any {
+                    it.status == InitializationTaskStatus.PENDING
+                }
+                val isTerminalState = !isRunning && !hasPendingTasks
+                val isTerminalFailure = state.failedTask != null && isTerminalState
                 when {
                     isRunning -> notificationManager.updateProgress(state)
-                    state.isCompleted || state.failedTask != null -> {
+                    state.isCompleted || isTerminalFailure -> {
                         notificationManager.showTerminal(state)
                         stopSelf()
                     }
 
-                    state.requiresManualStart -> stopSelf()
+                    state.requiresManualStart || isTerminalState -> stopSelf()
                 }
             }
         }
