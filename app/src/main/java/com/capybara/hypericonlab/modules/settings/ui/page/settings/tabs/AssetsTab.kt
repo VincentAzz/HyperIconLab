@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -19,25 +20,29 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.FailureReason
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
-import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
 import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
+import com.capybara.hypericonlab.modules.icon.ui.page.home.component.InitializationCard
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
+
+private object AssetsTabDefaults {
+    val InitializationHorizontalPadding = 16.dp
+}
 
 @Composable
 fun AssetsTab(
@@ -58,14 +63,10 @@ fun AssetsTab(
 
     // 当前版本信息（从 Facade 观察，来源切换后自动更新）
     val version by assetsFacade.currentVersion.collectAsStateWithLifecycle()
-    // 更新流程状态（检查/下载/解压/成功/失败）
-    val updateState by assetsFacade.updateState.collectAsStateWithLifecycle()
+    val initializationState by initializationCoordinator.state.collectAsStateWithLifecycle()
     val templateState by assetsFacade.templateState.collectAsStateWithLifecycle()
-    val preprocessState by appM3PreprocessManager.state.collectAsStateWithLifecycle()
     val cacheAvailable by appM3PreprocessManager.cacheAvailable.collectAsStateWithLifecycle()
     val hasDownloadedAssets = assetsFacade.getDownloadedVersions().isNotEmpty()
-    val templateAvailable =
-        (templateState as? IconPackTemplateState.Available)?.version == version.version
     // 下载代理开关
     val useDownloadProxy by appSettingsRepository.useDownloadProxy.collectAsStateWithLifecycle()
     var showClearCacheDialog by remember { mutableStateOf(false) }
@@ -84,22 +85,7 @@ fun AssetsTab(
     val downloadModeText =
         if (useDownloadProxy) DownloadMode.PROXY.label else DownloadMode.DIRECT.label
 
-    // 检查更新按钮文本与启用状态
-    val (baseCheckButtonText, baseCheckEnabled) = updateStateToButton(updateState)
-    val templateNeedsRetry = version.source == ResourceSource.REMOTE &&
-            (updateState == UpdateState.UpToDate || updateState is UpdateState.Success) &&
-            !templateAvailable &&
-            (templateState == IconPackTemplateState.Failed ||
-                    templateState == IconPackTemplateState.Unavailable)
-    val templateInProgress = templateState == IconPackTemplateState.Checking ||
-            templateState is IconPackTemplateState.Downloading
-    val checkButtonText = when {
-        templateState is IconPackTemplateState.Downloading -> "模板下载中"
-        templateState == IconPackTemplateState.Checking -> "模板检查中"
-        templateNeedsRetry -> "重试"
-        else -> baseCheckButtonText
-    }
-    val checkEnabled = if (templateInProgress) false else baseCheckEnabled || templateNeedsRetry
+    val templateVersionText = formatTemplateVersion(version.source, templateState)
 
     LazyColumn(
         modifier = modifier
@@ -116,12 +102,23 @@ fun AssetsTab(
             bottom = outerPadding.calculateBottomPadding(),
         ),
     ) {
+        item(key = "initialization") {
+            InitializationCard(
+                modifier = Modifier.padding(horizontal = AssetsTabDefaults.InitializationHorizontalPadding),
+                state = initializationState,
+                onStart = { initializationCoordinator.startInitialization(manualStart = true) },
+                onRetry = { initializationCoordinator.startInitialization(manualStart = true) }
+            )
+        }
+
         item(key = "lawnicons") {
             SegmentedColumn(title = "Lawnicons") {
                 // 版本 + 来源合并显示：20260731 (ba36a38) - 云端
                 item {
                     BaseWidget(
-                        iconPlaceholder = false, title = "版本", trailingContent = {
+                        iconPlaceholder = false,
+                        title = "版本",
+                        trailingContent = {
                             Text(
                                 text = versionText,
                                 style = MaterialTheme.typography.bodyMedium,
@@ -133,7 +130,9 @@ fun AssetsTab(
 
                 item {
                     BaseWidget(
-                        iconPlaceholder = false, title = "图标数量", trailingContent = {
+                        iconPlaceholder = false,
+                        title = "图标数量",
+                        trailingContent = {
                             Text(
                                 text = "${version.svgCount} 图标, ${version.mapperCount} 映射",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -142,45 +141,24 @@ fun AssetsTab(
                         })
                 }
 
-                // 检查更新：云端来源显示，或仅有本地资产时显示（需保留更新入口）
-                // 仅当本地来源且已有云端版本共存时隐藏（用户手动切回本地无需更新）
-                val hasCloudVersions = assetsFacade.getDownloadedVersions().isNotEmpty()
-                val showUpdateEntry = version.source == ResourceSource.REMOTE || !hasCloudVersions
-
-                item(animatedVisibility = showUpdateEntry) {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "检查资源更新",
-                        description = updateStateDescription(updateState),
-                        trailingContent = {
-                            PrimaryActionButton(
-                                text = checkButtonText, enabled = checkEnabled, onClick = {
-                                    initializationCoordinator.startManualAssetUpdate()
-                                })
-                        })
-                }
-
                 item {
                     BaseWidget(
                         iconPlaceholder = false,
                         title = "APK 模板",
-                        description = "模板与云端 Lawnicons 版本严格绑定",
+                        // description = "模板与 Lawnicons 资源版本绑定",
                         trailingContent = {
                             Text(
-                                text = templateStateText(
-                                    version.source,
-                                    templateState,
-                                    templateAvailable
-                                ),
+                                text = templateVersionText,
                                 style = MaterialTheme.typography.bodyMedium,
+                                fontFamily = GoogleSansCodeFontFamily,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     )
                 }
 
-                // 下载方式：与检查更新同条件显示
-                item(animatedVisibility = showUpdateEntry) {
+                // 下载方式
+                item {
                     BaseWidget(
                         iconPlaceholder = false,
                         title = "下载方式",
@@ -253,25 +231,6 @@ fun AssetsTab(
             }
         }
 
-        item(key = "appM3Cache") {
-            SegmentedColumn(title = "App-M3 缓存") {
-                item {
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "预处理颜色映射集",
-                        description = preprocessDescription(preprocessState),
-                        trailingContent = {
-                            PrimaryActionButton(
-                                text = preprocessButtonText(preprocessState),
-                                enabled = preprocessState is AppM3PreprocessManager.PreprocessState.Idle,
-                                onClick = { appM3PreprocessManager.startPreprocess() }
-                            )
-                        }
-                    )
-                }
-            }
-        }
-
         item(key = "navPadding") {
             Spacer(modifier = Modifier.navigationBarsPadding())
         }
@@ -328,103 +287,19 @@ fun AssetsTab(
     }
 }
 
-private fun preprocessDescription(
-    state: AppM3PreprocessManager.PreprocessState
-): String = when (state) {
-    AppM3PreprocessManager.PreprocessState.Idle -> "可加快基于应用-M3样式的构建速度"
-    is AppM3PreprocessManager.PreprocessState.Running -> {
-        val percent = if (state.total > 0) state.computed * 100 / state.total else 0
-        "可加快基于应用-M3样式的构建速度\n已完成 $percent%"
-    }
-
-    AppM3PreprocessManager.PreprocessState.Done -> "可加快基于应用-M3样式的构建速度\n已完成 100%"
-}
-
-private fun preprocessButtonText(
-    state: AppM3PreprocessManager.PreprocessState
-): String = when (state) {
-    AppM3PreprocessManager.PreprocessState.Idle -> "开始"
-    is AppM3PreprocessManager.PreprocessState.Running -> "处理中"
-    AppM3PreprocessManager.PreprocessState.Done -> "已完成"
-}
-
-// 更新状态映射为按钮文本，进行中状态禁用点击
-private fun updateStateToButton(state: UpdateState): Pair<String, Boolean> = when (state) {
-    UpdateState.Idle -> "检查" to true
-    is UpdateState.Checking -> "检查中" to false
-    is UpdateState.Downloading -> "下载中 ${ButtonConstants.PERCENT_FMT.format((state.progress * ButtonConstants.PERCENT_SCALE).toInt())}" to false
-    is UpdateState.Extracting -> "解压中 ${ButtonConstants.PERCENT_FMT.format((state.progress * ButtonConstants.PERCENT_SCALE).toInt())}" to false
-    is UpdateState.Success -> "已更新" to true
-    is UpdateState.Failed -> "重试" to true
-    UpdateState.UpToDate -> "已是最新" to false
-}
-
-
-// 更新状态描述文本
-private fun updateStateDescription(state: UpdateState): String? = when (state) {
-    UpdateState.Idle -> "同时检查 Lawnicons 与配套 APK 模板"
-    is UpdateState.Checking -> "正在检查云端版本..."
-    is UpdateState.Downloading -> "正在下载资源包..."
-    is UpdateState.Extracting -> "正在解压资源..."
-    is UpdateState.Success -> "已切换到版本 ${state.newVersion}"
-    is UpdateState.Failed -> FailureMessage.forReason(state.reason)
-    UpdateState.UpToDate -> "当前已是最新版本"
-}
-
-private fun templateStateText(
+private fun formatTemplateVersion(
     source: ResourceSource,
-    state: IconPackTemplateState,
-    templateAvailable: Boolean
+    state: IconPackTemplateState
 ): String = if (source == ResourceSource.ASSETS) {
     "内置版本不支持"
-} else if (templateAvailable) {
-    "已就绪"
 } else {
     when (state) {
-        IconPackTemplateState.Idle -> "待检查"
-        IconPackTemplateState.Checking -> "检查中"
-        is IconPackTemplateState.Downloading ->
-            "下载中 ${ButtonConstants.PERCENT_FMT.format((state.progress * ButtonConstants.PERCENT_SCALE).toInt())}"
+        is IconPackTemplateState.Available -> state.version
+        IconPackTemplateState.Idle -> "未准备"
+        IconPackTemplateState.Checking,
+        is IconPackTemplateState.Downloading -> "准备中"
 
-        is IconPackTemplateState.Available -> "已就绪 (${state.version})"
-        IconPackTemplateState.Unavailable -> "当前版本未提供"
-        IconPackTemplateState.Failed -> "更新失败"
+        IconPackTemplateState.Unavailable,
+        IconPackTemplateState.Failed -> "不可用"
     }
-}
-
-private object FailureMessage {
-    const val RATE_LIMITED = "GitHub API 限速，请稍后重试或切换网络"
-
-    const val NETWORK_ERROR = "连接失败，请检查网络连接"
-
-    const val TIMEOUT = "连接超时，请检查网络连接"
-
-    const val HTTP_ERROR = "连接异常，请稍后重试"
-
-    const val CORRUPTED = "校验失败，请重新下载"
-
-    const val PARSE_ERROR = "解析失败"
-
-    const val EXTRACT_FAILED = "解压失败"
-
-    const val ACTIVATE_FAILED = "版本切换失败"
-
-    const val UNKNOWN = "更新失败，请重试"
-
-    fun forReason(reason: FailureReason): String = when (reason) {
-        FailureReason.RATE_LIMITED -> RATE_LIMITED
-        FailureReason.NETWORK_ERROR -> NETWORK_ERROR
-        FailureReason.TIMEOUT -> TIMEOUT
-        FailureReason.HTTP_ERROR -> HTTP_ERROR
-        FailureReason.CORRUPTED -> CORRUPTED
-        FailureReason.PARSE_ERROR -> PARSE_ERROR
-        FailureReason.EXTRACT_FAILED -> EXTRACT_FAILED
-        FailureReason.ACTIVATE_FAILED -> ACTIVATE_FAILED
-        FailureReason.UNKNOWN -> UNKNOWN
-    }
-}
-
-private object ButtonConstants {
-    const val PERCENT_SCALE = 100
-    const val PERCENT_FMT = "%d%%"
 }
