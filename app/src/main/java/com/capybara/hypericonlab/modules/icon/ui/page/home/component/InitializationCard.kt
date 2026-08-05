@@ -1,6 +1,13 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.home.component
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +50,10 @@ private object InitializationCardDefaults {
     val ProgressDotSize = 4.dp
 }
 
+private enum class HeaderState {
+    Ready, Running, Completed, Failure, AssetUpdate
+}
+
 @Composable
 fun InitializationCard(
     state: InitializationState,
@@ -65,12 +76,14 @@ fun InitializationCard(
     val displayTaskState = activeTaskState ?: fallbackTaskState
     val progress = displayTaskState?.progress?.coerceIn(0f, 1f) ?: 0f
 
-    val isRunning = displayTaskState != null && hasStarted && !hasFailure && !state.isCompleted
-    val isAssetUpdate = state.resourceVersion != null || state.templateVersion != null
+    val isRunning = !state.requiresManualStart &&
+            displayTaskState != null && hasStarted && !hasFailure && !state.isCompleted
+    val isAssetUpdate = !state.requiresManualStart &&
+            (state.resourceVersion != null || state.templateVersion != null)
 
     SegmentedColumn(
         modifier = modifier.fillMaxWidth(),
-        // title = "初始化",
+        title = "初始化",
         contentPadding = InitializationCardDefaults.GroupPadding
     ) {
         item(key = "header") {
@@ -114,6 +127,14 @@ private fun InitializationHeader(
     onStart: () -> Unit,
     onRetry: () -> Unit
 ) {
+    val headerState = when {
+        state.isCompleted -> HeaderState.Completed
+        hasFailure -> HeaderState.Failure
+        isRunning -> HeaderState.Running
+        isAssetUpdate -> HeaderState.AssetUpdate
+        else -> HeaderState.Ready
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,47 +142,58 @@ private fun InitializationHeader(
         shape = LocalSegmentedItemShape.current,
         color = MaterialTheme.colorScheme.surfaceBright
     ) {
-        Column(modifier = Modifier.padding(InitializationCardDefaults.CardPadding)) {
-            when {
-                state.isCompleted -> {
-                    val completedCount = state.tasks.count {
-                        it.status == InitializationTaskStatus.COMPLETED
+        // 使用 AnimatedContent 在不同卡片状态间平滑切换
+        AnimatedContent(
+            targetState = headerState,
+            transitionSpec = {
+                (fadeIn() + slideInVertically { it / 2 }) togetherWith
+                        (fadeOut() + slideOutVertically { -it / 2 }) using
+                        SizeTransform(clip = false)
+            },
+            label = "HeaderStateTransition"
+        ) { targetHeaderState ->
+            Column(modifier = Modifier.padding(InitializationCardDefaults.CardPadding)) {
+                when (targetHeaderState) {
+                    HeaderState.Completed -> {
+                        val completedCount = state.tasks.count {
+                            it.status == InitializationTaskStatus.COMPLETED
+                        }
+                        SummaryHeaderContent(
+                            title = "初始化完成 ($completedCount/${state.tasks.size})",
+                            trailingIcon = AppMaterialSymbols.check_circle
+                        )
                     }
-                    SummaryHeaderContent(
-                        title = "初始化完成 ($completedCount/${state.tasks.size})",
-                        trailingIcon = AppMaterialSymbols.check_circle
-                    )
-                }
 
-                hasFailure -> {
-                    SummaryHeaderContent(
-                        title = "初始化未完成",
-                        actionText = "重试",
-                        onAction = onRetry
-                    )
-                }
+                    HeaderState.Failure -> {
+                        SummaryHeaderContent(
+                            title = "初始化未完成",
+                            actionText = "重试",
+                            onAction = onRetry
+                        )
+                    }
 
-                isRunning -> {
-                    RunningHeaderContent(
-                        state = state,
-                        progress = progress
-                    )
-                }
+                    HeaderState.Running -> {
+                        RunningHeaderContent(
+                            state = state,
+                            progress = progress
+                        )
+                    }
 
-                isAssetUpdate -> {
-                    SummaryHeaderContent(
-                        title = "资产更新",
-                        actionText = "更新",
-                        onAction = onStart
-                    )
-                }
+                    HeaderState.AssetUpdate -> {
+                        SummaryHeaderContent(
+                            title = "资产更新",
+                            actionText = "更新",
+                            onAction = onStart
+                        )
+                    }
 
-                else -> {
-                    SummaryHeaderContent(
-                        title = "重新初始化",
-                        actionText = "开始",
-                        onAction = onStart
-                    )
+                    HeaderState.Ready -> {
+                        SummaryHeaderContent(
+                            title = "重新初始化",
+                            actionText = "开始",
+                            onAction = onStart
+                        )
+                    }
                 }
             }
         }
@@ -207,11 +239,7 @@ private fun RunningHeaderContent(
 ) {
     val runningTaskTitle =
         state.tasks.firstOrNull { it.status == InitializationTaskStatus.RUNNING }?.task?.let {
-            when (it) {
-                InitializationTask.LAWNICONS -> "从仓库拉取 Lawnicons 资源"
-                InitializationTask.APK_TEMPLATE -> "从仓库拉取图标包 APK 模板"
-                InitializationTask.APP_M3_CACHE -> "生成颜色映射缓存"
-            }
+            taskTitle(it)
         } ?: state.activeTask?.let { taskTitle(it) }
         ?: state.tasks.lastOrNull { it.status == InitializationTaskStatus.COMPLETED }
             ?.task?.let { taskTitle(it) }
@@ -223,11 +251,23 @@ private fun RunningHeaderContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(InitializationCardDefaults.HeaderGap)
         ) {
-            Text(
-                text = runningTaskTitle,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
+            // 对任务文本切换使用渐变+垂直滑动动画
+            AnimatedContent(
+                targetState = runningTaskTitle,
+                transitionSpec = {
+                    (fadeIn() + slideInVertically { it / 2 }) togetherWith
+                            (fadeOut() + slideOutVertically { -it / 2 })
+                },
+                modifier = Modifier.weight(1f),
+                label = "TaskTitleTransition"
+            ) { title ->
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1
+                )
+            }
+
             Text(
                 text = "${(progress * 100).roundToInt()}%",
                 style = MaterialTheme.typography.bodyMedium

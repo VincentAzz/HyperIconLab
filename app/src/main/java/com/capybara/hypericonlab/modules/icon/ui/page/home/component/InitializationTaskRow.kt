@@ -105,6 +105,8 @@ private fun InitializationTaskItem(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
+            // Spacer(Modifier.height(2.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,

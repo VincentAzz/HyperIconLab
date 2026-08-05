@@ -52,15 +52,16 @@ class InitializationCoordinator(
 
     private var initializationJob: Job? = null
     private var resetJob: Job? = null
+    private var assetUpdateJob: Job? = null
 
     @Synchronized
-    fun startInitialization(): Job {
+    fun startInitialization(manualStart: Boolean = false): Job {
         initializationJob?.takeIf { it.isActive }?.let { return it }
         return scope.launch {
             try {
                 resetJob?.join()
                 resetJob = null
-                runInitialization()
+                runInitialization(manualStart)
             } finally {
                 synchronized(this@InitializationCoordinator) {
                     initializationJob = null
@@ -73,16 +74,84 @@ class InitializationCoordinator(
         initializationJob?.cancel()
     }
 
-    fun resetForManualInitialization() {
+    /** 按资源、模板、颜色缓存顺序执行资产页的手动更新。 */
+    @Synchronized
+    fun startManualAssetUpdate(): Job {
+        assetUpdateJob?.takeIf { it.isActive }?.let { return it }
+        return scope.launch {
+            try {
+                appLogStore.add("资源更新：开始执行手动资产更新", LogType.INFO)
+                assetsFacade.resetUpdateState()
+                assetsFacade.checkAndInstall()
+                val resourceUpdated = assetsFacade.updateState.value is UpdateState.Success
+                assetsFacade.refresh()
+                if (resourceUpdated) {
+                    appM3PreprocessManager.clearCache()
+                }
+                loadCurrentColorSchemes()
+                appM3PreprocessManager.startPreprocess()
+                appLogStore.add("资源更新：已开始生成 App-M3 颜色映射缓存", LogType.INFO)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                appLogStore.add(
+                    "资源更新：手动资产更新失败（${e.message ?: "未知错误"}）",
+                    LogType.ERROR
+                )
+            } finally {
+                synchronized(this@InitializationCoordinator) {
+                    assetUpdateJob = null
+                }
+            }
+        }.also { assetUpdateJob = it }
+    }
+
+    fun resetForManualInitialization(
+        invalidatedTasks: Set<InitializationTask> = InitializationTask.entries.toSet()
+    ) {
         initializationJob?.cancel()
-        _state.value = InitializationState()
+        assetUpdateJob?.cancel()
+        appM3PreprocessManager.cancelPreprocess()
+        val currentState = _state.value
+        val resetTasks = currentState.tasks.map { taskState ->
+            if (taskState.task in invalidatedTasks ||
+                taskState.status == InitializationTaskStatus.RUNNING
+            ) {
+                InitializationTaskState(task = taskState.task)
+            } else {
+                taskState
+            }
+        }
+        _state.value = currentState.copy(
+            tasks = resetTasks,
+            activeTask = null,
+            isCompleted = resetTasks.all {
+                it.status == InitializationTaskStatus.COMPLETED
+            },
+            resourceVersion = currentState.resourceVersion.takeUnless {
+                InitializationTask.LAWNICONS in invalidatedTasks
+            },
+            templateVersion = currentState.templateVersion.takeUnless {
+                InitializationTask.APK_TEMPLATE in invalidatedTasks
+            },
+            cacheSourceVersion = currentState.cacheSourceVersion.takeUnless {
+                InitializationTask.APP_M3_CACHE in invalidatedTasks
+            },
+            cacheConfigVersion = currentState.cacheConfigVersion.takeUnless {
+                InitializationTask.APP_M3_CACHE in invalidatedTasks
+            },
+            failedTask = null,
+            failureMessage = null,
+            failureAt = null,
+            requiresManualStart = true
+        )
         appLogStore.add("初始化已重置，等待手动开始", LogType.INFO)
         resetJob = scope.launch {
-            stateRepository.clear()
+            persistCurrentState()
         }
     }
 
-    private suspend fun runInitialization() {
+    private suspend fun runInitialization(manualStart: Boolean) {
         val persisted = stateRepository.state.first()
         val validCompletedTasks = validCompletedTasks(persisted)
         val wasCompleted = persisted.isCompleted &&
@@ -93,6 +162,11 @@ class InitializationCoordinator(
             appLogStore.add("继续未完成的初始化任务", LogType.INFO)
         }
         _state.value = restoreState(persisted, validCompletedTasks)
+        if (persisted.requiresManualStart && !manualStart) {
+            persistCurrentState()
+            return
+        }
+        _state.value = _state.value.copy(requiresManualStart = false)
         persistCurrentState()
 
         if (InitializationTask.LAWNICONS in validCompletedTasks) {
@@ -365,7 +439,8 @@ class InitializationCoordinator(
                 cacheConfigVersion = current.cacheConfigVersion,
                 failedTask = current.failedTask,
                 failureMessage = current.failureMessage,
-                failureAt = current.failureAt
+                failureAt = current.failureAt,
+                requiresManualStart = current.requiresManualStart
             )
         )
     }
@@ -396,7 +471,8 @@ class InitializationCoordinator(
             cacheConfigVersion = persisted.cacheConfigVersion,
             failedTask = persisted.failedTask,
             failureMessage = persisted.failureMessage,
-            failureAt = persisted.failureAt
+            failureAt = persisted.failureAt,
+            requiresManualStart = persisted.requiresManualStart
         )
     }
 
@@ -412,8 +488,9 @@ class InitializationCoordinator(
                             assetsFacade.templateState.value is IconPackTemplateState.Available
 
                 InitializationTask.APP_M3_CACHE ->
-                    persisted.cacheSourceVersion == currentVersion &&
-                            persisted.isCacheConfigCurrent()
+                    persisted.isCacheConfigCurrent() &&
+                            (persisted.cacheSourceVersion == currentVersion ||
+                                    InitializationTask.LAWNICONS !in persisted.completedTasks)
             }
         }
     }

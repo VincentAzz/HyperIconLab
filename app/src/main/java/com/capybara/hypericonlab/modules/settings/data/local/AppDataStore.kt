@@ -61,6 +61,8 @@ class AppDataStore(
         val INITIALIZATION_FAILURE_MESSAGE =
             stringPreferencesKey("initialization_failure_message")
         val INITIALIZATION_FAILURE_AT = longPreferencesKey("initialization_failure_at")
+        val INITIALIZATION_REQUIRES_MANUAL_START =
+            booleanPreferencesKey("initialization_requires_manual_start")
     }
 
     suspend fun putString(key: Preferences.Key<String>, value: String) {

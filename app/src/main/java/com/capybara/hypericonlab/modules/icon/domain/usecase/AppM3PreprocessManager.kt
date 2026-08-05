@@ -27,12 +27,16 @@ class AppM3PreprocessManager(
     private val _state = MutableStateFlow<PreprocessState>(PreprocessState.Idle)
     val state: StateFlow<PreprocessState> = _state.asStateFlow()
 
+    private val _cacheAvailable = MutableStateFlow(false)
+    val cacheAvailable: StateFlow<Boolean> = _cacheAvailable.asStateFlow()
+
     private var appColorSchemes: Map<String, Pair<String, String>> = emptyMap()
     private var preprocessJob: Job? = null
     private val preprocessMutex = Mutex()
 
     fun updateAppColorSchemes(schemes: Map<String, Pair<String, String>>) {
         appColorSchemes = schemes
+        _cacheAvailable.value = AppM3ColorCache.cachedSeedCount() > 0
     }
 
     fun startPreprocess(reduceWhiteBg: Boolean = true) {
@@ -61,9 +65,17 @@ class AppM3PreprocessManager(
         _state.value = PreprocessState.Idle
     }
 
+    /** 清除 App-M3 缓存并回到可手动开始的状态。 */
+    fun clearCache() {
+        cancelPreprocess()
+        AppM3ColorCache.clear(context)
+        _cacheAvailable.value = false
+    }
+
     private suspend fun runPreprocess(reduceWhiteBg: Boolean) {
         if (appColorSchemes.isEmpty()) {
             _state.value = PreprocessState.Done
+            _cacheAvailable.value = false
             return
         }
 
@@ -79,5 +91,6 @@ class AppM3PreprocessManager(
             }
         )
         _state.value = PreprocessState.Done
+        _cacheAvailable.value = AppM3ColorCache.cachedSeedCount() > 0
     }
 }

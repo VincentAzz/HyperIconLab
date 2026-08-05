@@ -7,11 +7,16 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,6 +29,8 @@ import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateS
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.UpdateState
+import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
+import com.capybara.hypericonlab.modules.icon.domain.usecase.AppM3PreprocessManager
 import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
@@ -45,6 +52,7 @@ fun AssetsTab(
     val layoutDirection = LocalLayoutDirection.current
     val assetsFacade = koinInject<LawniconsAssetFacade>()
     val initializationCoordinator = koinInject<InitializationCoordinator>()
+    val appM3PreprocessManager = koinInject<AppM3PreprocessManager>()
     val appSettingsRepository = koinInject<AppSettingsRepository>()
     val scope = rememberCoroutineScope()
 
@@ -53,10 +61,15 @@ fun AssetsTab(
     // 更新流程状态（检查/下载/解压/成功/失败）
     val updateState by assetsFacade.updateState.collectAsStateWithLifecycle()
     val templateState by assetsFacade.templateState.collectAsStateWithLifecycle()
+    val preprocessState by appM3PreprocessManager.state.collectAsStateWithLifecycle()
+    val cacheAvailable by appM3PreprocessManager.cacheAvailable.collectAsStateWithLifecycle()
+    val hasDownloadedAssets = assetsFacade.getDownloadedVersions().isNotEmpty()
     val templateAvailable =
         (templateState as? IconPackTemplateState.Available)?.version == version.version
     // 下载代理开关
     val useDownloadProxy by appSettingsRepository.useDownloadProxy.collectAsStateWithLifecycle()
+    var showClearCacheDialog by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
 
     // 版本号 + 来源统一显示：日期 (commit) - 内置/云端
     val versionDate = version.version.substringBefore("-")
@@ -142,7 +155,7 @@ fun AssetsTab(
                         trailingContent = {
                             PrimaryActionButton(
                                 text = checkButtonText, enabled = checkEnabled, onClick = {
-                                    scope.launch { assetsFacade.checkAndInstall() }
+                                    initializationCoordinator.startManualAssetUpdate()
                                 })
                         })
                 }
@@ -217,14 +230,44 @@ fun AssetsTab(
                         description = "删除所有云端下载的 Lawnicons 资产\n仅保留应用内置版本",
                         trailingContent = {
                             PrimaryActionButton(
-                                text = "清除", onClick = {
-                                    scope.launch {
-                                        assetsFacade.clearCloudAssets()
-                                        assetsFacade.resetUpdateState()
-                                        initializationCoordinator.resetForManualInitialization()
-                                    }
-                                })
+                                text = if (hasDownloadedAssets) "清除" else "已清除",
+                                enabled = hasDownloadedAssets,
+                                onClick = { showResetDialog = true }
+                            )
                         })
+                }
+                item {
+                    BaseWidget(
+                        iconPlaceholder = false,
+                        title = "清除颜色映射缓存",
+                        description = "删除 App-M3 颜色映射缓存，下次可重新生成",
+                        trailingContent = {
+                            PrimaryActionButton(
+                                text = if (cacheAvailable) "清除" else "已清除",
+                                enabled = cacheAvailable,
+                                onClick = { showClearCacheDialog = true }
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
+        item(key = "appM3Cache") {
+            SegmentedColumn(title = "App-M3 缓存") {
+                item {
+                    BaseWidget(
+                        iconPlaceholder = false,
+                        title = "预处理颜色映射集",
+                        description = preprocessDescription(preprocessState),
+                        trailingContent = {
+                            PrimaryActionButton(
+                                text = preprocessButtonText(preprocessState),
+                                enabled = preprocessState is AppM3PreprocessManager.PreprocessState.Idle,
+                                onClick = { appM3PreprocessManager.startPreprocess() }
+                            )
+                        }
+                    )
                 }
             }
         }
@@ -233,6 +276,76 @@ fun AssetsTab(
             Spacer(modifier = Modifier.navigationBarsPadding())
         }
     }
+
+    if (showClearCacheDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearCacheDialog = false },
+            title = { Text("清除颜色映射缓存？") },
+            text = { Text("清除后不会自动开始生成，需要在资产页手动点击开始。") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showClearCacheDialog = false
+                        appM3PreprocessManager.clearCache()
+                        initializationCoordinator.resetForManualInitialization(
+                            invalidatedTasks = setOf(InitializationTask.APP_M3_CACHE)
+                        )
+                    }
+                ) { Text("清除") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearCacheDialog = false }) { Text("取消") }
+            }
+        )
+    }
+
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("清除已下载资产？") },
+            text = { Text("将删除云端 Lawnicons 与 APK 模板，颜色映射缓存会保留。") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showResetDialog = false
+                        scope.launch {
+                            assetsFacade.clearCloudAssets()
+                            assetsFacade.resetUpdateState()
+                            initializationCoordinator.resetForManualInitialization(
+                                invalidatedTasks = setOf(
+                                    InitializationTask.LAWNICONS,
+                                    InitializationTask.APK_TEMPLATE
+                                )
+                            )
+                        }
+                    }
+                ) { Text("确定") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) { Text("取消") }
+            }
+        )
+    }
+}
+
+private fun preprocessDescription(
+    state: AppM3PreprocessManager.PreprocessState
+): String = when (state) {
+    AppM3PreprocessManager.PreprocessState.Idle -> "可加快基于应用-M3样式的构建速度"
+    is AppM3PreprocessManager.PreprocessState.Running -> {
+        val percent = if (state.total > 0) state.computed * 100 / state.total else 0
+        "可加快基于应用-M3样式的构建速度\n已完成 $percent%"
+    }
+
+    AppM3PreprocessManager.PreprocessState.Done -> "可加快基于应用-M3样式的构建速度\n已完成 100%"
+}
+
+private fun preprocessButtonText(
+    state: AppM3PreprocessManager.PreprocessState
+): String = when (state) {
+    AppM3PreprocessManager.PreprocessState.Idle -> "开始"
+    is AppM3PreprocessManager.PreprocessState.Running -> "处理中"
+    AppM3PreprocessManager.PreprocessState.Done -> "已完成"
 }
 
 // 更新状态映射为按钮文本，进行中状态禁用点击

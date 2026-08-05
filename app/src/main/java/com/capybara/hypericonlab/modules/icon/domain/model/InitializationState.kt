@@ -37,7 +37,8 @@ data class InitializationState(
     val cacheConfigVersion: String? = null,
     val failedTask: InitializationTask? = null,
     val failureMessage: String? = null,
-    val failureAt: Long? = null
+    val failureAt: Long? = null,
+    val requiresManualStart: Boolean = false
 )
 
 data class InitializationPersistenceState(
@@ -50,7 +51,8 @@ data class InitializationPersistenceState(
     val cacheConfigVersion: String? = null,
     val failedTask: InitializationTask? = null,
     val failureMessage: String? = null,
-    val failureAt: Long? = null
+    val failureAt: Long? = null,
+    val requiresManualStart: Boolean = false
 ) {
     fun isCacheConfigCurrent(): Boolean =
         cacheConfigVersion == InitializationCacheConfig.VERSION

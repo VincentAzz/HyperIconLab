@@ -25,7 +25,9 @@ class InitializationStateRepositoryImpl(
                 cacheConfigVersion = preferences[AppDataStore.INITIALIZATION_CACHE_CONFIG_VERSION],
                 failedTask = parseTask(preferences[AppDataStore.INITIALIZATION_FAILED_TASK]),
                 failureMessage = preferences[AppDataStore.INITIALIZATION_FAILURE_MESSAGE],
-                failureAt = preferences[AppDataStore.INITIALIZATION_FAILURE_AT]
+                failureAt = preferences[AppDataStore.INITIALIZATION_FAILURE_AT],
+                requiresManualStart =
+                    preferences[AppDataStore.INITIALIZATION_REQUIRES_MANUAL_START] ?: false
             )
         }
 
@@ -62,6 +64,8 @@ class InitializationStateRepositoryImpl(
                 state.failureMessage
             )
             putOptionalLong(preferences, AppDataStore.INITIALIZATION_FAILURE_AT, state.failureAt)
+            preferences[AppDataStore.INITIALIZATION_REQUIRES_MANUAL_START] =
+                state.requiresManualStart
         }
     }
 
@@ -77,6 +81,7 @@ class InitializationStateRepositoryImpl(
             preferences.remove(AppDataStore.INITIALIZATION_FAILED_TASK)
             preferences.remove(AppDataStore.INITIALIZATION_FAILURE_MESSAGE)
             preferences.remove(AppDataStore.INITIALIZATION_FAILURE_AT)
+            preferences.remove(AppDataStore.INITIALIZATION_REQUIRES_MANUAL_START)
         }
     }
 
