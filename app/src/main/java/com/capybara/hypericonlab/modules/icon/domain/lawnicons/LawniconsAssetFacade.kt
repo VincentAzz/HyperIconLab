@@ -10,6 +10,9 @@ interface LawniconsAssetFacade {
     // 主资源更新状态
     val updateState: StateFlow<UpdateState>
 
+    // 纯检查阶段的资产更新状态
+    val assetCheckState: StateFlow<AssetUpdateCheckState>
+
     // 图标包模板状态
     val templateState: StateFlow<IconPackTemplateState>
 
@@ -40,6 +43,9 @@ interface LawniconsAssetFacade {
     // 检查并安装 Lawnicons 与模板
     suspend fun checkAndInstall()
 
+    // 仅检查 Lawnicons 与 APK 模板更新，不执行下载
+    suspend fun checkForAssetUpdates(): AssetUpdateCheckState
+
     // 静默检查并安装 Lawnicons 与模板
     suspend fun checkAndInstallSilently()
 
@@ -68,6 +74,9 @@ class DefaultLawniconsAssetFacade(
     override val updateState: StateFlow<UpdateState>
         get() = updateManager.state
 
+    override val assetCheckState: StateFlow<AssetUpdateCheckState>
+        get() = updateManager.assetCheckState
+
     override val templateState: StateFlow<IconPackTemplateState>
         get() = templateManager.state
 
@@ -95,6 +104,9 @@ class DefaultLawniconsAssetFacade(
     override suspend fun checkAndInstall() {
         updateManager.checkAndInstall()
     }
+
+    override suspend fun checkForAssetUpdates(): AssetUpdateCheckState =
+        updateManager.checkForAssetUpdates()
 
     override suspend fun checkAndInstallSilently() {
         updateManager.checkAndInstallSilently()

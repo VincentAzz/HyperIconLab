@@ -4,10 +4,12 @@ import android.content.Context
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import java.io.File
 
 // 云端更新流程编排器：检查更新 → 下载 → 校验 → 解压 → 原子切换 → 清理旧版本
@@ -28,17 +30,19 @@ class LawniconsUpdateManager(
     private val _state = MutableStateFlow<UpdateState>(UpdateState.Idle)
     val state: StateFlow<UpdateState> = _state.asStateFlow()
 
+    private val _assetCheckState = MutableStateFlow<AssetUpdateCheckState>(
+        AssetUpdateCheckState.Idle
+    )
+    val assetCheckState: StateFlow<AssetUpdateCheckState> = _assetCheckState.asStateFlow()
+
     // 检查更新：查询云端最新版本，与本地激活版本对比
     // silent=true 时失败不发通知（首次启动自动拉取场景）
     // 返回 ReleaseInfo（有更新）或 null（无更新或失败，state 已反映原因）
     suspend fun checkUpdate(silent: Boolean = false): ReleaseInfo? {
         val current = resourceManager.currentVersion.value
         _state.value = UpdateState.Checking(current.version)
-        // 读取代理设置，开启时对 github.com 资源下载加前缀
-        val useProxy = appSettingsRepository.preferencesFlow.first().useDownloadProxy
-        val proxyPrefix = if (useProxy) UpdateConstants.PROXY_PREFIX else ""
         val release = try {
-            apiService.getLatestRelease(proxyPrefix)
+            fetchLatestRelease()
         } catch (e: LawniconsUpdateException) {
             // ApiService 已分类异常，直接映射为 Failed 状态
             failWith(e.reason, silent)
@@ -56,6 +60,59 @@ class LawniconsUpdateManager(
         }
         _state.value = UpdateState.Idle
         return release
+    }
+
+    // 仅检查 Lawnicons 与 APK 模板更新，不下载或切换本地资源
+    suspend fun checkForAssetUpdates(): AssetUpdateCheckState {
+        val current = resourceManager.currentVersion.value
+        _assetCheckState.value = AssetUpdateCheckState.Checking(current.version)
+        appLogStore.add("资源更新：开始检查可用版本", LogType.INFO)
+
+        val release = try {
+            fetchLatestRelease()
+        } catch (e: LawniconsUpdateException) {
+            val failed = AssetUpdateCheckState.Failed(e.reason)
+            _assetCheckState.value = failed
+            appLogStore.add("资源更新：版本检查失败（${e.reason}）", LogType.ERROR)
+            return failed
+        }
+
+        if (release == null) {
+            val failed = AssetUpdateCheckState.Failed(FailureReason.UNKNOWN)
+            _assetCheckState.value = failed
+            appLogStore.add("资源更新：未找到可用 Release", LogType.ERROR)
+            return failed
+        }
+
+        val resourceUpdateRequired = current.source != ResourceSource.REMOTE ||
+                release.version != current.version
+        val templateAvailable = withContext(Dispatchers.IO) {
+            current.source == ResourceSource.REMOTE && templateManager.isAvailable()
+        }
+        // 资源版本变化时，模板也必须跟随新版本重新准备。
+        val templateUpdateRequired = release.templateArchive != null &&
+                (resourceUpdateRequired || !templateAvailable)
+        val result = if (resourceUpdateRequired || templateUpdateRequired) {
+            AssetUpdateCheckState.Available(
+                currentVersion = current,
+                availableRelease = release,
+                resourceUpdateRequired = resourceUpdateRequired,
+                templateUpdateRequired = templateUpdateRequired,
+                cacheRebuildRequired = resourceUpdateRequired
+            )
+        } else {
+            AssetUpdateCheckState.UpToDate(current.version)
+        }
+        _assetCheckState.value = result
+        appLogStore.add(
+            if (result is AssetUpdateCheckState.Available) {
+                "资源更新：发现可用版本 ${release.version}"
+            } else {
+                "资源更新：当前资源已是最新"
+            },
+            LogType.INFO
+        )
+        return result
     }
 
     // 下载并安装指定 release：下载 → 校验 → 解压 → 激活 → 清理
@@ -181,6 +238,13 @@ class LawniconsUpdateManager(
     private fun failWith(reason: FailureReason, silent: Boolean = false) {
         _state.value = UpdateState.Failed(reason)
         if (!silent) notifier.notifyFailed(reason)
+    }
+
+    private suspend fun fetchLatestRelease(): ReleaseInfo? {
+        // 读取代理设置，开启时对 github.com 资源下载加前缀
+        val useProxy = appSettingsRepository.preferencesFlow.first().useDownloadProxy
+        val proxyPrefix = if (useProxy) UpdateConstants.PROXY_PREFIX else ""
+        return apiService.getLatestRelease(proxyPrefix)
     }
 
     // 模板与当前激活的云端 Lawnicons 版本严格绑定；内置回滚资源不下载模板。

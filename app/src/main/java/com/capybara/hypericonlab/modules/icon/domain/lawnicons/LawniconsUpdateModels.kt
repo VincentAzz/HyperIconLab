@@ -22,6 +22,31 @@ data class ReleaseAssetInfo(
     val sizeBytes: Long
 )
 
+// 纯检查阶段的资产更新状态，不包含下载进度
+sealed class AssetUpdateCheckState {
+    data object Idle : AssetUpdateCheckState()
+
+    data class Checking(
+        val currentVersion: String
+    ) : AssetUpdateCheckState()
+
+    data class UpToDate(
+        val currentVersion: String
+    ) : AssetUpdateCheckState()
+
+    data class Available(
+        val currentVersion: LawniconsVersion,
+        val availableRelease: ReleaseInfo,
+        val resourceUpdateRequired: Boolean,
+        val templateUpdateRequired: Boolean,
+        val cacheRebuildRequired: Boolean
+    ) : AssetUpdateCheckState()
+
+    data class Failed(
+        val reason: FailureReason
+    ) : AssetUpdateCheckState()
+}
+
 // 更新失败原因分类：供 UI 显示针对性文案、通知栏推送
 enum class FailureReason {
     RATE_LIMITED,    // GitHub API 限速（403），提示切换网络或稍后重试
