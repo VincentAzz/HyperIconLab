@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource
@@ -96,6 +97,8 @@ fun AssetsTab(
         trigger = AssetUpdateCheckTrigger.MANUAL,
         now = currentTime
     )
+    val isSimulatedAssetUpdateTriggered =
+        (assetCheckState as? AssetUpdateCheckState.Available)?.isSimulated == true
 
     // 版本号 + 来源统一显示：日期 (commit) - 内置/云端
     val versionDate = version.version.substringBefore("-")
@@ -166,6 +169,7 @@ fun AssetsTab(
                 hasDownloadedAssets = hasDownloadedAssets,
                 cacheAvailable = cacheAvailable,
                 isAssetUpdateRunning = assetUpdateRunning,
+                isSimulatedAssetUpdateTriggered = isSimulatedAssetUpdateTriggered,
                 onClearAssets = { showResetDialog = true },
                 onClearColorCache = { showClearCacheDialog = true },
                 onSimulateAssetUpdate = assetsFacade::simulateAssetUpdate

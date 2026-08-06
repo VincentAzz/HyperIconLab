@@ -43,8 +43,8 @@ object InitializationTaskRowDefaults {
     val IconToTextGap = 16.dp
     val TextLineGap = 2.dp
 
-    // val IndicatorTopOffset = 0.dp
-    // val IconTopOffset = 0.dp
+    val IndicatorTopOffset = 2.dp
+    val IconTopOffset = 1.dp
 }
 
 
@@ -83,7 +83,7 @@ private fun InitializationTaskItem(
             if (isRunning) {
                 CircularProgressIndicator(
                     modifier = Modifier
-                        // .padding(top = InitializationTaskRowDefaults.IndicatorTopOffset)
+                        .padding(top = InitializationTaskRowDefaults.IndicatorTopOffset)
                         .size(InitializationTaskRowDefaults.IndicatorSize),
                     color = MaterialTheme.colorScheme.onSurface,
                     strokeWidth = 2.dp,
@@ -95,7 +95,7 @@ private fun InitializationTaskItem(
                     contentDescription = null,
                     tint = iconColor,
                     modifier = Modifier
-                        // .padding(top = InitializationTaskRowDefaults.IconTopOffset)
+                        .padding(top = InitializationTaskRowDefaults.IconTopOffset)
                         .size(InitializationTaskRowDefaults.IconSize)
                 )
             }
@@ -234,7 +234,7 @@ fun AssetUpdateTaskRow(
                         text = oldVersion,
                         style = MaterialTheme.typography.bodySmall,
                         fontFamily = GoogleSansCodeFontFamily,
-                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.error
                     )
                     Icon(
                         imageVector = AppMaterialSymbols.arrow_right_alt,
@@ -248,7 +248,7 @@ fun AssetUpdateTaskRow(
                         text = newVersion,
                         style = MaterialTheme.typography.bodySmall,
                         fontFamily = GoogleSansCodeFontFamily,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color(0xFF43A047)
                     )
                 }
             }

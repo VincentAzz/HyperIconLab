@@ -11,6 +11,7 @@ fun AssetCleanupSection(
     hasDownloadedAssets: Boolean,
     cacheAvailable: Boolean,
     isAssetUpdateRunning: Boolean,
+    isSimulatedAssetUpdateTriggered: Boolean,
     onClearAssets: () -> Unit,
     onClearColorCache: () -> Unit,
     onSimulateAssetUpdate: () -> Unit
@@ -51,11 +52,11 @@ fun AssetCleanupSection(
                 BaseWidget(
                     iconPlaceholder = false,
                     title = "模拟资产更新",
-                    description = "注入虚拟更新，不变更数据\n20260806 → 20770101\n测试资产更新流程",
+                    description = "注入虚拟更新\n测试资产更新流程，不变更真实数据",
                     trailingContent = {
                         PrimaryActionButton(
-                            text = "模拟更新",
-                            enabled = !isAssetUpdateRunning,
+                            text = if (isSimulatedAssetUpdateTriggered) "已触发" else "触发",
+                            enabled = !isAssetUpdateRunning && !isSimulatedAssetUpdateTriggered,
                             onClick = onSimulateAssetUpdate
                         )
                     }

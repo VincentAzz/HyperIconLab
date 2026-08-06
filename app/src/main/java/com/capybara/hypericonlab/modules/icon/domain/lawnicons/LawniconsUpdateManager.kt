@@ -154,11 +154,7 @@ class LawniconsUpdateManager(
     }
 
     fun simulateAssetUpdate() {
-        val current = resourceManager.currentVersion.value
-        val virtualCurrent = current.copy(
-            version = SimulationConstants.CURRENT_VERSION,
-            source = ResourceSource.REMOTE
-        )
+        val current = simulationBaseVersion()
         val virtualRelease = ReleaseInfo(
             version = SimulationConstants.AVAILABLE_VERSION,
             zipUrl = SimulationConstants.VIRTUAL_URL,
@@ -176,7 +172,7 @@ class LawniconsUpdateManager(
             )
         )
         _assetCheckState.value = AssetUpdateCheckState.Available(
-            currentVersion = virtualCurrent,
+            currentVersion = current,
             availableRelease = virtualRelease,
             resourceUpdateRequired = true,
             templateUpdateRequired = true,
@@ -184,10 +180,20 @@ class LawniconsUpdateManager(
             isSimulated = true
         )
         appLogStore.add(
-            "调试：已注入虚拟资产更新 ${SimulationConstants.CURRENT_VERSION} → " +
+            "调试：已注入虚拟资产更新 ${current.version} → " +
                     SimulationConstants.AVAILABLE_VERSION,
             LogType.INFO
         )
+    }
+
+    private fun simulationBaseVersion(): LawniconsVersion {
+        val activeVersion = resourceManager.currentVersion.value
+        if (activeVersion.source == ResourceSource.REMOTE) return activeVersion
+        return resourceManager.getDownloadedVersions()
+            .asSequence()
+            .mapNotNull(resourceManager::getRemoteVersionInfo)
+            .maxByOrNull { it.version }
+            ?: resourceManager.getAssetsVersionInfo()
     }
 
     fun finishSimulatedAssetUpdate() {
@@ -226,6 +232,7 @@ class LawniconsUpdateManager(
     }
 
     private fun isCheckAllowed(trigger: AssetUpdateCheckTrigger, now: Long): Boolean {
+        if (!UpdateConstants.ASSET_CHECK_COOLDOWN_ENABLED) return true
         val lastCheckedAt = when (trigger) {
             AssetUpdateCheckTrigger.AUTOMATIC -> _lastAutomaticAssetCheckAt.value
             AssetUpdateCheckTrigger.MANUAL -> _lastManualAssetCheckAt.value
@@ -246,6 +253,7 @@ class LawniconsUpdateManager(
         trigger: AssetUpdateCheckTrigger = AssetUpdateCheckTrigger.MANUAL,
         now: Long = System.currentTimeMillis()
     ): Long {
+        if (!UpdateConstants.ASSET_CHECK_COOLDOWN_ENABLED) return 0L
         val lastCheckedAt = when (trigger) {
             AssetUpdateCheckTrigger.AUTOMATIC -> _lastAutomaticAssetCheckAt.value
             AssetUpdateCheckTrigger.MANUAL -> _lastManualAssetCheckAt.value
@@ -423,14 +431,15 @@ class LawniconsUpdateManager(
         // GitHub 加速代理前缀
         const val PROXY_PREFIX = "https://ghfast.top/"
 
+        // 测试阶段不限制自动检查和手动检查频率
+        const val ASSET_CHECK_COOLDOWN_ENABLED = false
         const val AUTOMATIC_CHECK_COOLDOWN_MS = 24 * 60 * 60 * 1000L
         const val MANUAL_CHECK_COOLDOWN_MS = 6 * 60 * 60 * 1000L
     }
 }
 
 private object SimulationConstants {
-    const val CURRENT_VERSION = "20260806"
-    const val AVAILABLE_VERSION = "20770101"
+    const val AVAILABLE_VERSION = "20770101 (virtual)"
     const val VIRTUAL_URL = "debug://asset-update"
 }
 

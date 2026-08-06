@@ -28,14 +28,14 @@ fun AssetUpdateCheckSection(
         else -> canCheck
     }
     val description = when {
-        isUpdating -> "正在更新 Lawnicons、APK 模板和颜色缓存"
-        isChecking -> "正在检查 Lawnicons 与 APK 模板更新"
+        isUpdating -> "正在更新资产"
+        isChecking -> "正在检查资产更新"
         state is AssetUpdateCheckState.Available ->
-            "发现可用版本 ${state.availableRelease.version}，点击更新"
+            "资产更新可用 ${state.availableRelease.version}"
 
-        state is AssetUpdateCheckState.UpToDate -> "当前 Lawnicons 与 APK 模板已是最新"
+        state is AssetUpdateCheckState.UpToDate -> "当前资产已是最新"
         state is AssetUpdateCheckState.Failed -> "检查失败，请稍后重试"
-        else -> "检查 Lawnicons 与 APK 模板是否有新版本"
+        else -> "检查资产是否有更新"
     }
 
     BaseWidget(

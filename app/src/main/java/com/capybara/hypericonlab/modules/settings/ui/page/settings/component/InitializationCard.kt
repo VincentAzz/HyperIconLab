@@ -20,7 +20,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.LocalSegmentedItemShape
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
@@ -49,6 +54,7 @@ private object InitializationCardDefaults {
     val CardPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
     val GroupPadding = PaddingValues(bottom = 8.dp)
     val HeaderGap = 8.dp
+    val AssetBadgeSize = 6.dp
     val ProgressHeight = 4.dp
     val ProgressDotSize = 4.dp
     val TaskListTopPadding = 8.dp
@@ -220,7 +226,8 @@ private fun InitializationHeader(
                         SummaryHeaderContent(
                             title = "资产更新",
                             actionText = "更新",
-                            onAction = onAssetUpdate
+                            onAction = onAssetUpdate,
+                            showAssetBadge = true
                         )
                     }
 
@@ -242,18 +249,35 @@ private fun SummaryHeaderContent(
     title: String,
     trailingIcon: ImageVector? = null,
     actionText: String? = null,
-    onAction: (() -> Unit)? = null
+    onAction: (() -> Unit)? = null,
+    showAssetBadge: Boolean = false
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(InitializationCardDefaults.HeaderGap)
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
-        )
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            BadgedBox(
+                badge = {
+                    if (showAssetBadge) {
+                        Badge(
+                            modifier = Modifier.size(InitializationCardDefaults.AssetBadgeSize),
+                            containerColor = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(end = if (showAssetBadge) 8.dp else 0.dp)
+                )
+            }
+        }
         if (actionText != null) {
             PrimaryActionButton(
                 text = actionText,
@@ -289,26 +313,33 @@ private fun RunningHeaderContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(InitializationCardDefaults.HeaderGap)
         ) {
-            // 对任务文本切换使用渐变+垂直滑动动画
-            AnimatedContent(
-                targetState = runningTaskTitle,
-                transitionSpec = {
-                    (fadeIn() + slideInVertically { it / 2 }) togetherWith
-                            (fadeOut() + slideOutVertically { -it / 2 })
-                },
-                modifier = Modifier.weight(1f),
-                label = "TaskTitleTransition"
-            ) { title ->
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1
-                )
+            // 使用 Box 包裹以稳定 weight 分配的空间，防止 AnimatedContent 宽度变化影响外部 Row 布局
+            Box(modifier = Modifier.weight(1f)) {
+                AnimatedContent(
+                    targetState = runningTaskTitle,
+                    transitionSpec = {
+                        (fadeIn() + slideInVertically { it }) togetherWith
+                                (fadeOut() + slideOutVertically { -it }) using
+                                SizeTransform(clip = false)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart,
+                    label = "TaskTitleTransition"
+                ) { title ->
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             Text(
                 text = "${(progress * 100).roundToInt()}%",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.widthIn(min = 40.dp), // 为百分比预留固定最小宽度
+                textAlign = TextAlign.End // 确保数字向右对齐
             )
         }
         Spacer(modifier = Modifier.height(InitializationCardDefaults.HeaderGap))

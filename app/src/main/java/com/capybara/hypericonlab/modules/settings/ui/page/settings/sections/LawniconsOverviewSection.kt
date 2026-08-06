@@ -72,7 +72,7 @@ fun LawniconsOverviewSection(
                 description = "加速代理可提升 GitHub 资源下载速度",
                 trailingContent = {
                     PrimaryActionButton(
-                        text = downloadModeText,
+                        text = "选择",
                         onClick = onChooseDownloadMode
                     )
                 }
@@ -86,7 +86,7 @@ fun LawniconsOverviewSection(
                 description = "在内置版本与云端版本间切换",
                 trailingContent = {
                     PrimaryActionButton(
-                        text = "选择",
+                        text = "切换",
                         onClick = onSwitchSource
                     )
                 }
