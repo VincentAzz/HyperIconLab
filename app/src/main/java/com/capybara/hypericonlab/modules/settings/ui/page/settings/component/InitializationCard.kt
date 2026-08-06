@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.LocalSegmentedItemShape
+import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.symbol.check_circle
@@ -54,7 +53,6 @@ private object InitializationCardDefaults {
     val CardPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
     val GroupPadding = PaddingValues(bottom = 8.dp)
     val HeaderGap = 8.dp
-    val AssetBadgeSize = 6.dp
     val ProgressHeight = 4.dp
     val ProgressDotSize = 4.dp
     val TaskListTopPadding = 8.dp
@@ -261,20 +259,10 @@ private fun SummaryHeaderContent(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.CenterStart
         ) {
-            BadgedBox(
-                badge = {
-                    if (showAssetBadge) {
-                        Badge(
-                            modifier = Modifier.size(InitializationCardDefaults.AssetBadgeSize),
-                            containerColor = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-            ) {
+            NotifyBadge(showBadge = showAssetBadge) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(end = if (showAssetBadge) 8.dp else 0.dp)
                 )
             }
         }
