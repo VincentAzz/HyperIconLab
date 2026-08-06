@@ -20,8 +20,11 @@ import com.capybara.hypericonlab.core.designsystem.symbol.settings
 import com.capybara.hypericonlab.core.designsystem.symbol.task_alt
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.util.LocalWindowLayoutInfo
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsSharedViewModel
+import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 
 val LocalThemeState = staticCompositionLocalOf { ThemeState() }
@@ -54,6 +57,9 @@ fun MainScreen(
     sharedViewModel: SettingsSharedViewModel
 ) {
     val sharedState by sharedViewModel.state.collectAsStateWithLifecycle()
+    val assetsFacade = koinInject<LawniconsAssetFacade>()
+    val assetCheckState by assetsFacade.assetCheckState.collectAsStateWithLifecycle()
+    val hasAssetUpdate = assetCheckState is AssetUpdateCheckState.Available
     val useBlur = uiState.useBlur
     val useFloatingBottomBar = uiState.useFloatingBottomBar
     val useFloatingBottomBarBlur = uiState.useFloatingBottomBarBlur
@@ -123,6 +129,7 @@ fun MainScreen(
     ) {
         MainScreenScaffold(
             configCount = configCount,
+            hasAssetUpdate = hasAssetUpdate,
             mainPagerState = mainPagerState,
             tabs = tabs,
             useBlur = useBlur,

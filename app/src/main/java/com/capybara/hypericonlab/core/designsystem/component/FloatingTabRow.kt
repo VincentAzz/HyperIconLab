@@ -88,6 +88,7 @@ fun FloatingTabRow(
     onSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
     icons: List<ImageVector>? = null,
+    badgeVisibility: List<Boolean> = emptyList(),
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
     indicatorColor: Color = MaterialTheme.colorScheme.primary,
     barHeight: Dp = 48.dp,
@@ -298,11 +299,13 @@ fun FloatingTabRow(
                                 .padding(end = 4.dp)
                         )
                     }
-                    Text(
-                        text = label,
-                        style = tabTextStyle,
-                        color = unselectedTextColor,
-                    )
+                    NotifyBadge(showBadge = badgeVisibility.getOrNull(index) == true) {
+                        Text(
+                            text = label,
+                            style = tabTextStyle,
+                            color = unselectedTextColor,
+                        )
+                    }
                 }
             }
         }
@@ -351,11 +354,13 @@ fun FloatingTabRow(
                                         .padding(end = 4.dp)
                                 )
                             }
-                            Text(
-                                text = label,
-                                style = tabTextStyle,
-                                color = selectedTextColor,
-                            )
+                            NotifyBadge(showBadge = badgeVisibility.getOrNull(index) == true) {
+                                Text(
+                                    text = label,
+                                    style = tabTextStyle,
+                                    color = selectedTextColor,
+                                )
+                            }
                         }
                     }
                 }

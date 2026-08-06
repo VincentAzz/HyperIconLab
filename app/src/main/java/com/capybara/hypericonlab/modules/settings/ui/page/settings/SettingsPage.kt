@@ -49,6 +49,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
@@ -84,6 +85,8 @@ fun SettingsPage(
     val assetsFacade = koinInject<LawniconsAssetFacade>()
     val appSettingsRepository = koinInject<AppSettingsRepository>()
     val currentVersion by assetsFacade.currentVersion.collectAsStateWithLifecycle()
+    val assetCheckState by assetsFacade.assetCheckState.collectAsStateWithLifecycle()
+    val hasAssetUpdate = assetCheckState is AssetUpdateCheckState.Available
     // 下载代理开关：在顶层持续订阅稳定的 StateFlow，避免重组时由于冷流收集导致的初始值回显错误
     val useDownloadProxy by appSettingsRepository.useDownloadProxy.collectAsStateWithLifecycle()
     // 页面级 scope：sheet 关闭不会取消，确保 putBoolean 协程能执行完成
@@ -260,6 +263,7 @@ fun SettingsPage(
                         selectedIndex = uiState.selectedTab,
                         onSelected = { viewModel.dispatch(ThemeSettingsAction.SetSelectedTab(it)) },
                         icons = settingIcons,
+                        badgeVisibility = listOf(false, hasAssetUpdate, false),
                         containerColor = if (uiState.useTabRowTransparentBackground) Color.Transparent else MaterialTheme.colorScheme.surfaceContainerHighest, // surfaceContainerHighest 稍暗一点
                         alignment = if (uiState.useTabRowCenterAlignment) FloatingTabRowAlignment.CENTER else FloatingTabRowAlignment.START,
                         widthMode = if (uiState.useTabRowFillWidth) FloatingTabRowWidthMode.FILL else FloatingTabRowWidthMode.WRAP_CONTENT,

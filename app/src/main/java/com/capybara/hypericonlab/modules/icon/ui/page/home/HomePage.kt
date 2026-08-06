@@ -46,6 +46,7 @@ import top.yukonga.miuix.kmp.blur.layerBackdrop
 
 private object HomePageDefaults {
     val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+    val KeepInitializationCardVisibleForDebug = true
 }
 
 @OptIn(
@@ -127,7 +128,9 @@ fun HomePage(
                         bottom = outerPadding.calculateBottomPadding()
                     )
             ) {
-                if (hasAssetUpdate || !initializationState.isCompleted || completedCardVisible) {
+                if (HomePageDefaults.KeepInitializationCardVisibleForDebug ||
+                    hasAssetUpdate || !initializationState.isCompleted || completedCardVisible
+                ) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

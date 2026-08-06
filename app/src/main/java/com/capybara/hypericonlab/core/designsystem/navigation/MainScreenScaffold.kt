@@ -47,6 +47,7 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBar
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarCompact
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarDefaults
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarItem
+import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
 import com.capybara.hypericonlab.modules.icon.ui.page.home.HomePage
@@ -59,6 +60,7 @@ import top.yukonga.miuix.kmp.blur.layerBackdrop
 @Composable
 fun MainScreenScaffold(
     configCount: Int,
+    hasAssetUpdate: Boolean,
     mainPagerState: MainPagerState,
     tabs: List<NavigationTab>,
     useBlur: Boolean,
@@ -81,6 +83,7 @@ fun MainScreenScaffold(
                     mainPagerState = mainPagerState,
                     tabs = tabs,
                     configCount = configCount,
+                    hasAssetUpdate = hasAssetUpdate,
                     backdrop = floatingBackdrop,
                     m3Backdrop = m3Backdrop,
                     useBlur = useBlur,
@@ -94,6 +97,7 @@ fun MainScreenScaffold(
                     currentPage = mainPagerState.pagerState.targetPage,
                     onPageChanged = { mainPagerState.animateToPage(it) },
                     configCount = configCount,
+                    hasAssetUpdate = hasAssetUpdate,
                     containerColor = if (useBlur) Color.Transparent else BottomAppBarDefaults.containerColor,
                     isMedium = isMedium
                 )
@@ -118,6 +122,7 @@ private fun FloatingBottomBarSlot(
     mainPagerState: MainPagerState,
     tabs: List<NavigationTab>,
     configCount: Int,
+    hasAssetUpdate: Boolean,
     backdrop: LayerBackdrop,
     m3Backdrop: LayerBackdrop?,
     useBlur: Boolean,
@@ -216,14 +221,18 @@ private fun FloatingBottomBarSlot(
                                 contentDescription = tab.label,
                             )
                         }
-                        Text(
-                            text = tab.label,
-                            fontSize = 11.sp,
-                            lineHeight = 14.sp,
-                            maxLines = 1,
-                            softWrap = false,
-                            overflow = TextOverflow.Visible
-                        )
+                        NotifyBadge(
+                            showBadge = index == TAB_INDEX_SETTINGS && hasAssetUpdate
+                        ) {
+                            Text(
+                                text = tab.label,
+                                fontSize = 11.sp,
+                                lineHeight = 14.sp,
+                                maxLines = 1,
+                                softWrap = false,
+                                overflow = TextOverflow.Visible
+                            )
+                        }
                     }
                 }
             }
@@ -284,6 +293,7 @@ private fun StandardRowNavigation(
     currentPage: Int,
     onPageChanged: (Int) -> Unit,
     configCount: Int,
+    hasAssetUpdate: Boolean,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     isMedium: Boolean = false
 ) {
@@ -314,7 +324,9 @@ private fun StandardRowNavigation(
                     }
                 },
                 label = {
-                    Text(text = navigationData.label)
+                    NotifyBadge(showBadge = index == TAB_INDEX_SETTINGS && hasAssetUpdate) {
+                        Text(text = navigationData.label)
+                    }
                 }
             )
         }
