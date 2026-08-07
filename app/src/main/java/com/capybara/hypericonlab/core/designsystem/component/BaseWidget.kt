@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -51,10 +52,12 @@ enum class BaseWidgetIconBackgroundShape {
 }
 
 object BaseWidgetIconBackgroundConfig {
-    const val Enabled = false
+    val Enabled = false
+
     val Shape = BaseWidgetIconBackgroundShape.CIRCLE
     val IconSize = 24.dp
     val BackgroundPadding = 6.dp
+    val BackgroundHorizontalOffset = (-2).dp
     val RoundedRectangleCornerRadius = ChipCornerRadius
     val SeedPaletteStyle = PaletteStyle.TonalSpot
     val SeedColorSpec = ThemeColorSpec.SPEC_2021
@@ -218,6 +221,13 @@ fun BaseWidget(
             {
                 val leadingModifier = Modifier
                     .size(iconContainerSize)
+                    .offset(
+                        x = if (iconBackgroundEnabled && icon != null) {
+                            BaseWidgetIconBackgroundConfig.BackgroundHorizontalOffset
+                        } else {
+                            0.dp
+                        }
+                    )
                     .alpha(alpha)
                     .let { baseModifier ->
                         if (iconBackgroundEnabled && icon != null) {

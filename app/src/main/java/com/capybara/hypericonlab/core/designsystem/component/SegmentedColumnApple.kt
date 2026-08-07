@@ -43,7 +43,7 @@ private object AppleSegmentedColumnConfig {
     val HorizontalPadding = 16.dp
     val VerticalPadding = 8.dp
     val TitleBottomPadding = 16.dp
-    val LeadingContentSpacing = 16.dp
+    val LeadingContentSpacing = 12.dp
     val DividerHeight = 0.8.dp
     const val DividerAlpha = 0.6f
     const val SpringStiffness = 800f

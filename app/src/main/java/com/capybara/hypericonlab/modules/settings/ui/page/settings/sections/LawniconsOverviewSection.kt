@@ -24,7 +24,7 @@ fun LawniconsOverviewSection(
     onCheckAssetUpdates: () -> Unit,
     onUpdateAssets: () -> Unit
 ) {
-    SegmentedColumn(title = "Lawnicons") {
+    SegmentedColumn(title = "资产") {
         item {
             BaseWidget(
                 iconPlaceholder = false,

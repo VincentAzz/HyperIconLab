@@ -25,7 +25,9 @@ fun AssetDebugSection(
             BaseWidget(
                 icon = AppMaterialSymbols.delete,
                 // iconPlaceholder = false,
-                iconColor = MaterialTheme.colorScheme.error,
+                // iconColor = MaterialTheme.colorScheme.error,
+                iconBackgroundEnabled = true,
+                iconBackgroundSeedColor = MaterialTheme.colorScheme.error,
                 title = "清除已下载资产",
                 description = "删除所有云端下载的资产\n用于测试资产版本回退\n重新初始化 1 & 2",
                 trailingContent = {
@@ -41,8 +43,8 @@ fun AssetDebugSection(
         item {
             BaseWidget(
                 icon = AppMaterialSymbols.delete,
-                // iconPlaceholder = false,
-                iconColor = MaterialTheme.colorScheme.error,
+                iconBackgroundEnabled = true,
+                iconBackgroundSeedColor = MaterialTheme.colorScheme.error,
                 title = "清除颜色映射缓存",
                 description = "删除 App-M3 颜色映射缓存\n用于测试刷新颜色缓存\n重新初始化 3",
                 trailingContent = {
@@ -59,9 +61,9 @@ fun AssetDebugSection(
             item {
                 BaseWidget(
                     icon = AppMaterialSymbols.cloud_download,
-                    iconColor = MaterialTheme.colorScheme.primary,
+                    iconBackgroundEnabled = true,
                     title = "模拟资产更新",
-                    description = "注入虚拟更新\n测试资产更新流程，不变更真实数据",
+                    description = "注入虚拟更新\n用于测试资产更新流程\n不变更真实数据",
                     trailingContent = {
                         PrimaryActionButton(
                             text = if (isSimulatedAssetUpdateTriggered) "已触发" else "触发",

@@ -142,7 +142,7 @@ fun AssetsTab(
             )
         }
 
-        item(key = "lawnicons") {
+        item(key = "overview") {
             LawniconsOverviewSection(
                 versionText = versionText,
                 iconCountText = "${version.svgCount} 图标, ${version.mapperCount} 映射",
