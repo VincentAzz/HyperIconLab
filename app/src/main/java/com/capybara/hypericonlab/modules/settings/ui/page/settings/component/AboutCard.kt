@@ -30,29 +30,39 @@ import com.capybara.hypericonlab.core.designsystem.effect.BgEffectBackground
 import com.capybara.hypericonlab.core.designsystem.symbol.commit
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+
+private object AboutCardConfig {
+    val PreviewPadding = 6.dp
+}
 
 @Composable
 fun AboutCard(
     modifier: Modifier = Modifier,
 ) {
+    val cardCornerRadius = currentPreferredCardCornerRadius()
+    val previewCornerRadius = insetCornerRadius(
+        cardCornerRadius,
+        AboutCardConfig.PreviewPadding
+    )
+
     Card(
         modifier = modifier,
-        shape = rememberKyantRoundedRectangleShape(CardCornerRadius),
+        shape = rememberKyantRoundedRectangleShape(cardCornerRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceBright
         )
     ) {
         Column {
-            Box(modifier = Modifier.padding(6.dp)) {
+            Box(modifier = Modifier.padding(AboutCardConfig.PreviewPadding)) {
                 BgEffectBackground(
                     isDarkTheme = AppTheme.isDark,
                     surfaceColor = MaterialTheme.colorScheme.surfaceBright,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
+                        .clip(rememberKyantRoundedRectangleShape(previewCornerRadius))
                 ) {
                     Column(
                         modifier = Modifier

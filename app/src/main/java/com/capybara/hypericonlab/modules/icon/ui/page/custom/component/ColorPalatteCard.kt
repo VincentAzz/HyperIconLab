@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.LargeCardRadius
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
@@ -38,7 +38,6 @@ import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRec
 import com.capybara.hypericonlab.core.designsystem.util.getDisplayName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import androidx.compose.ui.draw.clip
 import java.util.concurrent.ConcurrentHashMap
 
 private val colorSchemeCache = ConcurrentHashMap<String, ColorScheme>()
@@ -194,7 +193,7 @@ private fun IconSwatchContent(scheme: ColorScheme, isSelected: Boolean) {
             .size(64.dp)
             .background(
                 color = squircleBackgroundColor,
-                shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
+                shape = rememberKyantRoundedRectangleShape(CornerRadius)
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -248,7 +247,7 @@ private fun FallbackIconSwatchContent(baseColor: Color, isSelected: Boolean) {
             .size(64.dp)
             .background(
                 color = baseColor.copy(alpha = 0.1f),
-                shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
+                shape = rememberKyantRoundedRectangleShape(CornerRadius)
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -291,7 +290,7 @@ private fun FullSwatchContent(scheme: ColorScheme, isSelected: Boolean) {
             .size(64.dp)
             .background(
                 color = squircleBackgroundColor,
-                shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
+                shape = rememberKyantRoundedRectangleShape(CornerRadius)
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -349,7 +348,7 @@ private fun FallbackSwatchContent(baseColor: Color, isSelected: Boolean) {
             .size(64.dp)
             .background(
                 color = baseColor.copy(alpha = 0.1f),
-                shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
+                shape = rememberKyantRoundedRectangleShape(CornerRadius)
             ),
         contentAlignment = Alignment.Center
     ) {

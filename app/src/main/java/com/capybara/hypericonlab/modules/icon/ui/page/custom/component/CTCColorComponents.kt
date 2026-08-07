@@ -44,7 +44,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.color_lens
 import com.capybara.hypericonlab.core.designsystem.symbol.swap_horiz
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.LargeCardRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
@@ -77,7 +77,7 @@ fun CTCColorSwatchPreviewIcon(
                 .size(64.dp)
                 .background(
                     color = squircleBackgroundColor,
-                    shape = rememberKyantRoundedRectangleShape(CardCornerRadius)
+                    shape = rememberKyantRoundedRectangleShape(CornerRadius)
                 ),
             contentAlignment = Alignment.Center
         ) {

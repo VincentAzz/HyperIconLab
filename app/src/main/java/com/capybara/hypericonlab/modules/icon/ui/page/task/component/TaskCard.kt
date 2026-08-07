@@ -38,7 +38,8 @@ import androidx.compose.ui.unit.sp
 import com.capybara.hypericonlab.core.designsystem.theme.ConnectionRadius
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
-import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerInset
+import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
@@ -196,7 +197,11 @@ private fun ThumbnailSlot(
     }
     Box(
         modifier = modifier
-            .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
+            .clip(
+                rememberKyantRoundedRectangleShape(
+                    insetCornerRadius(CornerRadius, PreviewCornerInset)
+                )
+            )
             .background(bgColor),
         contentAlignment = Alignment.Center
     ) {

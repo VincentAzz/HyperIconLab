@@ -29,6 +29,8 @@ import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_INSTALL_APK_
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_TAB_INDEX
 import com.capybara.hypericonlab.core.designsystem.navigation.LocalPendingTab
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.LocalPreferredCardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.LocalSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.LocalUseGoogleSansFlex
 import com.capybara.hypericonlab.core.designsystem.util.LocalWindowLayoutInfo
@@ -91,10 +93,16 @@ class MainActivity : ComponentActivity(), KoinComponent {
             if (!isThemeLoaded) return@setContent
 
             val layoutInfo = rememberWindowLayoutInfo()
+            val preferredCardCornerRadius = if (uiState.useCustomCardCornerRadius) {
+                uiState.cardCornerSize.cornerRadius
+            } else {
+                CornerRadius
+            }
 
             CompositionLocalProvider(
                 LocalWindowLayoutInfo provides layoutInfo,
                 LocalSmootherRoundedCornersEnabled provides uiState.useSmootherRoundedCorners,
+                LocalPreferredCardCornerRadius provides preferredCardCornerRadius,
                 LocalUseAppleStyleCard provides uiState.useAppleStyleCard,
                 LocalUseGoogleSansFlex provides uiState.useGoogleSansFlex,
                 LocalPendingTab provides pendingTab

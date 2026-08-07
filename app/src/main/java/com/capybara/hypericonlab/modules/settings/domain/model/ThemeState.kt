@@ -2,6 +2,7 @@ package com.capybara.hypericonlab.modules.settings.domain.model
 
 import android.os.Build
 import androidx.compose.ui.graphics.Color
+import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
@@ -20,6 +21,8 @@ data class ThemeState(
     val floatingBottomBarCompactType: FloatingBottomBarCompactType = FloatingBottomBarCompactType.MIXED_ICON,
     val seedColor: Color = PresetColors.first().color,
     val useSmootherRoundedCorners: Boolean = true,
+    val useCustomCardCornerRadius: Boolean = false,
+    val cardCornerSize: CardCornerSize = CardCornerSize.DEFAULT,
     val useBlur: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
     val useProgressiveBlurTopAppBar: Boolean = false,
     val useTabRowCenterAlignment: Boolean = false,

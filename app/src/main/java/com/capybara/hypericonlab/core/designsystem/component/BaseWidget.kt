@@ -38,8 +38,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
-import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerInset
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
@@ -58,7 +59,7 @@ object BaseWidgetIconBackgroundConfig {
     val IconSize = 24.dp
     val BackgroundPadding = 6.dp
     val BackgroundHorizontalOffset = (-2).dp
-    val RoundedRectangleCornerRadius = ChipCornerRadius
+    val RoundedRectangleCornerInset = ChipCornerInset
     val SeedPaletteStyle = PaletteStyle.TonalSpot
     val SeedColorSpec = ThemeColorSpec.SPEC_2021
 }
@@ -203,10 +204,14 @@ fun BaseWidget(
     } else {
         iconSize
     }
+    val iconBackgroundCornerRadius = insetCornerRadius(
+        currentSegmentedColumnOuterCornerRadius(),
+        BaseWidgetIconBackgroundConfig.RoundedRectangleCornerInset
+    )
     val iconBackgroundShape = when (BaseWidgetIconBackgroundConfig.Shape) {
         BaseWidgetIconBackgroundShape.CIRCLE -> CircleShape
         BaseWidgetIconBackgroundShape.ROUNDED_RECTANGLE -> rememberKyantRoundedRectangleShape(
-            BaseWidgetIconBackgroundConfig.RoundedRectangleCornerRadius
+            iconBackgroundCornerRadius
         )
     }
 

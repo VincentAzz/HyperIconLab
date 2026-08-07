@@ -75,8 +75,8 @@ enum class FloatingTabRowWidthMode {
  * @param onSelected tab 切换回调
  * @param containerColor Bar 背景颜色，默认跟随 ConfigCard 卡片背景色
  * @param indicatorColor 指示器颜色，默认跟随 StyleChip 选中色
- * @param barCornerRadius Bar 圆角半径，默认使用 CardCornerRadius
- * @param indicatorCornerRadius 指示器圆角半径，默认使用 ChipCornerRadius
+ * @param barCornerRadius Bar 圆角半径，默认使用 TabRowBarCornerRadius
+ * @param indicatorCornerRadius 指示器圆角半径，默认使用 TabRowIndicatorCornerRadius
  * @param indicatorPadding Bar 与指示器之间的 padding（上下内缩），默认 4.dp
  * @param alignment 整个 TabRow 的对齐方式，默认靠左（仅 WRAP_CONTENT 模式生效）
  * @param widthMode 宽度模式，WRAP_CONTENT 按文本内容自动宽度，FILL 铺满父容器且 tab 项均分宽度

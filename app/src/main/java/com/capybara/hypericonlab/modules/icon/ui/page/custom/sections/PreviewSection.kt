@@ -41,8 +41,8 @@ import com.capybara.hypericonlab.core.designsystem.symbol.open_in_full
 import com.capybara.hypericonlab.core.designsystem.symbol.refresh
 import com.capybara.hypericonlab.core.designsystem.symbol.wallpaper
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 
@@ -57,11 +57,17 @@ fun PreviewSection(
     onSavePreset: () -> Unit,
     savePresetEnabled: Boolean = false
 ) {
+    val cardCornerRadius = currentPreferredCardCornerRadius()
+    val previewCornerRadius = insetCornerRadius(
+        cardCornerRadius,
+        PreviewSectionConfig.PREVIEW_INNER_PADDING
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(PreviewSectionConfig.CARD_OUTER_PADDING),
-        shape = rememberKyantRoundedRectangleShape(CardCornerRadius),
+        shape = rememberKyantRoundedRectangleShape(cardCornerRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceBright
         )
@@ -81,7 +87,7 @@ fun PreviewSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(targetHeight)
-                        .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
+                        .clip(rememberKyantRoundedRectangleShape(previewCornerRadius))
                         .background(Color.Gray)
                         .clickable(enabled = !isLoading) { onExpand() }
                 ) {

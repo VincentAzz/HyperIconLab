@@ -44,6 +44,7 @@ import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
+import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
@@ -116,6 +117,50 @@ fun SettingsTab(
                         )
                     }
                 }
+                expandableItem(
+                    expanded = uiState.useCustomCardCornerRadius,
+                    topContent = {
+                        SwitchWidget(
+                            iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_custom_card_corner_radius),
+                            description = stringResource(R.string.theme_settings_use_custom_card_corner_radius_desc),
+                            checked = uiState.useCustomCardCornerRadius,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseCustomCardCornerRadius(it)
+                                )
+                            }
+                        )
+                    },
+                    bottomContent = { shape ->
+                        BaseItemContainer(shape = shape) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                CardCornerSize.entries.forEach { size ->
+                                    StyleChip(
+                                        label = stringResource(
+                                            when (size) {
+                                                CardCornerSize.DEFAULT -> R.string.theme_settings_card_corner_default
+                                                CardCornerSize.LARGE -> R.string.theme_settings_card_corner_large
+                                            }
+                                        ),
+                                        selected = uiState.cardCornerSize == size,
+                                        onClick = {
+                                            viewModel.dispatch(
+                                                ThemeSettingsAction.SetCardCornerSize(size)
+                                            )
+                                        },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                )
                 item {
                     SwitchWidget(
                         iconPlaceholder = false,

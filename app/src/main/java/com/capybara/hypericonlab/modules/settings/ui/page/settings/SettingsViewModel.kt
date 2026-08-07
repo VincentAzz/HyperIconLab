@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
 import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
@@ -61,6 +62,8 @@ class SettingsViewModel(
 
         ThemeSettingsState(
             useSmootherRoundedCorners = themeState.useSmootherRoundedCorners,
+            useCustomCardCornerRadius = themeState.useCustomCardCornerRadius,
+            cardCornerSize = themeState.cardCornerSize,
             useBlur = themeState.useBlur,
             useProgressiveBlurTopAppBar = themeState.useProgressiveBlurTopAppBar,
             useTabRowCenterAlignment = themeState.useTabRowCenterAlignment,
@@ -94,6 +97,26 @@ class SettingsViewModel(
                 updateSetting(
                     BooleanSetting.UiUseSmootherRoundedCorners,
                     action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseCustomCardCornerRadius -> viewModelScope.launch {
+                if (!action.enable) {
+                    updateSetting(
+                        StringSetting.CardCornerSize,
+                        CardCornerSize.DEFAULT.name
+                    )
+                }
+                updateSetting(
+                    BooleanSetting.UiUseCustomCardCornerRadius,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetCardCornerSize -> viewModelScope.launch {
+                updateSetting(
+                    StringSetting.CardCornerSize,
+                    action.size.name
                 )
             }
 

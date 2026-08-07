@@ -2,6 +2,7 @@ package com.capybara.hypericonlab.modules.settings.data.repository
 
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.Preferences
+import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
@@ -29,6 +30,11 @@ class AppSettingsRepositoryImpl(
         AppPreferences(
             useSmootherRoundedCorners = prefs[AppDataStore.UI_USE_SMOOTHER_ROUNDED_CORNERS]
                 ?: true,
+            useCustomCardCornerRadius = prefs[AppDataStore.UI_USE_CUSTOM_CARD_CORNER_RADIUS]
+                ?: false,
+            cardCornerSize = CardCornerSize.fromValueOrDefault(
+                prefs[AppDataStore.UI_CARD_CORNER_SIZE] ?: CardCornerSize.DEFAULT.name
+            ),
             useBlur = prefs[AppDataStore.UI_USE_BLUR]
                 ?: true,
             useProgressiveBlurTopAppBar = prefs[AppDataStore.UI_USE_PROGRESSIVE_BLUR_TOP_APP_BAR]
@@ -113,6 +119,7 @@ class AppSettingsRepositoryImpl(
         StringSetting.ThemePaletteStyle -> AppDataStore.THEME_PALETTE_STYLE
         StringSetting.ThemeColorSpec -> AppDataStore.THEME_COLOR_SPEC
         StringSetting.FloatingBottomBarCompactType -> AppDataStore.UI_FLOATING_BAR_COMPACT_TYPE
+        StringSetting.CardCornerSize -> AppDataStore.UI_CARD_CORNER_SIZE
     }
 
     private fun intKey(setting: IntSetting): Preferences.Key<Int> = when (setting) {
@@ -123,6 +130,7 @@ class AppSettingsRepositoryImpl(
 
     private fun booleanKey(setting: BooleanSetting): Preferences.Key<Boolean> = when (setting) {
         BooleanSetting.UiUseSmootherRoundedCorners -> AppDataStore.UI_USE_SMOOTHER_ROUNDED_CORNERS
+        BooleanSetting.UiUseCustomCardCornerRadius -> AppDataStore.UI_USE_CUSTOM_CARD_CORNER_RADIUS
         BooleanSetting.UiUseBlur -> AppDataStore.UI_USE_BLUR
         BooleanSetting.UiUseLiquidGlassBottomSheet -> AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET
         BooleanSetting.ThemeUseDynamicColor -> AppDataStore.THEME_USE_DYNAMIC_COLOR

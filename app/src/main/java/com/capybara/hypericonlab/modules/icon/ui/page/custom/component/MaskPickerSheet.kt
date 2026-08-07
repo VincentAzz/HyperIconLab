@@ -72,7 +72,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
@@ -433,7 +433,7 @@ fun MaskItem(
 
     // Animate shape and colors
     val cornerRadius by animateDpAsState(
-        targetValue = if (isSelected) CardCornerRadius else ExtraLargeRadius,
+        targetValue = if (isSelected) CornerRadius else ExtraLargeRadius,
         animationSpec = tween(durationMillis = 400),
         label = "cornerRadius"
     )

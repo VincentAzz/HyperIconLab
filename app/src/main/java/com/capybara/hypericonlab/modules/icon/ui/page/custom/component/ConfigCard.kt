@@ -48,10 +48,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.capybara.hypericonlab.core.designsystem.component.currentSegmentedColumnOuterCornerRadius
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerInset
+import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.render.image.MaskAssetLoader
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +67,8 @@ fun ConfigCard(
     containerColor: Color? = null,
     content: @Composable () -> Unit
 ) {
+    val cardCornerRadius = currentPreferredCardCornerRadius()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -92,7 +96,7 @@ fun ConfigCard(
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = rememberKyantRoundedRectangleShape(CardCornerRadius),
+            shape = rememberKyantRoundedRectangleShape(cardCornerRadius),
             colors = CardDefaults.cardColors(
                 containerColor = containerColor ?: MaterialTheme.colorScheme.surfaceBright
             )
@@ -116,6 +120,7 @@ fun StyleChip(
     selectedContentColor: Color = MaterialTheme.colorScheme.onPrimary,
     unselectedContentColor: Color? = null
 ) {
+    val outerCornerRadius = currentSegmentedColumnOuterCornerRadius()
     val backgroundColor by animateColorAsState(
         targetValue = if (selected) selectedContainerColor
         else unselectedContainerColor,
@@ -135,7 +140,9 @@ fun StyleChip(
     Surface(
         onClick = onClick,
         enabled = enabled,
-        shape = rememberKyantRoundedRectangleShape(ChipCornerRadius),
+        shape = rememberKyantRoundedRectangleShape(
+            insetCornerRadius(outerCornerRadius, ChipCornerInset)
+        ),
         color = backgroundColor,
         modifier = modifier.height(36.dp)
     ) {

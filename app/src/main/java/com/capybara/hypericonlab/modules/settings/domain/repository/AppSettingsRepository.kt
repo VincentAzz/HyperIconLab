@@ -8,7 +8,8 @@ enum class StringSetting {
     ThemeMode,
     ThemePaletteStyle,
     ThemeColorSpec,
-    FloatingBottomBarCompactType
+    FloatingBottomBarCompactType,
+    CardCornerSize
 }
 
 enum class IntSetting {
@@ -19,6 +20,7 @@ enum class IntSetting {
 
 enum class BooleanSetting {
     UiUseSmootherRoundedCorners,
+    UiUseCustomCardCornerRadius,
     UiUseBlur,
     UiUseLiquidGlassBottomSheet,
     ThemeUseDynamicColor,

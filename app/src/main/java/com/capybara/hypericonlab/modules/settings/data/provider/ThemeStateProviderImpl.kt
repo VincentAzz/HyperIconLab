@@ -39,6 +39,8 @@ class ThemeStateProviderImpl(
             floatingBottomBarCompactType = prefs.floatingBottomBarCompactType,
             seedColor = effectiveSeedColor,
             useSmootherRoundedCorners = prefs.useSmootherRoundedCorners,
+            useCustomCardCornerRadius = prefs.useCustomCardCornerRadius,
+            cardCornerSize = prefs.cardCornerSize,
             useBlur = prefs.useBlur,
             useProgressiveBlurTopAppBar = prefs.useProgressiveBlurTopAppBar,
             useTabRowCenterAlignment = prefs.useTabRowCenterAlignment,

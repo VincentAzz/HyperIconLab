@@ -63,7 +63,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.render.image.BgImageDir
@@ -368,7 +368,7 @@ private fun AddImageButton(
     enabled: Boolean,
     onClick: () -> Unit
 ) {
-    val cornerShape = rememberKyantRoundedRectangleShape(CardCornerRadius)
+    val cornerShape = rememberKyantRoundedRectangleShape(CornerRadius)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.combinedClickable(
@@ -419,7 +419,7 @@ private fun ImageGridItem(
 
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
     val borderWidth = if (isSelected) 2.dp else 0.dp
-    val cornerShape = rememberKyantRoundedRectangleShape(CardCornerRadius)
+    val cornerShape = rememberKyantRoundedRectangleShape(CornerRadius)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -27,8 +27,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
+import com.capybara.hypericonlab.core.designsystem.component.currentSegmentedColumnOuterCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
-import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerInset
+import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
@@ -49,7 +51,14 @@ fun PreviewSection(
         modifier = Modifier
             .fillMaxWidth()
             .height(TaskDetailSheetConfig.PREVIEW_HEIGHT)
-            .clip(rememberKyantRoundedRectangleShape(PreviewCornerRadius))
+            .clip(
+                rememberKyantRoundedRectangleShape(
+                    insetCornerRadius(
+                        currentSegmentedColumnOuterCornerRadius(),
+                        PreviewCornerInset
+                    )
+                )
+            )
             .background(bgColor),
         contentAlignment = Alignment.Center
     ) {

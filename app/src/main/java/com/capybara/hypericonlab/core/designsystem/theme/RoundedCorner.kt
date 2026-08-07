@@ -17,17 +17,42 @@ val CornerRadius = 16.dp
 
 val ConnectionRadius = 6.dp
 
-val CardCornerRadius = 16.dp
+val ChipCornerInset = 8.dp
 
-val ChipCornerRadius = 8.dp
-
-val PreviewCornerRadius = 10.dp
+val PreviewCornerInset = 6.dp
 
 val SwatchPreviewCornerRadius = 4.dp
 
 val LargeCardRadius = 20.dp
 
 val ExtraLargeRadius = 32.dp
+
+enum class CardCornerSize(val cornerRadius: Dp) {
+    DEFAULT(16.dp),
+    LARGE(26.dp);
+
+    companion object {
+        fun fromValueOrDefault(value: String): CardCornerSize =
+            entries.find { it.name == value } ?: DEFAULT
+    }
+}
+
+val LocalPreferredCardCornerRadius = staticCompositionLocalOf { CornerRadius }
+
+@Composable
+@ReadOnlyComposable
+fun currentPreferredCardCornerRadius(): Dp = LocalPreferredCardCornerRadius.current
+
+fun insetCornerRadius(
+    outerRadius: Dp,
+    inset: Dp,
+    minimumRadius: Dp = 0.dp
+): Dp {
+    val safeOuterRadius = outerRadius.coerceAtLeast(0.dp)
+    val safeInset = inset.coerceAtLeast(0.dp)
+    val safeMinimumRadius = minimumRadius.coerceAtLeast(0.dp)
+    return (safeOuterRadius - safeInset).coerceAtLeast(safeMinimumRadius)
+}
 
 object TabRowRoundedCorner {
     val TabRowIndicatorCornerRadius = 24.dp
