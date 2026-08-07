@@ -34,7 +34,7 @@ import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoord
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.InitializationCard
-import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.AssetCleanupSection
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.AssetDebugSection
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.sections.LawniconsOverviewSection
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -165,7 +165,7 @@ fun AssetsTab(
 
         // 清除资产缓存：删除所有云端下载资源并切回本地（调试用，上线前移除）
         item(key = "clearCache") {
-            AssetCleanupSection(
+            AssetDebugSection(
                 hasDownloadedAssets = hasDownloadedAssets,
                 cacheAvailable = cacheAvailable,
                 isAssetUpdateRunning = assetUpdateRunning,

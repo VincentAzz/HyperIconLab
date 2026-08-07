@@ -25,15 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.semantics.disabled
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
@@ -200,42 +197,25 @@ fun BaseWidget(
         }
     }
 
-    if (onClick != null) {
-        ListItem(
-            selected = selected,
-            modifier = itemModifier,
-            onClick = {
+    ListItem(
+        selected = selected,
+        modifier = itemModifier,
+        onClick = {
+            if (onClick != null) {
                 clickHaptic?.let { haptic.performHapticFeedback(it) }
                 onClick()
-            },
-            enabled = enabled,
-            colors = colors,
-            shapes = shapes,
-            verticalAlignment = Alignment.CenterVertically,
-            leadingContent = leadingContent,
-            supportingContent = supportingContent,
-            trailingContent = trailing,
-            interactionSource = interactionSource,
-            content = headline
-        )
-    } else {
-        ListItem(
-            headlineContent = headline,
-            modifier = itemModifier
-                .clip(baseShape)
-                .then(
-                    if (!enabled) {
-                        Modifier.semantics { disabled() }
-                    } else {
-                        Modifier
-                    }
-                ),
-            colors = colors,
-            leadingContent = leadingContent,
-            supportingContent = supportingContent,
-            trailingContent = trailing
-        )
-    }
+            }
+        },
+        enabled = enabled && onClick != null,
+        colors = colors,
+        shapes = shapes,
+        verticalAlignment = Alignment.CenterVertically,
+        leadingContent = leadingContent,
+        supportingContent = supportingContent,
+        trailingContent = trailing,
+        interactionSource = interactionSource,
+        content = headline
+    )
 }
 
 @Composable
