@@ -19,6 +19,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -126,9 +127,17 @@ fun BaseWidget(
     )
 
     val itemModifier = modifier.fillMaxWidth()
+    val hasLeadingContent = icon != null || iconPlaceholder
+    val leadingContentReporter = LocalSegmentedLeadingContentReporter.current
+
+    if (leadingContentReporter != null) {
+        SideEffect {
+            leadingContentReporter(hasLeadingContent)
+        }
+    }
 
     val leadingContent: (@Composable () -> Unit)? =
-        if (icon != null || iconPlaceholder) {
+        if (hasLeadingContent) {
             {
                 Box(
                     modifier = Modifier

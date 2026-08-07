@@ -15,7 +15,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
@@ -41,12 +47,18 @@ private object AppleSegmentedColumnConfig {
     val HorizontalPadding = 16.dp
     val VerticalPadding = 8.dp
     val TitleBottomPadding = 16.dp
+    val LeadingIconSize = 24.dp
+    val LeadingContentSpacing = 16.dp
+    val DividerStartWithLeading = HorizontalPadding + LeadingIconSize + LeadingContentSpacing
     val DividerHeight = 0.8.dp
     const val DividerAlpha = 0.6f
     const val SpringStiffness = 800f
     const val SpringDamping = 0.5f
     const val ContentFadeMultiplier = 1.5f
 }
+
+internal val LocalSegmentedLeadingContentReporter =
+    staticCompositionLocalOf<((Boolean) -> Unit)?> { null }
 
 @Composable
 fun SegmentedColumnApple(
@@ -105,14 +117,18 @@ fun SegmentedColumnApple(
                 )
             }
         }
-        val lastVisibleIndex = allItems.indexOfLast { it.visible }
+        val firstVisibleIndex = allItems.indexOfFirst { it.visible }
 
         Layout(
             modifier = Modifier.clip(groupShape),
             content = {
                 allItems.forEachIndexed { index, itemData ->
                     key(itemData.key ?: index) {
-                        val isLast = index == lastVisibleIndex
+                        val isFirst = index == firstVisibleIndex
+                        var hasLeadingContent by remember { mutableStateOf(false) }
+                        val leadingContentReporter = remember {
+                            { hasLeading: Boolean -> hasLeadingContent = hasLeading }
+                        }
                         val targetTopPadding = itemData.customTopPadding ?: 0.dp
                         val isDynamicDpSupported =
                             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
@@ -147,23 +163,31 @@ fun SegmentedColumnApple(
                                         shape = ProgressClipShape(safeProgress)
                                     }
                                     alpha = (
-                                            currentProgress *
-                                                    AppleSegmentedColumnConfig.ContentFadeMultiplier
+                                            currentProgress * AppleSegmentedColumnConfig.ContentFadeMultiplier
                                             ).coerceIn(0f, 1f)
                                 }
                         ) {
                             CompositionLocalProvider(
                                 LocalSegmentedItemShape provides RectangleShape,
-                                LocalSegmentedContainerColorAlpha provides containerColorAlpha
+                                LocalSegmentedContainerColorAlpha provides containerColorAlpha,
+                                LocalSegmentedLeadingContentReporter provides leadingContentReporter
                             ) {
-                                Column(modifier = Modifier.padding(top = currentTopPadding)) {
-                                    itemData.content(RectangleShape)
-                                    if (!isLast && itemData.visible) {
+                                Box {
+                                    Box(modifier = Modifier.padding(top = currentTopPadding)) {
+                                        itemData.content(RectangleShape)
+                                    }
+                                    if (!isFirst && itemData.visible) {
                                         Box(
                                             modifier = Modifier
+                                                .align(Alignment.TopCenter)
                                                 .fillMaxWidth()
                                                 .padding(
-                                                    horizontal = AppleSegmentedColumnConfig.HorizontalPadding
+                                                    start = if (hasLeadingContent) {
+                                                        AppleSegmentedColumnConfig.DividerStartWithLeading
+                                                    } else {
+                                                        AppleSegmentedColumnConfig.HorizontalPadding
+                                                    },
+                                                    end = AppleSegmentedColumnConfig.HorizontalPadding
                                                 )
                                                 .height(AppleSegmentedColumnConfig.DividerHeight)
                                                 .background(
