@@ -136,7 +136,7 @@ extern "C" {
  * @return padded bitmap with white stroke + original icon pasted on top
  */
 JNIEXPORT jobject JNICALL
-Java_com_capybara_hypericonlab_core_image_StickerNativeProcessor_nativeDrawStroke(
+Java_com_capybara_hypericonlab_modules_render_image_StickerNativeProcessor_nativeDrawStroke(
         JNIEnv *env, jclass clazz, jobject srcBitmap, jint strokeWidth) {
 
     if (strokeWidth < 1) strokeWidth = 1;
@@ -235,7 +235,7 @@ Java_com_capybara_hypericonlab_core_image_StickerNativeProcessor_nativeDrawStrok
  * Get the stroke mask only (no icon pasted).
  */
 JNIEXPORT jobject JNICALL
-Java_com_capybara_hypericonlab_core_image_StickerNativeProcessor_nativeGetStrokeMask(
+Java_com_capybara_hypericonlab_modules_render_image_StickerNativeProcessor_nativeGetStrokeMask(
         JNIEnv *env, jclass clazz, jobject srcBitmap, jint strokeWidth) {
 
     if (strokeWidth < 1) strokeWidth = 1;
@@ -302,7 +302,7 @@ Java_com_capybara_hypericonlab_core_image_StickerNativeProcessor_nativeGetStroke
  * @return bitmap with holes filled, or original if no holes found
  */
 JNIEXPORT jobject JNICALL
-Java_com_capybara_hypericonlab_core_image_StickerNativeProcessor_nativeFillHoles(
+Java_com_capybara_hypericonlab_modules_render_image_StickerNativeProcessor_nativeFillHoles(
         JNIEnv *env, jclass clazz, jobject srcBitmap, jint fillColor) {
 
     // Read source bitmap
@@ -381,7 +381,7 @@ Java_com_capybara_hypericonlab_core_image_StickerNativeProcessor_nativeFillHoles
  * @return single-channel alpha bitmap where holes are white (255), rest transparent (0)
  */
 JNIEXPORT jobject JNICALL
-Java_com_capybara_hypericonlab_core_image_StickerNativeProcessor_nativeGetHoleMask(
+Java_com_capybara_hypericonlab_modules_render_image_StickerNativeProcessor_nativeGetHoleMask(
         JNIEnv *env, jclass clazz, jobject srcBitmap) {
 
     // Read source bitmap
