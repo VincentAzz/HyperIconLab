@@ -43,9 +43,7 @@ private object AppleSegmentedColumnConfig {
     val HorizontalPadding = 16.dp
     val VerticalPadding = 8.dp
     val TitleBottomPadding = 16.dp
-    val LeadingIconSize = 24.dp
     val LeadingContentSpacing = 16.dp
-    val DividerStartWithLeading = HorizontalPadding + LeadingIconSize + LeadingContentSpacing
     val DividerHeight = 0.8.dp
     const val DividerAlpha = 0.6f
     const val SpringStiffness = 800f
@@ -54,7 +52,7 @@ private object AppleSegmentedColumnConfig {
 }
 
 internal val LocalSegmentedLeadingContentReporter =
-    staticCompositionLocalOf<((Boolean) -> Unit)?> { null }
+    staticCompositionLocalOf<((Dp?) -> Unit)?> { null }
 
 @Composable
 fun SegmentedColumnApple(
@@ -111,7 +109,7 @@ fun SegmentedColumnApple(
         }
         val leadingContentStates = allItems.mapIndexed { index, item ->
             key(item.key ?: index) {
-                remember { mutableStateOf(false) }
+                remember { mutableStateOf<Dp?>(null) }
             }
         }
 
@@ -123,12 +121,12 @@ fun SegmentedColumnApple(
                         val previousVisibleIndex = (index - 1 downTo 0)
                             .firstOrNull { allItems[it].visible }
                         val isFirst = previousVisibleIndex == null
-                        val previousItemHasLeadingContent = previousVisibleIndex?.let {
+                        val previousItemLeadingContentWidth = previousVisibleIndex?.let {
                             leadingContentStates[it].value
-                        } ?: false
+                        }
                         val currentLeadingContentState = leadingContentStates[index]
                         val leadingContentReporter = remember(currentLeadingContentState) {
-                            { hasLeading: Boolean -> currentLeadingContentState.value = hasLeading }
+                            { leadingWidth: Dp? -> currentLeadingContentState.value = leadingWidth }
                         }
 
                         Box(
@@ -169,11 +167,11 @@ fun SegmentedColumnApple(
                                                 .align(Alignment.TopCenter)
                                                 .fillMaxWidth()
                                                 .padding(
-                                                    start = if (previousItemHasLeadingContent) {
-                                                        AppleSegmentedColumnConfig.DividerStartWithLeading
-                                                    } else {
-                                                        AppleSegmentedColumnConfig.HorizontalPadding
-                                                    },
+                                                    start = previousItemLeadingContentWidth?.let {
+                                                        AppleSegmentedColumnConfig.HorizontalPadding +
+                                                                it + AppleSegmentedColumnConfig.LeadingContentSpacing
+                                                    }
+                                                        ?: AppleSegmentedColumnConfig.HorizontalPadding,
                                                     end = AppleSegmentedColumnConfig.HorizontalPadding
                                                 )
                                                 .height(AppleSegmentedColumnConfig.DividerHeight)

@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.core.designsystem.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -19,6 +21,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
@@ -33,8 +36,67 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
+import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+
+enum class BaseWidgetIconBackgroundShape {
+    CIRCLE,
+    ROUNDED_RECTANGLE
+}
+
+object BaseWidgetIconBackgroundConfig {
+    const val Enabled = false
+    val Shape = BaseWidgetIconBackgroundShape.CIRCLE
+    val IconSize = 24.dp
+    val BackgroundPadding = 6.dp
+    val RoundedRectangleCornerRadius = ChipCornerRadius
+    val SeedPaletteStyle = PaletteStyle.TonalSpot
+    val SeedColorSpec = ThemeColorSpec.SPEC_2021
+}
+
+@Immutable
+private data class BaseWidgetIconBackgroundColors(
+    val containerColor: Color,
+    val contentColor: Color
+)
+
+@Composable
+private fun rememberBaseWidgetIconBackgroundColors(
+    seedColor: Color?
+): BaseWidgetIconBackgroundColors {
+    if (seedColor == null || seedColor == Color.Unspecified) {
+        return BaseWidgetIconBackgroundColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        )
+    }
+
+    val isDark = AppTheme.isDark
+    val seededColorScheme = remember(
+        seedColor,
+        isDark,
+        BaseWidgetIconBackgroundConfig.SeedPaletteStyle,
+        BaseWidgetIconBackgroundConfig.SeedColorSpec
+    ) {
+        dynamicColorScheme(
+            keyColor = seedColor,
+            isDark = isDark,
+            style = BaseWidgetIconBackgroundConfig.SeedPaletteStyle,
+            colorSpec = BaseWidgetIconBackgroundConfig.SeedColorSpec
+        )
+    }
+
+    return BaseWidgetIconBackgroundColors(
+        containerColor = seededColorScheme.secondaryContainer,
+        contentColor = seededColorScheme.onSecondaryContainer
+    )
+}
 
 val LocalSegmentedItemShape = compositionLocalOf<Shape> { RoundedCornerShape(CornerRadius) }
 
@@ -47,6 +109,8 @@ fun BaseWidget(
     icon: ImageVector? = null,
     iconColor: Color? = null,
     iconPlaceholder: Boolean = true,
+    iconBackgroundEnabled: Boolean = BaseWidgetIconBackgroundConfig.Enabled,
+    iconBackgroundSeedColor: Color? = null,
     title: String,
     titleStyle: TextStyle = MaterialTheme.typography.titleMedium,
     description: String? = null,
@@ -82,11 +146,14 @@ fun BaseWidget(
         MaterialTheme.colorScheme.onSurface
     }
 
+    val iconBackgroundColors = rememberBaseWidgetIconBackgroundColors(
+        iconBackgroundSeedColor.takeIf { iconBackgroundEnabled }
+    )
     val resolvedIconColor = iconColor
-        ?: if (selected) {
-            baseContentColor
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
+        ?: when {
+            iconBackgroundEnabled -> iconBackgroundColors.contentColor
+            selected -> baseContentColor
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
         }
 
     val finalDescriptionColor = when {
@@ -126,30 +193,56 @@ fun BaseWidget(
     val itemModifier = modifier.fillMaxWidth()
     val hasLeadingContent = icon != null || iconPlaceholder
     val leadingContentReporter = LocalSegmentedLeadingContentReporter.current
+    val iconSize = BaseWidgetIconBackgroundConfig.IconSize
+    val iconBackgroundPadding = BaseWidgetIconBackgroundConfig.BackgroundPadding.coerceAtLeast(0.dp)
+    val iconContainerSize = if (iconBackgroundEnabled) {
+        iconSize + iconBackgroundPadding * 2
+    } else {
+        iconSize
+    }
+    val iconBackgroundShape = when (BaseWidgetIconBackgroundConfig.Shape) {
+        BaseWidgetIconBackgroundShape.CIRCLE -> CircleShape
+        BaseWidgetIconBackgroundShape.ROUNDED_RECTANGLE -> rememberKyantRoundedRectangleShape(
+            BaseWidgetIconBackgroundConfig.RoundedRectangleCornerRadius
+        )
+    }
 
     if (leadingContentReporter != null) {
         SideEffect {
-            leadingContentReporter(hasLeadingContent)
+            leadingContentReporter(iconContainerSize.takeIf { hasLeadingContent })
         }
     }
 
     val leadingContent: (@Composable () -> Unit)? =
         if (hasLeadingContent) {
             {
+                val leadingModifier = Modifier
+                    .size(iconContainerSize)
+                    .alpha(alpha)
+                    .let { baseModifier ->
+                        if (iconBackgroundEnabled && icon != null) {
+                            baseModifier.background(
+                                color = iconBackgroundColors.containerColor,
+                                shape = iconBackgroundShape
+                            )
+                        } else {
+                            baseModifier
+                        }
+                    }
+
                 Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .alpha(alpha),
+                    modifier = leadingModifier,
                     contentAlignment = Alignment.Center
                 ) {
                     if (icon != null) {
                         Icon(
+                            modifier = Modifier.size(iconSize),
                             imageVector = icon,
                             contentDescription = null,
                             tint = resolvedIconColor
                         )
                     } else {
-                        Spacer(modifier = Modifier.size(24.dp))
+                        Spacer(modifier = Modifier.size(iconSize))
                     }
                 }
             }
