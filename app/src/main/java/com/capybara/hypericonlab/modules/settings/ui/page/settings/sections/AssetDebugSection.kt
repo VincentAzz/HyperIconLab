@@ -24,6 +24,7 @@ fun AssetDebugSection(
         item {
             BaseWidget(
                 icon = AppMaterialSymbols.delete,
+                // iconPlaceholder = false,
                 iconColor = MaterialTheme.colorScheme.error,
                 title = "清除已下载资产",
                 description = "删除所有云端下载的资产\n用于测试资产版本回退\n重新初始化 1 & 2",
@@ -40,6 +41,7 @@ fun AssetDebugSection(
         item {
             BaseWidget(
                 icon = AppMaterialSymbols.delete,
+                // iconPlaceholder = false,
                 iconColor = MaterialTheme.colorScheme.error,
                 title = "清除颜色映射缓存",
                 description = "删除 App-M3 颜色映射缓存\n用于测试刷新颜色缓存\n重新初始化 3",

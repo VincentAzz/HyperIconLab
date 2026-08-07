@@ -13,11 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -111,17 +109,26 @@ fun SegmentedColumnApple(
                 )
             }
         }
-        val firstVisibleIndex = allItems.indexOfFirst { it.visible }
+        val leadingContentStates = allItems.mapIndexed { index, item ->
+            key(item.key ?: index) {
+                remember { mutableStateOf(false) }
+            }
+        }
 
         Layout(
             modifier = Modifier.clip(groupShape),
             content = {
                 allItems.forEachIndexed { index, itemData ->
                     key(itemData.key ?: index) {
-                        val isFirst = index == firstVisibleIndex
-                        var hasLeadingContent by remember { mutableStateOf(false) }
-                        val leadingContentReporter = remember {
-                            { hasLeading: Boolean -> hasLeadingContent = hasLeading }
+                        val previousVisibleIndex = (index - 1 downTo 0)
+                            .firstOrNull { allItems[it].visible }
+                        val isFirst = previousVisibleIndex == null
+                        val previousItemHasLeadingContent = previousVisibleIndex?.let {
+                            leadingContentStates[it].value
+                        } ?: false
+                        val currentLeadingContentState = leadingContentStates[index]
+                        val leadingContentReporter = remember(currentLeadingContentState) {
+                            { hasLeading: Boolean -> currentLeadingContentState.value = hasLeading }
                         }
 
                         Box(
@@ -162,7 +169,7 @@ fun SegmentedColumnApple(
                                                 .align(Alignment.TopCenter)
                                                 .fillMaxWidth()
                                                 .padding(
-                                                    start = if (hasLeadingContent) {
+                                                    start = if (previousItemHasLeadingContent) {
                                                         AppleSegmentedColumnConfig.DividerStartWithLeading
                                                     } else {
                                                         AppleSegmentedColumnConfig.HorizontalPadding
