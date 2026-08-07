@@ -29,6 +29,7 @@ enum class BooleanSetting {
     UiUseTabRowCenterAlignment,
     UiUseTabRowTransparentBackground,
     UiUseTabRowFillWidth,
+    UiUseAppleStyleCard,
     UiUseGoogleSansFlex,
     UiUseDownloadProxy
 }

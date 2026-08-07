@@ -119,6 +119,21 @@ fun SettingsTab(
                 item {
                     SwitchWidget(
                         iconPlaceholder = false,
+                        title = "使用 Apple 风格卡片",
+                        description = "启用后卡片组将使用无间距连接样式及分割线",
+                        checked = uiState.useAppleStyleCard,
+                        onCheckedChange = {
+                            viewModel.dispatch(
+                                ThemeSettingsAction.SetUseAppleStyleCard(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                }
+                item {
+                    SwitchWidget(
+                        iconPlaceholder = false,
                         title = stringResource(R.string.theme_settings_use_google_sans_flex),
                         description = stringResource(R.string.theme_settings_use_google_sans_flex_desc),
                         checked = uiState.useGoogleSansFlex,

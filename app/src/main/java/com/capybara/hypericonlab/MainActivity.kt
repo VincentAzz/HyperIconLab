@@ -23,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.capybara.hypericonlab.core.designsystem.component.LocalUseAppleStyleCard
 import com.capybara.hypericonlab.core.designsystem.navigation.AppRoot
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_INSTALL_APK_URI
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_TAB_INDEX
@@ -94,6 +95,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
             CompositionLocalProvider(
                 LocalWindowLayoutInfo provides layoutInfo,
                 LocalSmootherRoundedCornersEnabled provides uiState.useSmootherRoundedCorners,
+                LocalUseAppleStyleCard provides uiState.useAppleStyleCard,
                 LocalUseGoogleSansFlex provides uiState.useGoogleSansFlex,
                 LocalPendingTab provides pendingTab
             ) {

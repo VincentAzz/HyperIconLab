@@ -68,6 +68,7 @@ class SettingsViewModel(
             useTabRowFillWidth = themeState.useTabRowFillWidth,
             useLiquidGlassBottomSheet = themeState.useLiquidGlassBottomSheet,
             liquidGlassBlurRadius = themeState.liquidGlassBlurRadius,
+            useAppleStyleCard = themeState.useAppleStyleCard,
             useGoogleSansFlex = themeState.useGoogleSansFlex,
             themeMode = themeState.themeMode,
             paletteStyle = themeState.paletteStyle,
@@ -142,6 +143,13 @@ class SettingsViewModel(
                 updateSetting(
                     IntSetting.UiLiquidGlassBlurRadius,
                     action.value
+                )
+            }
+
+            is ThemeSettingsAction.SetUseAppleStyleCard -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseAppleStyleCard,
+                    action.enable
                 )
             }
 

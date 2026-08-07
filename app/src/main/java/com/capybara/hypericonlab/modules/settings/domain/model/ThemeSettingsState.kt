@@ -17,6 +17,7 @@ data class ThemeSettingsState(
     val useTabRowFillWidth: Boolean = false,
     val useLiquidGlassBottomSheet: Boolean = false,
     val liquidGlassBlurRadius: Int = 24,
+    val useAppleStyleCard: Boolean = false,
     val useGoogleSansFlex: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val paletteStyle: PaletteStyle = PaletteStyle.Expressive,

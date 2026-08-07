@@ -43,6 +43,8 @@ class AppSettingsRepositoryImpl(
                 ?: false,
             liquidGlassBlurRadius = prefs[AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS]
                 ?: 24,
+            useAppleStyleCard = prefs[AppDataStore.UI_USE_APPLE_STYLE_CARD]
+                ?: false,
             useGoogleSansFlex = prefs[AppDataStore.UI_USE_GOOGLE_SANS_FLEX]
                 ?: true,
             themeMode = ThemeMode.fromValueOrDefault(
@@ -131,6 +133,7 @@ class AppSettingsRepositoryImpl(
         BooleanSetting.UiUseTabRowCenterAlignment -> AppDataStore.UI_USE_TAB_ROW_CENTER_ALIGNMENT
         BooleanSetting.UiUseTabRowTransparentBackground -> AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND
         BooleanSetting.UiUseTabRowFillWidth -> AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH
+        BooleanSetting.UiUseAppleStyleCard -> AppDataStore.UI_USE_APPLE_STYLE_CARD
         BooleanSetting.UiUseGoogleSansFlex -> AppDataStore.UI_USE_GOOGLE_SANS_FLEX
         BooleanSetting.UiUseDownloadProxy -> AppDataStore.UI_USE_DOWNLOAD_PROXY
     }

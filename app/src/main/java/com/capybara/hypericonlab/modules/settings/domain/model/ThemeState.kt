@@ -28,4 +28,5 @@ data class ThemeState(
     val useLiquidGlassBottomSheet: Boolean = false,
     val liquidGlassBlurRadius: Int = 24,
     val useGoogleSansFlex: Boolean = false,
+    val useAppleStyleCard: Boolean = false,
 )

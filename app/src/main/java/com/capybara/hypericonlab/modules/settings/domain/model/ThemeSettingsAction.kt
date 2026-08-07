@@ -15,6 +15,7 @@ sealed interface ThemeSettingsAction {
     data class SetUseTabRowFillWidth(val enable: Boolean) : ThemeSettingsAction
     data class SetUseLiquidGlassBottomSheet(val enable: Boolean) : ThemeSettingsAction
     data class SetLiquidGlassBlurRadius(val value: Int) : ThemeSettingsAction
+    data class SetUseAppleStyleCard(val enable: Boolean) : ThemeSettingsAction
     data class SetUseGoogleSansFlex(val enable: Boolean) : ThemeSettingsAction
     data class SetThemeMode(val mode: ThemeMode) : ThemeSettingsAction
     data class SetPaletteStyle(val style: PaletteStyle) : ThemeSettingsAction
