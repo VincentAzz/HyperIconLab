@@ -1,7 +1,5 @@
 package com.capybara.hypericonlab.core.designsystem.component
 
-import android.os.Build
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -104,10 +102,6 @@ fun SegmentedColumnApple(
             dampingRatio = AppleSegmentedColumnConfig.SpringDamping,
             stiffness = AppleSegmentedColumnConfig.SpringStiffness
         )
-        val dpSpring = spring<Dp>(
-            dampingRatio = AppleSegmentedColumnConfig.SpringDamping,
-            stiffness = AppleSegmentedColumnConfig.SpringStiffness
-        )
         val progresses = allItems.mapIndexed { index, item ->
             key(item.key ?: index) {
                 animateFloatAsState(
@@ -128,18 +122,6 @@ fun SegmentedColumnApple(
                         var hasLeadingContent by remember { mutableStateOf(false) }
                         val leadingContentReporter = remember {
                             { hasLeading: Boolean -> hasLeadingContent = hasLeading }
-                        }
-                        val targetTopPadding = itemData.customTopPadding ?: 0.dp
-                        val isDynamicDpSupported =
-                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                        val currentTopPadding = if (isDynamicDpSupported) {
-                            animateDpAsState(
-                                targetValue = targetTopPadding,
-                                animationSpec = dpSpring,
-                                label = "AppleSegmentedItemTopPadding"
-                            ).value
-                        } else {
-                            targetTopPadding
                         }
 
                         Box(
@@ -173,9 +155,7 @@ fun SegmentedColumnApple(
                                 LocalSegmentedLeadingContentReporter provides leadingContentReporter
                             ) {
                                 Box {
-                                    Box(modifier = Modifier.padding(top = currentTopPadding)) {
-                                        itemData.content(RectangleShape)
-                                    }
+                                    itemData.content(RectangleShape)
                                     if (!isFirst && itemData.visible) {
                                         Box(
                                             modifier = Modifier
