@@ -10,6 +10,6 @@ enum class LiquidGlassEngine {
 
     companion object {
         fun fromValueOrDefault(value: String): LiquidGlassEngine =
-            entries.find { it.name == value } ?: MIUIX
+            entries.find { it.name == value } ?: KYANT
     }
 }

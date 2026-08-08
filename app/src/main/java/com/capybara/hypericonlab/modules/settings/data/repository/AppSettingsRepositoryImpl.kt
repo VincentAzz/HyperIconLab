@@ -48,8 +48,10 @@ class AppSettingsRepositoryImpl(
                 ?: false,
             useLiquidGlassBottomSheet = prefs[AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET]
                 ?: false,
+            useCustomLiquidGlassEngine = prefs[AppDataStore.UI_USE_CUSTOM_LIQUID_GLASS_ENGINE]
+                ?: false,
             liquidGlassEngine = LiquidGlassEngine.fromValueOrDefault(
-                prefs[AppDataStore.UI_LIQUID_GLASS_ENGINE] ?: LiquidGlassEngine.MIUIX.name
+                prefs[AppDataStore.UI_LIQUID_GLASS_ENGINE] ?: LiquidGlassEngine.KYANT.name
             ),
             useAppleStyleCard = prefs[AppDataStore.UI_USE_APPLE_STYLE_CARD]
                 ?: false,
@@ -135,6 +137,8 @@ class AppSettingsRepositoryImpl(
         BooleanSetting.UiUseCustomCardCornerRadius -> AppDataStore.UI_USE_CUSTOM_CARD_CORNER_RADIUS
         BooleanSetting.UiUseBlur -> AppDataStore.UI_USE_BLUR
         BooleanSetting.UiUseLiquidGlassBottomSheet -> AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET
+        BooleanSetting.UiUseCustomLiquidGlassEngine ->
+            AppDataStore.UI_USE_CUSTOM_LIQUID_GLASS_ENGINE
         BooleanSetting.ThemeUseDynamicColor -> AppDataStore.THEME_USE_DYNAMIC_COLOR
         BooleanSetting.UiUseFloatingBottomBar -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR
         BooleanSetting.UiUseFloatingBottomBarBlur -> AppDataStore.UI_USE_FLOATING_BOTTOM_BAR_BLUR

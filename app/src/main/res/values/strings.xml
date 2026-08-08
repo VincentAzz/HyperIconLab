@@ -23,6 +23,8 @@
     <string name="theme_settings_use_liquid_glass_bottom_sheet">Enable Liquid Glass Bottom Sheet</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">Enable liquid glass effect for bottom sheets</string>
     <string name="theme_settings_liquid_glass_engine">Liquid Glass Engine</string>
+    <string name="theme_settings_use_custom_liquid_glass_engine">Customize Liquid Glass Engine</string>
+    <string name="theme_settings_use_custom_liquid_glass_engine_desc">Choose the rendering engine for liquid glass effects</string>
     <string name="theme_settings_liquid_glass_engine_miuix">Miuix</string>
     <string name="theme_settings_liquid_glass_engine_kyant">Kyant</string>
     <string name="theme_settings_use_smoother_rounded_corners">Enable Smoother Rounded Corners</string>

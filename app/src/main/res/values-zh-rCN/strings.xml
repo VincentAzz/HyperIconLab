@@ -23,6 +23,8 @@
     <string name="theme_settings_use_liquid_glass_bottom_sheet">启用液态玻璃底部弹出菜单</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">为底部弹出菜单启用液态玻璃效果</string>
     <string name="theme_settings_liquid_glass_engine">液态玻璃引擎</string>
+    <string name="theme_settings_use_custom_liquid_glass_engine">自定义液态玻璃引擎</string>
+    <string name="theme_settings_use_custom_liquid_glass_engine_desc">选择液态玻璃效果使用的渲染引擎</string>
     <string name="theme_settings_liquid_glass_engine_miuix">Miuix</string>
     <string name="theme_settings_liquid_glass_engine_kyant">Kyant</string>
     <string name="theme_settings_use_smoother_rounded_corners">启用平滑圆角</string>

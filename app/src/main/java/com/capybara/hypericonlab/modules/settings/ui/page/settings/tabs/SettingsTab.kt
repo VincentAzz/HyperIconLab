@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -389,25 +388,38 @@ fun SettingsTab(
                             }
                         )
                     }
-                    item(animatedVisibility = uiState.useBlur) { shape ->
-                        BaseItemContainer(shape = shape) {
-                            Column(
-                                modifier = Modifier.padding(ExpandableStyleChipConfig.ContentPadding),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    ExpandableStyleChipConfig.ItemSpacing
-                                )
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.theme_settings_liquid_glass_engine),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
+                    expandableItem(
+                        animatedVisibility = uiState.useBlur,
+                        expanded = uiState.useCustomLiquidGlassEngine,
+                        topContent = {
+                            SwitchWidget(
+                                iconPlaceholder = false,
+                                title = stringResource(R.string.theme_settings_use_custom_liquid_glass_engine),
+                                description = stringResource(
+                                    R.string.theme_settings_use_custom_liquid_glass_engine_desc
+                                ),
+                                checked = uiState.useCustomLiquidGlassEngine,
+                                onCheckedChange = {
+                                    viewModel.dispatch(
+                                        ThemeSettingsAction.SetUseCustomLiquidGlassEngine(it)
+                                    )
+                                }
+                            )
+                        },
+                        bottomContent = { shape ->
+                            BaseItemContainer(shape = shape) {
                                 Row(
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(expandableStyleChipPadding),
                                     horizontalArrangement = Arrangement.spacedBy(
                                         ExpandableStyleChipConfig.ItemSpacing
                                     )
                                 ) {
-                                    LiquidGlassEngine.entries.forEach { engine ->
+                                    listOf(
+                                        LiquidGlassEngine.KYANT,
+                                        LiquidGlassEngine.MIUIX
+                                    ).forEach { engine ->
                                         StyleChip(
                                             label = when (engine) {
                                                 LiquidGlassEngine.MIUIX -> stringResource(
@@ -430,7 +442,7 @@ fun SettingsTab(
                                 }
                             }
                         }
-                    }
+                    )
                 }
             }
         }

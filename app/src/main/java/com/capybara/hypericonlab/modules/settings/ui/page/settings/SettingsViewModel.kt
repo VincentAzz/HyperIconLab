@@ -70,6 +70,7 @@ class SettingsViewModel(
             useTabRowTransparentBackground = themeState.useTabRowTransparentBackground,
             useTabRowFillWidth = themeState.useTabRowFillWidth,
             useLiquidGlassBottomSheet = themeState.useLiquidGlassBottomSheet,
+            useCustomLiquidGlassEngine = themeState.useCustomLiquidGlassEngine,
             liquidGlassEngine = themeState.liquidGlassEngine,
             useAppleStyleCard = themeState.useAppleStyleCard,
             useGoogleSansFlex = themeState.useGoogleSansFlex,
@@ -158,6 +159,13 @@ class SettingsViewModel(
             is ThemeSettingsAction.SetUseLiquidGlassBottomSheet -> viewModelScope.launch {
                 updateSetting(
                     BooleanSetting.UiUseLiquidGlassBottomSheet,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseCustomLiquidGlassEngine -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseCustomLiquidGlassEngine,
                     action.enable
                 )
             }

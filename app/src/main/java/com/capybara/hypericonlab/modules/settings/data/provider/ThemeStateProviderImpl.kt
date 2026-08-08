@@ -2,6 +2,7 @@ package com.capybara.hypericonlab.modules.settings.data.provider
 
 import android.os.Build
 import androidx.compose.ui.graphics.Color
+import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.domain.provider.SystemEnvProvider
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
@@ -47,7 +48,12 @@ class ThemeStateProviderImpl(
             useTabRowTransparentBackground = prefs.useTabRowTransparentBackground,
             useTabRowFillWidth = prefs.useTabRowFillWidth,
             useLiquidGlassBottomSheet = prefs.useLiquidGlassBottomSheet,
-            liquidGlassEngine = prefs.liquidGlassEngine,
+            useCustomLiquidGlassEngine = prefs.useCustomLiquidGlassEngine,
+            liquidGlassEngine = if (prefs.useCustomLiquidGlassEngine) {
+                prefs.liquidGlassEngine
+            } else {
+                LiquidGlassEngine.KYANT
+            },
             useAppleStyleCard = prefs.useAppleStyleCard,
             useGoogleSansFlex = prefs.useGoogleSansFlex,
         )

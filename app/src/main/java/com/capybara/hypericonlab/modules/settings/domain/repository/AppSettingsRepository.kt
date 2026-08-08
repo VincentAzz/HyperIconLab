@@ -23,6 +23,7 @@ enum class BooleanSetting {
     UiUseCustomCardCornerRadius,
     UiUseBlur,
     UiUseLiquidGlassBottomSheet,
+    UiUseCustomLiquidGlassEngine,
     ThemeUseDynamicColor,
     UiUseFloatingBottomBar,
     UiUseFloatingBottomBarBlur,
