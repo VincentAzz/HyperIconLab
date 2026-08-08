@@ -1,13 +1,7 @@
 package com.capybara.hypericonlab.modules.icon.ui.page.custom.component
 
 import android.graphics.Bitmap
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,13 +10,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -146,32 +138,25 @@ fun StyleChip(
         color = backgroundColor,
         modifier = modifier.height(36.dp)
     ) {
-        Box(modifier = Modifier.animateContentSize()) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .fillMaxHeight(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AnimatedVisibility(
-                    visible = selected,
-                    enter = expandHorizontally() + fadeIn(),
-                    exit = shrinkHorizontally() + fadeOut()
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = AppMaterialSymbols.check,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = selectedContentColor
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
-                }
-                Text(
-                    text = label,
-                    fontSize = 13.sp,
-                    color = textColor
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+                .fillMaxHeight(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                fontSize = 13.sp,
+                color = textColor
+            )
+            if (selected) {
+                Icon(
+                    imageVector = AppMaterialSymbols.check,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = selectedContentColor
                 )
             }
         }
