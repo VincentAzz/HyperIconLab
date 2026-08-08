@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
@@ -54,8 +53,7 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
 fun BackgroundTab(
     viewModel: IconViewModel,
     backdrop: LayerBackdrop? = null,
-    useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp
+    useLiquidGlass: Boolean = false
 ) {
     val style by viewModel.bgStyle.collectAsStateWithLifecycle()
     val selectedMasks by viewModel.selectedMasks.collectAsStateWithLifecycle()
@@ -326,8 +324,7 @@ fun BackgroundTab(
                 viewModel = viewModel,
                 isForeground = false,
                 backdrop = backdrop,
-                useLiquidGlass = useLiquidGlass,
-                liquidGlassBlurRadius = liquidGlassBlurRadius
+                useLiquidGlass = useLiquidGlass
             )
         }
 
@@ -340,8 +337,7 @@ fun BackgroundTab(
                 onPickStaticImage = { showStaticImagePicker2 = true },
                 onPickFillingImage = { showFillingImagePicker2 = true },
                 backdrop = backdrop,
-                useLiquidGlass = useLiquidGlass,
-                liquidGlassBlurRadius = liquidGlassBlurRadius
+                useLiquidGlass = useLiquidGlass
             )
         }
     }
@@ -355,8 +351,7 @@ fun BackgroundTab(
                 viewModel.updateConfig { c -> c.copy(selectedMasks = it) }; showMaskPicker = false
             },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -375,8 +370,7 @@ fun BackgroundTab(
                 showStaticImagePicker = false
             },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -395,8 +389,7 @@ fun BackgroundTab(
                 showFillingImagePicker = false
             },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -412,8 +405,7 @@ fun BackgroundTab(
                 showMaskPicker2 = false
             },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -432,8 +424,7 @@ fun BackgroundTab(
                 showStaticImagePicker2 = false
             },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -452,8 +443,7 @@ fun BackgroundTab(
                 showFillingImagePicker2 = false
             },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 }
@@ -471,8 +461,7 @@ private fun LowerLayerBackgroundSection(
     onPickStaticImage: () -> Unit,
     onPickFillingImage: () -> Unit,
     backdrop: LayerBackdrop? = null,
-    useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp
+    useLiquidGlass: Boolean = false
 ) {
     val style2 = bgLayer2.style
     val imageFilling2 = bgLayer2.imageFilling
@@ -671,8 +660,7 @@ private fun LowerLayerBackgroundSection(
             isForeground = false,
             layerIndex = 1,
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 }

@@ -43,7 +43,6 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
-import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.component.isAppleStyleCardEnabled
 import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
@@ -388,22 +387,6 @@ fun SettingsTab(
                                     )
                                 )
                             }
-                        )
-                    }
-                    item(animatedVisibility = uiState.useBlur && uiState.useLiquidGlassBottomSheet) { shape ->
-                        SliderWidget(
-                            title = stringResource(R.string.theme_settings_liquid_glass_blur_radius),
-                            value = uiState.liquidGlassBlurRadius.toFloat(),
-                            onValueChange = {
-                                viewModel.dispatch(
-                                    ThemeSettingsAction.SetLiquidGlassBlurRadius(
-                                        it.toInt()
-                                    )
-                                )
-                            },
-                            valueRange = 0f..48f,
-                            valueDisplay = "${uiState.liquidGlassBlurRadius} dp",
-                            shape = shape
                         )
                     }
                     item(animatedVisibility = uiState.useBlur) { shape ->

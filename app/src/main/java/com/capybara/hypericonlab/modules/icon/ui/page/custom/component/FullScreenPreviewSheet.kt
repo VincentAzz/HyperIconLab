@@ -60,7 +60,6 @@ fun FullScreenPreviewSheet(
     cornerRadius: Dp = ExtraLargeRadius,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     if (show && bitmap != null) {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -75,7 +74,6 @@ fun FullScreenPreviewSheet(
             cornerRadius = cornerRadius,
             backdrop = backdrop,
             useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius,
         ) {
             CenterAlignedTopAppBar(
                 title = {
@@ -217,5 +215,4 @@ fun FullScreenPreviewSheet(
         }
     }
 }
-
 

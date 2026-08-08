@@ -1,8 +1,6 @@
 package com.capybara.hypericonlab.modules.settings.ui.page.settings.component
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
@@ -21,7 +19,6 @@ fun DownloadModeSheet(
     onConfirm: (DownloadMode) -> Unit,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     val currentMode = if (currentUseProxy) DownloadMode.PROXY else DownloadMode.DIRECT
     SelectionSheet(
@@ -32,7 +29,6 @@ fun DownloadModeSheet(
         onConfirm = onConfirm,
         itemLabel = { mode -> mode.label },
         backdrop = backdrop,
-        useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius
+        useLiquidGlass = useLiquidGlass
     )
 }

@@ -15,8 +15,7 @@ enum class StringSetting {
 
 enum class IntSetting {
     ThemeSeedColor,
-    LastMainPageIndex,
-    UiLiquidGlassBlurRadius
+    LastMainPageIndex
 }
 
 enum class BooleanSetting {

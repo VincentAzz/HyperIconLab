@@ -78,7 +78,6 @@ fun BuildOptionSheet(
     cornerRadius: Dp = ExtraLargeRadius,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     // 默认选中第一个 enabled 的产物类型与第一个图标集
     var selectedProductType by remember {
@@ -99,7 +98,6 @@ fun BuildOptionSheet(
         cornerRadius = cornerRadius,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius,
         fillMaxHeight = false
     ) {
         // Header：与项目其他 sheet 一致的 CenterAlignedTopAppBar + 关闭/确认按钮

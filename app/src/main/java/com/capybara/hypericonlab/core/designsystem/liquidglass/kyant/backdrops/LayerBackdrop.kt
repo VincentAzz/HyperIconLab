@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -73,3 +74,5 @@ class LayerBackdrop internal constructor(
     }
 }
 
+// 由主屏幕提供给弹层使用的 Kyant 背景层
+val LocalKyantBackdrop = staticCompositionLocalOf<LayerBackdrop?> { null }

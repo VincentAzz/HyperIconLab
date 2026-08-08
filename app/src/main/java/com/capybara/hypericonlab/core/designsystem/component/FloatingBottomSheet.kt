@@ -27,12 +27,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.drawBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.blur
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.colorControls
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.lens
 import com.capybara.hypericonlab.core.designsystem.liquidglass.liquidGlassEffect
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
+
+private object KyantSheetConfig {
+    const val LightSurfaceAlpha = 0.6f
+    const val DarkSurfaceAlpha = LightSurfaceAlpha
+    const val LightBrightness = 0.2f
+    const val Saturation = 1.5f
+    val LightBlurRadius = 16.dp
+    val DarkBlurRadius = 8.dp
+    val RefractionHeight = 24.dp
+    val RefractionAmount = 48.dp
+    val MiuixBlurRadius = 24.dp
+}
 
 /**
  * Floating BottomSheet component.
@@ -52,8 +70,6 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
  * @param useLiquidGlass When true and a backdrop is present, apply a liquid glass effect
  *  (refraction + edge highlight) instead of the standard blur. Falls back to standard blur
  *  when runtime shaders are unsupported. Supports the design system's smoother rounded rectangle.
- * @param liquidGlassBlurRadius Gaussian blur radius used by the liquid glass effect; ignored when
- *  [useLiquidGlass] is false. Defaults to 24.dp.
  * @param content The content of the sheet.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +91,6 @@ fun FloatingBottomSheet(
     fillMaxHeight: Boolean = true,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     LaunchedEffect(Unit) {
@@ -86,6 +101,16 @@ fun FloatingBottomSheet(
 
     val shape = rememberKyantRoundedRectangleShape(cornerRadius)
     val liquidGlassShape = RoundedCornerShape(cornerRadius)
+    val kyantBackdrop = LocalKyantBackdrop.current
+    val hasBackdrop = backdrop != null || (useLiquidGlass && kyantBackdrop != null)
+    val isDarkTheme = AppTheme.isDark
+    val kyantContainerColor = containerColor.copy(
+        alpha = if (isDarkTheme) {
+            KyantSheetConfig.DarkSurfaceAlpha
+        } else {
+            KyantSheetConfig.LightSurfaceAlpha
+        }
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -102,14 +127,41 @@ fun FloatingBottomSheet(
                 .padding(bottom = bottomPadding)
                 .then(if (fillMaxHeight) Modifier.fillMaxSize() else Modifier.wrapContentHeight())
                 .then(
-                    if (useLiquidGlass && backdrop != null) {
+                    if (useLiquidGlass && kyantBackdrop != null) {
+                        Modifier
+                            .clip(shape)
+                            .drawBackdrop(
+                                backdrop = kyantBackdrop,
+                                shape = { shape },
+                                effects = {
+                                    colorControls(
+                                        brightness = if (isDarkTheme) 0f else KyantSheetConfig.LightBrightness,
+                                        saturation = KyantSheetConfig.Saturation
+                                    )
+                                    blur(
+                                        (if (isDarkTheme) {
+                                            KyantSheetConfig.DarkBlurRadius
+                                        } else {
+                                            KyantSheetConfig.LightBlurRadius
+                                        }).toPx()
+                                    )
+                                    lens(
+                                        refractionHeight = KyantSheetConfig.RefractionHeight.toPx(),
+                                        refractionAmount = KyantSheetConfig.RefractionAmount.toPx(),
+                                        depthEffect = true
+                                    )
+                                },
+                                highlight = null,
+                                onDrawSurface = { drawRect(kyantContainerColor) }
+                            )
+                    } else if (useLiquidGlass && backdrop != null) {
                         Modifier
                             .clip(shape)
                             .liquidGlassEffect(
                                 backdrop = backdrop,
                                 shape = liquidGlassShape,
                                 cornerRadius = cornerRadius,
-                                blurRadius = liquidGlassBlurRadius
+                                blurRadius = KyantSheetConfig.MiuixBlurRadius
                             )
                     } else if (backdrop != null) {
                         Modifier.material3BlurEffect(
@@ -121,7 +173,7 @@ fun FloatingBottomSheet(
                         Modifier
                     }
                 ),
-            color = if (backdrop != null) Color.Transparent else containerColor,
+            color = if (hasBackdrop) Color.Transparent else containerColor,
             shape = shape,
             tonalElevation = tonalElevation
         ) {

@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.symbol.close
@@ -48,8 +47,7 @@ fun <T> SelectionSheet(
     // 可选：单项是否可选中，返回 false 时该项置灰，默认全部可选中
     itemEnabled: ((T) -> Boolean)? = null,
     backdrop: LayerBackdrop? = null,
-    useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp
+    useLiquidGlass: Boolean = false
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
@@ -63,8 +61,7 @@ fun <T> SelectionSheet(
         bottomPadding = 8.dp,
         cornerRadius = ExtraLargeRadius,
         backdrop = backdrop,
-        useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius
+        useLiquidGlass = useLiquidGlass
     ) {
         CenterAlignedTopAppBar(
             title = { SheetTitle(title) },

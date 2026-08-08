@@ -22,8 +22,6 @@
     <string name="theme_settings_use_progressive_blur_top_app_bar_desc">Apply progressive blur to the top app bar</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet">Enable Liquid Glass Bottom Sheet</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">Enable liquid glass effect for bottom sheets</string>
-    <string name="theme_settings_liquid_glass_blur_radius">Liquid Glass Blur Radius</string>
-    <string name="theme_settings_liquid_glass_blur_radius_desc">Adjust the blur intensity of the liquid glass effect (0–48 dp)</string>
     <string name="theme_settings_liquid_glass_engine">Liquid Glass Engine</string>
     <string name="theme_settings_liquid_glass_engine_miuix">Miuix</string>
     <string name="theme_settings_liquid_glass_engine_kyant">Kyant</string>

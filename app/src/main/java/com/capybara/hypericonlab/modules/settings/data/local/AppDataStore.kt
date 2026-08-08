@@ -20,8 +20,6 @@ class AppDataStore(
         val UI_USE_BLUR = booleanPreferencesKey("ui_use_blur")
         val UI_USE_LIQUID_GLASS_BOTTOM_SHEET =
             booleanPreferencesKey("ui_use_liquid_glass_bottom_sheet")
-        val UI_LIQUID_GLASS_BLUR_RADIUS =
-            intPreferencesKey("ui_liquid_glass_blur_radius")
         val UI_LIQUID_GLASS_ENGINE = stringPreferencesKey("ui_liquid_glass_engine")
         val UI_USE_SMOOTHER_ROUNDED_CORNERS = booleanPreferencesKey("ui_use_smoother_rounded_corners")
         val UI_USE_CUSTOM_CARD_CORNER_RADIUS =

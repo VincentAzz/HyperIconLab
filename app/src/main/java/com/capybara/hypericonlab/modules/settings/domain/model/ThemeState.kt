@@ -30,7 +30,6 @@ data class ThemeState(
     val useTabRowTransparentBackground: Boolean = false,
     val useTabRowFillWidth: Boolean = false,
     val useLiquidGlassBottomSheet: Boolean = false,
-    val liquidGlassBlurRadius: Int = 24,
     val liquidGlassEngine: LiquidGlassEngine = LiquidGlassEngine.MIUIX,
     val useGoogleSansFlex: Boolean = false,
     val useAppleStyleCard: Boolean = false,

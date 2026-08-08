@@ -35,6 +35,7 @@ import androidx.compose.material3.ShortNavigationBarArrangement
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,6 +51,7 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarDe
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarItem
 import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
 import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantBackdrop
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
@@ -111,17 +113,27 @@ fun MainScreenScaffold(
             }
         }
     ) { paddingValues ->
-        MainPagerContent(
-            modifier = Modifier.fillMaxSize(),
-            mainPagerState = mainPagerState,
-            tabs = tabs,
-            useBlur = useBlur,
-            useFloatingBottomBar = useFloatingBottomBar,
-            m3Backdrop = m3Backdrop,
-            floatingBackdrop = floatingBackdrop,
-            kyantBackdrop = kyantBackdrop,
-            outerPadding = paddingValues
-        )
+        CompositionLocalProvider(
+            LocalKyantBackdrop provides if (
+                LocalThemeState.current.liquidGlassEngine == LiquidGlassEngine.KYANT
+            ) {
+                kyantBackdrop
+            } else {
+                null
+            }
+        ) {
+            MainPagerContent(
+                modifier = Modifier.fillMaxSize(),
+                mainPagerState = mainPagerState,
+                tabs = tabs,
+                useBlur = useBlur,
+                useFloatingBottomBar = useFloatingBottomBar,
+                m3Backdrop = m3Backdrop,
+                floatingBackdrop = floatingBackdrop,
+                kyantBackdrop = kyantBackdrop,
+                outerPadding = paddingValues
+            )
+        }
     }
 }
 
@@ -275,7 +287,10 @@ private fun MainPagerContent(
         modifier = modifier
             .then(if (m3Backdrop != null) Modifier.layerBackdrop(m3Backdrop) else Modifier)
             .then(
-                if (useFloatingBottomBar && themeState.liquidGlassEngine == LiquidGlassEngine.KYANT) {
+                if (
+                    themeState.liquidGlassEngine == LiquidGlassEngine.KYANT &&
+                    (useFloatingBottomBar || themeState.useLiquidGlassBottomSheet)
+                ) {
                     Modifier.kyantLayerBackdrop(kyantBackdrop)
                 } else if (useFloatingBottomBar) {
                     Modifier.layerBackdrop(floatingBackdrop)

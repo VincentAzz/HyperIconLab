@@ -123,7 +123,6 @@ fun MaskPickerSheet(
     cornerRadius: Dp = ExtraLargeRadius,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     val context = LocalContext.current
     // 检测初始是否为自定义形状模式
@@ -177,7 +176,6 @@ fun MaskPickerSheet(
         cornerRadius = cornerRadius,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius,
     ) {
         // Header
         CenterAlignedTopAppBar(

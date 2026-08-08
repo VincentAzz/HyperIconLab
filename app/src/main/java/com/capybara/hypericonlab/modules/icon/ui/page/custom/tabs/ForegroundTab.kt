@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLocale
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
@@ -26,8 +25,7 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
 fun ForegroundTab(
     viewModel: IconViewModel,
     backdrop: LayerBackdrop? = null,
-    useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp
+    useLiquidGlass: Boolean = false
 ) {
     val style by viewModel.fgStyle.collectAsStateWithLifecycle()
     val strokeWidth by viewModel.strokeWidthRatio.collectAsStateWithLifecycle()
@@ -98,8 +96,7 @@ fun ForegroundTab(
                 viewModel = viewModel,
                 isForeground = true,
                 backdrop = backdrop,
-                useLiquidGlass = useLiquidGlass,
-                liquidGlassBlurRadius = liquidGlassBlurRadius
+                useLiquidGlass = useLiquidGlass
             )
         }
 

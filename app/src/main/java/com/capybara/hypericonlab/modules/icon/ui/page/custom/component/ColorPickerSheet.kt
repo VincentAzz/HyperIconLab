@@ -63,7 +63,6 @@ fun ColorPickerSheet(
     cornerRadius: Dp = ExtraLargeRadius,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     val initialArgb = remember(initialColor) {
         try {
@@ -92,7 +91,6 @@ fun ColorPickerSheet(
         cornerRadius = cornerRadius,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius,
         fillMaxHeight = false,
     ) {
         CenterAlignedTopAppBar(

@@ -47,7 +47,6 @@ class ThemeStateProviderImpl(
             useTabRowTransparentBackground = prefs.useTabRowTransparentBackground,
             useTabRowFillWidth = prefs.useTabRowFillWidth,
             useLiquidGlassBottomSheet = prefs.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = prefs.liquidGlassBlurRadius,
             liquidGlassEngine = prefs.liquidGlassEngine,
             useAppleStyleCard = prefs.useAppleStyleCard,
             useGoogleSansFlex = prefs.useGoogleSansFlex,

@@ -55,7 +55,6 @@ fun TaskDetailSheet(
     cornerRadius: Dp = ExtraLargeRadius,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     val isActive = task.status == BuildTaskStatus.PENDING ||
             task.status == BuildTaskStatus.RUNNING
@@ -80,7 +79,6 @@ fun TaskDetailSheet(
         cornerRadius = cornerRadius,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius,
         fillMaxHeight = true
     ) {
         Column(

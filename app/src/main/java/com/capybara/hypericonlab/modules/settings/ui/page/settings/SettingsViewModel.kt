@@ -70,7 +70,6 @@ class SettingsViewModel(
             useTabRowTransparentBackground = themeState.useTabRowTransparentBackground,
             useTabRowFillWidth = themeState.useTabRowFillWidth,
             useLiquidGlassBottomSheet = themeState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = themeState.liquidGlassBlurRadius,
             liquidGlassEngine = themeState.liquidGlassEngine,
             useAppleStyleCard = themeState.useAppleStyleCard,
             useGoogleSansFlex = themeState.useGoogleSansFlex,
@@ -160,13 +159,6 @@ class SettingsViewModel(
                 updateSetting(
                     BooleanSetting.UiUseLiquidGlassBottomSheet,
                     action.enable
-                )
-            }
-
-            is ThemeSettingsAction.SetLiquidGlassBlurRadius -> viewModelScope.launch {
-                updateSetting(
-                    IntSetting.UiLiquidGlassBlurRadius,
-                    action.value
                 )
             }
 

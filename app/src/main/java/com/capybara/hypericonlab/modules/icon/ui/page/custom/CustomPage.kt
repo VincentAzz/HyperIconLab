@@ -300,15 +300,13 @@ fun CustomPage(
                         0 -> ForegroundTab(
                             viewModel,
                             backdrop,
-                            useLiquidGlass = themeState.useLiquidGlassBottomSheet,
-                            liquidGlassBlurRadius = themeState.liquidGlassBlurRadius.dp
+                            useLiquidGlass = themeState.useLiquidGlassBottomSheet
                         )
 
                         1 -> BackgroundTab(
                             viewModel,
                             backdrop,
-                            useLiquidGlass = themeState.useLiquidGlassBottomSheet,
-                            liquidGlassBlurRadius = themeState.liquidGlassBlurRadius.dp
+                            useLiquidGlass = themeState.useLiquidGlassBottomSheet
                         )
 
                         2 -> BorderTab(
@@ -329,8 +327,7 @@ fun CustomPage(
         configText = previewConfigText,
         onDismiss = { showFullScreenPreview = false },
         backdrop = backdrop,
-        useLiquidGlass = themeState.useLiquidGlassBottomSheet,
-        liquidGlassBlurRadius = themeState.liquidGlassBlurRadius.dp
+        useLiquidGlass = themeState.useLiquidGlassBottomSheet
     )
 
     // 构建选项 Sheet
@@ -360,8 +357,7 @@ fun CustomPage(
                 }
             },
             backdrop = backdrop,
-            useLiquidGlass = themeState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = themeState.liquidGlassBlurRadius.dp
+            useLiquidGlass = themeState.useLiquidGlassBottomSheet
         )
     }
 }

@@ -125,8 +125,7 @@ fun SettingsPage(
             },
             itemLabel = { style: PaletteStyle -> style.displayName },
             backdrop = backdrop,
-            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
         )
     }
 
@@ -147,8 +146,7 @@ fun SettingsPage(
                 }
             },
             backdrop = backdrop,
-            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
         )
     }
 
@@ -167,8 +165,7 @@ fun SettingsPage(
             },
             itemLabel = { spec: ThemeColorSpec -> spec.displayName },
             backdrop = backdrop,
-            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
         )
     }
 
@@ -178,8 +175,7 @@ fun SettingsPage(
             viewModel = iconViewModel,
             onDismiss = { showLogSheet = false },
             backdrop = backdrop,
-            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
         )
     }
 
@@ -188,8 +184,7 @@ fun SettingsPage(
         LawniconsBrowserSheet(
             onDismiss = { showLawniconsSheet = false },
             backdrop = backdrop,
-            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
         )
     }
 
@@ -199,8 +194,7 @@ fun SettingsPage(
             currentVersion = currentVersion,
             onDismiss = { showSourceSheet = false },
             backdrop = backdrop,
-            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
         )
     }
 
@@ -219,8 +213,7 @@ fun SettingsPage(
                 }
             },
             backdrop = backdrop,
-            useLiquidGlass = uiState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = uiState.liquidGlassBlurRadius.dp
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
         )
     }
 

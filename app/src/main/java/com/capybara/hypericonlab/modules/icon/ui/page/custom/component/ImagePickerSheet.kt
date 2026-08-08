@@ -103,7 +103,6 @@ fun ImagePickerSheet(
     cornerRadius: Dp = 32.dp,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     val context = LocalContext.current
     var currentSelection by remember { mutableStateOf(selectedImages) }
@@ -164,7 +163,6 @@ fun ImagePickerSheet(
         cornerRadius = cornerRadius,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius,
     ) {
         CenterAlignedTopAppBar(
             title = { SheetTitle(title) },

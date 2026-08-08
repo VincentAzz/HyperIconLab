@@ -235,8 +235,7 @@ fun TaskPage(
             onDismiss = { selectedTaskId = null },
             backdrop = backdrop,
             // 跟随应用的 BottomSheet 液态玻璃开关，而非全局模糊开关 useBlur
-            useLiquidGlass = themeState.useLiquidGlassBottomSheet,
-            liquidGlassBlurRadius = themeState.liquidGlassBlurRadius.dp
+            useLiquidGlass = themeState.useLiquidGlassBottomSheet
         )
     }
 }

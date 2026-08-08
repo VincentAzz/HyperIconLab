@@ -48,8 +48,6 @@ class AppSettingsRepositoryImpl(
                 ?: false,
             useLiquidGlassBottomSheet = prefs[AppDataStore.UI_USE_LIQUID_GLASS_BOTTOM_SHEET]
                 ?: false,
-            liquidGlassBlurRadius = prefs[AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS]
-                ?: 24,
             liquidGlassEngine = LiquidGlassEngine.fromValueOrDefault(
                 prefs[AppDataStore.UI_LIQUID_GLASS_ENGINE] ?: LiquidGlassEngine.MIUIX.name
             ),
@@ -130,7 +128,6 @@ class AppSettingsRepositoryImpl(
     private fun intKey(setting: IntSetting): Preferences.Key<Int> = when (setting) {
         IntSetting.ThemeSeedColor -> AppDataStore.THEME_SEED_COLOR
         IntSetting.LastMainPageIndex -> AppDataStore.LAST_MAIN_PAGE_INDEX
-        IntSetting.UiLiquidGlassBlurRadius -> AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS
     }
 
     private fun booleanKey(setting: BooleanSetting): Preferences.Key<Boolean> = when (setting) {

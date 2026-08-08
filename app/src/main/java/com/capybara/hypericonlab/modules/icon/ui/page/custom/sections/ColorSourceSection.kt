@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
@@ -62,8 +61,7 @@ fun ColorSourceSection(
     isForeground: Boolean,
     layerIndex: Int = 0,
     backdrop: LayerBackdrop? = null,
-    useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp
+    useLiquidGlass: Boolean = false
 ) {
     val config by viewModel.config.collectAsStateWithLifecycle()
     val bgLayer2 = config.bgLayer2
@@ -175,8 +173,7 @@ fun ColorSourceSection(
             },
             itemLabel = { style: PaletteStyle -> style.displayName },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -191,8 +188,7 @@ fun ColorSourceSection(
             },
             itemLabel = { spec: ThemeColorSpec -> spec.displayName },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -207,8 +203,7 @@ fun ColorSourceSection(
             },
             itemLabel = { style: PaletteStyle -> style.displayName },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -223,8 +218,7 @@ fun ColorSourceSection(
             },
             itemLabel = { spec: ThemeColorSpec -> spec.displayName },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 
@@ -657,8 +651,7 @@ fun ColorSourceSection(
                 showColorPicker = false
             },
             backdrop = backdrop,
-            useLiquidGlass = useLiquidGlass,
-            liquidGlassBlurRadius = liquidGlassBlurRadius
+            useLiquidGlass = useLiquidGlass
         )
     }
 }

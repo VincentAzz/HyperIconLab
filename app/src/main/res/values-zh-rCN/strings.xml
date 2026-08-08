@@ -22,8 +22,6 @@
     <string name="theme_settings_use_progressive_blur_top_app_bar_desc">为应用顶栏启用渐变模糊效果</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet">启用液态玻璃底部弹出菜单</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">为底部弹出菜单启用液态玻璃效果</string>
-    <string name="theme_settings_liquid_glass_blur_radius">菜单液态玻璃模糊半径</string>
-    <string name="theme_settings_liquid_glass_blur_radius_desc">调整液态玻璃效果的模糊强度（0–48 dp）</string>
     <string name="theme_settings_liquid_glass_engine">液态玻璃引擎</string>
     <string name="theme_settings_liquid_glass_engine_miuix">Miuix</string>
     <string name="theme_settings_liquid_glass_engine_kyant">Kyant</string>

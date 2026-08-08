@@ -104,7 +104,6 @@ fun LawniconsBrowserSheet(
     cornerRadius: Dp = ExtraLargeRadius,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     val assetsFacade = koinInject<LawniconsAssetFacade>()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -178,7 +177,6 @@ fun LawniconsBrowserSheet(
         cornerRadius = cornerRadius,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius,
     ) {
         CenterAlignedTopAppBar(
             title = { SheetTitle("浏览原始图标") },

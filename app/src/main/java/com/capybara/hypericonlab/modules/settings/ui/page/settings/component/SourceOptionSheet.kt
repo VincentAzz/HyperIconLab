@@ -2,8 +2,6 @@ package com.capybara.hypericonlab.modules.settings.ui.page.settings.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.symbol.archive
 import com.capybara.hypericonlab.core.designsystem.symbol.cloud_download
@@ -35,7 +33,6 @@ fun SourceOptionSheet(
     onDismiss: () -> Unit,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
-    liquidGlassBlurRadius: Dp = 24.dp,
 ) {
     val assetsFacade = koinInject<LawniconsAssetFacade>()
 
@@ -75,8 +72,7 @@ fun SourceOptionSheet(
         // 云端未下载时置灰，仅允许选中本地
         itemEnabled = { option -> option !is SourceOption.RemotePending },
         backdrop = backdrop,
-        useLiquidGlass = useLiquidGlass,
-        liquidGlassBlurRadius = liquidGlassBlurRadius
+        useLiquidGlass = useLiquidGlass
     )
 }
 
