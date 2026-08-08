@@ -44,6 +44,7 @@ import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
+import com.capybara.hypericonlab.core.designsystem.component.isAppleStyleCardEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
@@ -61,6 +62,11 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 import java.util.Locale
 
+private object ExpandableStyleChipConfig {
+    val ContentPadding = 12.dp
+    val ItemSpacing = 8.dp
+}
+
 @Composable
 fun SettingsTab(
     uiState: ThemeSettingsState,
@@ -76,6 +82,13 @@ fun SettingsTab(
     modifier: Modifier = Modifier,
 ) {
     val layoutDirection = LocalLayoutDirection.current
+    val appleStyleCardEnabled = isAppleStyleCardEnabled()
+    val expandableStyleChipPadding = PaddingValues(
+        start = ExpandableStyleChipConfig.ContentPadding,
+        top = if (appleStyleCardEnabled) 0.dp else ExpandableStyleChipConfig.ContentPadding,
+        end = ExpandableStyleChipConfig.ContentPadding,
+        bottom = ExpandableStyleChipConfig.ContentPadding
+    )
 
     LazyColumn(
         modifier = modifier
@@ -137,8 +150,10 @@ fun SettingsTab(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(12.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    .padding(expandableStyleChipPadding),
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    ExpandableStyleChipConfig.ItemSpacing
+                                )
                             ) {
                                 CardCornerSize.entries.forEach { size ->
                                     StyleChip(
@@ -251,58 +266,60 @@ fun SettingsTab(
                         }
                     )
                 }
-                item(animatedVisibility = uiState.useFloatingBottomBar) {
-                    SwitchWidget(
-                        iconPlaceholder = false,
-                        title = stringResource(R.string.theme_settings_use_floating_bottom_bar_compact),
-                        description = stringResource(R.string.theme_settings_use_floating_bottom_bar_compact_desc),
-                        checked = uiState.useFloatingBottomBarCompact,
-                        onCheckedChange = {
-                            viewModel.dispatch(
-                                ThemeSettingsAction.SetUseFloatingBarCompact(
-                                    it
+                expandableItem(
+                    animatedVisibility = uiState.useFloatingBottomBar,
+                    expanded = uiState.useFloatingBottomBarCompact,
+                    topContent = {
+                        SwitchWidget(
+                            iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_floating_bottom_bar_compact),
+                            description = stringResource(R.string.theme_settings_use_floating_bottom_bar_compact_desc),
+                            checked = uiState.useFloatingBottomBarCompact,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseFloatingBarCompact(it)
                                 )
-                            )
-                        }
-                    )
-                }
-                item(
-                    animatedVisibility = uiState.useFloatingBottomBar && uiState.useFloatingBottomBarCompact
-                ) { shape ->
-                    BaseItemContainer(shape = shape) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FloatingBottomBarCompactType.entries.chunked(2)
-                                .forEach { rowEntries ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(
-                                            8.dp
-                                        )
-                                    ) {
-                                        rowEntries.forEach { entry ->
-                                            StyleChip(
-                                                label = entry.displayName,
-                                                selected = uiState.floatingBottomBarCompactType == entry,
-                                                onClick = {
-                                                    viewModel.dispatch(
-                                                        ThemeSettingsAction.SetFloatingBottomBarCompactType(
-                                                            entry
-                                                        )
-                                                    )
-                                                },
-                                                modifier = Modifier.weight(1f)
+                            }
+                        )
+                    },
+                    bottomContent = { shape ->
+                        BaseItemContainer(shape = shape) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(expandableStyleChipPadding),
+                                verticalArrangement = Arrangement.spacedBy(
+                                    ExpandableStyleChipConfig.ItemSpacing
+                                )
+                            ) {
+                                FloatingBottomBarCompactType.entries.chunked(2)
+                                    .forEach { rowEntries ->
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(
+                                                ExpandableStyleChipConfig.ItemSpacing
                                             )
+                                        ) {
+                                            rowEntries.forEach { entry ->
+                                                StyleChip(
+                                                    label = entry.displayName,
+                                                    selected = uiState.floatingBottomBarCompactType == entry,
+                                                    onClick = {
+                                                        viewModel.dispatch(
+                                                            ThemeSettingsAction.SetFloatingBottomBarCompactType(
+                                                                entry
+                                                            )
+                                                        )
+                                                    },
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                            }
                                         }
                                     }
-                                }
+                            }
                         }
                     }
-                }
+                )
             }
         }
 

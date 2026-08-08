@@ -161,7 +161,11 @@ fun SegmentedColumnApple(
                             ) {
                                 Box {
                                     itemData.content(RectangleShape)
-                                    if (!isFirst && itemData.visible) {
+                                    if (
+                                        !isFirst &&
+                                        itemData.visible &&
+                                        itemData.showDividerBefore
+                                    ) {
                                         Box(
                                             modifier = Modifier
                                                 .align(Alignment.TopCenter)

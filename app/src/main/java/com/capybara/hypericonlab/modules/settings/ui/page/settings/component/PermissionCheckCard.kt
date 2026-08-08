@@ -100,9 +100,6 @@ fun PermissionCheckCard(
                         iconPlaceholder = false,
                         title = stringResource(R.string.permission_check_notification_title),
                         description = stringResource(R.string.permission_check_notification_desc),
-                        onClick = {
-                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        },
                         trailingContent = {
                             PrimaryActionButton(
                                 text = stringResource(R.string.permission_check_grant),
@@ -121,9 +118,6 @@ fun PermissionCheckCard(
                         iconPlaceholder = false,
                         title = stringResource(R.string.permission_check_storage_title),
                         description = stringResource(R.string.permission_check_storage_desc),
-                        onClick = {
-                            storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        },
                         trailingContent = {
                             PrimaryActionButton(
                                 text = stringResource(R.string.permission_check_grant),
@@ -142,7 +136,6 @@ fun PermissionCheckCard(
                         iconPlaceholder = false,
                         title = stringResource(R.string.permission_check_install_title),
                         description = stringResource(R.string.permission_check_install_desc),
-                        onClick = { apkInstaller.openUnknownSourcesSettings() },
                         trailingContent = {
                             PrimaryActionButton(
                                 text = stringResource(R.string.permission_check_grant),

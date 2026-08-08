@@ -59,6 +59,7 @@ data class SegmentedItemData(
     val customTopPadding: Dp? = null,
     val forceFlatTop: Boolean = false,
     val forceFlatBottom: Boolean = false,
+    val showDividerBefore: Boolean = true,
     val content: @Composable (Shape) -> Unit
 )
 
@@ -72,16 +73,18 @@ class SegmentedColumnScope {
         topPadding: Dp? = null,
         forceFlatTop: Boolean = false,
         forceFlatBottom: Boolean = false,
+        showDividerBefore: Boolean = true,
         content: @Composable (Shape) -> Unit
     ) {
         items.add(
             SegmentedItemData(
-                key ?: items.size,
-                animatedVisibility,
-                topPadding,
-                forceFlatTop,
-                forceFlatBottom,
-                content
+                key = key ?: items.size,
+                visible = animatedVisibility,
+                customTopPadding = topPadding,
+                forceFlatTop = forceFlatTop,
+                forceFlatBottom = forceFlatBottom,
+                showDividerBefore = showDividerBefore,
+                content = content
             )
         )
     }
@@ -90,21 +93,20 @@ class SegmentedColumnScope {
         animatedVisibility: Boolean = true,
         expanded: Boolean,
         topPadding: Dp? = null,
-        bottomPadding: Dp = 1.dp,
+        bottomPadding: Dp? = null,
         topContent: @Composable (Shape) -> Unit,
         bottomContent: @Composable (Shape) -> Unit
     ) {
         item(
             animatedVisibility = animatedVisibility,
             topPadding = topPadding,
-            forceFlatBottom = expanded,
             content = topContent
         )
 
         item(
             animatedVisibility = animatedVisibility && expanded,
             topPadding = bottomPadding,
-            forceFlatTop = true,
+            showDividerBefore = false,
             content = bottomContent
         )
     }
