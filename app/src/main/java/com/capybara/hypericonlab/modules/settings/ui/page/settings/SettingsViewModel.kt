@@ -5,14 +5,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
 import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsState
+import com.capybara.hypericonlab.modules.settings.domain.provider.KyantGlassTuningController
 import com.capybara.hypericonlab.modules.settings.domain.provider.SystemEnvProvider
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
 import com.capybara.hypericonlab.modules.settings.domain.repository.BooleanSetting
+import com.capybara.hypericonlab.modules.settings.domain.repository.FloatSetting
 import com.capybara.hypericonlab.modules.settings.domain.repository.IntSetting
 import com.capybara.hypericonlab.modules.settings.domain.repository.StringSetting
 import com.capybara.hypericonlab.modules.settings.domain.usecase.UpdateSettingUseCase
@@ -29,7 +32,8 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(
     themeStateProvider: ThemeStateProvider,
     systemEnvProvider: SystemEnvProvider,
-    private val updateSetting: UpdateSettingUseCase
+    private val updateSetting: UpdateSettingUseCase,
+    private val kyantGlassTuningController: KyantGlassTuningController
 ) : ViewModel() {
 
     private val _selectedTab = MutableStateFlow(0)
@@ -72,6 +76,7 @@ class SettingsViewModel(
             useLiquidGlassBottomSheet = themeState.useLiquidGlassBottomSheet,
             useCustomLiquidGlassEngine = themeState.useCustomLiquidGlassEngine,
             liquidGlassEngine = themeState.liquidGlassEngine,
+            kyantGlassTuning = themeState.kyantGlassTuning,
             useAppleStyleCard = themeState.useAppleStyleCard,
             useGoogleSansFlex = themeState.useGoogleSansFlex,
             themeMode = themeState.themeMode,
@@ -177,6 +182,16 @@ class SettingsViewModel(
                 )
             }
 
+            is ThemeSettingsAction.PreviewKyantGlassTuning -> {
+                kyantGlassTuningController.updatePreview(action.tuning)
+            }
+
+            ThemeSettingsAction.PersistKyantGlassTuning -> viewModelScope.launch {
+                persistKyantGlassTuning(
+                    kyantGlassTuningController.currentOr(state.value.kyantGlassTuning)
+                )
+            }
+
             is ThemeSettingsAction.SetUseAppleStyleCard -> viewModelScope.launch {
                 updateSetting(
                     BooleanSetting.UiUseAppleStyleCard,
@@ -258,5 +273,22 @@ class SettingsViewModel(
                 _selectedTab.value = action.index
             }
         }
+    }
+
+    private suspend fun persistKyantGlassTuning(tuning: KyantGlassTuning) {
+        val normalized = tuning.normalized()
+        updateSetting(FloatSetting.KyantGlassBlurScale, normalized.blurScale)
+        updateSetting(
+            FloatSetting.KyantGlassRefractionHeightScale,
+            normalized.refractionHeightScale
+        )
+        updateSetting(
+            FloatSetting.KyantGlassRefractionAmountScale,
+            normalized.refractionAmountScale
+        )
+        updateSetting(
+            FloatSetting.KyantGlassChromaticAberration,
+            normalized.chromaticAberration
+        )
     }
 }

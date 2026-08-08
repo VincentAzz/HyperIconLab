@@ -2,6 +2,7 @@ package com.capybara.hypericonlab.modules.settings.domain.usecase
 
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.domain.repository.BooleanSetting
+import com.capybara.hypericonlab.modules.settings.domain.repository.FloatSetting
 import com.capybara.hypericonlab.modules.settings.domain.repository.IntSetting
 import com.capybara.hypericonlab.modules.settings.domain.repository.StringSetting
 
@@ -18,5 +19,9 @@ class UpdateSettingUseCase(
 
     suspend operator fun invoke(setting: IntSetting, value: Int) {
         appSettingsRepo.putInt(setting, value)
+    }
+
+    suspend operator fun invoke(setting: FloatSetting, value: Float) {
+        appSettingsRepo.putFloat(setting, value)
     }
 }

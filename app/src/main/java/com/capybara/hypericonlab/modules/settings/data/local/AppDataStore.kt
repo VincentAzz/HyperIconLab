@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -23,6 +24,13 @@ class AppDataStore(
         val UI_LIQUID_GLASS_ENGINE = stringPreferencesKey("ui_liquid_glass_engine")
         val UI_USE_CUSTOM_LIQUID_GLASS_ENGINE =
             booleanPreferencesKey("ui_use_custom_liquid_glass_engine")
+        val KYANT_GLASS_BLUR_SCALE = floatPreferencesKey("kyant_glass_blur_scale")
+        val KYANT_GLASS_REFRACTION_HEIGHT_SCALE =
+            floatPreferencesKey("kyant_glass_refraction_height_scale")
+        val KYANT_GLASS_REFRACTION_AMOUNT_SCALE =
+            floatPreferencesKey("kyant_glass_refraction_amount_scale")
+        val KYANT_GLASS_CHROMATIC_ABERRATION =
+            floatPreferencesKey("kyant_glass_chromatic_aberration")
         val UI_USE_SMOOTHER_ROUNDED_CORNERS = booleanPreferencesKey("ui_use_smoother_rounded_corners")
         val UI_USE_CUSTOM_CARD_CORNER_RADIUS =
             booleanPreferencesKey("ui_use_custom_card_corner_radius")
@@ -92,6 +100,13 @@ class AppDataStore(
     }
 
     fun getBoolean(key: Preferences.Key<Boolean>, default: Boolean = false): Flow<Boolean> =
+        dataStore.data.map { it[key] ?: default }
+
+    suspend fun putFloat(key: Preferences.Key<Float>, value: Float) {
+        dataStore.edit { it[key] = value }
+    }
+
+    fun getFloat(key: Preferences.Key<Float>, default: Float = 0f): Flow<Float> =
         dataStore.data.map { it[key] ?: default }
 
     suspend fun edit(transform: suspend (MutablePreferences) -> Unit) {

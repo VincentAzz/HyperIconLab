@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.LocalKyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.drawBackdrop
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.blur
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.colorControls
@@ -64,6 +65,7 @@ fun FloatingBottomSheetKyant(
 
     val shape = rememberKyantRoundedRectangleShape(cornerRadius)
     val isDarkTheme = AppTheme.isDark
+    val tuning = LocalKyantGlassTuning.current
     val surfaceColor = containerColor.copy(
         alpha = if (isDarkTheme) {
             KyantSheetConfig.DarkSurfaceAlpha
@@ -95,17 +97,23 @@ fun FloatingBottomSheetKyant(
                             brightness = if (isDarkTheme) 0f else KyantSheetConfig.LightBrightness,
                             saturation = KyantSheetConfig.Saturation
                         )
-                        blur(
-                            (if (isDarkTheme) {
-                                KyantSheetConfig.DarkBlurRadius
-                            } else {
-                                KyantSheetConfig.LightBlurRadius
-                            }).toPx()
-                        )
+                        val blurRadius = if (isDarkTheme) {
+                            KyantSheetConfig.DarkBlurRadius
+                        } else {
+                            KyantSheetConfig.LightBlurRadius
+                        }
+                        blur(blurRadius.toPx() * tuning.blurScale)
                         lens(
-                            refractionHeight = KyantSheetConfig.RefractionHeight.toPx(),
-                            refractionAmount = KyantSheetConfig.RefractionAmount.toPx(),
-                            depthEffect = true
+                            refractionHeight = (
+                                    KyantSheetConfig.RefractionHeight.toPx() *
+                                            tuning.refractionHeightScale
+                                    ).coerceAtMost(size.minDimension / 2f),
+                            refractionAmount = (
+                                    KyantSheetConfig.RefractionAmount.toPx() *
+                                            tuning.refractionAmountScale
+                                    ).coerceAtMost(size.minDimension),
+                            depthEffect = true,
+                            chromaticAberrationIntensity = tuning.chromaticAberration
                         )
                     },
                     highlight = null,

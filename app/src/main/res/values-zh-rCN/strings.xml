@@ -27,6 +27,13 @@
     <string name="theme_settings_use_custom_liquid_glass_engine_desc">选择液态玻璃效果使用的渲染引擎</string>
     <string name="theme_settings_liquid_glass_engine_miuix">Miuix</string>
     <string name="theme_settings_liquid_glass_engine_kyant">Kyant</string>
+    <string name="theme_settings_kyant_glass_blur_scale">模糊强度</string>
+    <string name="theme_settings_kyant_glass_refraction_height_scale">折射高度</string>
+    <string name="theme_settings_kyant_glass_refraction_amount_scale">折射强度</string>
+    <string name="theme_settings_kyant_glass_chromatic_aberration">色散强度</string>
+    <string name="theme_settings_kyant_glass_preset_transparent">通透</string>
+    <string name="theme_settings_kyant_glass_preset_default">默认</string>
+    <string name="theme_settings_kyant_glass_preset_blurred">模糊</string>
     <string name="theme_settings_use_smoother_rounded_corners">启用平滑圆角</string>
     <string name="theme_settings_use_smoother_rounded_corners_desc">在应用中使用连续曲率的平滑圆角</string>
     <string name="theme_settings_use_custom_card_corner_radius">自定义卡片圆角</string>

@@ -19,6 +19,7 @@ fun SliderWidget(
     title: String,
     value: Float,
     onValueChange: (Float) -> Unit,
+    onValueChangeFinished: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0,
@@ -61,6 +62,7 @@ fun SliderWidget(
             ExpressiveSlider(
                 value = value,
                 onValueChange = onValueChange,
+                onValueChangeFinished = onValueChangeFinished,
                 valueRange = valueRange,
                 steps = steps,
                 enabled = enabled,

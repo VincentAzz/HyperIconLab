@@ -3,6 +3,8 @@ package com.capybara.hypericonlab.modules.settings.data.repository
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.Preferences
 import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningDefaults
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
@@ -13,6 +15,7 @@ import com.capybara.hypericonlab.modules.settings.data.local.AppDataStore
 import com.capybara.hypericonlab.modules.settings.domain.model.AppPreferences
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
 import com.capybara.hypericonlab.modules.settings.domain.repository.BooleanSetting
+import com.capybara.hypericonlab.modules.settings.domain.repository.FloatSetting
 import com.capybara.hypericonlab.modules.settings.domain.repository.IntSetting
 import com.capybara.hypericonlab.modules.settings.domain.repository.StringSetting
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +56,18 @@ class AppSettingsRepositoryImpl(
             liquidGlassEngine = LiquidGlassEngine.fromValueOrDefault(
                 prefs[AppDataStore.UI_LIQUID_GLASS_ENGINE] ?: LiquidGlassEngine.KYANT.name
             ),
+            kyantGlassTuning = KyantGlassTuning(
+                blurScale = prefs[AppDataStore.KYANT_GLASS_BLUR_SCALE]
+                    ?: KyantGlassTuningDefaults.BlurScale,
+                refractionHeightScale =
+                    prefs[AppDataStore.KYANT_GLASS_REFRACTION_HEIGHT_SCALE]
+                        ?: KyantGlassTuningDefaults.RefractionHeightScale,
+                refractionAmountScale =
+                    prefs[AppDataStore.KYANT_GLASS_REFRACTION_AMOUNT_SCALE]
+                        ?: KyantGlassTuningDefaults.RefractionAmountScale,
+                chromaticAberration = prefs[AppDataStore.KYANT_GLASS_CHROMATIC_ABERRATION]
+                    ?: KyantGlassTuningDefaults.ChromaticAberration
+            ).normalized(),
             useAppleStyleCard = prefs[AppDataStore.UI_USE_APPLE_STYLE_CARD]
                 ?: false,
             useGoogleSansFlex = prefs[AppDataStore.UI_USE_GOOGLE_SANS_FLEX]
@@ -112,6 +127,12 @@ class AppSettingsRepositoryImpl(
     override fun getInt(setting: IntSetting, default: Int): Flow<Int> =
         appDataStore.getInt(intKey(setting), default)
 
+    override suspend fun putFloat(setting: FloatSetting, value: Float) =
+        appDataStore.putFloat(floatKey(setting), value)
+
+    override fun getFloat(setting: FloatSetting, default: Float): Flow<Float> =
+        appDataStore.getFloat(floatKey(setting), default)
+
     override suspend fun putBoolean(setting: BooleanSetting, value: Boolean) =
         appDataStore.putBoolean(booleanKey(setting), value)
 
@@ -130,6 +151,18 @@ class AppSettingsRepositoryImpl(
     private fun intKey(setting: IntSetting): Preferences.Key<Int> = when (setting) {
         IntSetting.ThemeSeedColor -> AppDataStore.THEME_SEED_COLOR
         IntSetting.LastMainPageIndex -> AppDataStore.LAST_MAIN_PAGE_INDEX
+    }
+
+    private fun floatKey(setting: FloatSetting): Preferences.Key<Float> = when (setting) {
+        FloatSetting.KyantGlassBlurScale -> AppDataStore.KYANT_GLASS_BLUR_SCALE
+        FloatSetting.KyantGlassRefractionHeightScale ->
+            AppDataStore.KYANT_GLASS_REFRACTION_HEIGHT_SCALE
+
+        FloatSetting.KyantGlassRefractionAmountScale ->
+            AppDataStore.KYANT_GLASS_REFRACTION_AMOUNT_SCALE
+
+        FloatSetting.KyantGlassChromaticAberration ->
+            AppDataStore.KYANT_GLASS_CHROMATIC_ABERRATION
     }
 
     private fun booleanKey(setting: BooleanSetting): Preferences.Key<Boolean> = when (setting) {

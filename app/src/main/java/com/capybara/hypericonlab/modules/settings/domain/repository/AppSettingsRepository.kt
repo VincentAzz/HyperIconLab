@@ -18,6 +18,13 @@ enum class IntSetting {
     LastMainPageIndex
 }
 
+enum class FloatSetting {
+    KyantGlassBlurScale,
+    KyantGlassRefractionHeightScale,
+    KyantGlassRefractionAmountScale,
+    KyantGlassChromaticAberration
+}
+
 enum class BooleanSetting {
     UiUseSmootherRoundedCorners,
     UiUseCustomCardCornerRadius,
@@ -46,6 +53,9 @@ interface AppSettingsRepository {
 
     suspend fun putInt(setting: IntSetting, value: Int)
     fun getInt(setting: IntSetting, default: Int = 0): Flow<Int>
+
+    suspend fun putFloat(setting: FloatSetting, value: Float)
+    fun getFloat(setting: FloatSetting, default: Float = 0f): Flow<Float>
 
     suspend fun putBoolean(setting: BooleanSetting, value: Boolean)
     fun getBoolean(setting: BooleanSetting, default: Boolean = false): Flow<Boolean>

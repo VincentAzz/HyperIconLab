@@ -9,6 +9,7 @@ import com.capybara.hypericonlab.modules.settings.data.local.AppDataStore
 import com.capybara.hypericonlab.modules.settings.data.provider.SystemEnvProviderImpl
 import com.capybara.hypericonlab.modules.settings.data.provider.ThemeStateProviderImpl
 import com.capybara.hypericonlab.modules.settings.data.repository.AppSettingsRepositoryImpl
+import com.capybara.hypericonlab.modules.settings.domain.provider.KyantGlassTuningController
 import com.capybara.hypericonlab.modules.settings.domain.provider.SystemEnvProvider
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
@@ -49,11 +50,13 @@ val settingsModule = module {
     }
 
     singleOf(::SystemEnvProviderImpl) { bind<SystemEnvProvider>() }
+    singleOf(::KyantGlassTuningController)
 
     single<ThemeStateProvider> {
         ThemeStateProviderImpl(
             appSettingsRepo = get<AppSettingsRepository>(),
             systemEnvProvider = get(),
+            kyantGlassTuningController = get(),
             appScope = get(named("AppScope"))
         )
     }

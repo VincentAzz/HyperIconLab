@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.compose.ui.graphics.Color
 import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
+import com.capybara.hypericonlab.modules.settings.domain.provider.KyantGlassTuningController
 import com.capybara.hypericonlab.modules.settings.domain.provider.SystemEnvProvider
 import com.capybara.hypericonlab.modules.settings.domain.provider.ThemeStateProvider
 import com.capybara.hypericonlab.modules.settings.domain.repository.AppSettingsRepository
@@ -16,12 +17,14 @@ import kotlinx.coroutines.flow.stateIn
 class ThemeStateProviderImpl(
     appSettingsRepo: AppSettingsRepository,
     private val systemEnvProvider: SystemEnvProvider,
+    kyantGlassTuningController: KyantGlassTuningController,
     appScope: CoroutineScope
 ) : ThemeStateProvider {
     override val themeStateFlow: StateFlow<ThemeState> = combine(
         appSettingsRepo.preferencesFlow,
-        systemEnvProvider.getWallpaperColorsFlow()
-    ) { prefs, wallpaperColors ->
+        systemEnvProvider.getWallpaperColorsFlow(),
+        kyantGlassTuningController.preview
+    ) { prefs, wallpaperColors, previewTuning ->
         val manualSeedColor = Color(prefs.seedColorInt)
         val effectiveSeedColor =
             if (prefs.useDynamicColor && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
@@ -54,6 +57,7 @@ class ThemeStateProviderImpl(
             } else {
                 LiquidGlassEngine.KYANT
             },
+            kyantGlassTuning = previewTuning ?: prefs.kyantGlassTuning,
             useAppleStyleCard = prefs.useAppleStyleCard,
             useGoogleSansFlex = prefs.useGoogleSansFlex,
         )

@@ -53,6 +53,7 @@ import com.capybara.hypericonlab.core.designsystem.animation.InteractiveHighligh
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.layerBackdrop
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberCombinedBackdrop
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.LocalKyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.drawBackdrop
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.blur
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.lens
@@ -72,6 +73,16 @@ import kotlin.math.sign
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.Backdrop as KyantBackdrop
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.shadow.InnerShadow as KyantInnerShadow
 import top.yukonga.miuix.kmp.blur.LayerBackdrop as MiuixLayerBackdrop
+
+private object KyantCompactConfig {
+    val BlurRadius = 4.dp
+    val PanelRefractionHeight = 20.dp
+    val PanelRefractionAmount = 20.dp
+    val HiddenRefractionHeight = 24.dp
+    val HiddenRefractionAmount = 24.dp
+    val IndicatorRefractionHeight = 8.dp
+    val IndicatorRefractionAmount = 12.dp
+}
 
 @Composable
 fun FloatingBottomBarCompactKyant(
@@ -93,6 +104,7 @@ fun FloatingBottomBarCompactKyant(
     val effectShape = CircleShape
     val containerColor =
         if (isBlurEnabled || isStandardBlurEnabled) colors.containerColor.copy(0.4f) else colors.containerColor
+    val tuning = LocalKyantGlassTuning.current
 
     val tabsBackdrop = rememberLayerBackdrop()
     val density = LocalDensity.current
@@ -275,10 +287,17 @@ fun FloatingBottomBarCompactKyant(
                                     shape = { pillShape },
                                     effects = {
                                         vibrancy()
-                                        blur(4.dp.toPx())
+                                        blur(KyantCompactConfig.BlurRadius.toPx() * tuning.blurScale)
                                         lens(
-                                            refractionHeight = 20.dp.toPx(),
-                                            refractionAmount = 20.dp.toPx(),
+                                            refractionHeight = (
+                                                    KyantCompactConfig.PanelRefractionHeight.toPx() *
+                                                            tuning.refractionHeightScale
+                                                    ).coerceAtMost(size.minDimension / 2f),
+                                            refractionAmount = (
+                                                    KyantCompactConfig.PanelRefractionAmount.toPx() *
+                                                            tuning.refractionAmountScale
+                                                    ).coerceAtMost(size.minDimension),
+                                            chromaticAberrationIntensity = tuning.chromaticAberration
                                         )
                                     },
                                     highlight = { baseHighlight.copy(alpha = 0.75f) },
@@ -334,10 +353,17 @@ fun FloatingBottomBarCompactKyant(
                             shape = { pillShape },
                             effects = {
                                 vibrancy()
-                                blur(4.dp.toPx())
+                                blur(KyantCompactConfig.BlurRadius.toPx() * tuning.blurScale)
                                 lens(
-                                    refractionHeight = 24.dp.toPx(),
-                                    refractionAmount = 24.dp.toPx(),
+                                    refractionHeight = (
+                                            KyantCompactConfig.HiddenRefractionHeight.toPx() *
+                                                    tuning.refractionHeightScale
+                                            ).coerceAtMost(size.minDimension / 2f),
+                                    refractionAmount = (
+                                            KyantCompactConfig.HiddenRefractionAmount.toPx() *
+                                                    tuning.refractionAmountScale
+                                            ).coerceAtMost(size.minDimension),
+                                    chromaticAberrationIntensity = tuning.chromaticAberration
                                 )
                             },
                             highlight = {
@@ -377,8 +403,14 @@ fun FloatingBottomBarCompactKyant(
                             effects = {
                                 val progress = dampedDragAnimation.pressProgress
                                 lens(
-                                    refractionHeight = 8.dp.toPx() * progress,
-                                    refractionAmount = 12.dp.toPx() * progress,
+                                    refractionHeight = (
+                                            KyantCompactConfig.IndicatorRefractionHeight.toPx() *
+                                                    tuning.refractionHeightScale * progress
+                                            ).coerceAtMost(size.minDimension / 2f),
+                                    refractionAmount = (
+                                            KyantCompactConfig.IndicatorRefractionAmount.toPx() *
+                                                    tuning.refractionAmountScale * progress
+                                            ).coerceAtMost(size.minDimension),
                                     depthEffect = true,
                                     chromaticAberration = true,
                                 )

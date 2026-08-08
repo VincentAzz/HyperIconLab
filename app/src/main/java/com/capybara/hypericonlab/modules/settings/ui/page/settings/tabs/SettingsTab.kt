@@ -56,6 +56,7 @@ import com.capybara.hypericonlab.modules.render.image.StickerProcessor
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsState
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.KyantGlassTuningControls
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.PermissionCheckCard
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -408,35 +409,64 @@ fun SettingsTab(
                         },
                         bottomContent = { shape ->
                             BaseItemContainer(shape = shape) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(expandableStyleChipPadding),
-                                    horizontalArrangement = Arrangement.spacedBy(
-                                        ExpandableStyleChipConfig.ItemSpacing
-                                    )
-                                ) {
-                                    listOf(
-                                        LiquidGlassEngine.KYANT,
-                                        LiquidGlassEngine.MIUIX
-                                    ).forEach { engine ->
-                                        StyleChip(
-                                            label = when (engine) {
-                                                LiquidGlassEngine.MIUIX -> stringResource(
-                                                    R.string.theme_settings_liquid_glass_engine_miuix
-                                                )
+                                Column {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(expandableStyleChipPadding),
+                                        horizontalArrangement = Arrangement.spacedBy(
+                                            ExpandableStyleChipConfig.ItemSpacing
+                                        )
+                                    ) {
+                                        listOf(
+                                            LiquidGlassEngine.KYANT,
+                                            LiquidGlassEngine.MIUIX
+                                        ).forEach { engine ->
+                                            StyleChip(
+                                                label = when (engine) {
+                                                    LiquidGlassEngine.MIUIX -> stringResource(
+                                                        R.string.theme_settings_liquid_glass_engine_miuix
+                                                    )
 
-                                                LiquidGlassEngine.KYANT -> stringResource(
-                                                    R.string.theme_settings_liquid_glass_engine_kyant
-                                                )
-                                            },
-                                            selected = uiState.liquidGlassEngine == engine,
-                                            onClick = {
+                                                    LiquidGlassEngine.KYANT -> stringResource(
+                                                        R.string.theme_settings_liquid_glass_engine_kyant
+                                                    )
+                                                },
+                                                selected = uiState.liquidGlassEngine == engine,
+                                                onClick = {
+                                                    viewModel.dispatch(
+                                                        ThemeSettingsAction.SetLiquidGlassEngine(
+                                                            engine
+                                                        )
+                                                    )
+                                                },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+                                    }
+                                    AnimatedVisibility(
+                                        visible = uiState.liquidGlassEngine == LiquidGlassEngine.KYANT
+                                    ) {
+                                        KyantGlassTuningControls(
+                                            tuning = uiState.kyantGlassTuning,
+                                            onTuningChange = {
                                                 viewModel.dispatch(
-                                                    ThemeSettingsAction.SetLiquidGlassEngine(engine)
+                                                    ThemeSettingsAction.PreviewKyantGlassTuning(it)
                                                 )
                                             },
-                                            modifier = Modifier.weight(1f)
+                                            onValueChangeFinished = {
+                                                viewModel.dispatch(
+                                                    ThemeSettingsAction.PersistKyantGlassTuning
+                                                )
+                                            },
+                                            onPresetSelected = {
+                                                viewModel.dispatch(
+                                                    ThemeSettingsAction.PreviewKyantGlassTuning(it)
+                                                )
+                                                viewModel.dispatch(
+                                                    ThemeSettingsAction.PersistKyantGlassTuning
+                                                )
+                                            }
                                         )
                                     }
                                 }
