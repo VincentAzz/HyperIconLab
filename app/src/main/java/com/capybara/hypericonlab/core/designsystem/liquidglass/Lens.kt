@@ -8,6 +8,7 @@ package com.capybara.hypericonlab.core.designsystem.liquidglass
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastCoerceAtMost
+import com.capybara.hypericonlab.core.designsystem.shape.RoundedRectangularShape
 import top.yukonga.miuix.kmp.blur.BackdropEffectScope
 import top.yukonga.miuix.kmp.blur.runtimeShaderEffect
 import top.yukonga.miuix.kmp.shader.isRuntimeShaderSupported
@@ -70,6 +71,17 @@ fun BackdropEffectScope.lens(
 }
 
 private fun BackdropEffectScope.roundedRectCornerRadii(): FloatArray? {
+    val roundedRectShape = shape as? RoundedRectangularShape
+    if (roundedRectShape != null) {
+        val corners = roundedRectShape.corners(size, layoutDirection, this)
+        return floatArrayOf(
+            corners.topLeft,
+            corners.topRight,
+            corners.bottomRight,
+            corners.bottomLeft,
+        )
+    }
+
     val cornerShape = shape as? CornerBasedShape ?: return null
     val sizePx = size
     val maxRadius = sizePx.minDimension / 2f

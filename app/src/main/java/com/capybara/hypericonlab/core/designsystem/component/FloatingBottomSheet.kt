@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -50,8 +51,7 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
  * @param backdrop Optional backdrop for blur effect.
  * @param useLiquidGlass When true and a backdrop is present, apply a liquid glass effect
  *  (refraction + edge highlight) instead of the standard blur. Falls back to standard blur
- *  when runtime shaders are unsupported. Requires a CornerBasedShape, so smoother rounded corners
- *  are disabled in this mode.
+ *  when runtime shaders are unsupported. Supports the design system's smoother rounded rectangle.
  * @param liquidGlassBlurRadius Gaussian blur radius used by the liquid glass effect; ignored when
  *  [useLiquidGlass] is false. Defaults to 24.dp.
  * @param content The content of the sheet.
@@ -84,11 +84,8 @@ fun FloatingBottomSheet(
         }
     }
 
-    val shape = if (useLiquidGlass && backdrop != null) {
-        RoundedCornerShape(cornerRadius)
-    } else {
-        rememberKyantRoundedRectangleShape(cornerRadius)
-    }
+    val shape = rememberKyantRoundedRectangleShape(cornerRadius)
+    val liquidGlassShape = RoundedCornerShape(cornerRadius)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -106,12 +103,14 @@ fun FloatingBottomSheet(
                 .then(if (fillMaxHeight) Modifier.fillMaxSize() else Modifier.wrapContentHeight())
                 .then(
                     if (useLiquidGlass && backdrop != null) {
-                        Modifier.liquidGlassEffect(
-                            backdrop = backdrop,
-                            shape = shape,
-                            cornerRadius = cornerRadius,
-                            blurRadius = liquidGlassBlurRadius
-                        )
+                        Modifier
+                            .clip(shape)
+                            .liquidGlassEffect(
+                                backdrop = backdrop,
+                                shape = liquidGlassShape,
+                                cornerRadius = cornerRadius,
+                                blurRadius = liquidGlassBlurRadius
+                            )
                     } else if (backdrop != null) {
                         Modifier.material3BlurEffect(
                             backdrop = backdrop,

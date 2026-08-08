@@ -35,6 +35,7 @@ import androidx.compose.material3.ShortNavigationBarArrangement
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +50,7 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarDe
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarItem
 import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
 import com.capybara.hypericonlab.modules.icon.ui.page.home.HomePage
 import com.capybara.hypericonlab.modules.icon.ui.page.task.TaskPage
@@ -129,40 +131,42 @@ private fun FloatingBottomBarSlot(
     useFloatingBottomBarBlur: Boolean
 ) {
     val themeState = LocalThemeState.current
+    val smootherRoundedCornersEnabled = isSmootherRoundedCornersEnabled()
 
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        if (themeState.useFloatingBottomBarCompact) {
-            FloatingBottomBarCompact(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {},
-                    )
-                    .padding(
-                        bottom = 12.dp + WindowInsets.navigationBars.asPaddingValues()
-                            .calculateBottomPadding()
+        key(smootherRoundedCornersEnabled) {
+            if (themeState.useFloatingBottomBarCompact) {
+                FloatingBottomBarCompact(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {},
+                        )
+                        .padding(
+                            bottom = 12.dp + WindowInsets.navigationBars.asPaddingValues()
+                                .calculateBottomPadding()
+                        ),
+                    selectedIndex = { mainPagerState.pagerState.targetPage },
+                    onSelected = { index: Int ->
+                        mainPagerState.animateToPage(index)
+                    },
+                    backdrop = backdrop,
+                    m3Backdrop = m3Backdrop,
+                    tabsCount = tabs.size,
+                    isBlurEnabled = useFloatingBottomBarBlur,
+                    isStandardBlurEnabled = useBlur,
+                    colors = FloatingBottomBarDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        indicatorColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onSurface
                     ),
-                selectedIndex = { mainPagerState.pagerState.targetPage },
-                onSelected = { index: Int ->
-                    mainPagerState.animateToPage(index)
-                },
-                backdrop = backdrop,
-                m3Backdrop = m3Backdrop,
-                tabsCount = tabs.size,
-                isBlurEnabled = useFloatingBottomBarBlur,
-                isStandardBlurEnabled = useBlur,
-                colors = FloatingBottomBarDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    indicatorColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
-            ) {
-                tabs.forEachIndexed { index, tab ->
-                    FloatingBarCompactItem(
+                ) {
+                    tabs.forEachIndexed { index, tab ->
+                        FloatingBarCompactItem(
                         selectedIndex = { mainPagerState.pagerState.targetPage },
                         onClick = {
                             mainPagerState.animateToPage(index)
@@ -171,67 +175,68 @@ private fun FloatingBottomBarSlot(
                         label = tab.label,
                         type = themeState.floatingBottomBarCompactType,
                         index = index
-                    )
+                        )
+                    }
                 }
-            }
-        } else {
-            FloatingBottomBar(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {},
+            } else {
+                FloatingBottomBar(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {},
+                        )
+                        .padding(
+                            bottom = 12.dp + WindowInsets.navigationBars.asPaddingValues()
+                                .calculateBottomPadding()
+                        ),
+                    selectedIndex = { mainPagerState.pagerState.targetPage },
+                    onSelected = { index: Int ->
+                        mainPagerState.animateToPage(index)
+                    },
+                    backdrop = backdrop,
+                    m3Backdrop = m3Backdrop,
+                    tabsCount = tabs.size,
+                    isBlurEnabled = useFloatingBottomBarBlur,
+                    isStandardBlurEnabled = useBlur,
+                    colors = FloatingBottomBarDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        indicatorColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onSurface
                     )
-                    .padding(
-                        bottom = 12.dp + WindowInsets.navigationBars.asPaddingValues()
-                            .calculateBottomPadding()
-                    ),
-                selectedIndex = { mainPagerState.pagerState.targetPage },
-                onSelected = { index: Int ->
-                    mainPagerState.animateToPage(index)
-                },
-                backdrop = backdrop,
-                m3Backdrop = m3Backdrop,
-                tabsCount = tabs.size,
-                isBlurEnabled = useFloatingBottomBarBlur,
-                isStandardBlurEnabled = useBlur,
-                colors = FloatingBottomBarDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    indicatorColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
-            ) {
-                tabs.forEachIndexed { index, tab ->
-                    FloatingBottomBarItem(
-                        onClick = {
-                            mainPagerState.animateToPage(index)
-                        },
-                        modifier = Modifier.defaultMinSize(minWidth = 76.dp)
-                    ) {
-                        val showBadge = index == 1 && configCount > 1
+                ) {
+                    tabs.forEachIndexed { index, tab ->
+                        FloatingBottomBarItem(
+                            onClick = {
+                                mainPagerState.animateToPage(index)
+                            },
+                            modifier = Modifier.defaultMinSize(minWidth = 76.dp)
+                        ) {
+                            val showBadge = index == 1 && configCount > 1
 
-                        BadgedBox(
-                            badge = {
-                                ConfigBadge(showBadge = showBadge, configCount = configCount)
+                            BadgedBox(
+                                badge = {
+                                    ConfigBadge(showBadge = showBadge, configCount = configCount)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = tab.icon,
+                                    contentDescription = tab.label,
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = tab.icon,
-                                contentDescription = tab.label,
-                            )
-                        }
-                        NotifyBadge(
-                            showBadge = index == TAB_INDEX_SETTINGS && hasAssetUpdate
-                        ) {
-                            Text(
-                                text = tab.label,
-                                fontSize = 11.sp,
-                                lineHeight = 14.sp,
-                                maxLines = 1,
-                                softWrap = false,
-                                overflow = TextOverflow.Visible
-                            )
+                            NotifyBadge(
+                                showBadge = index == TAB_INDEX_SETTINGS && hasAssetUpdate
+                            ) {
+                                Text(
+                                    text = tab.label,
+                                    fontSize = 11.sp,
+                                    lineHeight = 14.sp,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Visible
+                                )
+                            }
                         }
                     }
                 }

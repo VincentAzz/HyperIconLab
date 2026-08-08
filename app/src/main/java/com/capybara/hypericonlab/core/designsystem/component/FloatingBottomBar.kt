@@ -225,7 +225,8 @@ fun FloatingBottomBar(
     content: @Composable RowScope.() -> Unit
 ) {
     val isInDark = AppTheme.isDark
-    val pillShape = if (isBlurEnabled) CircleShape else rememberKyantCapsuleShape()
+    val pillShape = rememberKyantCapsuleShape()
+    val effectShape = CircleShape
     val containerColor =
         if (isBlurEnabled || isStandardBlurEnabled) colors.containerColor.copy(0.4f) else colors.containerColor
 
@@ -350,7 +351,7 @@ fun FloatingBottomBar(
                     }
                     .graphicsLayer { translationX = panelOffset }
                     .dropShadow(
-                        shape = pillShape,
+                        shape = effectShape,
                         shadow = Shadow(
                             radius = 10.dp,
                             color = Color.Black,
@@ -364,35 +365,39 @@ fun FloatingBottomBar(
                     )
                     .then(
                         if (isBlurEnabled) {
-                            Modifier.drawBackdrop(
-                                backdrop = backdrop,
-                                shape = { pillShape },
-                                effects = {
-                                    vibrancy()
-                                    blur(4.dp.toPx(), 4.dp.toPx())
-                                    lens(
-                                        refractionHeight = 24.dp.toPx(),
-                                        refractionAmount = 24.dp.toPx(),
-                                    )
-                                },
-                                highlight = { baseHighlight.copy(alpha = 0.75f) },
-                                layerBlock = {
-                                    val width = size.width.coerceAtLeast(1f)
-                                    val s = lerp(
-                                        1f,
-                                        1f + 16.dp.toPx() / width,
-                                        dampedDragAnimation.pressProgress
-                                    )
-                                    scaleX = s
-                                    scaleY = s
-                                },
-                                onDrawSurface = { drawRect(containerColor) },
-                            )
+                            Modifier
+                                .drawBackdrop(
+                                    backdrop = backdrop,
+                                    shape = { effectShape },
+                                    effects = {
+                                        vibrancy()
+                                        blur(4.dp.toPx(), 4.dp.toPx())
+                                        lens(
+                                            refractionHeight = 24.dp.toPx(),
+                                            refractionAmount = 24.dp.toPx(),
+                                        )
+                                    },
+                                    highlight = { baseHighlight.copy(alpha = 0.75f) },
+                                    layerBlock = {
+                                        clip = true
+                                        shape = pillShape
+                                        val width = size.width.coerceAtLeast(1f)
+                                        val s = lerp(
+                                            1f,
+                                            1f + 16.dp.toPx() / width,
+                                            dampedDragAnimation.pressProgress
+                                        )
+                                        scaleX = s
+                                        scaleY = s
+                                    },
+                                    onDrawSurface = { drawRect(containerColor) },
+                                )
                         } else if (isStandardBlurEnabled) {
                             Modifier
+                                .clip(pillShape)
                                 .material3BlurEffect(
                                     backdrop = m3Backdrop,
-                                    shape = pillShape
+                                    shape = effectShape
                                 )
                                 .background(Color.Transparent, pillShape)
                         } else {
@@ -422,7 +427,7 @@ fun FloatingBottomBar(
                         .graphicsLayer { translationX = panelOffset }
                         .drawBackdrop(
                             backdrop = backdrop,
-                            shape = { pillShape },
+                            shape = { effectShape },
                             effects = {
                                 vibrancy()
                                 blur(4.dp.toPx(), 4.dp.toPx())
@@ -458,7 +463,7 @@ fun FloatingBottomBar(
                         .then(dampedDragAnimation.modifier)
                         .drawBackdrop(
                             backdrop = combinedBackdrop,
-                            shape = { pillShape },
+                            shape = { effectShape },
                             effects = {
                                 val progress = dampedDragAnimation.pressProgress
                                 lens(
@@ -470,6 +475,8 @@ fun FloatingBottomBar(
                             },
                             highlight = { pillHighlight.copy(alpha = dampedDragAnimation.pressProgress) },
                             layerBlock = {
+                                clip = true
+                                shape = pillShape
                                 scaleX = dampedDragAnimation.scaleX
                                 scaleY = dampedDragAnimation.scaleY
                                 val velocity = dampedDragAnimation.velocity / 10f
@@ -487,7 +494,7 @@ fun FloatingBottomBar(
                                 drawRect(Color.Black.copy(alpha = 0.03f * progress))
                             },
                         )
-                        .innerShadow(shape = pillShape) {
+                        .innerShadow(shape = effectShape) {
                             InnerShadow(
                                 radius = 8.dp * dampedDragAnimation.pressProgress,
                                 color = Color.Black.copy(alpha = 0.15f),
