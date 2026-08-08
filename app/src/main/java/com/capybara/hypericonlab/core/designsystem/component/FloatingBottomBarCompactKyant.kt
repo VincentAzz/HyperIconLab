@@ -1,36 +1,21 @@
 package com.capybara.hypericonlab.core.designsystem.component
 
 import android.os.Build
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -54,190 +38,56 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.util.lerp
 import com.capybara.hypericonlab.core.designsystem.animation.DampedDragAnimation
 import com.capybara.hypericonlab.core.designsystem.animation.InteractiveHighlight
-import com.capybara.hypericonlab.core.designsystem.liquidglass.InnerShadow
-import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
-import com.capybara.hypericonlab.core.designsystem.liquidglass.innerShadow
-import com.capybara.hypericonlab.core.designsystem.liquidglass.lens
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.layerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberCombinedBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.drawBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.blur
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.lens
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.vibrancy
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.highlight.Highlight
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
-import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberCombinedBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.vibrancy
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactHeight
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactIndicatorHeight
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactIndicatorPadding
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.blur.Backdrop
-import top.yukonga.miuix.kmp.blur.LayerBackdrop
-import top.yukonga.miuix.kmp.blur.blur
-import top.yukonga.miuix.kmp.blur.drawBackdrop
-import top.yukonga.miuix.kmp.blur.highlight.BloomStroke
-import top.yukonga.miuix.kmp.blur.highlight.Highlight
-import top.yukonga.miuix.kmp.blur.highlight.LightPosition
-import top.yukonga.miuix.kmp.blur.highlight.LightSource
-import top.yukonga.miuix.kmp.blur.layerBackdrop
-import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import kotlin.math.abs
 import kotlin.math.sign
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop
-
-val LocalFloatingBottomBarReportPosition =
-    staticCompositionLocalOf { { _: Int, _: Float, _: Float -> } }
-
-@Composable
-fun FloatingBarCompactItem(
-    selectedIndex: () -> Int,
-    onClick: () -> Unit,
-    icon: ImageVector,
-    label: String,
-    type: FloatingBottomBarCompactType,
-    index: Int,
-    modifier: Modifier = Modifier,
-) {
-    val selected = selectedIndex() == index
-    val scale = LocalFloatingBottomBarTabScale.current
-    val contentColor = LocalFloatingBottomBarContentColor.current
-    val reportPosition = LocalFloatingBottomBarReportPosition.current
-
-    val sizeAnimationSpec =
-        remember { spring<IntSize>(stiffness = Spring.StiffnessMediumLow) }
-
-    Row(
-        modifier = modifier
-            .onGloballyPositioned { coords ->
-                reportPosition(index, coords.positionInParent().x, coords.size.width.toFloat())
-            }
-            .clip(rememberKyantCapsuleShape())
-            .clickable(
-                interactionSource = null,
-                indication = null,
-                role = Role.Tab,
-                onClick = onClick
-            )
-            .fillMaxHeight()
-            .graphicsLayer {
-                val s = scale()
-                scaleX = s
-                scaleY = s
-                compositingStrategy = CompositingStrategy.Offscreen
-            }
-            .padding(horizontal = 16.dp)
-            .animateContentSize(sizeAnimationSpec),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        CompositionLocalProvider(
-            LocalContentColor provides contentColor
-        ) {
-            val showIcon = when (type) {
-                FloatingBottomBarCompactType.ICON_ONLY -> true
-                FloatingBottomBarCompactType.TEXT_ONLY -> false
-                FloatingBottomBarCompactType.MIXED_ICON -> true
-                FloatingBottomBarCompactType.MIXED_TEXT -> selected
-            }
-
-            val showText = when (type) {
-                FloatingBottomBarCompactType.ICON_ONLY -> false
-                FloatingBottomBarCompactType.TEXT_ONLY -> true
-                FloatingBottomBarCompactType.MIXED_ICON -> selected
-                FloatingBottomBarCompactType.MIXED_TEXT -> true
-            }
-
-            AnimatedVisibility(
-                visible = showIcon,
-                enter = fadeIn() + expandHorizontally(animationSpec = sizeAnimationSpec),
-                exit = fadeOut() + shrinkHorizontally(animationSpec = sizeAnimationSpec)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            AnimatedVisibility(
-                visible = showIcon && showText,
-                enter = fadeIn() + expandHorizontally(animationSpec = sizeAnimationSpec),
-                exit = fadeOut() + shrinkHorizontally(animationSpec = sizeAnimationSpec)
-            ) {
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-
-            AnimatedVisibility(
-                visible = showText,
-                enter = fadeIn(animationSpec = tween(300)) + expandHorizontally(animationSpec = sizeAnimationSpec),
-                exit = fadeOut(animationSpec = tween(150)) + shrinkHorizontally(animationSpec = sizeAnimationSpec)
-            ) {
-                Text(
-                    text = label,
-                    fontSize = 14.sp,
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                    maxLines = 1,
-                    softWrap = false,
-                    overflow = TextOverflow.Visible
-                )
-            }
-        }
-    }
-}
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.Backdrop as KyantBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.shadow.InnerShadow as KyantInnerShadow
+import top.yukonga.miuix.kmp.blur.LayerBackdrop as MiuixLayerBackdrop
 
 @Composable
-fun FloatingBottomBarCompact(
+fun FloatingBottomBarCompactKyant(
     modifier: Modifier = Modifier,
     selectedIndex: () -> Int,
     onSelected: (index: Int) -> Unit,
-    backdrop: Backdrop,
-    m3Backdrop: LayerBackdrop? = null,
+    backdrop: KyantBackdrop,
+    m3Backdrop: MiuixLayerBackdrop? = null,
     tabsCount: Int,
     isBlurEnabled: Boolean = true,
     isStandardBlurEnabled: Boolean = false,
-    engine: LiquidGlassEngine = LiquidGlassEngine.MIUIX,
-    kyantBackdrop: KyantLayerBackdrop? = null,
     colors: FloatingBottomBarColors = FloatingBottomBarDefaults.colors(),
     barHeight: Dp = FloatingBottomBarCompactHeight,
     indicatorPadding: Dp = FloatingBottomBarCompactIndicatorPadding,
     content: @Composable RowScope.() -> Unit
 ) {
-    if (engine == LiquidGlassEngine.KYANT && isBlurEnabled && kyantBackdrop != null) {
-        FloatingBottomBarCompactKyant(
-            selectedIndex = selectedIndex,
-            onSelected = onSelected,
-            backdrop = kyantBackdrop,
-            m3Backdrop = m3Backdrop,
-            tabsCount = tabsCount,
-            isBlurEnabled = true,
-            isStandardBlurEnabled = false,
-            colors = colors,
-            barHeight = barHeight,
-            indicatorPadding = indicatorPadding,
-            modifier = modifier,
-            content = content
-        )
-        return
-    }
-
     val isInDark = AppTheme.isDark
     val pillShape = rememberKyantCapsuleShape()
     val effectShape = CircleShape
@@ -380,35 +230,7 @@ fun FloatingBottomBarCompact(
             null
         }
 
-    val indicatorSpecular = remember {
-        Highlight(
-            width = 1.dp,
-            alpha = 1f,
-            style = BloomStroke(
-                color = Color.White.copy(alpha = 0.12f),
-                innerBlurRadius = 2.0.dp,
-                primaryLight = LightSource(
-                    position = LightPosition(
-                        0.5f,
-                        -0.3f,
-                        -0.05f
-                    ),
-                    color = Color.White,
-                    intensity = 1f,
-                ),
-                secondaryLight = LightSource(
-                    position = LightPosition(
-                        0.5f,
-                        0.8f,
-                        -0.5f
-                    ),
-                    color = Color.White,
-                    intensity = 0.4f,
-                ),
-                dualPeak = true,
-            ),
-        )
-    }
+    val indicatorSpecular = Highlight.Default
 
     val baseHighlight = indicatorSpecular
     val pillHighlight = indicatorSpecular
@@ -450,10 +272,10 @@ fun FloatingBottomBarCompact(
                             Modifier
                                 .drawBackdrop(
                                     backdrop = backdrop,
-                                    shape = { effectShape },
+                                    shape = { pillShape },
                                     effects = {
                                         vibrancy()
-                                        blur(4.dp.toPx(), 4.dp.toPx())
+                                        blur(4.dp.toPx())
                                         lens(
                                             refractionHeight = 20.dp.toPx(),
                                             refractionAmount = 20.dp.toPx(),
@@ -509,13 +331,18 @@ fun FloatingBottomBarCompact(
                         .graphicsLayer { translationX = panelOffset }
                         .drawBackdrop(
                             backdrop = backdrop,
-                            shape = { effectShape },
+                            shape = { pillShape },
                             effects = {
                                 vibrancy()
-                                blur(4.dp.toPx(), 4.dp.toPx())
+                                blur(4.dp.toPx())
                                 lens(
                                     refractionHeight = 24.dp.toPx(),
                                     refractionAmount = 24.dp.toPx(),
+                                )
+                            },
+                            highlight = {
+                                indicatorSpecular.copy(
+                                    alpha = dampedDragAnimation.pressProgress
                                 )
                             },
                             onDrawSurface = { drawRect(containerColor) },
@@ -546,17 +373,25 @@ fun FloatingBottomBarCompact(
                         .then(dampedDragAnimation.modifier)
                         .drawBackdrop(
                             backdrop = combinedBackdrop,
-                            shape = { effectShape },
+                            shape = { pillShape },
                             effects = {
                                 val progress = dampedDragAnimation.pressProgress
                                 lens(
                                     refractionHeight = 8.dp.toPx() * progress,
                                     refractionAmount = 12.dp.toPx() * progress,
                                     depthEffect = true,
-                                    chromaticAberration = 0.5f,
+                                    chromaticAberration = true,
                                 )
                             },
                             highlight = { pillHighlight.copy(alpha = dampedDragAnimation.pressProgress) },
+                            innerShadow = {
+                                val progress = dampedDragAnimation.pressProgress
+                                KyantInnerShadow(
+                                    radius = 6.dp * progress,
+                                    color = Color.Black.copy(alpha = 0.15f),
+                                    alpha = progress
+                                )
+                            },
                             layerBlock = {
                                 clip = true
                                 shape = pillShape
@@ -577,13 +412,6 @@ fun FloatingBottomBarCompact(
                                 drawRect(Color.Black.copy(alpha = 0.03f * progress))
                             },
                         )
-                        .innerShadow(shape = effectShape) {
-                            InnerShadow(
-                                radius = 6.dp * dampedDragAnimation.pressProgress,
-                                color = Color.Black.copy(alpha = 0.15f),
-                                alpha = dampedDragAnimation.pressProgress,
-                            )
-                        }
                         .height(innerHeight)
                         .width(tabWidthDp)
                 )

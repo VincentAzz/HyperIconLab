@@ -166,6 +166,8 @@ private fun FloatingBottomBarSlot(
                     tabsCount = tabs.size,
                     isBlurEnabled = useFloatingBottomBarBlur,
                     isStandardBlurEnabled = useBlur,
+                    engine = themeState.liquidGlassEngine,
+                    kyantBackdrop = kyantBackdrop,
                     colors = FloatingBottomBarDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         indicatorColor = MaterialTheme.colorScheme.primary,
