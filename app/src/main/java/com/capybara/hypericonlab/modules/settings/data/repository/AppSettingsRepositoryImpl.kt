@@ -2,6 +2,7 @@ package com.capybara.hypericonlab.modules.settings.data.repository
 
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.Preferences
+import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
@@ -49,6 +50,9 @@ class AppSettingsRepositoryImpl(
                 ?: false,
             liquidGlassBlurRadius = prefs[AppDataStore.UI_LIQUID_GLASS_BLUR_RADIUS]
                 ?: 24,
+            liquidGlassEngine = LiquidGlassEngine.fromValueOrDefault(
+                prefs[AppDataStore.UI_LIQUID_GLASS_ENGINE] ?: LiquidGlassEngine.MIUIX.name
+            ),
             useAppleStyleCard = prefs[AppDataStore.UI_USE_APPLE_STYLE_CARD]
                 ?: false,
             useGoogleSansFlex = prefs[AppDataStore.UI_USE_GOOGLE_SANS_FLEX]
@@ -120,6 +124,7 @@ class AppSettingsRepositoryImpl(
         StringSetting.ThemeColorSpec -> AppDataStore.THEME_COLOR_SPEC
         StringSetting.FloatingBottomBarCompactType -> AppDataStore.UI_FLOATING_BAR_COMPACT_TYPE
         StringSetting.CardCornerSize -> AppDataStore.UI_CARD_CORNER_SIZE
+        StringSetting.LiquidGlassEngine -> AppDataStore.UI_LIQUID_GLASS_ENGINE
     }
 
     private fun intKey(setting: IntSetting): Preferences.Key<Int> = when (setting) {

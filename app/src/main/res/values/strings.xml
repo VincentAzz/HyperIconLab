@@ -24,6 +24,9 @@
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">Enable liquid glass effect for bottom sheets</string>
     <string name="theme_settings_liquid_glass_blur_radius">Liquid Glass Blur Radius</string>
     <string name="theme_settings_liquid_glass_blur_radius_desc">Adjust the blur intensity of the liquid glass effect (0–48 dp)</string>
+    <string name="theme_settings_liquid_glass_engine">Liquid Glass Engine</string>
+    <string name="theme_settings_liquid_glass_engine_miuix">Miuix</string>
+    <string name="theme_settings_liquid_glass_engine_kyant">Kyant</string>
     <string name="theme_settings_use_smoother_rounded_corners">Enable Smoother Rounded Corners</string>
     <string name="theme_settings_use_smoother_rounded_corners_desc">Use continuous curvature smooth corners in the app</string>
     <string name="theme_settings_use_custom_card_corner_radius">Customize Card Corners</string>

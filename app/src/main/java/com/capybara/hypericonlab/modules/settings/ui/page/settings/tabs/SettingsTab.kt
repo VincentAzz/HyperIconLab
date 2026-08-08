@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +46,7 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.component.isAppleStyleCardEnabled
+import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
@@ -403,6 +405,48 @@ fun SettingsTab(
                             valueDisplay = "${uiState.liquidGlassBlurRadius} dp",
                             shape = shape
                         )
+                    }
+                    item(animatedVisibility = uiState.useBlur) { shape ->
+                        BaseItemContainer(shape = shape) {
+                            Column(
+                                modifier = Modifier.padding(ExpandableStyleChipConfig.ContentPadding),
+                                verticalArrangement = Arrangement.spacedBy(
+                                    ExpandableStyleChipConfig.ItemSpacing
+                                )
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.theme_settings_liquid_glass_engine),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        ExpandableStyleChipConfig.ItemSpacing
+                                    )
+                                ) {
+                                    LiquidGlassEngine.entries.forEach { engine ->
+                                        StyleChip(
+                                            label = when (engine) {
+                                                LiquidGlassEngine.MIUIX -> stringResource(
+                                                    R.string.theme_settings_liquid_glass_engine_miuix
+                                                )
+
+                                                LiquidGlassEngine.KYANT -> stringResource(
+                                                    R.string.theme_settings_liquid_glass_engine_kyant
+                                                )
+                                            },
+                                            selected = uiState.liquidGlassEngine == engine,
+                                            onClick = {
+                                                viewModel.dispatch(
+                                                    ThemeSettingsAction.SetLiquidGlassEngine(engine)
+                                                )
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

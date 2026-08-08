@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.modules.settings.domain.model
 
+import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
@@ -17,6 +18,7 @@ data class AppPreferences(
     val useTabRowFillWidth: Boolean = false,
     val useLiquidGlassBottomSheet: Boolean = false,
     val liquidGlassBlurRadius: Int = 24,
+    val liquidGlassEngine: LiquidGlassEngine = LiquidGlassEngine.MIUIX,
     val useGoogleSansFlex: Boolean = false,
     val themeMode: ThemeMode,
     val paletteStyle: PaletteStyle,

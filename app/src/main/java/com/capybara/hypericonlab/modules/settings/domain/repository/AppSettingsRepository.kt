@@ -9,7 +9,8 @@ enum class StringSetting {
     ThemePaletteStyle,
     ThemeColorSpec,
     FloatingBottomBarCompactType,
-    CardCornerSize
+    CardCornerSize,
+    LiquidGlassEngine
 }
 
 enum class IntSetting {

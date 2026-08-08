@@ -1,6 +1,7 @@
 package com.capybara.hypericonlab.modules.settings.domain.model
 
 import androidx.compose.ui.graphics.Color
+import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
@@ -18,6 +19,7 @@ sealed interface ThemeSettingsAction {
     data class SetUseTabRowFillWidth(val enable: Boolean) : ThemeSettingsAction
     data class SetUseLiquidGlassBottomSheet(val enable: Boolean) : ThemeSettingsAction
     data class SetLiquidGlassBlurRadius(val value: Int) : ThemeSettingsAction
+    data class SetLiquidGlassEngine(val engine: LiquidGlassEngine) : ThemeSettingsAction
     data class SetUseAppleStyleCard(val enable: Boolean) : ThemeSettingsAction
     data class SetUseGoogleSansFlex(val enable: Boolean) : ThemeSettingsAction
     data class SetThemeMode(val mode: ThemeMode) : ThemeSettingsAction
