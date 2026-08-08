@@ -165,8 +165,14 @@ fun FloatingBarCompactItem(
 
             AnimatedVisibility(
                 visible = showIcon,
-                enter = fadeIn() + expandHorizontally(animationSpec = sizeAnimationSpec),
-                exit = fadeOut() + shrinkHorizontally(animationSpec = sizeAnimationSpec)
+                enter = fadeIn() + expandHorizontally(
+                    animationSpec = sizeAnimationSpec,
+                    expandFrom = Alignment.Start
+                ),
+                exit = fadeOut() + shrinkHorizontally(
+                    animationSpec = sizeAnimationSpec,
+                    shrinkTowards = Alignment.Start
+                )
             ) {
                 Icon(
                     imageVector = icon,
@@ -177,16 +183,28 @@ fun FloatingBarCompactItem(
 
             AnimatedVisibility(
                 visible = showIcon && showText,
-                enter = fadeIn() + expandHorizontally(animationSpec = sizeAnimationSpec),
-                exit = fadeOut() + shrinkHorizontally(animationSpec = sizeAnimationSpec)
+                enter = fadeIn() + expandHorizontally(
+                    animationSpec = sizeAnimationSpec,
+                    expandFrom = Alignment.Start
+                ),
+                exit = fadeOut() + shrinkHorizontally(
+                    animationSpec = sizeAnimationSpec,
+                    shrinkTowards = Alignment.Start
+                )
             ) {
                 Spacer(modifier = Modifier.width(8.dp))
             }
 
             AnimatedVisibility(
                 visible = showText,
-                enter = fadeIn(animationSpec = tween(300)) + expandHorizontally(animationSpec = sizeAnimationSpec),
-                exit = fadeOut(animationSpec = tween(150)) + shrinkHorizontally(animationSpec = sizeAnimationSpec)
+                enter = fadeIn(animationSpec = tween(300)) + expandHorizontally(
+                    animationSpec = sizeAnimationSpec,
+                    expandFrom = Alignment.Start
+                ),
+                exit = fadeOut(animationSpec = tween(150)) + shrinkHorizontally(
+                    animationSpec = sizeAnimationSpec,
+                    shrinkTowards = Alignment.Start
+                )
             ) {
                 Text(
                     text = label,
