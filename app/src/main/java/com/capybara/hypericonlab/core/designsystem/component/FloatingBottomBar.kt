@@ -57,6 +57,7 @@ import androidx.compose.ui.util.lerp
 import com.capybara.hypericonlab.core.designsystem.animation.DampedDragAnimation
 import com.capybara.hypericonlab.core.designsystem.animation.InteractiveHighlight
 import com.capybara.hypericonlab.core.designsystem.liquidglass.InnerShadow
+import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.liquidglass.innerShadow
 import com.capybara.hypericonlab.core.designsystem.liquidglass.lens
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
@@ -88,6 +89,7 @@ import kotlin.math.sign
 import kotlin.math.sin
 import kotlin.math.sqrt
 import androidx.compose.material3.LocalContentColor as M3LocalContentColor
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop
 
 val LocalFloatingBottomBarContentColor = staticCompositionLocalOf { Color.Unspecified }
 val LocalFloatingBottomBarTabScale = staticCompositionLocalOf { { 1f } }
@@ -221,9 +223,24 @@ fun FloatingBottomBar(
     tabsCount: Int,
     isBlurEnabled: Boolean = true,
     isStandardBlurEnabled: Boolean = false,
+    engine: LiquidGlassEngine = LiquidGlassEngine.MIUIX,
+    kyantBackdrop: KyantLayerBackdrop? = null,
     colors: FloatingBottomBarColors = FloatingBottomBarDefaults.colors(),
     content: @Composable RowScope.() -> Unit
 ) {
+    if (engine == LiquidGlassEngine.KYANT && isBlurEnabled && kyantBackdrop != null) {
+        FloatingBottomBarKyant(
+            selectedTabIndex = selectedIndex,
+            onTabSelected = onSelected,
+            backdrop = kyantBackdrop,
+            tabsCount = tabsCount,
+            modifier = modifier,
+            colors = colors,
+            content = content
+        )
+        return
+    }
+
     val isInDark = AppTheme.isDark
     val pillShape = rememberKyantCapsuleShape()
     val effectShape = CircleShape

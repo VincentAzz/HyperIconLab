@@ -49,6 +49,7 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarCo
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarDefaults
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarItem
 import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
+import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
@@ -57,6 +58,8 @@ import com.capybara.hypericonlab.modules.icon.ui.page.task.TaskPage
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsPage
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.layerBackdrop as kyantLayerBackdrop
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -70,6 +73,7 @@ fun MainScreenScaffold(
     useFloatingBottomBarBlur: Boolean,
     m3Backdrop: LayerBackdrop?,
     floatingBackdrop: LayerBackdrop,
+    kyantBackdrop: KyantLayerBackdrop,
     isMedium: Boolean
 ) {
     val navigationWindowInsets = WindowInsets.safeDrawing.only(
@@ -89,7 +93,8 @@ fun MainScreenScaffold(
                     backdrop = floatingBackdrop,
                     m3Backdrop = m3Backdrop,
                     useBlur = useBlur,
-                    useFloatingBottomBarBlur = useFloatingBottomBarBlur
+                    useFloatingBottomBarBlur = useFloatingBottomBarBlur,
+                    kyantBackdrop = kyantBackdrop
                 )
             } else {
                 StandardRowNavigation(
@@ -114,6 +119,7 @@ fun MainScreenScaffold(
             useFloatingBottomBar = useFloatingBottomBar,
             m3Backdrop = m3Backdrop,
             floatingBackdrop = floatingBackdrop,
+            kyantBackdrop = kyantBackdrop,
             outerPadding = paddingValues
         )
     }
@@ -128,7 +134,8 @@ private fun FloatingBottomBarSlot(
     backdrop: LayerBackdrop,
     m3Backdrop: LayerBackdrop?,
     useBlur: Boolean,
-    useFloatingBottomBarBlur: Boolean
+    useFloatingBottomBarBlur: Boolean,
+    kyantBackdrop: KyantLayerBackdrop
 ) {
     val themeState = LocalThemeState.current
     val smootherRoundedCornersEnabled = isSmootherRoundedCornersEnabled()
@@ -136,7 +143,7 @@ private fun FloatingBottomBarSlot(
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        key(smootherRoundedCornersEnabled) {
+        key(smootherRoundedCornersEnabled, themeState.liquidGlassEngine) {
             if (themeState.useFloatingBottomBarCompact) {
                 FloatingBottomBarCompact(
                     modifier = Modifier
@@ -200,6 +207,8 @@ private fun FloatingBottomBarSlot(
                     tabsCount = tabs.size,
                     isBlurEnabled = useFloatingBottomBarBlur,
                     isStandardBlurEnabled = useBlur,
+                    engine = themeState.liquidGlassEngine,
+                    kyantBackdrop = kyantBackdrop,
                     colors = FloatingBottomBarDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         indicatorColor = MaterialTheme.colorScheme.primary,
@@ -254,14 +263,24 @@ private fun MainPagerContent(
     useFloatingBottomBar: Boolean,
     m3Backdrop: LayerBackdrop?,
     floatingBackdrop: LayerBackdrop,
+    kyantBackdrop: KyantLayerBackdrop,
     outerPadding: PaddingValues
 ) {
+    val themeState = LocalThemeState.current
     HorizontalPager(
         state = mainPagerState.pagerState,
         userScrollEnabled = true,
         modifier = modifier
             .then(if (m3Backdrop != null) Modifier.layerBackdrop(m3Backdrop) else Modifier)
-            .then(if (useFloatingBottomBar) Modifier.layerBackdrop(floatingBackdrop) else Modifier)
+            .then(
+                if (useFloatingBottomBar && themeState.liquidGlassEngine == LiquidGlassEngine.KYANT) {
+                    Modifier.kyantLayerBackdrop(kyantBackdrop)
+                } else if (useFloatingBottomBar) {
+                    Modifier.layerBackdrop(floatingBackdrop)
+                } else {
+                    Modifier
+                }
+            )
     ) { page ->
         when (page) {
             0 -> HomePage(

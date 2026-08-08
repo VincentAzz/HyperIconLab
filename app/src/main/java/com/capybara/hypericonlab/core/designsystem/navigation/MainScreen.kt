@@ -26,6 +26,7 @@ import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsSharedViewModel
 import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberLayerBackdrop as rememberKyantLayerBackdrop
 
 val LocalThemeState = staticCompositionLocalOf { ThemeState() }
 
@@ -65,6 +66,7 @@ fun MainScreen(
     val useFloatingBottomBarBlur = uiState.useFloatingBottomBarBlur
     val m3Backdrop = rememberMaterial3BlurBackdrop(useBlur)
     val floatingBackdrop = rememberLayerBackdrop()
+    val kyantBackdrop = rememberKyantLayerBackdrop()
 
     val configCount = 0
     val homeLabel = stringResource(id = R.string.home)
@@ -137,6 +139,7 @@ fun MainScreen(
             useFloatingBottomBarBlur = useFloatingBottomBarBlur,
             m3Backdrop = m3Backdrop,
             floatingBackdrop = floatingBackdrop,
+            kyantBackdrop = kyantBackdrop,
             isMedium = isMedium
         )
     }

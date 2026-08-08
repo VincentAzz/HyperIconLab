@@ -1,5 +1,6 @@
 package com.capybara.hypericonlab.core.designsystem.liquidglass.kyant
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -15,6 +16,9 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawTransform
 import androidx.compose.ui.unit.Density
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 internal class InverseLayerScope : GraphicsLayerScope {
 
@@ -79,57 +83,48 @@ internal class InverseLayerScope : GraphicsLayerScope {
         rotationZ = 0f
         cameraDistance = DefaultCameraDistance
         transformOrigin = TransformOrigin.Center
-        …9504 tokens truncated…{
-            val canvas = drawContext.canvas
-            canvas.save()
-            canvas.clipOutline(outline, clipPath)
-            canvas.drawOutline(outline, paint)
-            canvas.restore()
+        shape = RectangleShape
+        clip = false
+        renderEffect = null
+        blendMode = BlendMode.SrcOver
+        colorFilter = null
+        compositingStrategy = CompositingStrategy.Auto
+
+        matrix = null
+    }
+
+    private fun DrawTransform.inverseTransformAtTopLeft(
+        rotationZ: Float = 0f,
+        scaleX: Float = 1f,
+        scaleY: Float = 1f
+    ) {
+        if (rotationZ == 0f) {
+            if (scaleX != 0f && scaleY != 0f) {
+                scale(1f / scaleX, 1f / scaleY, Offset.Zero)
+            }
+            return
         }
-    }
 
-    translate(-1f, -1f)
-    {
-        drawLayer(highlightLayer)
-    }
-}
-}
+        val matrix = matrix ?: Matrix().also { matrix = it }
+        if (matrix.values.size < 16) return
 
-override fun onAttach() {
-    val graphicsContext = requireGraphicsContext()
-    highlightLayer = graphicsContext.createGraphicsLayer()
-}
+        val rz = rotationZ * (PI / 180.0)
+        val rsz = sin(rz).toFloat()
+        val rcz = cos(rz).toFloat()
 
-override fun onDetach() {
-    val graphicsContext = requireGraphicsContext()
-    highlightLayer?.let { layer ->
-        graphicsContext.releaseGraphicsLayer(layer)
-        highlightLayer = null
-    }
-    clipPath = null
-    runtimeShaderCache.clear()
-    prevStyle = null
-}
+        val a00 = rcz * scaleX
+        val a01 = rsz * scaleY
+        val a10 = -rsz * scaleX
+        val a11 = rcz * scaleY
 
-private fun DrawScope.configurePaint(highlight: Highlight) {
-    paint.color = highlight.style.color
-    paint.strokeWidth =
-        ceil(highlight.width.toPx().fastCoerceAtMost(size.minDimension / 2f)) * 2f
-    val blurRadius = highlight.blurRadius.toPx()
-    paint.asFrameworkPaint().maskFilter =
-        if (blurRadius > 0f) {
-            BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL)
-        } else {
-            null
-        }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        paint.shader = with(highlight.style) {
-            createShader(
-                shape = shapeProvider.shape,
-                runtimeShaderCache = runtimeShaderCache
-            )
-        }
+        val det = a00 * a11 - a01 * a10
+        if (det == 0f) return
+        val invDet = 1f / det
+        matrix[0, 0] = a11 * invDet
+        matrix[0, 1] = -a01 * invDet
+        matrix[1, 0] = -a10 * invDet
+        matrix[1, 1] = a00 * invDet
+
+        transform(matrix)
     }
 }
-}
-
