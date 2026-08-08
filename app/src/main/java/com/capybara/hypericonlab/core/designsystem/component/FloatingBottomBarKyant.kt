@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastCoerceIn
@@ -56,6 +58,14 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sign
 
+private object KyantBottomBarConfig {
+    val ItemMinWidth = 76.dp
+    val HorizontalPadding = 4.dp
+
+    fun barWidth(tabsCount: Int): Dp =
+        ItemMinWidth * tabsCount.toFloat() + HorizontalPadding * 2f
+}
+
 @Composable
 fun FloatingBottomBarKyant(
     selectedTabIndex: () -> Int,
@@ -74,7 +84,7 @@ fun FloatingBottomBarKyant(
     val pillShape = rememberKyantCapsuleShape()
 
     BoxWithConstraints(
-        modifier,
+        modifier.width(KyantBottomBarConfig.barWidth(tabsCount)),
         contentAlignment = Alignment.CenterStart
     ) {
         val density = LocalDensity.current
