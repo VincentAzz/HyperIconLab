@@ -33,8 +33,13 @@ import androidx.compose.ui.unit.max
 import androidx.compose.ui.util.lerp
 import kotlin.math.roundToInt
 
+enum class ExpressiveSliderTrackThickness(val height: Dp) {
+    THIN(4.dp),
+    STANDARD(6.dp),
+    THICK(8.dp)
+}
+
 private object ExpressiveSliderDefaults {
-    val TrackHeight = 6.dp
     val ThumbRadius = 8.dp
     val ThumbLineHeight = 24.dp
     val ThumbGap = 4.dp
@@ -54,7 +59,7 @@ fun ExpressiveSlider(
     steps: Int = 0,
     onValueChangeFinished: (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    trackHeight: Dp = ExpressiveSliderDefaults.TrackHeight,
+    trackThickness: ExpressiveSliderTrackThickness = ExpressiveSliderTrackThickness.THIN,
     thumbRadius: Dp = ExpressiveSliderDefaults.ThumbRadius,
     thumbLineHeight: Dp = ExpressiveSliderDefaults.ThumbLineHeight,
     thumbGap: Dp = ExpressiveSliderDefaults.ThumbGap,
@@ -62,6 +67,7 @@ fun ExpressiveSlider(
     inactiveTrackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     thumbColor: Color = MaterialTheme.colorScheme.primary,
 ) {
+    val trackHeight = trackThickness.height
     val isDragged by interactionSource.collectIsDraggedAsState()
     val isPressed by interactionSource.collectIsPressedAsState()
     val isInteracting = isDragged || isPressed
@@ -138,6 +144,10 @@ fun ExpressiveSlider(
                 thumbColor = Color.Transparent,
                 activeTrackColor = Color.Transparent,
                 inactiveTrackColor = Color.Transparent,
+                activeTickColor = Color.Transparent,
+                inactiveTickColor = Color.Transparent,
+                disabledActiveTickColor = Color.Transparent,
+                disabledInactiveTickColor = Color.Transparent,
             ),
         )
 

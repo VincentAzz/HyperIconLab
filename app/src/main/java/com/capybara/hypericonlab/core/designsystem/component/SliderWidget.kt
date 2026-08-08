@@ -26,7 +26,8 @@ fun SliderWidget(
     valueDisplay: String = String.format("%.2f", value),
     shape: Shape = MaterialTheme.shapes.medium,
     enabled: Boolean = true,
-    useMiuixSlider: Boolean = false
+    useMiuixSlider: Boolean = false,
+    trackThickness: ExpressiveSliderTrackThickness = ExpressiveSliderTrackThickness.THIN
 ) {
     BaseItemContainer(
         shape = shape,
@@ -66,6 +67,7 @@ fun SliderWidget(
                 valueRange = valueRange,
                 steps = steps,
                 enabled = enabled,
+                trackThickness = trackThickness,
                 modifier = Modifier.fillMaxWidth()
             )
         }
