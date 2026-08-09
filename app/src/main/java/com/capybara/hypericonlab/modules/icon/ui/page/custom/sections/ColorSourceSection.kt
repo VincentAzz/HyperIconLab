@@ -36,6 +36,7 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
+import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
@@ -44,7 +45,6 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.CTCConfigSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreviewIcon
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 

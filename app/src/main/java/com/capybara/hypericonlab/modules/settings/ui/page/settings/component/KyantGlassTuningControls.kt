@@ -15,7 +15,7 @@ import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassT
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuningDefaults
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuningParameter
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
+import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

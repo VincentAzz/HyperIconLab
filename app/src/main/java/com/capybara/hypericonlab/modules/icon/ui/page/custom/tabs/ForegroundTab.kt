@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
+import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ConfigCard
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.ColorSourceSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.GlassConfigSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.sections.StickerConfigSection

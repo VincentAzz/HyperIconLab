@@ -20,7 +20,7 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
+import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 
 // assets/shadow_baked/<shapeName>_<styleName>_shadow_512.png
