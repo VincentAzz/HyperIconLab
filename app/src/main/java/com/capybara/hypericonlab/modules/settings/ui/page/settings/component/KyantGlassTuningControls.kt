@@ -11,10 +11,10 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.R
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuningDefaults
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuningParameter
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningDefaults
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningParameter
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import kotlin.math.abs
 import kotlin.math.roundToInt

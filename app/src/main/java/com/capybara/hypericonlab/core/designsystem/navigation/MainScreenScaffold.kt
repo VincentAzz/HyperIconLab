@@ -45,6 +45,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantControlsBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBarCompactItem
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBar
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarCompact
@@ -52,10 +56,6 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarDe
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarItem
 import com.capybara.hypericonlab.core.designsystem.component.LocalAppleStyleControls
 import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
-import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantControlsBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
 import com.capybara.hypericonlab.modules.icon.ui.page.home.HomePage
@@ -63,9 +63,9 @@ import com.capybara.hypericonlab.modules.icon.ui.page.task.TaskPage
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsPage
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.layerBackdrop as kyantLayerBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberLayerBackdrop as rememberKyantLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.layerBackdrop as kyantLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.rememberLayerBackdrop as rememberKyantLayerBackdrop
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

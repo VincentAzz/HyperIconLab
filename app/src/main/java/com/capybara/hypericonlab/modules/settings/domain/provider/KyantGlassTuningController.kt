@@ -1,7 +1,7 @@
 package com.capybara.hypericonlab.modules.settings.domain.provider
 
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningParameter
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuningParameter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

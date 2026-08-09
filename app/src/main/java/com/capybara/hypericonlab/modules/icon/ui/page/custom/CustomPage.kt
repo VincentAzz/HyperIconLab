@@ -45,12 +45,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.appBarBlurEffect
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.getMaterial3AppBarColor
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidthMode
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.appBarBlurEffect
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.getMaterial3AppBarColor
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape

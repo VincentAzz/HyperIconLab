@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.symbol.color_lens
 import com.capybara.hypericonlab.core.designsystem.symbol.home
 import com.capybara.hypericonlab.core.designsystem.symbol.settings
@@ -26,7 +26,7 @@ import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsSharedViewModel
 import org.koin.compose.koinInject
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberLayerBackdrop as rememberKyantLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.rememberLayerBackdrop as rememberKyantLayerBackdrop
 
 val LocalThemeState = staticCompositionLocalOf { ThemeState() }
 

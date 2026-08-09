@@ -20,12 +20,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LayerBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.LocalKyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.drawBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.blur
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.colorControls
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.lens
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.LocalKyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.drawBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.blur
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.colorControls
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.lens
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 

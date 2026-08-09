@@ -38,13 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
+import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.component.isAppleStyleCardEnabled
-import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec

@@ -23,10 +23,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.LocalKyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.component.AppleStyleControls
 import com.capybara.hypericonlab.core.designsystem.component.LocalAppleStyleControls
 import com.capybara.hypericonlab.core.designsystem.component.LocalUseAppleStyleCard
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.LocalKyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.navigation.AppRoot
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_INSTALL_APK_URI
 import com.capybara.hypericonlab.core.designsystem.navigation.EXTRA_TAB_INDEX

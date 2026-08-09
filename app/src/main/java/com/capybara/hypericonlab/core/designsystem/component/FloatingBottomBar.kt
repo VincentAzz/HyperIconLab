@@ -3,10 +3,10 @@ package com.capybara.hypericonlab.core.designsystem.component
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
+import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
 import top.yukonga.miuix.kmp.blur.Backdrop
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop
 
 @Composable
 fun FloatingBottomBar(

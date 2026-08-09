@@ -2,9 +2,9 @@ package com.capybara.hypericonlab.modules.settings.data.repository
 
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.Preferences
-import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningDefaults
+import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuningDefaults
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle

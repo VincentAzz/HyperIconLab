@@ -2,7 +2,7 @@ package com.capybara.hypericonlab.modules.settings.data.provider
 
 import android.os.Build
 import androidx.compose.ui.graphics.Color
-import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
+import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState
 import com.capybara.hypericonlab.modules.settings.domain.provider.KyantGlassTuningController
 import com.capybara.hypericonlab.modules.settings.domain.provider.SystemEnvProvider

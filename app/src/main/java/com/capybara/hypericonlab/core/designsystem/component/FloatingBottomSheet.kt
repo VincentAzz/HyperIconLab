@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantBackdrop
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import top.yukonga.miuix.kmp.blur.LayerBackdrop

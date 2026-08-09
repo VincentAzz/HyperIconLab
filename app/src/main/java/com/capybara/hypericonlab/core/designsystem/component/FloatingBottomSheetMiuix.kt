@@ -23,8 +23,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.liquidGlassEffect
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.liquidGlassEffect
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import top.yukonga.miuix.kmp.blur.LayerBackdrop

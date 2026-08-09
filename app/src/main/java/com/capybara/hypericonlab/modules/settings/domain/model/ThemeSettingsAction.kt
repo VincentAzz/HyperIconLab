@@ -1,9 +1,9 @@
 package com.capybara.hypericonlab.modules.settings.domain.model
 
 import androidx.compose.ui.graphics.Color
-import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningParameter
+import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuningParameter
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle

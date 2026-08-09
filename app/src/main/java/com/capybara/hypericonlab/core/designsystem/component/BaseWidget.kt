@@ -38,7 +38,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantControlsBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantControlsBackdrop
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerInset
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius

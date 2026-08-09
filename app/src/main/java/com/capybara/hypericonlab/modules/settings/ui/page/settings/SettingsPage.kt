@@ -35,13 +35,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.appBarBlurEffect
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.getMaterial3AppBarColor
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidthMode
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.appBarBlurEffect
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.getMaterial3AppBarColor
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.symbol.info
 import com.capybara.hypericonlab.core.designsystem.symbol.inventory_2
 import com.capybara.hypericonlab.core.designsystem.symbol.settings

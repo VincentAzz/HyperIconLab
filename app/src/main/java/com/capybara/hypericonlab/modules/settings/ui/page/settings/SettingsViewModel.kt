@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
 import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor

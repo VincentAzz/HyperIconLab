@@ -50,16 +50,16 @@ import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.util.lerp
 import com.capybara.hypericonlab.core.designsystem.animation.DampedDragAnimation
 import com.capybara.hypericonlab.core.designsystem.animation.InteractiveHighlight
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.layerBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberCombinedBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberLayerBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.LocalKyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.drawBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.blur
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.lens
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.vibrancy
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.highlight.Highlight
-import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.layerBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.rememberCombinedBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.rememberLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.LocalKyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.drawBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.blur
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.lens
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.vibrancy
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.highlight.Highlight
+import com.capybara.hypericonlab.core.designsystem.blur.miuix.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactHeight
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactIndicatorHeight
@@ -70,8 +70,8 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sign
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.Backdrop as KyantBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.shadow.InnerShadow as KyantInnerShadow
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.Backdrop as KyantBackdrop
+import com.capybara.hypericonlab.core.designsystem.blur.kyant.shadow.InnerShadow as KyantInnerShadow
 import top.yukonga.miuix.kmp.blur.LayerBackdrop as MiuixLayerBackdrop
 
 private object KyantCompactConfig {
