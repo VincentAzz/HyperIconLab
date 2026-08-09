@@ -30,10 +30,10 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 private object KyantSheetConfig {
-    const val LightSurfaceAlpha = 0.6f
-    const val DarkSurfaceAlpha = LightSurfaceAlpha
-    const val LightBrightness = 0.2f
-    const val Saturation = 1.5f
+    val LightSurfaceAlpha = 0.6f
+    val DarkSurfaceAlpha = LightSurfaceAlpha
+    val LightBrightness = 0.1f
+    val Saturation = 1.5f
     val LightBlurRadius = 16.dp
     val DarkBlurRadius = 8.dp
     val RefractionHeight = 24.dp
