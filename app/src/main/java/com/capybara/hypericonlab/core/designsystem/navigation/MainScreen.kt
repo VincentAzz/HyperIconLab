@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
-import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.symbol.color_lens
 import com.capybara.hypericonlab.core.designsystem.symbol.home
 import com.capybara.hypericonlab.core.designsystem.symbol.settings

@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -49,10 +50,12 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBar
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarCompact
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarDefaults
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarItem
+import com.capybara.hypericonlab.core.designsystem.component.LocalAppleStyleControls
 import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
 import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantBackdrop
-import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantControlsBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
 import com.capybara.hypericonlab.modules.icon.ui.page.home.HomePage
@@ -62,6 +65,7 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.layerBackdrop as kyantLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberLayerBackdrop as rememberKyantLayerBackdrop
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -113,26 +117,49 @@ fun MainScreenScaffold(
             }
         }
     ) { paddingValues ->
-        CompositionLocalProvider(
-            LocalKyantBackdrop provides if (
-                LocalThemeState.current.liquidGlassEngine == LiquidGlassEngine.KYANT
-            ) {
-                kyantBackdrop
-            } else {
-                null
-            }
+        val appleStyleControls = LocalAppleStyleControls.current
+        val useSafeControlsBackdrop =
+            LocalThemeState.current.liquidGlassEngine == LiquidGlassEngine.KYANT &&
+                    (appleStyleControls.useToggle || appleStyleControls.useSlider)
+        val controlsBackdrop = if (useSafeControlsBackdrop) {
+            rememberKyantLayerBackdrop()
+        } else {
+            null
+        }
+        val activeKyantBackdrop = if (
+            LocalThemeState.current.liquidGlassEngine == LiquidGlassEngine.KYANT
         ) {
-            MainPagerContent(
-                modifier = Modifier.fillMaxSize(),
-                mainPagerState = mainPagerState,
-                tabs = tabs,
-                useBlur = useBlur,
-                useFloatingBottomBar = useFloatingBottomBar,
-                m3Backdrop = m3Backdrop,
-                floatingBackdrop = floatingBackdrop,
-                kyantBackdrop = kyantBackdrop,
-                outerPadding = paddingValues
-            )
+            kyantBackdrop
+        } else {
+            null
+        }
+
+        Box(Modifier.fillMaxSize()) {
+            // 控件位于页面背景层内部时不能直接读取包含自身的 Pager 图层，否则会形成渲染递归。
+            if (controlsBackdrop != null) {
+                Box(
+                    Modifier
+                        .matchParentSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .kyantLayerBackdrop(controlsBackdrop)
+                )
+            }
+            CompositionLocalProvider(
+                LocalKyantBackdrop provides activeKyantBackdrop,
+                LocalKyantControlsBackdrop provides controlsBackdrop
+            ) {
+                MainPagerContent(
+                    modifier = Modifier.fillMaxSize(),
+                    mainPagerState = mainPagerState,
+                    tabs = tabs,
+                    useBlur = useBlur,
+                    useFloatingBottomBar = useFloatingBottomBar,
+                    m3Backdrop = m3Backdrop,
+                    floatingBackdrop = floatingBackdrop,
+                    kyantBackdrop = kyantBackdrop,
+                    outerPadding = paddingValues
+                )
+            }
         }
     }
 }

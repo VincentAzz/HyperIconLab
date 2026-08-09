@@ -39,9 +39,9 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidthMode
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
-import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
-import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
-import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.appBarBlurEffect
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.getMaterial3AppBarColor
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.core.designsystem.symbol.info
 import com.capybara.hypericonlab.core.designsystem.symbol.inventory_2
 import com.capybara.hypericonlab.core.designsystem.symbol.settings

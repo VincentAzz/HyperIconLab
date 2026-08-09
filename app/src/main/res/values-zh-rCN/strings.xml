@@ -22,11 +22,15 @@
     <string name="theme_settings_use_progressive_blur_top_app_bar_desc">为应用顶栏启用渐变模糊效果</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet">启用液态玻璃底部弹出菜单</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">为底部弹出菜单启用液态玻璃效果</string>
+    <string name="theme_settings_use_apple_style_toggle">使用 Apple 风格开关</string>
+    <string name="theme_settings_use_apple_style_toggle_desc">使用 Kyant 液态玻璃样式的开关，仅在 Kyant 引擎下生效，可能影响性能</string>
+    <string name="theme_settings_use_apple_style_slider">使用 Apple 风格滑块</string>
+    <string name="theme_settings_use_apple_style_slider_desc">使用 Kyant 液态玻璃样式的滑块，仅在 Kyant 引擎下生效，可能影响性能</string>
     <string name="theme_settings_liquid_glass_engine">液态玻璃引擎</string>
     <string name="theme_settings_use_custom_liquid_glass_engine">自定义液态玻璃引擎</string>
     <string name="theme_settings_use_custom_liquid_glass_engine_desc">选择液态玻璃效果使用的渲染引擎</string>
-    <string name="theme_settings_liquid_glass_engine_miuix">Miuix</string>
-    <string name="theme_settings_liquid_glass_engine_kyant">Kyant</string>
+    <string name="theme_settings_liquid_glass_engine_miuix">miuix/miuix-blur</string>
+    <string name="theme_settings_liquid_glass_engine_kyant">Kyant/backdrop</string>
     <string name="theme_settings_kyant_glass_blur_scale">模糊强度</string>
     <string name="theme_settings_kyant_glass_refraction_height_scale">折射高度</string>
     <string name="theme_settings_kyant_glass_refraction_amount_scale">折射强度</string>

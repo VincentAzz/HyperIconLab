@@ -12,7 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantControlsBackdrop
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
+import kotlin.math.roundToInt
 
 @Composable
 fun SliderWidget(
@@ -60,16 +62,42 @@ fun SliderWidget(
                 )
             }
             // Spacer(Modifier.height(4.dp))
-            ExpressiveSlider(
-                value = value,
-                onValueChange = onValueChange,
-                onValueChangeFinished = onValueChangeFinished,
-                valueRange = valueRange,
-                steps = steps,
-                enabled = enabled,
-                trackThickness = trackThickness,
-                modifier = Modifier.fillMaxWidth()
-            )
+            val kyantBackdrop = LocalKyantControlsBackdrop.current
+            if (enabled && LocalAppleStyleControls.current.useSlider && kyantBackdrop != null) {
+                AppleLiquidSliderKyant(
+                    value = { value },
+                    onValueChange = { rawValue ->
+                        val resolvedValue = if (steps > 0) {
+                            val fraction = (rawValue - valueRange.start) /
+                                    (valueRange.endInclusive - valueRange.start)
+                            val stepCount = steps + 1
+                            val steppedFraction =
+                                (fraction * stepCount).roundToInt() / stepCount.toFloat()
+                            valueRange.start + steppedFraction *
+                                    (valueRange.endInclusive - valueRange.start)
+                        } else {
+                            rawValue
+                        }
+                        onValueChange(resolvedValue.coerceIn(valueRange))
+                    },
+                    onValueChangeFinished = onValueChangeFinished,
+                    valueRange = valueRange,
+                    visibilityThreshold = 0.001f,
+                    backdrop = kyantBackdrop,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                ExpressiveSlider(
+                    value = value,
+                    onValueChange = onValueChange,
+                    onValueChangeFinished = onValueChangeFinished,
+                    valueRange = valueRange,
+                    steps = steps,
+                    enabled = enabled,
+                    trackThickness = trackThickness,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }

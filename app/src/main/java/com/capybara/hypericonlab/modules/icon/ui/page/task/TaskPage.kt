@@ -46,9 +46,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidthMode
-import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
-import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
-import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.appBarBlurEffect
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.getMaterial3AppBarColor
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.modules.icon.ui.page.task.component.TaskCard
 import com.capybara.hypericonlab.modules.icon.ui.page.task.component.TaskDetailSheet
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel

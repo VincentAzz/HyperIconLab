@@ -36,6 +36,8 @@ class AppDataStore(
             booleanPreferencesKey("ui_use_custom_card_corner_radius")
         val UI_CARD_CORNER_SIZE = stringPreferencesKey("ui_card_corner_size")
         val UI_USE_APPLE_STYLE_CARD = booleanPreferencesKey("ui_use_apple_style_card")
+        val UI_USE_APPLE_STYLE_TOGGLE = booleanPreferencesKey("ui_use_apple_style_toggle")
+        val UI_USE_APPLE_STYLE_SLIDER = booleanPreferencesKey("ui_use_apple_style_slider")
         val UI_USE_GOOGLE_SANS_FLEX = booleanPreferencesKey("ui_use_google_sans_flex")
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val THEME_PALETTE_STYLE = stringPreferencesKey("theme_palette_style")

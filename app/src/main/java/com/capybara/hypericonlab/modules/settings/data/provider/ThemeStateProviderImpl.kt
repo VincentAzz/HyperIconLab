@@ -59,6 +59,12 @@ class ThemeStateProviderImpl(
             },
             kyantGlassTuning = previewTuning ?: prefs.kyantGlassTuning,
             useAppleStyleCard = prefs.useAppleStyleCard,
+            useAppleStyleToggle = prefs.useAppleStyleToggle &&
+                    (!prefs.useCustomLiquidGlassEngine ||
+                            prefs.liquidGlassEngine == LiquidGlassEngine.KYANT),
+            useAppleStyleSlider = prefs.useAppleStyleSlider &&
+                    (!prefs.useCustomLiquidGlassEngine ||
+                            prefs.liquidGlassEngine == LiquidGlassEngine.KYANT),
             useGoogleSansFlex = prefs.useGoogleSansFlex,
         )
     }.stateIn(

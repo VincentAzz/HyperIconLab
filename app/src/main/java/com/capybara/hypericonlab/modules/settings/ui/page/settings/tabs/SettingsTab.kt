@@ -389,6 +389,38 @@ fun SettingsTab(
                             }
                         )
                     }
+                    item {
+                        SwitchWidget(
+                            iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_apple_style_toggle),
+                            description = stringResource(
+                                R.string.theme_settings_use_apple_style_toggle_desc
+                            ),
+                            checked = uiState.useAppleStyleToggle,
+                            enabled = uiState.liquidGlassEngine == LiquidGlassEngine.KYANT,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseAppleStyleToggle(it)
+                                )
+                            }
+                        )
+                    }
+                    item {
+                        SwitchWidget(
+                            iconPlaceholder = false,
+                            title = stringResource(R.string.theme_settings_use_apple_style_slider),
+                            description = stringResource(
+                                R.string.theme_settings_use_apple_style_slider_desc
+                            ),
+                            checked = uiState.useAppleStyleSlider,
+                            enabled = uiState.liquidGlassEngine == LiquidGlassEngine.KYANT,
+                            onCheckedChange = {
+                                viewModel.dispatch(
+                                    ThemeSettingsAction.SetUseAppleStyleSlider(it)
+                                )
+                            }
+                        )
+                    }
                     expandableItem(
                         animatedVisibility = uiState.useBlur,
                         expanded = uiState.useCustomLiquidGlassEngine,
@@ -449,9 +481,12 @@ fun SettingsTab(
                                     ) {
                                         KyantGlassTuningControls(
                                             tuning = uiState.kyantGlassTuning,
-                                            onTuningChange = {
+                                            onTuningChange = { parameter, value ->
                                                 viewModel.dispatch(
-                                                    ThemeSettingsAction.PreviewKyantGlassTuning(it)
+                                                    ThemeSettingsAction.PreviewKyantGlassTuningParameter(
+                                                        parameter = parameter,
+                                                        value = value
+                                                    )
                                                 )
                                             },
                                             onValueChangeFinished = {

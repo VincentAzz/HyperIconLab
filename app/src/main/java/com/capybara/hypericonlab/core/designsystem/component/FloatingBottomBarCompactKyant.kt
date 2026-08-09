@@ -59,7 +59,7 @@ import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.blu
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.lens
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.vibrancy
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.highlight.Highlight
-import com.capybara.hypericonlab.core.designsystem.liquidglass.material3BlurEffect
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactHeight
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactIndicatorHeight

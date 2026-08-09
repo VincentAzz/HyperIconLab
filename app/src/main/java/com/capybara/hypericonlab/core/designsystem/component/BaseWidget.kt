@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.LocalKyantControlsBackdrop
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerInset
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
@@ -345,11 +346,23 @@ fun SwitchWidget(
         iconPlaceholder = iconPlaceholder,
         onClick = { onCheckedChange(!checked) },
         trailingContent = {
-            Switch(
-                checked = checked,
-                onCheckedChange = onCheckedChange,
-                enabled = enabled
-            )
+            val kyantBackdrop = LocalKyantControlsBackdrop.current
+            if (enabled && LocalAppleStyleControls.current.useToggle && kyantBackdrop != null) {
+                AppleLiquidToggleKyant(
+                    selected = { checked },
+                    onSelect = onCheckedChange,
+                    backdrop = kyantBackdrop,
+                    modifier = Modifier,
+                    selectedTrackColor = MaterialTheme.colorScheme.primary,
+                    thumbColor = MaterialTheme.colorScheme.surface
+                )
+            } else {
+                Switch(
+                    checked = checked,
+                    onCheckedChange = onCheckedChange,
+                    enabled = enabled
+                )
+            }
         }
     )
 }

@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
@@ -78,6 +79,8 @@ class SettingsViewModel(
             liquidGlassEngine = themeState.liquidGlassEngine,
             kyantGlassTuning = themeState.kyantGlassTuning,
             useAppleStyleCard = themeState.useAppleStyleCard,
+            useAppleStyleToggle = themeState.useAppleStyleToggle,
+            useAppleStyleSlider = themeState.useAppleStyleSlider,
             useGoogleSansFlex = themeState.useGoogleSansFlex,
             themeMode = themeState.themeMode,
             paletteStyle = themeState.paletteStyle,
@@ -180,10 +183,22 @@ class SettingsViewModel(
                     StringSetting.LiquidGlassEngine,
                     action.engine.name
                 )
+                if (action.engine == LiquidGlassEngine.MIUIX) {
+                    updateSetting(BooleanSetting.UiUseAppleStyleToggle, false)
+                    updateSetting(BooleanSetting.UiUseAppleStyleSlider, false)
+                }
             }
 
             is ThemeSettingsAction.PreviewKyantGlassTuning -> {
                 kyantGlassTuningController.updatePreview(action.tuning)
+            }
+
+            is ThemeSettingsAction.PreviewKyantGlassTuningParameter -> {
+                kyantGlassTuningController.updatePreview(
+                    parameter = action.parameter,
+                    value = action.value,
+                    fallback = state.value.kyantGlassTuning
+                )
             }
 
             ThemeSettingsAction.PersistKyantGlassTuning -> viewModelScope.launch {
@@ -195,6 +210,20 @@ class SettingsViewModel(
             is ThemeSettingsAction.SetUseAppleStyleCard -> viewModelScope.launch {
                 updateSetting(
                     BooleanSetting.UiUseAppleStyleCard,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseAppleStyleToggle -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseAppleStyleToggle,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseAppleStyleSlider -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseAppleStyleSlider,
                     action.enable
                 )
             }

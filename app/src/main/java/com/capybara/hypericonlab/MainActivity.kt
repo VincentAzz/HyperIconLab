@@ -23,6 +23,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.capybara.hypericonlab.core.designsystem.component.AppleStyleControls
+import com.capybara.hypericonlab.core.designsystem.component.LocalAppleStyleControls
 import com.capybara.hypericonlab.core.designsystem.component.LocalUseAppleStyleCard
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.LocalKyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.navigation.AppRoot
@@ -99,6 +101,10 @@ class MainActivity : ComponentActivity(), KoinComponent {
                 LocalUseAppleStyleCard provides uiState.useAppleStyleCard,
                 LocalUseGoogleSansFlex provides uiState.useGoogleSansFlex,
                 LocalKyantGlassTuning provides uiState.kyantGlassTuning,
+                LocalAppleStyleControls provides AppleStyleControls(
+                    useToggle = uiState.useAppleStyleToggle,
+                    useSlider = uiState.useAppleStyleSlider
+                ),
                 LocalPendingTab provides pendingTab
             ) {
                 AppTheme(

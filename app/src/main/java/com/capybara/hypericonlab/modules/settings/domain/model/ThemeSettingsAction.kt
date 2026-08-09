@@ -3,6 +3,7 @@ package com.capybara.hypericonlab.modules.settings.domain.model
 import androidx.compose.ui.graphics.Color
 import com.capybara.hypericonlab.core.designsystem.liquidglass.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningParameter
 import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
@@ -22,8 +23,14 @@ sealed interface ThemeSettingsAction {
     data class SetUseCustomLiquidGlassEngine(val enable: Boolean) : ThemeSettingsAction
     data class SetLiquidGlassEngine(val engine: LiquidGlassEngine) : ThemeSettingsAction
     data class PreviewKyantGlassTuning(val tuning: KyantGlassTuning) : ThemeSettingsAction
+    data class PreviewKyantGlassTuningParameter(
+        val parameter: KyantGlassTuningParameter,
+        val value: Float
+    ) : ThemeSettingsAction
     data object PersistKyantGlassTuning : ThemeSettingsAction
     data class SetUseAppleStyleCard(val enable: Boolean) : ThemeSettingsAction
+    data class SetUseAppleStyleToggle(val enable: Boolean) : ThemeSettingsAction
+    data class SetUseAppleStyleSlider(val enable: Boolean) : ThemeSettingsAction
     data class SetUseGoogleSansFlex(val enable: Boolean) : ThemeSettingsAction
     data class SetThemeMode(val mode: ThemeMode) : ThemeSettingsAction
     data class SetPaletteStyle(val style: PaletteStyle) : ThemeSettingsAction

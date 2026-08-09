@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.liquidglass
+package com.capybara.hypericonlab.core.designsystem.liquidglass.miuix
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

@@ -22,6 +22,10 @@
     <string name="theme_settings_use_progressive_blur_top_app_bar_desc">Apply progressive blur to the top app bar</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet">Enable Liquid Glass Bottom Sheet</string>
     <string name="theme_settings_use_liquid_glass_bottom_sheet_desc">Enable liquid glass effect for bottom sheets</string>
+    <string name="theme_settings_use_apple_style_toggle">Use Apple-style toggles</string>
+    <string name="theme_settings_use_apple_style_toggle_desc">Use Kyant liquid glass toggles when the Kyant engine is active</string>
+    <string name="theme_settings_use_apple_style_slider">Use Apple-style sliders</string>
+    <string name="theme_settings_use_apple_style_slider_desc">Use Kyant liquid glass sliders when the Kyant engine is active</string>
     <string name="theme_settings_liquid_glass_engine">Liquid Glass Engine</string>
     <string name="theme_settings_use_custom_liquid_glass_engine">Customize Liquid Glass Engine</string>
     <string name="theme_settings_use_custom_liquid_glass_engine_desc">Choose the rendering engine for liquid glass effects</string>

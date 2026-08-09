@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.liquidglass
+package com.capybara.hypericonlab.core.designsystem.liquidglass.miuix
 
 // Adapted from Kyant0/AndroidLiquidGlass — https://github.com/Kyant0/AndroidLiquidGlass (Apache 2.0).
 // Alpha-masked progressive blur: uniform blur + Y-direction alpha gradient (iOS 26 style).

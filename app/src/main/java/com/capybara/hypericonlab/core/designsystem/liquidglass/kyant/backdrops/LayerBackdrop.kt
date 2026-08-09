@@ -74,5 +74,5 @@ class LayerBackdrop internal constructor(
     }
 }
 
-// 由主屏幕提供给弹层使用的 Kyant 背景层
 val LocalKyantBackdrop = staticCompositionLocalOf<LayerBackdrop?> { null }
+val LocalKyantControlsBackdrop = staticCompositionLocalOf<LayerBackdrop?> { null }

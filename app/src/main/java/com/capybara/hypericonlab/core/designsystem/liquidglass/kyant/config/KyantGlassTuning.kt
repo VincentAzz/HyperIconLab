@@ -13,6 +13,13 @@ object KyantGlassTuningDefaults {
     val ChromaticAberrationRange = 0f..1f
 }
 
+enum class KyantGlassTuningParameter {
+    BLUR_SCALE,
+    REFRACTION_HEIGHT_SCALE,
+    REFRACTION_AMOUNT_SCALE,
+    CHROMATIC_ABERRATION
+}
+
 @Immutable
 data class KyantGlassTuning(
     val blurScale: Float = KyantGlassTuningDefaults.BlurScale,

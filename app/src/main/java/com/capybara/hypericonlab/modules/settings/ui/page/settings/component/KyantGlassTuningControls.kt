@@ -14,6 +14,7 @@ import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningDefaults
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.config.KyantGlassTuningParameter
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.StyleChip
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -48,7 +49,7 @@ private object KyantGlassTuningControlsConfig {
 @Composable
 fun KyantGlassTuningControls(
     tuning: KyantGlassTuning,
-    onTuningChange: (KyantGlassTuning) -> Unit,
+    onTuningChange: (KyantGlassTuningParameter, Float) -> Unit,
     onValueChangeFinished: () -> Unit,
     onPresetSelected: (KyantGlassTuning) -> Unit,
     modifier: Modifier = Modifier
@@ -57,7 +58,9 @@ fun KyantGlassTuningControls(
         SliderWidget(
             title = stringResource(R.string.theme_settings_kyant_glass_blur_scale),
             value = tuning.blurScale,
-            onValueChange = { onTuningChange(tuning.copy(blurScale = it)) },
+            onValueChange = {
+                onTuningChange(KyantGlassTuningParameter.BLUR_SCALE, it)
+            },
             onValueChangeFinished = onValueChangeFinished,
             valueRange = KyantGlassTuningDefaults.ScaleRange,
             steps = KyantGlassTuningControlsConfig.ScaleSteps,
@@ -68,7 +71,7 @@ fun KyantGlassTuningControls(
             title = stringResource(R.string.theme_settings_kyant_glass_refraction_height_scale),
             value = tuning.refractionHeightScale,
             onValueChange = {
-                onTuningChange(tuning.copy(refractionHeightScale = it))
+                onTuningChange(KyantGlassTuningParameter.REFRACTION_HEIGHT_SCALE, it)
             },
             onValueChangeFinished = onValueChangeFinished,
             valueRange = KyantGlassTuningDefaults.ScaleRange,
@@ -80,7 +83,7 @@ fun KyantGlassTuningControls(
             title = stringResource(R.string.theme_settings_kyant_glass_refraction_amount_scale),
             value = tuning.refractionAmountScale,
             onValueChange = {
-                onTuningChange(tuning.copy(refractionAmountScale = it))
+                onTuningChange(KyantGlassTuningParameter.REFRACTION_AMOUNT_SCALE, it)
             },
             onValueChangeFinished = onValueChangeFinished,
             valueRange = KyantGlassTuningDefaults.ScaleRange,
@@ -92,7 +95,7 @@ fun KyantGlassTuningControls(
             title = stringResource(R.string.theme_settings_kyant_glass_chromatic_aberration),
             value = tuning.chromaticAberration,
             onValueChange = {
-                onTuningChange(tuning.copy(chromaticAberration = it))
+                onTuningChange(KyantGlassTuningParameter.CHROMATIC_ABERRATION, it)
             },
             onValueChangeFinished = onValueChangeFinished,
             valueRange = KyantGlassTuningDefaults.ChromaticAberrationRange,

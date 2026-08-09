@@ -31,9 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.capybara.hypericonlab.core.designsystem.liquidglass.appBarBlurEffect
-import com.capybara.hypericonlab.core.designsystem.liquidglass.getMaterial3AppBarColor
-import com.capybara.hypericonlab.core.designsystem.liquidglass.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.appBarBlurEffect
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.getMaterial3AppBarColor
+import com.capybara.hypericonlab.core.designsystem.liquidglass.miuix.rememberMaterial3BlurBackdrop
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.usecase.InitializationCoordinator

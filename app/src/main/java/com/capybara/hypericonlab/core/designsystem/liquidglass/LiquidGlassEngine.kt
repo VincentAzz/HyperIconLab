@@ -1,6 +1,5 @@
 package com.capybara.hypericonlab.core.designsystem.liquidglass
 
-// 液态玻璃渲染引擎
 enum class LiquidGlassEngine {
     // miuix-blur
     MIUIX,

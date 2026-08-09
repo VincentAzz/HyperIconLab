@@ -1,0 +1,225 @@
+package com.capybara.hypericonlab.core.designsystem.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastCoerceIn
+import androidx.compose.ui.util.lerp
+import com.capybara.hypericonlab.core.designsystem.animation.DampedDragAnimation
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.Backdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.layerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberCombinedBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.backdrops.rememberLayerBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.drawBackdrop
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.blur
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.effects.lens
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.highlight.Highlight
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.shadow.InnerShadow
+import com.capybara.hypericonlab.core.designsystem.liquidglass.kyant.shadow.Shadow
+import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
+import kotlinx.coroutines.flow.collectLatest
+
+private object AppleLiquidToggleKyantDefaults {
+    val Width = 64.dp
+    val Height = 28.dp
+    val ThumbWidth = 40.dp
+    val ThumbHeight = 24.dp
+    val ThumbPadding = 2.dp
+    val DragWidth = 20.dp
+    val BlurRadius = 8.dp
+    val TrackColorLight = Color(0xFF787878).copy(alpha = 0.2f)
+    val TrackColorDark = Color(0xFF787880).copy(alpha = 0.36f)
+}
+
+@Composable
+fun AppleLiquidToggleKyant(
+    selected: () -> Boolean,
+    onSelect: (Boolean) -> Unit,
+    backdrop: Backdrop,
+    modifier: Modifier = Modifier,
+    selectedTrackColor: Color = MaterialTheme.colorScheme.primary,
+    unselectedTrackColor: Color = if (AppTheme.isDark) {
+        AppleLiquidToggleKyantDefaults.TrackColorDark
+    } else {
+        AppleLiquidToggleKyantDefaults.TrackColorLight
+    },
+    thumbColor: Color = MaterialTheme.colorScheme.surface
+) {
+    val density = LocalDensity.current
+    val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr
+    val dragWidth = with(density) { AppleLiquidToggleKyantDefaults.DragWidth.toPx() }
+    val animationScope = rememberCoroutineScope()
+    var didDrag by remember { mutableStateOf(false) }
+    var fraction by remember { mutableFloatStateOf(if (selected()) 1f else 0f) }
+    val dampedDragAnimation = remember(animationScope) {
+        DampedDragAnimation(
+            animationScope = animationScope,
+            initialValue = fraction,
+            valueRange = 0f..1f,
+            visibilityThreshold = 0.001f,
+            initialScale = 1f,
+            pressedScale = 1.5f,
+            onDragStarted = {},
+            onDragStopped = {
+                if (didDrag) {
+                    fraction = if (targetValue >= 0.5f) 1f else 0f
+                    onSelect(fraction == 1f)
+                    didDrag = false
+                } else {
+                    fraction = if (selected()) 0f else 1f
+                    onSelect(fraction == 1f)
+                }
+            },
+            onDrag = { _, dragAmount ->
+                if (!didDrag) {
+                    didDrag = dragAmount.x != 0f
+                }
+                val delta = dragAmount.x / dragWidth
+                fraction = if (isLtr) {
+                    (fraction + delta).fastCoerceIn(0f, 1f)
+                } else {
+                    (fraction - delta).fastCoerceIn(0f, 1f)
+                }
+            }
+        )
+    }
+
+    LaunchedEffect(dampedDragAnimation) {
+        snapshotFlow { fraction }.collectLatest { value ->
+            dampedDragAnimation.updateValue(value)
+        }
+    }
+    LaunchedEffect(selected) {
+        snapshotFlow { selected() }.collectLatest { isSelected ->
+            val target = if (isSelected) 1f else 0f
+            if (target != fraction) {
+                fraction = target
+                dampedDragAnimation.animateToValue(target)
+            }
+        }
+    }
+
+    val trackBackdrop = rememberLayerBackdrop()
+    val shape = rememberKyantCapsuleShape()
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Box(
+            Modifier
+                .layerBackdrop(trackBackdrop)
+                .clip(shape)
+                .background(
+                    lerp(
+                        unselectedTrackColor,
+                        selectedTrackColor,
+                        dampedDragAnimation.value
+                    )
+                )
+                .pointerInput(animationScope) {
+                    detectTapGestures {
+                        val target = if (selected()) 0f else 1f
+                        fraction = target
+                        dampedDragAnimation.animateToValue(target)
+                        onSelect(target == 1f)
+                    }
+                }
+                .size(AppleLiquidToggleKyantDefaults.Width, AppleLiquidToggleKyantDefaults.Height)
+        )
+
+        Box(
+            Modifier
+                .graphicsLayer {
+                    val padding = AppleLiquidToggleKyantDefaults.ThumbPadding.toPx()
+                    translationX = if (isLtr) {
+                        lerp(padding, padding + dragWidth, dampedDragAnimation.value)
+                    } else {
+                        lerp(-padding, -(padding + dragWidth), dampedDragAnimation.value)
+                    }
+                }
+                .semantics { role = Role.Switch }
+                .then(dampedDragAnimation.modifier)
+                .drawBackdrop(
+                    backdrop = rememberCombinedBackdrop(
+                        backdrop,
+                        rememberBackdrop(trackBackdrop) { drawBackdrop ->
+                            val progress = dampedDragAnimation.pressProgress
+                            scale(
+                                lerp(2f / 3f, 0.75f, progress),
+                                lerp(0f, 0.75f, progress)
+                            ) {
+                                drawBackdrop()
+                            }
+                        }
+                    ),
+                    shape = { shape },
+                    effects = {
+                        val progress = dampedDragAnimation.pressProgress
+                        blur(AppleLiquidToggleKyantDefaults.BlurRadius.toPx() * (1f - progress))
+                        lens(
+                            5.dp.toPx() * progress,
+                            10.dp.toPx() * progress,
+                            chromaticAberration = true
+                        )
+                    },
+                    highlight = {
+                        val progress = dampedDragAnimation.pressProgress
+                        Highlight.Ambient.copy(
+                            width = Highlight.Ambient.width / 1.5f,
+                            blurRadius = Highlight.Ambient.blurRadius / 1.5f,
+                            alpha = progress
+                        )
+                    },
+                    shadow = { Shadow(radius = 4.dp, color = Color.Black.copy(alpha = 0.05f)) },
+                    innerShadow = {
+                        InnerShadow(
+                            radius = 4.dp * dampedDragAnimation.pressProgress,
+                            alpha = dampedDragAnimation.pressProgress
+                        )
+                    },
+                    layerBlock = {
+                        scaleX = dampedDragAnimation.scaleX
+                        scaleY = dampedDragAnimation.scaleY
+                    },
+                    onDrawSurface = {
+                        drawRect(
+                            thumbColor.copy(alpha = 1f - dampedDragAnimation.pressProgress)
+                        )
+                    }
+                )
+                .size(
+                    AppleLiquidToggleKyantDefaults.ThumbWidth,
+                    AppleLiquidToggleKyantDefaults.ThumbHeight
+                )
+        )
+    }
+}
