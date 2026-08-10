@@ -33,9 +33,8 @@ import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.SheetConfigCardOuterVerticalPadding
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.modules.build.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import kotlinx.coroutines.launch
@@ -53,12 +52,6 @@ private object BuildOptionSheetConfig {
 
     // Header 确认按钮右侧 padding
     val HEADER_ICON_TRAILING_PADDING = 12.dp
-
-    // 内容区水平内边距
-    val CONTENT_HORIZONTAL_PADDING = 16.dp
-
-    // 内容区底部内边距（避免最后一张卡片紧贴 sheet 底部）
-    val CONTENT_BOTTOM_PADDING = 16.dp
 
     // chip 之间垂直间距（与 ForegroundTab 一致）
     val CHIP_SPACING = 8.dp
@@ -78,7 +71,7 @@ fun BuildOptionSheet(
     onConfirm: (ProductType, IconSetInfo) -> Unit,
     horizontalPadding: Dp = 8.dp,
     bottomPadding: Dp = 4.dp,
-    cornerRadius: Dp = ExtraLargeRadius,
+    cornerRadius: Dp? = null,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
 ) {
@@ -169,16 +162,16 @@ fun BuildOptionSheet(
         )
 
         // 内容：两个 ConfigCard，chip 一行一个，间距 8dp，与 ForegroundTab 风格一致
-        val isLargeCorner = currentPreferredCardCornerRadius() > CornerRadius
-        val contentHorizontalPadding =
-            if (isLargeCorner) 8.dp else BuildOptionSheetConfig.CONTENT_HORIZONTAL_PADDING
-        val contentBottomPadding =
-            if (isLargeCorner) 8.dp else BuildOptionSheetConfig.CONTENT_BOTTOM_PADDING
+        val roundedLayout = currentSheetRoundedLayout()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = contentHorizontalPadding)
-                .padding(bottom = contentBottomPadding)
+                .padding(horizontal = roundedLayout.cardInset)
+                .padding(
+                    bottom = roundedLayout.remainingBottomInset(
+                        SheetConfigCardOuterVerticalPadding
+                    )
+                )
         ) {
             // val cardContainerColor = MaterialTheme.colorScheme.surfaceBright
             val cardContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)

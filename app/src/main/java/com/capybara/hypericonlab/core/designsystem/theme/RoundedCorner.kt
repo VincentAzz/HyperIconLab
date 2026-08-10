@@ -2,6 +2,7 @@ package com.capybara.hypericonlab.core.designsystem.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -27,6 +28,14 @@ val LargeCardRadius = 20.dp
 
 val ExtraLargeRadius = 32.dp
 
+val DefaultSheetCornerRadius = 26.dp // 24
+
+val LargeSheetCornerRadius = 34.dp // 32
+
+val SheetConfigCardOuterVerticalPadding = 4.dp
+
+val SheetSegmentedColumnContentPadding = 0.dp
+
 enum class CardCornerSize(val cornerRadius: Dp) {
     DEFAULT(16.dp),
     LARGE(26.dp);
@@ -42,6 +51,32 @@ val LocalPreferredCardCornerRadius = staticCompositionLocalOf { CornerRadius }
 @Composable
 @ReadOnlyComposable
 fun currentPreferredCardCornerRadius(): Dp = LocalPreferredCardCornerRadius.current
+
+@Immutable
+data class SheetRoundedLayout(
+    val sheetCornerRadius: Dp,
+    val cardCornerRadius: Dp,
+    val cardInset: Dp
+) {
+    fun remainingBottomInset(contentBottomPadding: Dp = 0.dp): Dp =
+        (cardInset - contentBottomPadding).coerceAtLeast(0.dp)
+}
+
+@Composable
+@ReadOnlyComposable
+fun currentSheetRoundedLayout(): SheetRoundedLayout {
+    val cardCornerRadius = currentPreferredCardCornerRadius()
+    val sheetCornerRadius = if (cardCornerRadius > CornerRadius) {
+        LargeSheetCornerRadius
+    } else {
+        DefaultSheetCornerRadius
+    }
+    return SheetRoundedLayout(
+        sheetCornerRadius = sheetCornerRadius,
+        cardCornerRadius = cardCornerRadius,
+        cardInset = (sheetCornerRadius - cardCornerRadius).coerceAtLeast(0.dp)
+    )
+}
 
 fun insetCornerRadius(
     outerRadius: Dp,

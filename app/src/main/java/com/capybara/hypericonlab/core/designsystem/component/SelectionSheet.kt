@@ -28,9 +28,8 @@ import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.symbol.done
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.SheetSegmentedColumnContentPadding
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
@@ -53,6 +52,7 @@ fun <T> SelectionSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     var currentSelection by remember { mutableStateOf(selectedItem) }
+    val roundedLayout = currentSheetRoundedLayout()
 
     FloatingBottomSheet(
         onDismiss = onDismiss,
@@ -60,7 +60,6 @@ fun <T> SelectionSheet(
         fillMaxHeight = false,
         horizontalPadding = 8.dp,
         bottomPadding = 8.dp,
-        cornerRadius = ExtraLargeRadius,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass
     ) {
@@ -120,17 +119,14 @@ fun <T> SelectionSheet(
             }
         )
 
-        val isLargeCorner = currentPreferredCardCornerRadius() > CornerRadius
-        val innerHorizontalPadding = if (isLargeCorner) 8.dp else 16.dp
-        val innerBottomPadding = if (isLargeCorner) 8.dp else 16.dp
         SegmentedColumn(
             modifier = Modifier.padding(
-                start = innerHorizontalPadding,
-                end = innerHorizontalPadding,
-                top = 8.dp,
-                bottom = innerBottomPadding
+                start = roundedLayout.cardInset,
+                end = roundedLayout.cardInset,
+                top = roundedLayout.cardInset,
+                bottom = roundedLayout.cardInset
             ),
-            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
+            contentPadding = PaddingValues(SheetSegmentedColumnContentPadding),
             containerColorAlpha = 0.8f
         ) {
             items.forEach { item ->

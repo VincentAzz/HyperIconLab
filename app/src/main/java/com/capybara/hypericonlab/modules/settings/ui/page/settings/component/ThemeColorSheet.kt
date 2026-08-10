@@ -36,9 +36,8 @@ import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.symbol.done
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.SheetSegmentedColumnContentPadding
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
@@ -47,12 +46,6 @@ import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
 private object ThemeColorSheetLayout {
-    val DefaultHorizontalPadding = 16.dp
-    val LargeHorizontalPadding = 8.dp
-    val ContentTopPadding = 8.dp
-    val ContentBottomPadding = 16.dp
-    val ContentLargeBottomPadding = 8.dp
-    val ContentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp)
     val ColorMinimumWidth = 88.dp
     val ColorSpacing = 8.dp
 }
@@ -72,6 +65,7 @@ fun ThemeColorSheet(
     var draftColor by remember { mutableStateOf(selectedColor) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+    val roundedLayout = currentSheetRoundedLayout()
 
     fun closeSheet(confirm: Boolean) {
         coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -86,7 +80,6 @@ fun ThemeColorSheet(
         sheetState = sheetState,
         horizontalPadding = 8.dp,
         bottomPadding = 8.dp,
-        cornerRadius = ExtraLargeRadius,
         fillMaxHeight = true,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass
@@ -134,27 +127,16 @@ fun ThemeColorSheet(
             }
         )
 
-        val isLargeCorner = currentPreferredCardCornerRadius() > CornerRadius
-        val horizontalPadding = if (isLargeCorner) {
-            ThemeColorSheetLayout.LargeHorizontalPadding
-        } else {
-            ThemeColorSheetLayout.DefaultHorizontalPadding
-        }
-        val bottomPadding = if (isLargeCorner) {
-            ThemeColorSheetLayout.ContentLargeBottomPadding
-        } else {
-            ThemeColorSheetLayout.ContentBottomPadding
-        }
         SegmentedColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    start = horizontalPadding,
-                    end = horizontalPadding,
-                    top = ThemeColorSheetLayout.ContentTopPadding,
-                    bottom = bottomPadding
+                    start = roundedLayout.cardInset,
+                    end = roundedLayout.cardInset,
+                    top = roundedLayout.cardInset,
+                    bottom = roundedLayout.cardInset
                 ),
-            contentPadding = ThemeColorSheetLayout.ContentPadding,
+            contentPadding = PaddingValues(SheetSegmentedColumnContentPadding),
             containerColorAlpha = 0.8f
         ) {
             item {

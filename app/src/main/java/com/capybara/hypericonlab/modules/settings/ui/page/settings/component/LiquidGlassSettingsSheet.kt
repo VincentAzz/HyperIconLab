@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -26,7 +25,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
@@ -40,9 +41,8 @@ import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.symbol.done
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.SheetSegmentedColumnContentPadding
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
@@ -50,13 +50,6 @@ private object LiquidGlassSheetLayout {
     val HeaderButtonSize = 40.dp
     val HeaderIconSize = 24.dp
     val HeaderHorizontalPadding = 12.dp
-    val ContentHorizontalPadding = 16.dp
-    val ContentLargeHorizontalPadding = 8.dp
-    val ContentTopPadding = 8.dp
-    val ContentBottomPadding = 16.dp
-    val ContentLargeBottomPadding = 8.dp
-    val TuningReservedHeight = 420.dp
-    val ContentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp)
     val ChipPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp)
     val ChipSpacing = 8.dp
 }
@@ -76,6 +69,7 @@ fun LiquidGlassSettingsSheet(
     var tuning by remember { mutableStateOf(initialTuning) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+    val roundedLayout = currentSheetRoundedLayout()
 
     fun closeSheet(confirm: Boolean) {
         coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -90,7 +84,6 @@ fun LiquidGlassSettingsSheet(
         sheetState = sheetState,
         horizontalPadding = 8.dp,
         bottomPadding = 8.dp,
-        cornerRadius = ExtraLargeRadius,
         fillMaxHeight = false,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass
@@ -138,25 +131,14 @@ fun LiquidGlassSettingsSheet(
             }
         )
 
-        val isLargeCorner = currentPreferredCardCornerRadius() > CornerRadius
-        val horizontalPadding = if (isLargeCorner) {
-            LiquidGlassSheetLayout.ContentLargeHorizontalPadding
-        } else {
-            LiquidGlassSheetLayout.ContentHorizontalPadding
-        }
-        val bottomPadding = if (isLargeCorner) {
-            LiquidGlassSheetLayout.ContentLargeBottomPadding
-        } else {
-            LiquidGlassSheetLayout.ContentBottomPadding
-        }
         SegmentedColumn(
             modifier = Modifier.padding(
-                start = horizontalPadding,
-                end = horizontalPadding,
-                top = LiquidGlassSheetLayout.ContentTopPadding,
-                bottom = bottomPadding
+                start = roundedLayout.cardInset,
+                end = roundedLayout.cardInset,
+                top = roundedLayout.cardInset,
+                bottom = roundedLayout.cardInset
             ),
-            contentPadding = LiquidGlassSheetLayout.ContentPadding,
+            contentPadding = PaddingValues(SheetSegmentedColumnContentPadding),
             containerColorAlpha = 0.8f
         ) {
             item { shape ->
@@ -184,9 +166,14 @@ fun LiquidGlassSettingsSheet(
                                 )
                             }
                         }
-                        if (engine == LiquidGlassEngine.KYANT) {
+                        val showKyantControls = engine == LiquidGlassEngine.KYANT
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             KyantGlassTuningControls(
                                 tuning = tuning,
+                                enabled = showKyantControls,
                                 onTuningChange = { parameter, value ->
                                     tuning = tuning.copyFor(parameter, value)
                                     onPreviewTuning(tuning)
@@ -195,16 +182,15 @@ fun LiquidGlassSettingsSheet(
                                 onPresetSelected = {
                                     tuning = it
                                     onPreviewTuning(it)
-                                }
-                            )
-                        } else {
-                            Column(
+                                },
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(LiquidGlassSheetLayout.TuningReservedHeight),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
+                                    .alpha(if (showKyantControls) 1f else 0f)
+                                    .then(
+                                        if (showKyantControls) Modifier
+                                        else Modifier.clearAndSetSemantics { }
+                                    )
+                            )
+                            if (!showKyantControls) {
                                 Text(
                                     text = "当前引擎未配置自定义选项",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,

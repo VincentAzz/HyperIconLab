@@ -19,8 +19,8 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.shape.RoundedCornerStyle
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.SheetSegmentedColumnContentPadding
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.render.image.CustomMaskGenerator
 
@@ -36,11 +36,11 @@ fun CustomMaskTab(
     onCornerRadiusChange: (Float) -> Unit,
     onSmoothCornerChange: (Boolean) -> Unit
 ) {
-    val horizontalPadding = if (currentPreferredCardCornerRadius() > CornerRadius) 8.dp else 16.dp
+    val roundedLayout = currentSheetRoundedLayout()
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = horizontalPadding, vertical = 8.dp),
+            .padding(roundedLayout.cardInset),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
@@ -70,7 +70,7 @@ fun CustomMaskTab(
         }
 
         SegmentedColumn(
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)
+            contentPadding = PaddingValues(SheetSegmentedColumnContentPadding)
         ) {
             item { shape ->
                 SliderWidget(

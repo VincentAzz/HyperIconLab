@@ -44,10 +44,8 @@ import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
 import com.capybara.hypericonlab.core.designsystem.symbol.clear_all
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.core.logging.LogEntry
 import com.capybara.hypericonlab.core.logging.LogType
@@ -62,7 +60,7 @@ fun LogSheet(
     onDismiss: () -> Unit,
     horizontalPadding: Dp = 8.dp,
     bottomPadding: Dp = 4.dp,
-    cornerRadius: Dp = ExtraLargeRadius,
+    cornerRadius: Dp? = null,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
 ) {
@@ -70,6 +68,7 @@ fun LogSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    val roundedLayout = currentSheetRoundedLayout()
 
     val isAtTop by remember {
         derivedStateOf {
@@ -153,13 +152,15 @@ fun LogSheet(
             }
         } else {
 
-            val cardHorizontalPadding =
-                if (currentPreferredCardCornerRadius() > CornerRadius) 8.dp else 16.dp
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(cardHorizontalPadding, 0.dp, cardHorizontalPadding, 8.dp),
-                shape = rememberKyantRoundedRectangleShape(currentPreferredCardCornerRadius()),
+                    .padding(
+                        start = roundedLayout.cardInset,
+                        end = roundedLayout.cardInset,
+                        bottom = roundedLayout.cardInset
+                    ),
+                shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
                 color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {

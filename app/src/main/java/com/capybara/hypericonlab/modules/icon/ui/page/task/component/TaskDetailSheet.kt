@@ -32,7 +32,6 @@ import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.ui.page.task.sections.ConfirmDialog
@@ -52,7 +51,7 @@ fun TaskDetailSheet(
     onDismiss: () -> Unit,
     horizontalPadding: Dp = 8.dp,
     bottomPadding: Dp = 4.dp,
-    cornerRadius: Dp = ExtraLargeRadius,
+    cornerRadius: Dp? = null,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
 ) {
@@ -194,7 +193,6 @@ fun TaskDetailSheet(
 
 object TaskDetailSheetConfig {
     // 主体内容水平内边距
-    val CONTENT_HORIZONTAL_PADDING = 16.dp
 
     // 主体内容垂直内边距
     val CONTENT_VERTICAL_PADDING = 8.dp
@@ -227,7 +225,7 @@ object TaskDetailSheetConfig {
     val ERROR_CONTENT_PADDING = PaddingValues(16.dp)
 
     // 底部操作区按钮组内边距
-    val BOTTOM_ACTION_PADDING = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+    val BOTTOM_ACTION_TOP_PADDING = 12.dp
 
     // 底部按钮间距
     val BOTTOM_BUTTON_SPACING = 12.dp

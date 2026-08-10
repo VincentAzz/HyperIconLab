@@ -73,6 +73,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.MiuixThemeBridge
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
@@ -101,10 +102,11 @@ fun LawniconsBrowserSheet(
     onDismiss: () -> Unit,
     horizontalPadding: Dp = 8.dp,
     bottomPadding: Dp = 4.dp,
-    cornerRadius: Dp = ExtraLargeRadius,
+    cornerRadius: Dp? = null,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
 ) {
+    val roundedLayout = currentSheetRoundedLayout()
     val assetsFacade = koinInject<LawniconsAssetFacade>()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
@@ -260,8 +262,12 @@ fun LawniconsBrowserSheet(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp, 0.dp, 8.dp, 8.dp),
-            shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
+                .padding(
+                    start = roundedLayout.cardInset,
+                    end = roundedLayout.cardInset,
+                    bottom = roundedLayout.cardInset
+                ),
+            shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
             color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
         ) {
             Box(modifier = Modifier.fillMaxSize()) {

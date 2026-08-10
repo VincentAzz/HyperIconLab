@@ -23,6 +23,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.category
 import com.capybara.hypericonlab.core.designsystem.symbol.delete
 import com.capybara.hypericonlab.core.designsystem.symbol.refresh
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.ui.page.task.component.TaskDetailSheetConfig
@@ -35,6 +36,7 @@ fun DetailBottomActions(
     onDelete: () -> Unit,
     onRetry: () -> Unit
 ) {
+    val roundedLayout = currentSheetRoundedLayout()
     val showRetry = task.status == BuildTaskStatus.FAILED
     val isActive = task.status == BuildTaskStatus.PENDING ||
             task.status == BuildTaskStatus.RUNNING
@@ -43,7 +45,12 @@ fun DetailBottomActions(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(TaskDetailSheetConfig.BOTTOM_ACTION_PADDING)
+            .padding(
+                start = roundedLayout.cardInset,
+                top = TaskDetailSheetConfig.BOTTOM_ACTION_TOP_PADDING,
+                end = roundedLayout.cardInset,
+                bottom = roundedLayout.cardInset
+            )
     ) {
         if (showRetry) {
             FilledTonalButton(

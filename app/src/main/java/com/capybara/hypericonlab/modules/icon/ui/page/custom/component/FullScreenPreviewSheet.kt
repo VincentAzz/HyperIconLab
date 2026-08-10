@@ -41,8 +41,8 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidth
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -57,11 +57,12 @@ fun FullScreenPreviewSheet(
     onDismiss: () -> Unit,
     horizontalPadding: Dp = 8.dp,
     bottomPadding: Dp = 4.dp,
-    cornerRadius: Dp = ExtraLargeRadius,
+    cornerRadius: Dp? = null,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
 ) {
     if (show && bitmap != null) {
+        val roundedLayout = currentSheetRoundedLayout()
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val coroutineScope = rememberCoroutineScope()
         val pagerState = rememberPagerState(pageCount = { 2 })
@@ -155,8 +156,12 @@ fun FullScreenPreviewSheet(
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(8.dp, 0.dp, 8.dp, 8.dp),
-                shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
+                    .padding(
+                        start = roundedLayout.cardInset,
+                        end = roundedLayout.cardInset,
+                        bottom = roundedLayout.cardInset
+                    ),
+                shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
                 color = Color.Transparent
             ) {
                 // 禁用 overscroll effect：避免滑动力度大时到达边界页触发回弹抖动
@@ -165,7 +170,11 @@ fun FullScreenPreviewSheet(
                         state = pagerState,
                         modifier = Modifier
                             .fillMaxSize()
-                            .clip(rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp)),
+                            .clip(
+                                rememberKyantRoundedRectangleShape(
+                                    roundedLayout.cardCornerRadius
+                                )
+                            ),
                         pageSpacing = 8.dp
                     ) { page ->
                         val pageOffset = (
@@ -177,7 +186,9 @@ fun FullScreenPreviewSheet(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .graphicsLayer { this.alpha = fadeAlpha },
-                            shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
+                            shape = rememberKyantRoundedRectangleShape(
+                                roundedLayout.cardCornerRadius
+                            ),
                             color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.9f)
                         ) {
                             when (page) {
@@ -215,4 +226,3 @@ fun FullScreenPreviewSheet(
         }
     }
 }
-

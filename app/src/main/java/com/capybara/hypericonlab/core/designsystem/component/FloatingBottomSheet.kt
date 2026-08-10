@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantBackdrop
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
@@ -37,7 +37,7 @@ fun FloatingBottomSheet(
     ),
     horizontalPadding: Dp = 12.dp,
     bottomPadding: Dp = 8.dp,
-    cornerRadius: Dp = ExtraLargeRadius,
+    cornerRadius: Dp? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     tonalElevation: Dp = 2.dp,
     scrimColor: Color = Color.Black.copy(alpha = 0.32f),
@@ -47,6 +47,7 @@ fun FloatingBottomSheet(
     useLiquidGlass: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val resolvedCornerRadius = cornerRadius ?: currentSheetRoundedLayout().sheetCornerRadius
     val kyantBackdrop = LocalKyantBackdrop.current
     if (useLiquidGlass && kyantBackdrop != null) {
         FloatingBottomSheetKyant(
@@ -55,7 +56,7 @@ fun FloatingBottomSheet(
             sheetState = sheetState,
             horizontalPadding = horizontalPadding,
             bottomPadding = bottomPadding,
-            cornerRadius = cornerRadius,
+            cornerRadius = resolvedCornerRadius,
             containerColor = containerColor,
             tonalElevation = tonalElevation,
             scrimColor = scrimColor,
@@ -71,7 +72,7 @@ fun FloatingBottomSheet(
             sheetState = sheetState,
             horizontalPadding = horizontalPadding,
             bottomPadding = bottomPadding,
-            cornerRadius = cornerRadius,
+            cornerRadius = resolvedCornerRadius,
             containerColor = containerColor,
             tonalElevation = tonalElevation,
             scrimColor = scrimColor,

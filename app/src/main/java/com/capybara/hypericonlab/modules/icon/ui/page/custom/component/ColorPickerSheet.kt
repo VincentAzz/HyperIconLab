@@ -40,9 +40,9 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidth
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.MiuixThemeBridge
+import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import top.yukonga.miuix.kmp.basic.ColorPalette
 import top.yukonga.miuix.kmp.basic.ColorPicker
@@ -60,10 +60,11 @@ fun ColorPickerSheet(
     onColorSelected: (String) -> Unit,
     horizontalPadding: Dp = 8.dp,
     bottomPadding: Dp = 4.dp,
-    cornerRadius: Dp = ExtraLargeRadius,
+    cornerRadius: Dp? = null,
     backdrop: LayerBackdrop? = null,
     useLiquidGlass: Boolean = false,
 ) {
+    val roundedLayout = currentSheetRoundedLayout()
     val initialArgb = remember(initialColor) {
         try {
             Color(initialColor.toColorInt()).toArgb()
@@ -156,12 +157,12 @@ fun ColorPickerSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .imePadding()
-                .padding(horizontal = 8.dp)
-                .padding(bottom = 8.dp)
+                .padding(horizontal = roundedLayout.cardInset)
+                .padding(bottom = roundedLayout.cardInset)
         ) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
+                shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
                 color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
             ) {
                 MiuixThemeBridge {
