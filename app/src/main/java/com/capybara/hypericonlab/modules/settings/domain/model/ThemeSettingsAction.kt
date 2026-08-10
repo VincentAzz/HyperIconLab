@@ -28,6 +28,7 @@ sealed interface ThemeSettingsAction {
         val value: Float
     ) : ThemeSettingsAction
     data object PersistKyantGlassTuning : ThemeSettingsAction
+    data object ClearKyantGlassTuningPreview : ThemeSettingsAction
     data class SetUseAppleStyleCard(val enable: Boolean) : ThemeSettingsAction
     data class SetUseAppleStyleToggle(val enable: Boolean) : ThemeSettingsAction
     data class SetUseAppleStyleSlider(val enable: Boolean) : ThemeSettingsAction

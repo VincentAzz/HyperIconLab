@@ -14,6 +14,10 @@ class KyantGlassTuningController {
         _preview.value = tuning.normalized()
     }
 
+    fun clearPreview() {
+        _preview.value = null
+    }
+
     fun updatePreview(
         parameter: KyantGlassTuningParameter,
         value: Float,

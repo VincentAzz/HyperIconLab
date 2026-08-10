@@ -19,6 +19,8 @@ import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
 import com.capybara.hypericonlab.core.designsystem.shape.RoundedCornerStyle
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.render.image.CustomMaskGenerator
 
@@ -34,10 +36,11 @@ fun CustomMaskTab(
     onCornerRadiusChange: (Float) -> Unit,
     onSmoothCornerChange: (Boolean) -> Unit
 ) {
+    val horizontalPadding = if (currentPreferredCardCornerRadius() > CornerRadius) 8.dp else 16.dp
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = horizontalPadding, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(

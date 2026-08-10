@@ -58,8 +58,10 @@ import com.capybara.hypericonlab.modules.settings.domain.repository.BooleanSetti
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadMode
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.DownloadModeSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.LawniconsBrowserSheet
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.LiquidGlassSettingsSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.LogSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.SourceOptionSheet
+import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.ThemeColorSheet
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AboutTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.AssetsTab
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs.SettingsTab
@@ -103,6 +105,8 @@ fun SettingsPage(
     var showPaletteSheet by remember { mutableStateOf(false) }
     var showThemeModeSheet by remember { mutableStateOf(false) }
     var showColorSpecSheet by remember { mutableStateOf(false) }
+    var showLiquidGlassSheet by remember { mutableStateOf(false) }
+    var showThemeColorSheet by remember { mutableStateOf(false) }
     // 运行日志 sheet 显示状态：由设置页底部"运行日志"卡片触发
     var showLogSheet by remember { mutableStateOf(false) }
     // 资产页"浏览原始图标"卡片触发的 SVG 浏览 sheet
@@ -164,6 +168,45 @@ fun SettingsPage(
                 viewModel.dispatch(ThemeSettingsAction.SetColorSpec(spec))
             },
             itemLabel = { spec: ThemeColorSpec -> spec.displayName },
+            backdrop = backdrop,
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
+        )
+    }
+
+    if (showLiquidGlassSheet) {
+        LiquidGlassSettingsSheet(
+            initialEngine = uiState.liquidGlassEngine,
+            initialTuning = uiState.kyantGlassTuning,
+            onDismiss = {
+                viewModel.dispatch(ThemeSettingsAction.ClearKyantGlassTuningPreview)
+                showLiquidGlassSheet = false
+            },
+            onConfirm = { engine, tuning ->
+                viewModel.dispatch(ThemeSettingsAction.SetUseCustomLiquidGlassEngine(true))
+                viewModel.dispatch(ThemeSettingsAction.SetLiquidGlassEngine(engine))
+                viewModel.dispatch(ThemeSettingsAction.PreviewKyantGlassTuning(tuning))
+                viewModel.dispatch(ThemeSettingsAction.PersistKyantGlassTuning)
+                showLiquidGlassSheet = false
+            },
+            onPreviewTuning = { tuning ->
+                viewModel.dispatch(ThemeSettingsAction.PreviewKyantGlassTuning(tuning))
+            },
+            backdrop = backdrop,
+            useLiquidGlass = uiState.useLiquidGlassBottomSheet
+        )
+    }
+
+    if (showThemeColorSheet) {
+        ThemeColorSheet(
+            availableColors = uiState.availableColors,
+            selectedColor = uiState.seedColor,
+            currentStyle = uiState.paletteStyle,
+            colorSpec = uiState.colorSpec,
+            onDismiss = { showThemeColorSheet = false },
+            onConfirm = { color ->
+                viewModel.dispatch(ThemeSettingsAction.SetSeedColor(color))
+                showThemeColorSheet = false
+            },
             backdrop = backdrop,
             useLiquidGlass = uiState.useLiquidGlassBottomSheet
         )
@@ -292,6 +335,8 @@ fun SettingsPage(
                         onShowThemeModeSheet = { showThemeModeSheet = true },
                         onShowPaletteSheet = { showPaletteSheet = true },
                         onShowColorSpecSheet = { showColorSpecSheet = true },
+                        onShowLiquidGlassSheet = { showLiquidGlassSheet = true },
+                        onShowThemeColorSheet = { showThemeColorSheet = true },
                         onViewLog = { showLogSheet = true }
                     )
                 }

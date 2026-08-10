@@ -30,6 +30,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.done
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
@@ -119,14 +120,16 @@ fun <T> SelectionSheet(
             }
         )
 
+        val isLargeCorner = currentPreferredCardCornerRadius() > CornerRadius
+        val innerHorizontalPadding = if (isLargeCorner) 8.dp else 16.dp
+        val innerBottomPadding = if (isLargeCorner) 8.dp else 16.dp
         SegmentedColumn(
             modifier = Modifier.padding(
-                start = 16.dp,
-                end = 16.dp,
+                start = innerHorizontalPadding,
+                end = innerHorizontalPadding,
                 top = 8.dp,
-                bottom = 16.dp
+                bottom = innerBottomPadding
             ),
-            outerCornerRadius = CornerRadius,
             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
             containerColorAlpha = 0.8f
         ) {

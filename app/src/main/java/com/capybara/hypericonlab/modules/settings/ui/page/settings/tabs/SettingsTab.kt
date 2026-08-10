@@ -1,16 +1,7 @@
 package com.capybara.hypericonlab.modules.settings.ui.page.settings.tabs
 
 import android.os.Build
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,20 +13,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
@@ -52,13 +40,12 @@ import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
 import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
-import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreview
+import com.capybara.hypericonlab.core.designsystem.util.getDisplayName
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.render.image.StickerProcessor
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsState
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.SettingsViewModel
-import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.KyantGlassTuningControls
 import com.capybara.hypericonlab.modules.settings.ui.page.settings.component.PermissionCheckCard
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -80,6 +67,8 @@ fun SettingsTab(
     onShowThemeModeSheet: () -> Unit,
     onShowPaletteSheet: () -> Unit,
     onShowColorSpecSheet: () -> Unit,
+    onShowLiquidGlassSheet: () -> Unit,
+    onShowThemeColorSheet: () -> Unit,
     // 点击"查看运行日志"按钮回调，由 SettingsPage 提供以弹出 LogSheet
     onViewLog: () -> Unit,
     modifier: Modifier = Modifier,
@@ -423,93 +412,19 @@ fun SettingsTab(
                             }
                         )
                     }
-                    expandableItem(
-                        animatedVisibility = uiState.useBlur,
-                        expanded = uiState.useCustomLiquidGlassEngine,
-                        topContent = {
-                            SwitchWidget(
-                                iconPlaceholder = false,
-                                title = stringResource(R.string.theme_settings_use_custom_liquid_glass_engine),
-                                description = stringResource(
-                                    R.string.theme_settings_use_custom_liquid_glass_engine_desc
-                                ),
-                                checked = uiState.useCustomLiquidGlassEngine,
-                                onCheckedChange = {
-                                    viewModel.dispatch(
-                                        ThemeSettingsAction.SetUseCustomLiquidGlassEngine(it)
-                                    )
-                                }
-                            )
-                        },
-                        bottomContent = { shape ->
-                            BaseItemContainer(shape = shape) {
-                                Column {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(expandableStyleChipPadding),
-                                        horizontalArrangement = Arrangement.spacedBy(
-                                            ExpandableStyleChipConfig.ItemSpacing
-                                        )
-                                    ) {
-                                        listOf(
-                                            LiquidGlassEngine.KYANT,
-                                            LiquidGlassEngine.MIUIX
-                                        ).forEach { engine ->
-                                            StyleChip(
-                                                label = when (engine) {
-                                                    LiquidGlassEngine.MIUIX -> stringResource(
-                                                        R.string.theme_settings_liquid_glass_engine_miuix
-                                                    )
-
-                                                    LiquidGlassEngine.KYANT -> stringResource(
-                                                        R.string.theme_settings_liquid_glass_engine_kyant
-                                                    )
-                                                },
-                                                selected = uiState.liquidGlassEngine == engine,
-                                                onClick = {
-                                                    viewModel.dispatch(
-                                                        ThemeSettingsAction.SetLiquidGlassEngine(
-                                                            engine
-                                                        )
-                                                    )
-                                                },
-                                                modifier = Modifier.weight(1f)
-                                            )
-                                        }
-                                    }
-                                    AnimatedVisibility(
-                                        visible = uiState.liquidGlassEngine == LiquidGlassEngine.KYANT
-                                    ) {
-                                        KyantGlassTuningControls(
-                                            tuning = uiState.kyantGlassTuning,
-                                            onTuningChange = { parameter, value ->
-                                                viewModel.dispatch(
-                                                    ThemeSettingsAction.PreviewKyantGlassTuningParameter(
-                                                        parameter = parameter,
-                                                        value = value
-                                                    )
-                                                )
-                                            },
-                                            onValueChangeFinished = {
-                                                viewModel.dispatch(
-                                                    ThemeSettingsAction.PersistKyantGlassTuning
-                                                )
-                                            },
-                                            onPresetSelected = {
-                                                viewModel.dispatch(
-                                                    ThemeSettingsAction.PreviewKyantGlassTuning(it)
-                                                )
-                                                viewModel.dispatch(
-                                                    ThemeSettingsAction.PersistKyantGlassTuning
-                                                )
-                                            }
-                                        )
-                                    }
-                                }
+                    item(animatedVisibility = uiState.useBlur) {
+                        BaseWidget(
+                            iconPlaceholder = false,
+                            title = "自定义液态玻璃",
+                            description = "调整液态玻璃引擎和参数。",
+                            onClick = onShowLiquidGlassSheet,
+                            trailingContent = {
+                                BaseWidgetAction(
+                                    icon = BaseWidgetActionIcon.CHEVRON_RIGHT
+                                )
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -582,100 +497,21 @@ fun SettingsTab(
                         }
                     )
                 }
-            }
-        }
-
-        item {
-            AnimatedVisibility(
-                visible = !uiState.useDynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
-                enter = fadeIn(
-                    animationSpec = tween(
-                        durationMillis = 300,
-                        easing = FastOutSlowInEasing
-                    )
-                ) +
-                        expandVertically(
-                            animationSpec = tween(
-                                durationMillis = 400,
-                                easing = FastOutSlowInEasing
+                item {
+                    val selectedColor =
+                        uiState.availableColors.firstOrNull { it.color == uiState.seedColor }
+                    BaseWidget(
+                        iconPlaceholder = false,
+                        title = "主题颜色",
+                        enabled = !uiState.useDynamicColor,
+                        onClick = onShowThemeColorSheet,
+                        trailingContent = {
+                            BaseWidgetAction(
+                                statusText = selectedColor?.getDisplayName() ?: "自定义",
+                                icon = BaseWidgetActionIcon.EXPAND_ALL
                             )
-                        ),
-                exit = fadeOut(
-                    animationSpec = tween(
-                        durationMillis = 250,
-                        easing = FastOutSlowInEasing
-                    )
-                ) +
-                        shrinkVertically(
-                            animationSpec = tween(
-                                durationMillis = 350,
-                                easing = FastOutSlowInEasing
-                            )
-                        )
-            ) {
-                SegmentedColumn(
-                    title = stringResource(R.string.theme_settings_theme_color)
-                ) {
-                    item {
-                        BaseItemContainer {
-                            BoxWithConstraints(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 12.dp, vertical = 16.dp)
-                            ) {
-                                val itemMinWidth = 88.dp
-                                val columns =
-                                    (this.maxWidth / itemMinWidth).toInt()
-                                        .coerceAtLeast(1)
-                                val chunkedColors =
-                                    uiState.availableColors.chunked(columns)
-
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    chunkedColors.forEach { rowItems ->
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.Center
-                                        ) {
-                                            rowItems.forEach { rawColor ->
-                                                Box(
-                                                    modifier = Modifier.weight(1f),
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    ColorSwatchPreview(
-                                                        rawColor = rawColor,
-                                                        currentStyle = uiState.paletteStyle,
-                                                        colorSpec = uiState.colorSpec,
-                                                        textStyle = MaterialTheme.typography.labelMedium.copy(
-                                                            fontSize = 13.sp
-                                                        ),
-                                                        textColor = MaterialTheme.colorScheme.onSurface,
-                                                        isSelected = uiState.seedColor == rawColor.color &&
-                                                                !(uiState.useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S),
-                                                    ) {
-                                                        viewModel.dispatch(
-                                                            ThemeSettingsAction.SetSeedColor(
-                                                                rawColor.color
-                                                            )
-                                                        )
-                                                    }
-                                                }
-                                            }
-
-                                            val remaining = columns - rowItems.size
-                                            if (remaining > 0) {
-                                                repeat(remaining) {
-                                                    Spacer(Modifier.weight(1f))
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
                         }
-                    }
+                    )
                 }
             }
         }

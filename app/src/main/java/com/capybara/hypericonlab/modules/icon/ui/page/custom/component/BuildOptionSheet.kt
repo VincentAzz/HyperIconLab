@@ -33,7 +33,9 @@ import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
+import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
 import com.capybara.hypericonlab.modules.build.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import kotlinx.coroutines.launch
@@ -167,11 +169,16 @@ fun BuildOptionSheet(
         )
 
         // 内容：两个 ConfigCard，chip 一行一个，间距 8dp，与 ForegroundTab 风格一致
+        val isLargeCorner = currentPreferredCardCornerRadius() > CornerRadius
+        val contentHorizontalPadding =
+            if (isLargeCorner) 8.dp else BuildOptionSheetConfig.CONTENT_HORIZONTAL_PADDING
+        val contentBottomPadding =
+            if (isLargeCorner) 8.dp else BuildOptionSheetConfig.CONTENT_BOTTOM_PADDING
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = BuildOptionSheetConfig.CONTENT_HORIZONTAL_PADDING)
-                .padding(bottom = BuildOptionSheetConfig.CONTENT_BOTTOM_PADDING)
+                .padding(horizontal = contentHorizontalPadding)
+                .padding(bottom = contentBottomPadding)
         ) {
             // val cardContainerColor = MaterialTheme.colorScheme.surfaceBright
             val cardContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)

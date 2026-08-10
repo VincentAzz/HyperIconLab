@@ -44,8 +44,10 @@ import com.capybara.hypericonlab.core.designsystem.symbol.arrow_downward
 import com.capybara.hypericonlab.core.designsystem.symbol.clear_all
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
+import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.ExtraLargeRadius
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
+import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.core.logging.LogEntry
 import com.capybara.hypericonlab.core.logging.LogType
@@ -151,11 +153,13 @@ fun LogSheet(
             }
         } else {
 
+            val cardHorizontalPadding =
+                if (currentPreferredCardCornerRadius() > CornerRadius) 8.dp else 16.dp
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(8.dp, 0.dp, 8.dp, 8.dp),
-                shape = rememberKyantRoundedRectangleShape(ExtraLargeRadius - 8.dp),
+                    .padding(cardHorizontalPadding, 0.dp, cardHorizontalPadding, 8.dp),
+                shape = rememberKyantRoundedRectangleShape(currentPreferredCardCornerRadius()),
                 color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {

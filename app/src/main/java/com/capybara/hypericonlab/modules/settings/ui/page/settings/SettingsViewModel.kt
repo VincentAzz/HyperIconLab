@@ -207,6 +207,10 @@ class SettingsViewModel(
                 )
             }
 
+            ThemeSettingsAction.ClearKyantGlassTuningPreview -> {
+                kyantGlassTuningController.clearPreview()
+            }
+
             is ThemeSettingsAction.SetUseAppleStyleCard -> viewModelScope.launch {
                 updateSetting(
                     BooleanSetting.UiUseAppleStyleCard,

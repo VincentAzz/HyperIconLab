@@ -52,6 +52,7 @@ fun KyantGlassTuningControls(
     onTuningChange: (KyantGlassTuningParameter, Float) -> Unit,
     onValueChangeFinished: () -> Unit,
     onPresetSelected: (KyantGlassTuning) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -65,6 +66,7 @@ fun KyantGlassTuningControls(
             valueRange = KyantGlassTuningDefaults.ScaleRange,
             steps = KyantGlassTuningControlsConfig.ScaleSteps,
             valueDisplay = tuning.blurScale.toPercentage(),
+            enabled = enabled,
             shape = RectangleShape
         )
         SliderWidget(
@@ -77,6 +79,7 @@ fun KyantGlassTuningControls(
             valueRange = KyantGlassTuningDefaults.ScaleRange,
             steps = KyantGlassTuningControlsConfig.ScaleSteps,
             valueDisplay = tuning.refractionHeightScale.toPercentage(),
+            enabled = enabled,
             shape = RectangleShape
         )
         SliderWidget(
@@ -89,6 +92,7 @@ fun KyantGlassTuningControls(
             valueRange = KyantGlassTuningDefaults.ScaleRange,
             steps = KyantGlassTuningControlsConfig.ScaleSteps,
             valueDisplay = tuning.refractionAmountScale.toPercentage(),
+            enabled = enabled,
             shape = RectangleShape
         )
         SliderWidget(
@@ -101,6 +105,7 @@ fun KyantGlassTuningControls(
             valueRange = KyantGlassTuningDefaults.ChromaticAberrationRange,
             steps = KyantGlassTuningControlsConfig.ChromaticAberrationSteps,
             valueDisplay = tuning.chromaticAberration.toPercentage(),
+            enabled = enabled,
             shape = RectangleShape
         )
         Row(
@@ -133,6 +138,7 @@ fun KyantGlassTuningControls(
                     label = preset.label,
                     selected = tuning.matchesPreset(preset.tuning),
                     onClick = { onPresetSelected(preset.tuning) },
+                    enabled = enabled,
                     modifier = Modifier.weight(1f)
                 )
             }
