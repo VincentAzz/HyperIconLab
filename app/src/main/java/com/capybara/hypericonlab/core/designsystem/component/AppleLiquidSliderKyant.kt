@@ -69,7 +69,11 @@ fun AppleLiquidSliderKyant(
     } else {
         AppleLiquidSliderKyantDefaults.TrackColorLight
     },
-    thumbColor: Color = MaterialTheme.colorScheme.surface,
+    thumbColor: Color = if (AppTheme.isDark) {
+        MaterialTheme.colorScheme.surfaceContainer
+    } else {
+        MaterialTheme.colorScheme.surface
+    },
     onValueChangeFinished: (() -> Unit)? = null
 ) {
     BoxWithConstraints(

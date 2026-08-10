@@ -353,8 +353,7 @@ fun SwitchWidget(
                     onSelect = onCheckedChange,
                     backdrop = kyantBackdrop,
                     modifier = Modifier,
-                    selectedTrackColor = MaterialTheme.colorScheme.primary,
-                    thumbColor = MaterialTheme.colorScheme.surface
+                    selectedTrackColor = MaterialTheme.colorScheme.primary
                 )
             } else {
                 Switch(

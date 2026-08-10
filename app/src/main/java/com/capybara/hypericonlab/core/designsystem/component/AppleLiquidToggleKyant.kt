@@ -71,7 +71,11 @@ fun AppleLiquidToggleKyant(
     } else {
         AppleLiquidToggleKyantDefaults.TrackColorLight
     },
-    thumbColor: Color = MaterialTheme.colorScheme.surface
+    thumbColor: Color = if (AppTheme.isDark) {
+        MaterialTheme.colorScheme.surfaceContainer
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
 ) {
     val density = LocalDensity.current
     val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr

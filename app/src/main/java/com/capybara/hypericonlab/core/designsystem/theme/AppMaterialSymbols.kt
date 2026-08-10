@@ -45,15 +45,15 @@ curl -o SearchSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Ro
 curl -o SearchOffSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/search_off.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o ArchiveSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/archive.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o CloudDownloadSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/cloud_download.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
-
 curl -o ArrowRightAltSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/arrow_right_alt.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o ErrorSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/error.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o CheckCircleSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/check_circle.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o CircleSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/circle.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
-curl -o Symbol.kt ""
-curl -o Symbol.kt ""
-curl -o Symbol.kt ""
-curl -o Symbol.kt ""
+
+curl -o ChevronRightSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/chevron_right.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o UnfoldMoreSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/unfold_more.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o ExpandAllSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/expand_all.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
+curl -o ArrowOutwardSymbol.kt "https://fonts.gstatic.com/render/v1/Material+Symbols+Rounded/24dp/arrow_outward.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50"
 curl -o Symbol.kt ""
 curl -o Symbol.kt ""
 */
