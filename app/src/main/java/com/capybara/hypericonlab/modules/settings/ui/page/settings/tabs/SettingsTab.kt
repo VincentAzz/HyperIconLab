@@ -41,6 +41,8 @@ import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetActionIcon
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.StyleChip
@@ -51,7 +53,6 @@ import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompac
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreview
-
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 import com.capybara.hypericonlab.modules.render.image.StickerProcessor
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
@@ -522,12 +523,16 @@ fun SettingsTab(
                         // icon = AppMaterialSymbols.dark_mode,
                         iconPlaceholder = false,
                         title = stringResource(R.string.theme_settings_theme_mode),
-                        description = when (uiState.themeMode) {
-                            ThemeMode.LIGHT -> stringResource(R.string.theme_settings_theme_mode_light)
-                            ThemeMode.DARK -> stringResource(R.string.theme_settings_theme_mode_dark)
-                            ThemeMode.SYSTEM -> stringResource(R.string.theme_settings_theme_mode_system)
-                        },
-                        onClick = onShowThemeModeSheet
+                        onClick = onShowThemeModeSheet,
+                        trailingContent = {
+                            BaseWidgetAction(
+                                statusText = when (uiState.themeMode) {
+                                    ThemeMode.LIGHT -> stringResource(R.string.theme_settings_theme_mode_light)
+                                    ThemeMode.DARK -> stringResource(R.string.theme_settings_theme_mode_dark)
+                                    ThemeMode.SYSTEM -> stringResource(R.string.theme_settings_theme_mode_system)
+                                }
+                            )
+                        }
                     )
                 }
                 item {
@@ -535,8 +540,10 @@ fun SettingsTab(
                         // icon = AppMaterialSymbols.style,
                         iconPlaceholder = false,
                         title = stringResource(R.string.theme_settings_palette_style),
-                        description = uiState.paletteStyle.displayName,
-                        onClick = onShowPaletteSheet
+                        onClick = onShowPaletteSheet,
+                        trailingContent = {
+                            BaseWidgetAction(statusText = uiState.paletteStyle.displayName)
+                        }
                     )
                 }
                 item {
@@ -549,9 +556,14 @@ fun SettingsTab(
                         // icon = AppMaterialSymbols.design_services,
                         iconPlaceholder = false,
                         title = stringResource(id = R.string.theme_settings_color_spec),
-                        description = descriptionText,
+                        description = descriptionText.takeIf { !isSpec2025Supported },
                         enabled = isSpec2025Supported,
-                        onClick = onShowColorSpecSheet
+                        onClick = onShowColorSpecSheet,
+                        trailingContent = {
+                            BaseWidgetAction(
+                                statusText = activeSpec.displayName.takeIf { isSpec2025Supported }
+                            )
+                        }
                     )
                 }
                 item {
@@ -748,10 +760,11 @@ fun RunLogSettings(onViewLog: () -> Unit) {
                 iconPlaceholder = false,
                 title = "运行日志",
                 description = "查看图标生成与构建过程的运行日志",
+                onClick = onViewLog,
                 trailingContent = {
-                    PrimaryActionButton(
-                        text = "查看",
-                        onClick = onViewLog
+                    BaseWidgetAction(
+                        statusText = "查看",
+                        icon = BaseWidgetActionIcon.CHEVRON_RIGHT
                     )
                 }
             )

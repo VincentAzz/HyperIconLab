@@ -39,6 +39,8 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetActionIcon
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.core.designsystem.symbol.check
@@ -401,6 +403,9 @@ fun CTCConfigSection(viewModel: IconViewModel) {
                         "https://colors.xiaoxiaodong.ai/index.html".toUri()
                     )
                     context.startActivity(intent)
+                },
+                trailingContent = {
+                    BaseWidgetAction(icon = BaseWidgetActionIcon.ARROW_OUTWARD)
                 }
             )
         }

@@ -27,6 +27,7 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.StyleChip
@@ -182,6 +183,7 @@ fun StickerConfigSection(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(stickerLineColor.uppercase(), fontSize = 12.sp)
+                            BaseWidgetAction()
                         }
                     }
                 )
@@ -205,6 +207,7 @@ fun StickerConfigSection(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(stickerFillColor.uppercase(), fontSize = 12.sp)
+                            BaseWidgetAction()
                         }
                     }
                 )

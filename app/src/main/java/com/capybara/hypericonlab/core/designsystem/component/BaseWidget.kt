@@ -2,8 +2,10 @@ package com.capybara.hypericonlab.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +41,10 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantControlsBackdrop
+import com.capybara.hypericonlab.core.designsystem.symbol.arrow_outward
+import com.capybara.hypericonlab.core.designsystem.symbol.chevron_right
+import com.capybara.hypericonlab.core.designsystem.symbol.expand_all
+import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerInset
 import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
@@ -64,6 +70,52 @@ object BaseWidgetIconBackgroundConfig {
     val RoundedRectangleCornerInset = ChipCornerInset
     val SeedPaletteStyle = PaletteStyle.TonalSpot
     val SeedColorSpec = ThemeColorSpec.SPEC_2021
+}
+
+private object BaseWidgetActionDefaults {
+    val IconSize = 20.dp
+    val StatusIconSpacing = 8.dp
+}
+
+enum class BaseWidgetActionIcon {
+    EXPAND_ALL,
+    CHEVRON_RIGHT,
+    ARROW_OUTWARD
+}
+
+@Composable
+fun BaseWidgetAction(
+    statusText: String? = null,
+    icon: BaseWidgetActionIcon = BaseWidgetActionIcon.EXPAND_ALL,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
+) {
+    val contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+        alpha = if (enabled) 1f else 0.38f
+    )
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(BaseWidgetActionDefaults.StatusIconSpacing)
+    ) {
+        statusText?.takeIf { it.isNotBlank() }?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyMedium,
+                color = contentColor
+            )
+        }
+        Icon(
+            imageVector = when (icon) {
+                BaseWidgetActionIcon.EXPAND_ALL -> AppMaterialSymbols.expand_all
+                BaseWidgetActionIcon.CHEVRON_RIGHT -> AppMaterialSymbols.chevron_right
+                BaseWidgetActionIcon.ARROW_OUTWARD -> AppMaterialSymbols.arrow_outward
+            },
+            contentDescription = null,
+            modifier = Modifier.size(BaseWidgetActionDefaults.IconSize),
+            tint = contentColor
+        )
+    }
 }
 
 @Immutable

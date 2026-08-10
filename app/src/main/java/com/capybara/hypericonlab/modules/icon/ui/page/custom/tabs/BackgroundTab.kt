@@ -2,6 +2,7 @@ package com.capybara.hypericonlab.modules.icon.ui.page.custom.tabs
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
-import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.StyleChip
@@ -204,6 +205,10 @@ fun BackgroundTab(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .clickable(
+                                enabled = style != "retro",
+                                onClick = { showMaskPicker = true }
+                            )
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         Text(
@@ -220,9 +225,8 @@ fun BackgroundTab(
                             }
                         }
                         // retro 时暂时禁用更改按钮（形状由 ConfigSyncObserver 强制锁定为 ios27）
-                        PrimaryActionButton(
-                            text = "更改",
-                            onClick = { showMaskPicker = true },
+                        BaseWidgetAction(
+                            statusText = "更改",
                             enabled = style != "retro"
                         )
                     }
@@ -527,6 +531,7 @@ private fun LowerLayerBackgroundSection(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable(onClick = onPickMask)
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
                     Text(
@@ -542,10 +547,7 @@ private fun LowerLayerBackgroundSection(
                             MaskThumbnail(mask = mask)
                         }
                     }
-                    PrimaryActionButton(
-                        text = "更改",
-                        onClick = onPickMask
-                    )
+                    BaseWidgetAction(statusText = "更改")
                 }
             }
         }
@@ -689,6 +691,7 @@ private fun ImageSelectionRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onPickClick)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Text(
@@ -704,10 +707,7 @@ private fun ImageSelectionRow(
                 ImageThumbnail(ref = ref)
             }
         }
-        PrimaryActionButton(
-            text = "更改",
-            onClick = onPickClick
-        )
+        BaseWidgetAction(statusText = "更改")
     }
 }
 

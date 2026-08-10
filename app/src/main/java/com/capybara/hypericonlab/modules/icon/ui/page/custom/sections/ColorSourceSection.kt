@@ -33,6 +33,7 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
@@ -330,6 +331,7 @@ fun ColorSourceSection(
                                 .clip(CircleShape)
                                 .background(Color(configColor.toColorInt()))
                         )
+                        BaseWidgetAction()
                     }
                 }
             )
@@ -496,16 +498,20 @@ fun ColorSourceSection(
                 BaseWidget(
                     iconPlaceholder = false,
                     title = "调色板样式",
-                    description = wallpaperPaletteStyle.displayName,
-                    onClick = { showWallpaperPaletteStyleSheet = true }
+                    onClick = { showWallpaperPaletteStyleSheet = true },
+                    trailingContent = {
+                        BaseWidgetAction(statusText = wallpaperPaletteStyle.displayName)
+                    }
                 )
             }
             item {
                 BaseWidget(
                     iconPlaceholder = false,
                     title = "色彩规格",
-                    description = wallpaperColorSpec.displayName,
-                    onClick = { showWallpaperColorSpecSheet = true }
+                    onClick = { showWallpaperColorSpecSheet = true },
+                    trailingContent = {
+                        BaseWidgetAction(statusText = wallpaperColorSpec.displayName)
+                    }
                 )
             }
         }
@@ -562,16 +568,20 @@ fun ColorSourceSection(
                 BaseWidget(
                     iconPlaceholder = false,
                     title = "调色板样式",
-                    description = presetPaletteStyle.displayName,
-                    onClick = { showPaletteStyleSheet = true }
+                    onClick = { showPaletteStyleSheet = true },
+                    trailingContent = {
+                        BaseWidgetAction(statusText = presetPaletteStyle.displayName)
+                    }
                 )
             }
             item {
                 BaseWidget(
                     iconPlaceholder = false,
                     title = "色彩规格",
-                    description = presetColorSpec.displayName,
-                    onClick = { showColorSpecSheet = true }
+                    onClick = { showColorSpecSheet = true },
+                    trailingContent = {
+                        BaseWidgetAction(statusText = presetColorSpec.displayName)
+                    }
                 )
             }
             item {

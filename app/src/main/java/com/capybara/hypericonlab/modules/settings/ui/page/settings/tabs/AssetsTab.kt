@@ -151,6 +151,7 @@ fun AssetsTab(
                 assetUpdateRunning = assetUpdateRunning,
                 canCheckAssetUpdates = canCheckAssets,
                 downloadModeText = downloadModeText,
+                sourceText = sourceLabel,
                 onChooseDownloadMode = onChooseDownloadMode,
                 onSwitchSource = onSwitchSource,
                 onBrowseLawnicons = onBrowseLawnicons,

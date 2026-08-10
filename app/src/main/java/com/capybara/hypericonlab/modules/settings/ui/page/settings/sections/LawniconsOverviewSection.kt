@@ -4,7 +4,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
-import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetActionIcon
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
@@ -18,6 +19,7 @@ fun LawniconsOverviewSection(
     assetUpdateRunning: Boolean,
     canCheckAssetUpdates: Boolean,
     downloadModeText: String,
+    sourceText: String,
     onChooseDownloadMode: () -> Unit,
     onSwitchSource: () -> Unit,
     onBrowseLawnicons: () -> Unit,
@@ -70,11 +72,9 @@ fun LawniconsOverviewSection(
                 iconPlaceholder = false,
                 title = "下载方式",
                 description = "加速代理可提升 GitHub 资源下载速度",
+                onClick = onChooseDownloadMode,
                 trailingContent = {
-                    PrimaryActionButton(
-                        text = "选择",
-                        onClick = onChooseDownloadMode
-                    )
+                    BaseWidgetAction(statusText = downloadModeText)
                 }
             )
         }
@@ -84,11 +84,9 @@ fun LawniconsOverviewSection(
                 iconPlaceholder = false,
                 title = "来源",
                 description = "在内置版本与云端版本间切换",
+                onClick = onSwitchSource,
                 trailingContent = {
-                    PrimaryActionButton(
-                        text = "切换",
-                        onClick = onSwitchSource
-                    )
+                    BaseWidgetAction(statusText = sourceText)
                 }
             )
         }
@@ -98,10 +96,11 @@ fun LawniconsOverviewSection(
                 iconPlaceholder = false,
                 title = "浏览SVG图标",
                 description = "查看 Lawnicons 仓库的全部 SVG",
+                onClick = onBrowseLawnicons,
                 trailingContent = {
-                    PrimaryActionButton(
-                        text = "浏览",
-                        onClick = onBrowseLawnicons
+                    BaseWidgetAction(
+                        statusText = "浏览",
+                        icon = BaseWidgetActionIcon.CHEVRON_RIGHT
                     )
                 }
             )

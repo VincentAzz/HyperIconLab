@@ -18,7 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
-import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
+import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetActionIcon
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
@@ -117,10 +118,11 @@ private fun InnerShadowUnavailableHint(
                     iconPlaceholder = false,
                     title = title,
                     description = description,
+                    onClick = onAction,
                     trailingContent = {
-                        PrimaryActionButton(
-                            text = actionLabel,
-                            onClick = onAction
+                        BaseWidgetAction(
+                            statusText = actionLabel,
+                            icon = BaseWidgetActionIcon.CHEVRON_RIGHT
                         )
                     }
                 )
@@ -218,5 +220,4 @@ private fun InnerShadowCardGroup(
         }
     }
 }
-
 
