@@ -2,9 +2,7 @@ package com.capybara.hypericonlab.modules.settings.ui.page.settings.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,23 +29,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
-import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.symbol.done
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.SheetSegmentedColumnContentPadding
 import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreview
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
 private object ThemeColorSheetLayout {
-    val ColorMinimumWidth = 88.dp
-    val ColorSpacing = 8.dp
+    const val ColorColumns = 4
+    val CardContentPadding = 8.dp
+    val ColorHorizontalSpacing = 4.dp
+    val ColorVerticalSpacing = 0.dp
+    val SwatchVerticalPadding = 4.dp
+    val SwatchLabelSpacing = 6.dp
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,7 +81,7 @@ fun ThemeColorSheet(
         sheetState = sheetState,
         horizontalPadding = 8.dp,
         bottomPadding = 8.dp,
-        fillMaxHeight = true,
+        fillMaxHeight = false,
         backdrop = backdrop,
         useLiquidGlass = useLiquidGlass
     ) {
@@ -127,7 +128,7 @@ fun ThemeColorSheet(
             }
         )
 
-        SegmentedColumn(
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
@@ -136,45 +137,44 @@ fun ThemeColorSheet(
                     top = roundedLayout.cardInset,
                     bottom = roundedLayout.cardInset
                 ),
-            contentPadding = PaddingValues(SheetSegmentedColumnContentPadding),
-            containerColorAlpha = 0.8f
+            shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
+            color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
         ) {
-            item {
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 16.dp)
-                ) {
-                    val columns = (maxWidth / ThemeColorSheetLayout.ColorMinimumWidth)
-                        .toInt()
-                        .coerceAtLeast(1)
-                    Column(
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(ThemeColorSheetLayout.CardContentPadding),
+                verticalArrangement = Arrangement.spacedBy(
+                    ThemeColorSheetLayout.ColorVerticalSpacing
+                )
+            ) {
+                availableColors.chunked(ThemeColorSheetLayout.ColorColumns).forEach { rowItems ->
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(ThemeColorSheetLayout.ColorSpacing)
+                        horizontalArrangement = Arrangement.spacedBy(
+                            ThemeColorSheetLayout.ColorHorizontalSpacing
+                        )
                     ) {
-                        availableColors.chunked(columns).forEach { rowItems ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
+                        rowItems.forEach { rawColor ->
+                            Box(
+                                modifier = Modifier.weight(1f),
+                                contentAlignment = Alignment.Center
                             ) {
-                                rowItems.forEach { rawColor ->
-                                    Box(
-                                        modifier = Modifier.weight(1f),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        ColorSwatchPreview(
-                                            rawColor = rawColor,
-                                            currentStyle = currentStyle,
-                                            colorSpec = colorSpec,
-                                            textStyle = MaterialTheme.typography.labelMedium,
-                                            textColor = MaterialTheme.colorScheme.onSurface,
-                                            isSelected = draftColor == rawColor.color,
-                                            onClick = { draftColor = rawColor.color }
-                                        )
-                                    }
-                                }
-                                repeat(columns - rowItems.size) { Spacer(Modifier.weight(1f)) }
+                                ColorSwatchPreview(
+                                    rawColor = rawColor,
+                                    currentStyle = currentStyle,
+                                    colorSpec = colorSpec,
+                                    textStyle = MaterialTheme.typography.labelMedium,
+                                    textColor = MaterialTheme.colorScheme.onSurface,
+                                    isSelected = draftColor == rawColor.color,
+                                    verticalPadding = ThemeColorSheetLayout.SwatchVerticalPadding,
+                                    labelSpacing = ThemeColorSheetLayout.SwatchLabelSpacing,
+                                    onClick = { draftColor = rawColor.color }
+                                )
                             }
+                        }
+                        repeat(ThemeColorSheetLayout.ColorColumns - rowItems.size) {
+                            Spacer(Modifier.weight(1f))
                         }
                     }
                 }

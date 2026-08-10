@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
@@ -42,6 +43,11 @@ import java.util.concurrent.ConcurrentHashMap
 
 private val colorSchemeCache = ConcurrentHashMap<String, ColorScheme>()
 
+private object ColorSwatchPreviewLayout {
+    val VerticalPadding = 8.dp
+    val LabelSpacing = 12.dp
+}
+
 @Composable
 fun ColorSwatchPreview(
     rawColor: RawColor,
@@ -50,6 +56,8 @@ fun ColorSwatchPreview(
     isSelected: Boolean,
     textStyle: TextStyle,
     textColor: Color,
+    verticalPadding: Dp = ColorSwatchPreviewLayout.VerticalPadding,
+    labelSpacing: Dp = ColorSwatchPreviewLayout.LabelSpacing,
     onClick: () -> Unit
 ) {
     val isDarkForPreview = false
@@ -84,7 +92,7 @@ fun ColorSwatchPreview(
         modifier = Modifier
             .clip(rememberKyantRoundedRectangleShape(LargeCardRadius))
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp)
+            .padding(vertical = verticalPadding)
     ) {
         val currentScheme = scheme
         if (currentScheme != null) {
@@ -100,7 +108,7 @@ fun ColorSwatchPreview(
         }
 
         if (rawColor.getDisplayName() !== rawColor.key) {
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(labelSpacing))
             Text(
                 text = rawColor.getDisplayName(),
                 style = textStyle,

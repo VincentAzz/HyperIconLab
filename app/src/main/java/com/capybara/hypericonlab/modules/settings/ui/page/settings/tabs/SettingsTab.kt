@@ -102,8 +102,18 @@ fun SettingsTab(
             PermissionCheckCard()
         }
         item {
+            ThemeAndColorSettings(
+                uiState = uiState,
+                viewModel = viewModel,
+                onShowThemeModeSheet = onShowThemeModeSheet,
+                onShowPaletteSheet = onShowPaletteSheet,
+                onShowColorSpecSheet = onShowColorSpecSheet,
+                onShowThemeColorSheet = onShowThemeColorSheet
+            )
+        }
+        item {
             SegmentedColumn(
-                title = "应用视觉效果"
+                title = "组件风格"
             ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     item {
@@ -317,7 +327,7 @@ fun SettingsTab(
 
         item {
             SegmentedColumn(
-                title = "应用材质"
+                title = "组件材质"
             ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     item {
@@ -430,98 +440,7 @@ fun SettingsTab(
         }
 
         item {
-            SegmentedColumn(
-                title = "应用配色方案"
-            ) {
-                item {
-                    BaseWidget(
-                        // icon = AppMaterialSymbols.dark_mode,
-                        iconPlaceholder = false,
-                        title = stringResource(R.string.theme_settings_theme_mode),
-                        onClick = onShowThemeModeSheet,
-                        trailingContent = {
-                            BaseWidgetAction(
-                                statusText = when (uiState.themeMode) {
-                                    ThemeMode.LIGHT -> stringResource(R.string.theme_settings_theme_mode_light)
-                                    ThemeMode.DARK -> stringResource(R.string.theme_settings_theme_mode_dark)
-                                    ThemeMode.SYSTEM -> stringResource(R.string.theme_settings_theme_mode_system)
-                                }
-                            )
-                        }
-                    )
-                }
-                item {
-                    BaseWidget(
-                        // icon = AppMaterialSymbols.style,
-                        iconPlaceholder = false,
-                        title = stringResource(R.string.theme_settings_palette_style),
-                        onClick = onShowPaletteSheet,
-                        trailingContent = {
-                            BaseWidgetAction(statusText = uiState.paletteStyle.displayName)
-                        }
-                    )
-                }
-                item {
-                    val isSpec2025Supported = uiState.paletteStyle.supportsSpec2025
-                    val activeSpec =
-                        if (!isSpec2025Supported) ThemeColorSpec.SPEC_2021 else uiState.colorSpec
-                    val descriptionText =
-                        if (!isSpec2025Supported) stringResource(id = R.string.theme_settings_color_spec_only_2021) else activeSpec.displayName
-                    BaseWidget(
-                        // icon = AppMaterialSymbols.design_services,
-                        iconPlaceholder = false,
-                        title = stringResource(id = R.string.theme_settings_color_spec),
-                        description = descriptionText.takeIf { !isSpec2025Supported },
-                        enabled = isSpec2025Supported,
-                        onClick = onShowColorSpecSheet,
-                        trailingContent = {
-                            BaseWidgetAction(
-                                statusText = activeSpec.displayName.takeIf { isSpec2025Supported }
-                            )
-                        }
-                    )
-                }
-                item {
-                    SwitchWidget(
-                        // icon = AppMaterialSymbols.invert_colors,
-                        iconPlaceholder = false,
-                        title = stringResource(R.string.theme_settings_dynamic_color),
-                        description = stringResource(R.string.theme_settings_dynamic_color_desc),
-                        checked = uiState.useDynamicColor,
-                        onCheckedChange = {
-                            viewModel.dispatch(
-                                ThemeSettingsAction.SetUseDynamicColor(
-                                    it
-                                )
-                            )
-                        }
-                    )
-                }
-                item {
-                    val selectedColor =
-                        uiState.availableColors.firstOrNull { it.color == uiState.seedColor }
-                    BaseWidget(
-                        iconPlaceholder = false,
-                        title = "主题颜色",
-                        enabled = !uiState.useDynamicColor,
-                        onClick = onShowThemeColorSheet,
-                        trailingContent = {
-                            BaseWidgetAction(
-                                statusText = selectedColor?.getDisplayName() ?: "自定义",
-                                icon = BaseWidgetActionIcon.EXPAND_ALL
-                            )
-                        }
-                    )
-                }
-            }
-        }
-
-        item {
-            StreamingModeSettings()
-        }
-
-        item {
-            StickerCacheSettings()
+            PerformanceAndCacheSettings()
         }
 
         item {
@@ -534,8 +453,98 @@ fun SettingsTab(
 }
 
 @Composable
-fun StickerCacheSettings() {
+private fun ThemeAndColorSettings(
+    uiState: ThemeSettingsState,
+    viewModel: SettingsViewModel,
+    onShowThemeModeSheet: () -> Unit,
+    onShowPaletteSheet: () -> Unit,
+    onShowColorSpecSheet: () -> Unit,
+    onShowThemeColorSheet: () -> Unit
+) {
+    SegmentedColumn(title = "主题与配色") {
+        item {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = stringResource(R.string.theme_settings_theme_mode),
+                onClick = onShowThemeModeSheet,
+                trailingContent = {
+                    BaseWidgetAction(
+                        statusText = when (uiState.themeMode) {
+                            ThemeMode.LIGHT -> stringResource(R.string.theme_settings_theme_mode_light)
+                            ThemeMode.DARK -> stringResource(R.string.theme_settings_theme_mode_dark)
+                            ThemeMode.SYSTEM -> stringResource(R.string.theme_settings_theme_mode_system)
+                        }
+                    )
+                }
+            )
+        }
+        item {
+            BaseWidget(
+                iconPlaceholder = false,
+                title = stringResource(R.string.theme_settings_palette_style),
+                onClick = onShowPaletteSheet,
+                trailingContent = {
+                    BaseWidgetAction(statusText = uiState.paletteStyle.displayName)
+                }
+            )
+        }
+        item {
+            val isSpec2025Supported = uiState.paletteStyle.supportsSpec2025
+            val activeSpec =
+                if (!isSpec2025Supported) ThemeColorSpec.SPEC_2021 else uiState.colorSpec
+            val descriptionText = if (!isSpec2025Supported) {
+                stringResource(id = R.string.theme_settings_color_spec_only_2021)
+            } else {
+                activeSpec.displayName
+            }
+            BaseWidget(
+                iconPlaceholder = false,
+                title = stringResource(id = R.string.theme_settings_color_spec),
+                description = descriptionText.takeIf { !isSpec2025Supported },
+                enabled = isSpec2025Supported,
+                onClick = onShowColorSpecSheet,
+                trailingContent = {
+                    BaseWidgetAction(
+                        statusText = activeSpec.displayName.takeIf { isSpec2025Supported }
+                    )
+                }
+            )
+        }
+        item {
+            SwitchWidget(
+                iconPlaceholder = false,
+                title = stringResource(R.string.theme_settings_dynamic_color),
+                description = stringResource(R.string.theme_settings_dynamic_color_desc),
+                checked = uiState.useDynamicColor,
+                onCheckedChange = {
+                    viewModel.dispatch(ThemeSettingsAction.SetUseDynamicColor(it))
+                }
+            )
+        }
+        item {
+            val selectedColor =
+                uiState.availableColors.firstOrNull { it.color == uiState.seedColor }
+            BaseWidget(
+                iconPlaceholder = false,
+                title = "主题颜色",
+                enabled = !uiState.useDynamicColor,
+                onClick = onShowThemeColorSheet,
+                trailingContent = {
+                    BaseWidgetAction(
+                        statusText = selectedColor?.getDisplayName() ?: "自定义",
+                        icon = BaseWidgetActionIcon.EXPAND_ALL
+                    )
+                }
+            )
+        }
+    }
+}
+@Composable
+private fun PerformanceAndCacheSettings(
+    viewModel: IconViewModel = koinViewModel()
+) {
     val context = LocalContext.current
+    val useStreaming by viewModel.useStreaming.collectAsStateWithLifecycle()
     var cacheSize by remember { mutableStateOf("正在计算...") }
     val stickerProcessor = StickerProcessor
 
@@ -558,7 +567,16 @@ fun StickerCacheSettings() {
         updateSize()
     }
 
-    SegmentedColumn(title = "缓存") {
+    SegmentedColumn(title = "性能与缓存") {
+        item {
+            SwitchWidget(
+                iconPlaceholder = false,
+                title = "流式打包模式",
+                description = "通过流式打包图标来节省内存",
+                checked = useStreaming,
+                onCheckedChange = { viewModel.useStreaming.value = it }
+            )
+        }
         item {
             BaseWidget(
                 iconPlaceholder = false,
@@ -590,7 +608,7 @@ fun StickerCacheSettings() {
  */
 @Composable
 fun RunLogSettings(onViewLog: () -> Unit) {
-    SegmentedColumn(title = "日志") {
+    SegmentedColumn(title = "调试") {
         item {
             BaseWidget(
                 iconPlaceholder = false,
@@ -603,26 +621,6 @@ fun RunLogSettings(onViewLog: () -> Unit) {
                         icon = BaseWidgetActionIcon.CHEVRON_RIGHT
                     )
                 }
-            )
-        }
-    }
-}
-
-@Composable
-fun StreamingModeSettings(
-    viewModel: IconViewModel = koinViewModel()
-) {
-    val useStreaming by viewModel.useStreaming.collectAsStateWithLifecycle()
-    SegmentedColumn(
-        title = "性能"
-    ) {
-        item {
-            SwitchWidget(
-                iconPlaceholder = false,
-                title = "流式打包模式",
-                description = "通过流式打包图标来节省内存",
-                checked = useStreaming,
-                onCheckedChange = { viewModel.useStreaming.value = it }
             )
         }
     }

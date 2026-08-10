@@ -53,6 +53,10 @@ import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 
+private object CTCColorGridLayout {
+    const val Columns = 4
+}
+
 @Composable
 fun CTCColorSwatchPreviewIcon(
     bgName: String,
@@ -294,11 +298,10 @@ fun CTCConfigSection(viewModel: IconViewModel) {
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    val columns = 3
                     if (ctcType == "monochromatic") {
                         val schemes = CTCPresets.MonochromaticSchemes
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            schemes.chunked(columns).forEach { row ->
+                            schemes.chunked(CTCColorGridLayout.Columns).forEach { row ->
                                 Row(modifier = Modifier.fillMaxWidth()) {
                                     row.forEach { scheme ->
                                         val bg = when (ctcVariant) {
@@ -341,14 +344,16 @@ fun CTCConfigSection(viewModel: IconViewModel) {
                                             )
                                         }
                                     }
-                                    repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+                                    repeat(CTCColorGridLayout.Columns - row.size) {
+                                        Spacer(Modifier.weight(1f))
+                                    }
                                 }
                             }
                         }
                     } else {
                         val schemes = CTCPresets.ContrastSchemes
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            schemes.chunked(columns).forEach { row ->
+                            schemes.chunked(CTCColorGridLayout.Columns).forEach { row ->
                                 Row(modifier = Modifier.fillMaxWidth()) {
                                     row.forEach { scheme ->
                                         val isSwapped = ctcVariant == "swapped"
@@ -382,7 +387,9 @@ fun CTCConfigSection(viewModel: IconViewModel) {
                                             )
                                         }
                                     }
-                                    repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+                                    repeat(CTCColorGridLayout.Columns - row.size) {
+                                        Spacer(Modifier.weight(1f))
+                                    }
                                 }
                             }
                         }

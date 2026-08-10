@@ -3,7 +3,6 @@ package com.capybara.hypericonlab.modules.icon.ui.page.custom.sections
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -53,6 +52,10 @@ import top.yukonga.miuix.kmp.blur.LayerBackdrop
 // 这三项不适合用作图标配色
 private val ICON_PALETTE_STYLES: List<PaletteStyle> = PaletteStyle.entries.filter {
     it !in setOf(PaletteStyle.Monochrome, PaletteStyle.Fidelity, PaletteStyle.Content)
+}
+
+private object MaterialPresetGridLayout {
+    const val Columns = 4
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -586,14 +589,14 @@ fun ColorSourceSection(
             }
             item {
                 BaseItemContainer {
-                    BoxWithConstraints(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp, vertical = 16.dp)
                     ) {
-                        val itemMinWidth = 88.dp
-                        val columns = (this.maxWidth / itemMinWidth).toInt().coerceAtLeast(1)
-                        val chunkedColors = PresetColors.chunked(columns)
+                        val chunkedColors = PresetColors.chunked(
+                            MaterialPresetGridLayout.Columns
+                        )
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -629,7 +632,7 @@ fun ColorSourceSection(
                                             )
                                         }
                                     }
-                                    val remaining = columns - rowItems.size
+                                    val remaining = MaterialPresetGridLayout.Columns - rowItems.size
                                     if (remaining > 0) {
                                         repeat(remaining) { Spacer(Modifier.weight(1f)) }
                                     }
