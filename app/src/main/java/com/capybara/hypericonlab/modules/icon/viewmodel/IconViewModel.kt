@@ -9,7 +9,6 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.color.MonetColorExtractor
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogEntry
 import com.capybara.hypericonlab.core.logging.LogType
@@ -275,11 +274,7 @@ class IconViewModel(
             val themeMode = appSettingsRepository.preferencesFlow.first().themeMode
             val isSystemDark = Resources.getSystem().configuration.uiMode and
                     Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-            val isDark = when (themeMode) {
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-                ThemeMode.SYSTEM -> isSystemDark
-            }
+            val isDark = themeMode.resolveDark(isSystemDark)
             _config.update { current ->
                 current.copy(previewThemeMode = if (isDark) "dark" else "light")
             }

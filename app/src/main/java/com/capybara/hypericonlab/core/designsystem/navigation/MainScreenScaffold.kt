@@ -34,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarArrangement
 import androidx.compose.material3.ShortNavigationBarItem
+import androidx.compose.material3.ShortNavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -56,6 +57,7 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarDe
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarItem
 import com.capybara.hypericonlab.core.designsystem.component.LocalAppleStyleControls
 import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
+import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
 import com.capybara.hypericonlab.modules.icon.ui.page.home.HomePage
@@ -373,11 +375,23 @@ private fun StandardRowNavigation(
         containerColor = containerColor,
         arrangement = if (isMedium) ShortNavigationBarArrangement.Centered else ShortNavigationBarArrangement.EqualWeight
     ) {
+        val itemColors = if (AppTheme.usesMiuixDefaultPalette) {
+            ShortNavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                selectedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        } else {
+            ShortNavigationBarItemDefaults.colors()
+        }
         tabs.forEachIndexed { index, navigationData ->
             ShortNavigationBarItem(
                 selected = currentPage == index,
                 onClick = { onPageChanged(index) },
                 iconPosition = if (isMedium) NavigationItemIconPosition.Start else NavigationItemIconPosition.Top,
+                colors = itemColors,
                 icon = {
                     val showBadge = index == 1 && configCount > 1
                     BadgedBox(

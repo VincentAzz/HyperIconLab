@@ -473,69 +473,74 @@ private fun ThemeAndColorSettings(
                             ThemeMode.LIGHT -> stringResource(R.string.theme_settings_theme_mode_light)
                             ThemeMode.DARK -> stringResource(R.string.theme_settings_theme_mode_dark)
                             ThemeMode.SYSTEM -> stringResource(R.string.theme_settings_theme_mode_system)
+                            ThemeMode.MIUIX_DEFAULT_LIGHT -> stringResource(R.string.theme_settings_theme_mode_miuix_default_light)
+                            ThemeMode.MIUIX_DEFAULT_DARK -> stringResource(R.string.theme_settings_theme_mode_miuix_default_dark)
+                            ThemeMode.MIUIX_DEFAULT_SYSTEM -> stringResource(R.string.theme_settings_theme_mode_miuix_default_system)
                         }
                     )
                 }
             )
         }
-        item {
-            BaseWidget(
-                iconPlaceholder = false,
-                title = stringResource(R.string.theme_settings_palette_style),
-                onClick = onShowPaletteSheet,
-                trailingContent = {
-                    BaseWidgetAction(statusText = uiState.paletteStyle.displayName)
-                }
-            )
-        }
-        item {
-            val isSpec2025Supported = uiState.paletteStyle.supportsSpec2025
-            val activeSpec =
-                if (!isSpec2025Supported) ThemeColorSpec.SPEC_2021 else uiState.colorSpec
-            val descriptionText = if (!isSpec2025Supported) {
-                stringResource(id = R.string.theme_settings_color_spec_only_2021)
-            } else {
-                activeSpec.displayName
+        if (!uiState.themeMode.usesMiuixDefaultPalette) {
+            item {
+                BaseWidget(
+                    iconPlaceholder = false,
+                    title = stringResource(R.string.theme_settings_palette_style),
+                    onClick = onShowPaletteSheet,
+                    trailingContent = {
+                        BaseWidgetAction(statusText = uiState.paletteStyle.displayName)
+                    }
+                )
             }
-            BaseWidget(
-                iconPlaceholder = false,
-                title = stringResource(id = R.string.theme_settings_color_spec),
-                description = descriptionText.takeIf { !isSpec2025Supported },
-                enabled = isSpec2025Supported,
-                onClick = onShowColorSpecSheet,
-                trailingContent = {
-                    BaseWidgetAction(
-                        statusText = activeSpec.displayName.takeIf { isSpec2025Supported }
-                    )
+            item {
+                val isSpec2025Supported = uiState.paletteStyle.supportsSpec2025
+                val activeSpec =
+                    if (!isSpec2025Supported) ThemeColorSpec.SPEC_2021 else uiState.colorSpec
+                val descriptionText = if (!isSpec2025Supported) {
+                    stringResource(id = R.string.theme_settings_color_spec_only_2021)
+                } else {
+                    activeSpec.displayName
                 }
-            )
-        }
-        item {
-            SwitchWidget(
-                iconPlaceholder = false,
-                title = stringResource(R.string.theme_settings_dynamic_color),
-                description = stringResource(R.string.theme_settings_dynamic_color_desc),
-                checked = uiState.useDynamicColor,
-                onCheckedChange = {
-                    viewModel.dispatch(ThemeSettingsAction.SetUseDynamicColor(it))
-                }
-            )
-        }
-        item {
-            val selectedColor =
-                uiState.availableColors.firstOrNull { it.color == uiState.seedColor }
-            BaseWidget(
-                iconPlaceholder = false,
-                title = "主题颜色",
-                enabled = !uiState.useDynamicColor,
-                onClick = onShowThemeColorSheet,
-                trailingContent = {
-                    BaseWidgetAction(
-                        statusText = selectedColor?.getDisplayName() ?: "自定义",
-                        icon = BaseWidgetActionIcon.EXPAND_ALL
-                    )
-                }
-            )
+                BaseWidget(
+                    iconPlaceholder = false,
+                    title = stringResource(id = R.string.theme_settings_color_spec),
+                    description = descriptionText.takeIf { !isSpec2025Supported },
+                    enabled = isSpec2025Supported,
+                    onClick = onShowColorSpecSheet,
+                    trailingContent = {
+                        BaseWidgetAction(
+                            statusText = activeSpec.displayName.takeIf { isSpec2025Supported }
+                        )
+                    }
+                )
+            }
+            item {
+                SwitchWidget(
+                    iconPlaceholder = false,
+                    title = stringResource(R.string.theme_settings_dynamic_color),
+                    description = stringResource(R.string.theme_settings_dynamic_color_desc),
+                    checked = uiState.useDynamicColor,
+                    onCheckedChange = {
+                        viewModel.dispatch(ThemeSettingsAction.SetUseDynamicColor(it))
+                    }
+                )
+            }
+            item {
+                val selectedColor =
+                    uiState.availableColors.firstOrNull { it.color == uiState.seedColor }
+                BaseWidget(
+                    iconPlaceholder = false,
+                    title = "主题颜色",
+                    enabled = !uiState.useDynamicColor,
+                    onClick = onShowThemeColorSheet,
+                    trailingContent = {
+                        BaseWidgetAction(
+                            statusText = selectedColor?.getDisplayName() ?: "自定义",
+                            icon = BaseWidgetActionIcon.EXPAND_ALL
+                        )
+                    }
+                )
+            }
         }
     }
 }

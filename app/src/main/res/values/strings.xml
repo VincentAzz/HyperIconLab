@@ -54,9 +54,12 @@
     <string name="theme_settings_use_tab_row_fill_width_desc">Stretch the top tab row to fill the full width</string>
     <string name="theme_settings_theme_mode">Theme Mode</string>
     <string name="theme_settings_theme_mode_desc">Select theme mode</string>
-    <string name="theme_settings_theme_mode_light">Light theme</string>
-    <string name="theme_settings_theme_mode_dark">Dark theme</string>
-    <string name="theme_settings_theme_mode_system">Follow system theme</string>
+    <string name="theme_settings_theme_mode_light">Light theme (M3)</string>
+    <string name="theme_settings_theme_mode_dark">Dark theme (M3)</string>
+    <string name="theme_settings_theme_mode_system">Follow system (M3)</string>
+    <string name="theme_settings_theme_mode_miuix_default_light">Light theme (HyperOS)</string>
+    <string name="theme_settings_theme_mode_miuix_default_dark">Dark theme (HyperOS)</string>
+    <string name="theme_settings_theme_mode_miuix_default_system">Follow system (HyperOS)</string>
     <string name="theme_settings_palette_style">Palette Style</string>
     <string name="theme_settings_palette_style_desc">Select palette style</string>
     <string name="theme_settings_color_spec">Color Spec</string>

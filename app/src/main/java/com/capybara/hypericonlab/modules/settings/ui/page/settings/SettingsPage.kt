@@ -147,6 +147,9 @@ fun SettingsPage(
                     ThemeMode.LIGHT -> stringResource(R.string.theme_settings_theme_mode_light)
                     ThemeMode.DARK -> stringResource(R.string.theme_settings_theme_mode_dark)
                     ThemeMode.SYSTEM -> stringResource(R.string.theme_settings_theme_mode_system)
+                    ThemeMode.MIUIX_DEFAULT_LIGHT -> stringResource(R.string.theme_settings_theme_mode_miuix_default_light)
+                    ThemeMode.MIUIX_DEFAULT_DARK -> stringResource(R.string.theme_settings_theme_mode_miuix_default_dark)
+                    ThemeMode.MIUIX_DEFAULT_SYSTEM -> stringResource(R.string.theme_settings_theme_mode_miuix_default_system)
                 }
             },
             backdrop = backdrop,

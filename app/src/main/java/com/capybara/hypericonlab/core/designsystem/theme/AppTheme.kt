@@ -30,6 +30,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.designsystem.theme.material.animateAsState
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
+import com.capybara.hypericonlab.core.designsystem.theme.material.miuixDefaultMaterialColorScheme
 
 private val LocalIsDark = staticCompositionLocalOf { false }
 private val LocalPaletteStyle = staticCompositionLocalOf { PaletteStyle.Expressive }
@@ -37,6 +38,7 @@ private val LocalThemeColorSpec = staticCompositionLocalOf { ThemeColorSpec.SPEC
 private val LocalSeedColor = staticCompositionLocalOf { Color.Unspecified }
 private val LocalThemeMode = staticCompositionLocalOf { ThemeMode.SYSTEM }
 private val LocalUseDynamicColor = staticCompositionLocalOf { false }
+private val LocalUsesMiuixDefaultPalette = staticCompositionLocalOf { false }
 
 val LocalAppColorScheme =
     staticCompositionLocalOf<ColorScheme> { error("No ColorScheme provided") }
@@ -56,6 +58,8 @@ object AppTheme {
         @Composable @ReadOnlyComposable get() = LocalThemeMode.current
     val useDynamicColor: Boolean
         @Composable @ReadOnlyComposable get() = LocalUseDynamicColor.current
+    val usesMiuixDefaultPalette: Boolean
+        @Composable @ReadOnlyComposable get() = LocalUsesMiuixDefaultPalette.current
 }
 
 @Composable
@@ -67,22 +71,34 @@ fun AppTheme(
     seedColor: Color,
     content: @Composable () -> Unit
 ) {
-    val isDark = when (themeMode) {
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
-        ThemeMode.SYSTEM -> isSystemInDarkTheme()
-    }
-    val keyColor = if (useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-        colorResource(id = android.R.color.system_accent1_500)
-    else seedColor
+    val isDark = themeMode.resolveDark(isSystemInDarkTheme())
+    val usesMiuixDefaultPalette = themeMode.usesMiuixDefaultPalette
+    val effectiveUseDynamicColor = useDynamicColor && !usesMiuixDefaultPalette
+    val keyColor = when {
+        usesMiuixDefaultPalette -> Color.Unspecified
+        effectiveUseDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
+            colorResource(id = android.R.color.system_accent1_500)
 
-    val baseColorScheme = remember(keyColor, isDark, paletteStyle, colorSpec) {
-        dynamicColorScheme(
-            keyColor = keyColor,
-            isDark = isDark,
-            style = paletteStyle,
-            colorSpec = colorSpec
-        )
+        else -> seedColor
+    }
+
+    val baseColorScheme = remember(
+        keyColor,
+        isDark,
+        paletteStyle,
+        colorSpec,
+        usesMiuixDefaultPalette
+    ) {
+        if (usesMiuixDefaultPalette) {
+            miuixDefaultMaterialColorScheme(isDark)
+        } else {
+            dynamicColorScheme(
+                keyColor = keyColor,
+                isDark = isDark,
+                style = paletteStyle,
+                colorSpec = colorSpec
+            )
+        }
     }
     val animatedColorScheme = baseColorScheme.animateAsState()
 
@@ -92,7 +108,8 @@ fun AppTheme(
         LocalSeedColor provides seedColor,
         LocalAppColorScheme provides animatedColorScheme,
         LocalThemeMode provides themeMode,
-        LocalUseDynamicColor provides useDynamicColor,
+        LocalUseDynamicColor provides effectiveUseDynamicColor,
+        LocalUsesMiuixDefaultPalette provides usesMiuixDefaultPalette,
         LocalThemeColorSpec provides colorSpec
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)

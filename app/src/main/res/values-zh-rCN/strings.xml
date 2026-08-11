@@ -54,9 +54,12 @@
     <string name="theme_settings_use_tab_row_fill_width_desc">将顶栏菜单延伸至全宽</string>
     <string name="theme_settings_theme_mode">主题模式</string>
     <string name="theme_settings_theme_mode_desc">选择主题模式</string>
-    <string name="theme_settings_theme_mode_light">浅色主题</string>
-    <string name="theme_settings_theme_mode_dark">深色主题</string>
-    <string name="theme_settings_theme_mode_system">跟随系统主题</string>
+    <string name="theme_settings_theme_mode_light">浅色主题 (Material 3)</string>
+    <string name="theme_settings_theme_mode_dark">深色主题 (Material 3)</string>
+    <string name="theme_settings_theme_mode_system">跟随系统主题 (Material 3)</string>
+    <string name="theme_settings_theme_mode_miuix_default_light">浅色主题 (HyperOS)</string>
+    <string name="theme_settings_theme_mode_miuix_default_dark">深色主题 (HyperOS)</string>
+    <string name="theme_settings_theme_mode_miuix_default_system">跟随系统主题 (HyperOS)</string>
     <string name="theme_settings_palette_style">调色板样式</string>
     <string name="theme_settings_palette_style_desc">选择调色板样式</string>
     <string name="theme_settings_color_spec">颜色规格</string>
