@@ -22,6 +22,7 @@ import com.capybara.hypericonlab.core.designsystem.shape.RoundedCornerStyle
 import com.capybara.hypericonlab.core.designsystem.theme.SheetSegmentedColumnContentPadding
 import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerAlpha
 import com.capybara.hypericonlab.modules.render.image.CustomMaskGenerator
 
 // 自定义形状默认参数（默认 HyperOS 3）
@@ -70,7 +71,8 @@ fun CustomMaskTab(
         }
 
         SegmentedColumn(
-            contentPadding = PaddingValues(SheetSegmentedColumnContentPadding)
+            contentPadding = PaddingValues(SheetSegmentedColumnContentPadding),
+            containerColorAlpha = sheetCardContainerAlpha(visibleAlpha = 1f)
         ) {
             item { shape ->
                 SliderWidget(

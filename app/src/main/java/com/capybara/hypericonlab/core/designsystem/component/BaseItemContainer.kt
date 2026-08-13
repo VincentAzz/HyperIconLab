@@ -15,11 +15,14 @@ fun BaseItemContainer(
     shape: Shape = LocalSegmentedItemShape.current,
     content: @Composable () -> Unit
 ) {
+    val backgroundColor = MaterialTheme.colorScheme.surfaceBright.copy(
+        alpha = LocalSegmentedContainerColorAlpha.current
+    )
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceBright)
+            .background(backgroundColor)
     ) {
         content()
     }

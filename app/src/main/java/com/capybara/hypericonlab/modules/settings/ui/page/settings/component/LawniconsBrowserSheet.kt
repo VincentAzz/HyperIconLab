@@ -75,6 +75,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamil
 import com.capybara.hypericonlab.core.designsystem.theme.MiuixThemeBridge
 import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerColor
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.model.IconMapperEntry
@@ -268,7 +269,9 @@ fun LawniconsBrowserSheet(
                     bottom = roundedLayout.cardInset
                 ),
             shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
-            color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+            color = sheetCardContainerColor(
+                MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+            )
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 when (loadState) {

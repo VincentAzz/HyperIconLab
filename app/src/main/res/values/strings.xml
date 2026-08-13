@@ -60,6 +60,8 @@
     <string name="theme_settings_theme_mode_miuix_default_light">Light theme (HyperOS)</string>
     <string name="theme_settings_theme_mode_miuix_default_dark">Dark theme (HyperOS)</string>
     <string name="theme_settings_theme_mode_miuix_default_system">Follow system (HyperOS)</string>
+    <string name="theme_settings_show_sheet_card_background">Show sheet card backgrounds</string>
+    <string name="theme_settings_show_sheet_card_background_desc">Show grouped cards and title backgrounds in sheets</string>
     <string name="theme_settings_palette_style">Palette Style</string>
     <string name="theme_settings_palette_style_desc">Select palette style</string>
     <string name="theme_settings_color_spec">Color Spec</string>

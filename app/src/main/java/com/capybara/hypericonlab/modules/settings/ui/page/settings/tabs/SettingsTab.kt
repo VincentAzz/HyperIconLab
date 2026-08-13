@@ -196,6 +196,19 @@ fun SettingsTab(
                 item {
                     SwitchWidget(
                         iconPlaceholder = false,
+                        title = stringResource(R.string.theme_settings_show_sheet_card_background),
+                        description = stringResource(R.string.theme_settings_show_sheet_card_background_desc),
+                        checked = uiState.useSheetCardBackground,
+                        onCheckedChange = {
+                            viewModel.dispatch(
+                                ThemeSettingsAction.SetUseSheetCardBackground(it)
+                            )
+                        }
+                    )
+                }
+                item {
+                    SwitchWidget(
+                        iconPlaceholder = false,
                         title = stringResource(R.string.theme_settings_use_google_sans_flex),
                         description = stringResource(R.string.theme_settings_use_google_sans_flex_desc),
                         checked = uiState.useGoogleSansFlex,

@@ -25,6 +25,7 @@ data class ThemeSettingsState(
     val liquidGlassEngine: LiquidGlassEngine = LiquidGlassEngine.KYANT,
     val kyantGlassTuning: KyantGlassTuning = KyantGlassTuning(),
     val useAppleStyleCard: Boolean = false,
+    val useSheetCardBackground: Boolean = true,
     val useAppleStyleToggle: Boolean = false,
     val useAppleStyleSlider: Boolean = false,
     val useGoogleSansFlex: Boolean = false,

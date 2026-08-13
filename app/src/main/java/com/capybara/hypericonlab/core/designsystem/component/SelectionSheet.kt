@@ -30,6 +30,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.done
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.SheetSegmentedColumnContentPadding
 import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
+import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerAlpha
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
@@ -127,7 +128,7 @@ fun <T> SelectionSheet(
                 bottom = roundedLayout.cardInset
             ),
             contentPadding = PaddingValues(SheetSegmentedColumnContentPadding),
-            containerColorAlpha = 0.8f
+            containerColorAlpha = sheetCardContainerAlpha()
         ) {
             items.forEach { item ->
                 val enabled = itemEnabled?.invoke(item) ?: true

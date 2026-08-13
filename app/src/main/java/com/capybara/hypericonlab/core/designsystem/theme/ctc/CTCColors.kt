@@ -188,8 +188,16 @@ object CTCPresets {
     )
 
     val ContrastSchemes = listOf(
-        CTCContrastScheme("乳白 & 灰蓝", CTCColor("乳白", "#F9F4DC"), CTCColor("灰蓝", "#21373D")),
-        CTCContrastScheme("乳白 & 栗紫", CTCColor("乳白", "#F9F4DC"), CTCColor("栗紫", "#5A191B")),
+        CTCContrastScheme(
+            "乳白 & 灰蓝",
+            CTCColor("乳白", "#F9F4DC"),
+            CTCColor("灰蓝", "#21373D")
+        ),
+        CTCContrastScheme(
+            "乳白 & 栗紫",
+            CTCColor("乳白", "#F9F4DC"),
+            CTCColor("栗紫", "#5A191B")
+        ),
         CTCContrastScheme(
             "秋葵黄 & 玄色",
             CTCColor("秋葵黄", "#EED045"),
@@ -205,13 +213,21 @@ object CTCPresets {
             CTCColor("朱砂红", "#D92121"),
             CTCColor("明黄", "#FFD700")
         ),
-        CTCContrastScheme("枣红 & 乳白", CTCColor("枣红", "#7C1823"), CTCColor("乳白", "#F9F4DC")),
+        CTCContrastScheme(
+            "枣红 & 乳白",
+            CTCColor("枣红", "#7C1823"),
+            CTCColor("乳白", "#F9F4DC")
+        ),
         CTCContrastScheme(
             "浅苋菜紫 & 玄黑",
             CTCColor("浅苋菜紫", "#D8BFD8"),
             CTCColor("玄黑", "#0E100F")
         ),
-        CTCContrastScheme("姚黄 & 墨紫", CTCColor("姚黄", "#D0DEAA"), CTCColor("墨紫", "#310F1B")),
+        CTCContrastScheme(
+            "姚黄 & 墨紫",
+            CTCColor("姚黄", "#D0DEAA"),
+            CTCColor("墨紫", "#310F1B")
+        ),
         CTCContrastScheme(
             "篾黄 & 晶石紫",
             CTCColor("篾黄", "#F7DE98"),
@@ -242,7 +258,11 @@ object CTCPresets {
             CTCColor("靛蓝", "#4B0082"),
             CTCColor("梨花白", "#F8F5F0")
         ),
-        CTCContrastScheme("墨色 & 杏子", CTCColor("墨色", "#1D1B1C"), CTCColor("杏子", "#FDDA9F")),
+        CTCContrastScheme(
+            "墨色 & 杏子",
+            CTCColor("墨色", "#1D1B1C"),
+            CTCColor("杏子", "#FDDA9F")
+        ),
         CTCContrastScheme(
             "水牛灰 & 乳白",
             CTCColor("水牛灰", "#2F2F35"),
@@ -253,6 +273,10 @@ object CTCPresets {
             CTCColor("槲寄生绿", "#2B312C"),
             CTCColor("乳白", "#F9F4DC")
         ),
-        CTCContrastScheme("松花 & 钢蓝", CTCColor("松花", "#B6D7A8"), CTCColor("钢蓝", "#0F1423"))
+        CTCContrastScheme(
+            "松花 & 钢蓝",
+            CTCColor("松花", "#B6D7A8"),
+            CTCColor("钢蓝", "#0F1423")
+        )
     )
 }

@@ -35,6 +35,7 @@ import com.capybara.hypericonlab.core.designsystem.symbol.close
 import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.SheetConfigCardOuterVerticalPadding
 import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
+import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerColor
 import com.capybara.hypericonlab.modules.build.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import kotlinx.coroutines.launch
@@ -173,8 +174,9 @@ fun BuildOptionSheet(
                     )
                 )
         ) {
-            // val cardContainerColor = MaterialTheme.colorScheme.surfaceBright
-            val cardContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+            val cardContainerColor = sheetCardContainerColor(
+                MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+            )
 
             // 产物类型卡片
             ConfigCard(

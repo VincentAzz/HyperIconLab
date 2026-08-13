@@ -60,6 +60,8 @@
     <string name="theme_settings_theme_mode_miuix_default_light">浅色主题 (HyperOS)</string>
     <string name="theme_settings_theme_mode_miuix_default_dark">深色主题 (HyperOS)</string>
     <string name="theme_settings_theme_mode_miuix_default_system">跟随系统主题 (HyperOS)</string>
+    <string name="theme_settings_show_sheet_card_background">显示 Sheet 卡片背景</string>
+    <string name="theme_settings_show_sheet_card_background_desc">显示弹出菜单中的分段卡片和标题背景</string>
     <string name="theme_settings_palette_style">调色板样式</string>
     <string name="theme_settings_palette_style_desc">选择调色板样式</string>
     <string name="theme_settings_color_spec">颜色规格</string>

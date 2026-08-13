@@ -79,6 +79,7 @@ class SettingsViewModel(
             liquidGlassEngine = themeState.liquidGlassEngine,
             kyantGlassTuning = themeState.kyantGlassTuning,
             useAppleStyleCard = themeState.useAppleStyleCard,
+            useSheetCardBackground = themeState.useSheetCardBackground,
             useAppleStyleToggle = themeState.useAppleStyleToggle,
             useAppleStyleSlider = themeState.useAppleStyleSlider,
             useGoogleSansFlex = themeState.useGoogleSansFlex,
@@ -214,6 +215,13 @@ class SettingsViewModel(
             is ThemeSettingsAction.SetUseAppleStyleCard -> viewModelScope.launch {
                 updateSetting(
                     BooleanSetting.UiUseAppleStyleCard,
+                    action.enable
+                )
+            }
+
+            is ThemeSettingsAction.SetUseSheetCardBackground -> viewModelScope.launch {
+                updateSetting(
+                    BooleanSetting.UiUseSheetCardBackground,
                     action.enable
                 )
             }

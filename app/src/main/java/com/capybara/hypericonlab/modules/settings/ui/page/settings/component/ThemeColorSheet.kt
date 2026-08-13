@@ -38,6 +38,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
 import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerColor
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreview
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -138,7 +139,9 @@ fun ThemeColorSheet(
                     bottom = roundedLayout.cardInset
                 ),
             shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
-            color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+            color = sheetCardContainerColor(
+                MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+            )
         ) {
             Column(
                 modifier = Modifier

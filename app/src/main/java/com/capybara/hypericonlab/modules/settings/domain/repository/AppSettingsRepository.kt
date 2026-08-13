@@ -40,6 +40,7 @@ enum class BooleanSetting {
     UiUseTabRowTransparentBackground,
     UiUseTabRowFillWidth,
     UiUseAppleStyleCard,
+    UiUseSheetCardBackground,
     UiUseAppleStyleToggle,
     UiUseAppleStyleSlider,
     UiUseGoogleSansFlex,

@@ -30,7 +30,6 @@ import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
 import com.capybara.hypericonlab.core.designsystem.theme.material.animateAsState
 import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
-import com.capybara.hypericonlab.core.designsystem.theme.material.miuixDefaultMaterialColorScheme
 
 private val LocalIsDark = staticCompositionLocalOf { false }
 private val LocalPaletteStyle = staticCompositionLocalOf { PaletteStyle.Expressive }

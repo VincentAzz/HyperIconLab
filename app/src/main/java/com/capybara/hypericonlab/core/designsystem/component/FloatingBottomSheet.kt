@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantBackdrop
 import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
+import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerColor
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
 /**
@@ -90,7 +91,9 @@ fun SheetTitle(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f)
+    val backgroundColor = sheetCardContainerColor(
+        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f)
+    )
     val contentColor = MaterialTheme.colorScheme.onSecondaryContainer
     val titleHeight = 40.dp
 

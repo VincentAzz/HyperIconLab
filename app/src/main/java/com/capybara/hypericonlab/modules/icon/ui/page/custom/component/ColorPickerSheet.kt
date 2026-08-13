@@ -44,6 +44,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamil
 import com.capybara.hypericonlab.core.designsystem.theme.MiuixThemeBridge
 import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerColor
 import top.yukonga.miuix.kmp.basic.ColorPalette
 import top.yukonga.miuix.kmp.basic.ColorPicker
 import top.yukonga.miuix.kmp.basic.ColorSpace
@@ -163,7 +164,9 @@ fun ColorPickerSheet(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
-                color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+                color = sheetCardContainerColor(
+                    MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+                )
             ) {
                 MiuixThemeBridge {
                     Column(

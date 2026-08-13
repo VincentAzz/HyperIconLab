@@ -70,6 +70,8 @@ class AppSettingsRepositoryImpl(
             ).normalized(),
             useAppleStyleCard = prefs[AppDataStore.UI_USE_APPLE_STYLE_CARD]
                 ?: false,
+            useSheetCardBackground = prefs[AppDataStore.UI_USE_SHEET_CARD_BACKGROUND]
+                ?: true,
             useAppleStyleToggle = prefs[AppDataStore.UI_USE_APPLE_STYLE_TOGGLE]
                 ?: false,
             useAppleStyleSlider = prefs[AppDataStore.UI_USE_APPLE_STYLE_SLIDER]
@@ -185,6 +187,7 @@ class AppSettingsRepositoryImpl(
         BooleanSetting.UiUseTabRowTransparentBackground -> AppDataStore.UI_USE_TAB_ROW_TRANSPARENT_BACKGROUND
         BooleanSetting.UiUseTabRowFillWidth -> AppDataStore.UI_USE_TAB_ROW_FILL_WIDTH
         BooleanSetting.UiUseAppleStyleCard -> AppDataStore.UI_USE_APPLE_STYLE_CARD
+        BooleanSetting.UiUseSheetCardBackground -> AppDataStore.UI_USE_SHEET_CARD_BACKGROUND
         BooleanSetting.UiUseAppleStyleToggle -> AppDataStore.UI_USE_APPLE_STYLE_TOGGLE
         BooleanSetting.UiUseAppleStyleSlider -> AppDataStore.UI_USE_APPLE_STYLE_SLIDER
         BooleanSetting.UiUseGoogleSansFlex -> AppDataStore.UI_USE_GOOGLE_SANS_FLEX

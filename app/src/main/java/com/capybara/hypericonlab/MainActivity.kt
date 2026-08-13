@@ -36,6 +36,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.LocalPreferredCardCornerRadius
 import com.capybara.hypericonlab.core.designsystem.theme.LocalSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.LocalUseGoogleSansFlex
+import com.capybara.hypericonlab.core.designsystem.theme.LocalUseSheetCardBackground
 import com.capybara.hypericonlab.core.designsystem.util.LocalWindowLayoutInfo
 import com.capybara.hypericonlab.core.designsystem.util.rememberWindowLayoutInfo
 import com.capybara.hypericonlab.modules.build.domain.packaging.ApkInstallFacade
@@ -99,6 +100,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
                 LocalSmootherRoundedCornersEnabled provides uiState.useSmootherRoundedCorners,
                 LocalPreferredCardCornerRadius provides preferredCardCornerRadius,
                 LocalUseAppleStyleCard provides uiState.useAppleStyleCard,
+                LocalUseSheetCardBackground provides uiState.useSheetCardBackground,
                 LocalUseGoogleSansFlex provides uiState.useGoogleSansFlex,
                 LocalKyantGlassTuning provides uiState.kyantGlassTuning,
                 LocalAppleStyleControls provides AppleStyleControls(

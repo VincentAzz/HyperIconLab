@@ -59,6 +59,7 @@ class ThemeStateProviderImpl(
             },
             kyantGlassTuning = previewTuning ?: prefs.kyantGlassTuning,
             useAppleStyleCard = prefs.useAppleStyleCard,
+            useSheetCardBackground = prefs.useSheetCardBackground,
             useAppleStyleToggle = prefs.useAppleStyleToggle &&
                     (!prefs.useCustomLiquidGlassEngine ||
                             prefs.liquidGlassEngine == LiquidGlassEngine.KYANT),

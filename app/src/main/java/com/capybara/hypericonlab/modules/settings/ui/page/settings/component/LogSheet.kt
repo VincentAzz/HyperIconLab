@@ -47,6 +47,7 @@ import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
 import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerColor
 import com.capybara.hypericonlab.core.logging.LogEntry
 import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
@@ -161,7 +162,9 @@ fun LogSheet(
                         bottom = roundedLayout.cardInset
                     ),
                 shape = rememberKyantRoundedRectangleShape(roundedLayout.cardCornerRadius),
-                color = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+                color = sheetCardContainerColor(
+                    MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.8f)
+                )
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     LazyColumn(

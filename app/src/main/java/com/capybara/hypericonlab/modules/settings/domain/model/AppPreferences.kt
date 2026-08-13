@@ -32,6 +32,7 @@ data class AppPreferences(
     val floatingBottomBarCompactType: FloatingBottomBarCompactType = FloatingBottomBarCompactType.MIXED_ICON,
     val seedColorInt: Int,
     val useAppleStyleCard: Boolean = false,
+    val useSheetCardBackground: Boolean = true,
     val useAppleStyleToggle: Boolean = false,
     val useAppleStyleSlider: Boolean = false,
     val useDownloadProxy: Boolean = false,

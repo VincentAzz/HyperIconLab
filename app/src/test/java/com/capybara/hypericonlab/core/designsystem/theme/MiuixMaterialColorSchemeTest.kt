@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme.material
+package com.capybara.hypericonlab.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver

@@ -36,6 +36,7 @@ data class ThemeState(
     val kyantGlassTuning: KyantGlassTuning = KyantGlassTuning(),
     val useGoogleSansFlex: Boolean = false,
     val useAppleStyleCard: Boolean = false,
+    val useSheetCardBackground: Boolean = true,
     val useAppleStyleToggle: Boolean = false,
     val useAppleStyleSlider: Boolean = false,
 )
