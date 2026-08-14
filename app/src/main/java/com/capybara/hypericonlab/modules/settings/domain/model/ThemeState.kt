@@ -4,12 +4,12 @@ import android.os.Build
 import androidx.compose.ui.graphics.Color
 import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.PresetColors
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeMode
+import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarCompactType
+import com.capybara.hypericonlab.core.designsystem.config.CardCornerSize
 
 data class ThemeState(
     val isLoaded: Boolean = false,

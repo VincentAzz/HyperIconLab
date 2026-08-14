@@ -37,20 +37,20 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.capybara.hypericonlab.core.designsystem.color.ctc.CTCPresets
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetActionIcon
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.StyleChip
+import com.capybara.hypericonlab.core.designsystem.config.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.LargeCardRadius
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.color_lens
 import com.capybara.hypericonlab.core.designsystem.symbol.swap_horiz
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.LargeCardRadius
-import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.icon.viewmodel.IconViewModel
 
 private object CTCColorGridLayout {

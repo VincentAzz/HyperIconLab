@@ -26,8 +26,8 @@ import com.capybara.hypericonlab.core.designsystem.blur.kyant.drawBackdrop
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.blur
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.colorControls
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.lens
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 private object KyantSheetConfig {
     val LightSurfaceAlpha = 0.6f

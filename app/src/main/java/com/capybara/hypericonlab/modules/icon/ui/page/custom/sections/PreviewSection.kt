@@ -35,15 +35,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.capybara.hypericonlab.core.designsystem.config.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.insetCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.category
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.open_in_full
 import com.capybara.hypericonlab.core.designsystem.symbol.refresh
 import com.capybara.hypericonlab.core.designsystem.symbol.wallpaper
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 
 @Composable

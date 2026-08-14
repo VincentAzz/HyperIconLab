@@ -24,15 +24,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.capybara.hypericonlab.AppVersion
 import com.capybara.hypericonlab.R
-import com.capybara.hypericonlab.core.AppVersion
+import com.capybara.hypericonlab.core.designsystem.config.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.insetCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.core.designsystem.effect.BgEffectBackground
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.commit
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 private object AboutCardConfig {
     val PreviewPadding = 6.dp

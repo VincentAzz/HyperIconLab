@@ -1,7 +1,7 @@
 package com.capybara.hypericonlab.modules.icon.viewmodel
 
 import android.graphics.Bitmap
-import com.capybara.hypericonlab.core.color.MonetColorExtractor
+import com.capybara.hypericonlab.core.designsystem.color.utils.MonetColorExtractor
 import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import com.capybara.hypericonlab.modules.icon.domain.usecase.GeneratePreviewUseCase

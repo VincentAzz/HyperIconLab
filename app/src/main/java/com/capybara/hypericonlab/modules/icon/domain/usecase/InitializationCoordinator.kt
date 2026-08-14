@@ -1,9 +1,9 @@
 package com.capybara.hypericonlab.modules.icon.domain.usecase
 
 import android.content.Context
-import com.capybara.hypericonlab.core.color.AppColorSchemesLoader
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.utils.AppColorSchemesLoader
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.build.domain.usecase.BuildTaskManager

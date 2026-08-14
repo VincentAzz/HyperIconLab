@@ -7,7 +7,7 @@ import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetActionIcon
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
-import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
+import com.capybara.hypericonlab.core.designsystem.font.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
 
 @Composable

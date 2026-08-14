@@ -2,9 +2,9 @@ package com.capybara.hypericonlab.modules.icon.domain.model
 
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.toArgb
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.PresetColors
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
 import kotlinx.serialization.Serializable
 
 @Serializable

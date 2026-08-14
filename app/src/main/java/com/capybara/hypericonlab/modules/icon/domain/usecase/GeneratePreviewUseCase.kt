@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.core.graphics.toColorInt
-import com.capybara.hypericonlab.core.color.MonetColorExtractor
+import com.capybara.hypericonlab.core.designsystem.color.utils.MonetColorExtractor
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.mapper.IconMapperProcessor
 import com.capybara.hypericonlab.modules.icon.domain.model.GlassConfig

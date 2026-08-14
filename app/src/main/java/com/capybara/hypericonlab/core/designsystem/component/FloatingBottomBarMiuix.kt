@@ -62,11 +62,11 @@ import com.capybara.hypericonlab.core.designsystem.blur.miuix.lens
 import com.capybara.hypericonlab.core.designsystem.blur.miuix.material3BlurEffect
 import com.capybara.hypericonlab.core.designsystem.blur.miuix.rememberCombinedBackdrop
 import com.capybara.hypericonlab.core.designsystem.blur.miuix.vibrancy
+import com.capybara.hypericonlab.core.designsystem.config.FloatingBottomBarHeight
+import com.capybara.hypericonlab.core.designsystem.config.FloatingBottomBarIndicatorHeight
+import com.capybara.hypericonlab.core.designsystem.config.FloatingBottomBarIndicatorPadding
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantCapsuleShape
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarHeight
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarIndicatorHeight
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarIndicatorPadding
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch

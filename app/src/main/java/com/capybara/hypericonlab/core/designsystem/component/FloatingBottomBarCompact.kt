@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactHeight
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactIndicatorPadding
+import com.capybara.hypericonlab.core.designsystem.config.FloatingBottomBarCompactHeight
+import com.capybara.hypericonlab.core.designsystem.config.FloatingBottomBarCompactIndicatorPadding
 import top.yukonga.miuix.kmp.blur.Backdrop
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LayerBackdrop as KyantLayerBackdrop

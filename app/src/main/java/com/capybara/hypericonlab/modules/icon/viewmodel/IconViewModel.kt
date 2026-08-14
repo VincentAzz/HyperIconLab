@@ -8,7 +8,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.capybara.hypericonlab.core.color.MonetColorExtractor
+import com.capybara.hypericonlab.core.designsystem.color.utils.MonetColorExtractor
 import com.capybara.hypericonlab.core.logging.AppLogStore
 import com.capybara.hypericonlab.core.logging.LogEntry
 import com.capybara.hypericonlab.core.logging.LogType

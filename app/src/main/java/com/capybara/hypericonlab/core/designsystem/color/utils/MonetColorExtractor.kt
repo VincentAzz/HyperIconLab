@@ -1,15 +1,14 @@
-package com.capybara.hypericonlab.core.color
+package com.capybara.hypericonlab.core.designsystem.color.utils
 
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.scale
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
-import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.dynamicColorScheme
 import com.materialkolor.ktx.themeColors
-
 
 // 从壁纸 Bitmap 提取 M3 ColorScheme
 object MonetColorExtractor {

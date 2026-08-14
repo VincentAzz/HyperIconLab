@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.capybara.hypericonlab.core.color.MonetColorExtractor
+import com.capybara.hypericonlab.core.designsystem.color.utils.MonetColorExtractor
 import com.capybara.hypericonlab.core.logging.LogType
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus

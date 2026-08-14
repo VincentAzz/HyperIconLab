@@ -39,8 +39,8 @@ import com.capybara.hypericonlab.core.designsystem.component.LocalSegmentedItemS
 import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.check_circle
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
 import com.capybara.hypericonlab.modules.icon.domain.model.AssetUpdateUiState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationState

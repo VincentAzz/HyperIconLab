@@ -37,10 +37,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.capybara.hypericonlab.core.designsystem.theme.ConnectionRadius
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
-import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
+import com.capybara.hypericonlab.core.designsystem.config.ConnectionRadius
+import com.capybara.hypericonlab.core.designsystem.config.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.isSmootherRoundedCornersEnabled
+import com.capybara.hypericonlab.core.designsystem.config.kyantUnevenRoundedShape
 import kotlin.math.roundToInt
 
 private const val PADDING_HORIZONTAL = 16

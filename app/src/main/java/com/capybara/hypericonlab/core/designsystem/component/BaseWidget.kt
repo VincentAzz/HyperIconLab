@@ -41,19 +41,19 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantControlsBackdrop
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.dynamicColorScheme
+import com.capybara.hypericonlab.core.designsystem.config.ChipCornerInset
+import com.capybara.hypericonlab.core.designsystem.config.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.insetCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantCapsuleShape
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.arrow_outward
 import com.capybara.hypericonlab.core.designsystem.symbol.chevron_right
 import com.capybara.hypericonlab.core.designsystem.symbol.expand_all
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
-import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerInset
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
-import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
 
 enum class BaseWidgetIconBackgroundShape {
     CIRCLE,

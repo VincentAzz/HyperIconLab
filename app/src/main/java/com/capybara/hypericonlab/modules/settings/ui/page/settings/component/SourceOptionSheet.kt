@@ -3,9 +3,9 @@ package com.capybara.hypericonlab.modules.settings.ui.page.settings.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.archive
 import com.capybara.hypericonlab.core.designsystem.symbol.cloud_download
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsVersion
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.ResourceSource

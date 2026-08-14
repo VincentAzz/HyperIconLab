@@ -1,10 +1,11 @@
-package com.capybara.hypericonlab.core.designsystem.theme
+package com.capybara.hypericonlab.core.designsystem.color.miuix
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
 import top.yukonga.miuix.kmp.theme.Colors
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.theme.darkColorScheme as miuixDarkColorScheme

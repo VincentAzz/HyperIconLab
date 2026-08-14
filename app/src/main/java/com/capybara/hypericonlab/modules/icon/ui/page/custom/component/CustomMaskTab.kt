@@ -18,11 +18,11 @@ import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
+import com.capybara.hypericonlab.core.designsystem.config.SheetSegmentedColumnContentPadding
+import com.capybara.hypericonlab.core.designsystem.config.currentSheetRoundedLayout
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.config.sheetCardContainerAlpha
 import com.capybara.hypericonlab.core.designsystem.shape.RoundedCornerStyle
-import com.capybara.hypericonlab.core.designsystem.theme.SheetSegmentedColumnContentPadding
-import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
-import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerAlpha
 import com.capybara.hypericonlab.modules.render.image.CustomMaskGenerator
 
 // 自定义形状默认参数（默认 HyperOS 3）

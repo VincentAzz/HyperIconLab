@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.blur.miuix.liquidGlassEffect
 import com.capybara.hypericonlab.core.designsystem.blur.miuix.material3BlurEffect
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
 private object MiuixSheetConfig {

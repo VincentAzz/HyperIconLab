@@ -50,9 +50,9 @@ import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.util.lerp
 import com.capybara.hypericonlab.core.designsystem.animation.DampedDragAnimation
-import com.capybara.hypericonlab.core.designsystem.theme.TabRowRoundedCorner.TabRowBarCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.TabRowRoundedCorner.TabRowIndicatorCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
+import com.capybara.hypericonlab.core.designsystem.config.TabRowRoundedCorner.TabRowBarCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.TabRowRoundedCorner.TabRowIndicatorCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantCapsuleShape
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sign

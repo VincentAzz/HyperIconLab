@@ -4,11 +4,11 @@ import androidx.compose.ui.graphics.Color
 import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuningParameter
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeMode
+import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarCompactType
+import com.capybara.hypericonlab.core.designsystem.config.CardCornerSize
 
 sealed interface ThemeSettingsAction {
     data class SetUseSmootherRoundedCorners(val enable: Boolean) : ThemeSettingsAction

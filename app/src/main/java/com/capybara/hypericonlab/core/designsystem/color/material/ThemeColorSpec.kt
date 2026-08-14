@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme.material
+package com.capybara.hypericonlab.core.designsystem.color.material
 
 enum class ThemeColorSpec(val displayName: String) {
     SPEC_2021("Material 3 (2021)"),

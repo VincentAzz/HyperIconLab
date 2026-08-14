@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.util
+package com.capybara.hypericonlab.core.designsystem.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf

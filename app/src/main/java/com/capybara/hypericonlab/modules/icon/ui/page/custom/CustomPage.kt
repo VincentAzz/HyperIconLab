@@ -51,9 +51,9 @@ import com.capybara.hypericonlab.core.designsystem.blur.miuix.rememberMaterial3B
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRow
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowAlignment
 import com.capybara.hypericonlab.core.designsystem.component.FloatingTabRowWidthMode
-import com.capybara.hypericonlab.core.designsystem.theme.CornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
-import com.capybara.hypericonlab.core.designsystem.theme.kyantUnevenRoundedShape
+import com.capybara.hypericonlab.core.designsystem.config.CornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.isSmootherRoundedCornersEnabled
+import com.capybara.hypericonlab.core.designsystem.config.kyantUnevenRoundedShape
 import com.capybara.hypericonlab.modules.build.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.IconPackTemplateState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade

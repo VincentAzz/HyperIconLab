@@ -5,12 +5,12 @@ import android.graphics.Color
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.toColorInt
-import com.capybara.hypericonlab.core.color.HslColorUtils
-import com.capybara.hypericonlab.core.color.MonetColorExtractor
-import com.capybara.hypericonlab.core.designsystem.theme.ctc.CTCPresets
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
-import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
+import com.capybara.hypericonlab.core.designsystem.color.ctc.CTCPresets
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.dynamicColorScheme
+import com.capybara.hypericonlab.core.designsystem.color.utils.HslColorUtils
+import com.capybara.hypericonlab.core.designsystem.color.utils.MonetColorExtractor
 import com.capybara.hypericonlab.modules.icon.domain.model.IconConfigState
 import timber.log.Timber
 import androidx.compose.ui.graphics.Color as ComposeColor

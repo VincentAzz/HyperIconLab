@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme.material
+package com.capybara.hypericonlab.core.designsystem.color.material
 
 enum class PaletteStyle(
     val displayName: String,

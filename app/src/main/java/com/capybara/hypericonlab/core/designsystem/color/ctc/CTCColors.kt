@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme.ctc
+package com.capybara.hypericonlab.core.designsystem.color.ctc
 
 data class CTCColor(
     val name: String,

@@ -19,9 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantBackdrop
-import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
-import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerColor
+import com.capybara.hypericonlab.core.designsystem.config.currentSheetRoundedLayout
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantCapsuleShape
+import com.capybara.hypericonlab.core.designsystem.config.sheetCardContainerColor
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 
 /**

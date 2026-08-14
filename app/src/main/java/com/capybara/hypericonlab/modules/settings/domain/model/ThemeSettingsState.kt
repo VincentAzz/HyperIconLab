@@ -3,13 +3,13 @@ package com.capybara.hypericonlab.modules.settings.domain.model
 import androidx.compose.ui.graphics.Color
 import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
-import com.capybara.hypericonlab.core.designsystem.theme.FloatingBottomBarCompactType
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
-import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.PresetColors
+import com.capybara.hypericonlab.core.designsystem.color.material.RawColor
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeMode
+import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarCompactType
+import com.capybara.hypericonlab.core.designsystem.config.CardCornerSize
 
 data class ThemeSettingsState(
     val useSmootherRoundedCorners: Boolean = true,

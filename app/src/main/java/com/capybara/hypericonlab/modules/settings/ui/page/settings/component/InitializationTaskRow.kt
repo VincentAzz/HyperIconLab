@@ -25,12 +25,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.LocalSegmentedItemShape
+import com.capybara.hypericonlab.core.designsystem.font.GoogleSansCodeFontFamily
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.arrow_right_alt
 import com.capybara.hypericonlab.core.designsystem.symbol.check_circle
 import com.capybara.hypericonlab.core.designsystem.symbol.circle
 import com.capybara.hypericonlab.core.designsystem.symbol.error
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTask
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskState
 import com.capybara.hypericonlab.modules.icon.domain.model.InitializationTaskStatus

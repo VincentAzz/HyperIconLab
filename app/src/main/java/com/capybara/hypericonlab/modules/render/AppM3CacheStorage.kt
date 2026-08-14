@@ -1,8 +1,8 @@
 package com.capybara.hypericonlab.modules.render
 
 import android.content.Context
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File

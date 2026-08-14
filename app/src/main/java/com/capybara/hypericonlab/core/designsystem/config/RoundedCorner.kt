@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme
+package com.capybara.hypericonlab.core.designsystem.config
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable

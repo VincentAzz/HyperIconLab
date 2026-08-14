@@ -1,5 +1,4 @@
-package com.capybara.hypericonlab.core
-
+package com.capybara.hypericonlab
 
 object AppVersion {
     const val HYPERICONLAB_VERSION = "20260704-1.0.0"

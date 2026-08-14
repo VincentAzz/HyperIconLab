@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme
+package com.capybara.hypericonlab.core.designsystem.component
 
 enum class FloatingBottomBarCompactType(
     val displayName: String

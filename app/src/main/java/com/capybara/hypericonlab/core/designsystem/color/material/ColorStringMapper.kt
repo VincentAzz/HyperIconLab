@@ -1,9 +1,8 @@
-package com.capybara.hypericonlab.core.designsystem.util
+package com.capybara.hypericonlab.core.designsystem.color.material
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.capybara.hypericonlab.R
-import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
 
 @Composable
 fun RawColor.getDisplayName() = when (key) {

@@ -3,6 +3,7 @@ package com.capybara.hypericonlab.core.designsystem.theme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
+import com.capybara.hypericonlab.core.designsystem.color.miuix.miuixDefaultMaterialColorScheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

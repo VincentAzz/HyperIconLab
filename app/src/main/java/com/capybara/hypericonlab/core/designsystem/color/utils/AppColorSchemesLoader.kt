@@ -1,13 +1,10 @@
-package com.capybara.hypericonlab.core.color
+package com.capybara.hypericonlab.core.designsystem.color.utils
 
 import android.content.Context
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
 
-/**
- * Loads and parses the app_color_schemes.xml from assets.
- */
 object AppColorSchemesLoader {
 
     fun loadFromAssets(context: Context): Map<String, Pair<String, String>> {

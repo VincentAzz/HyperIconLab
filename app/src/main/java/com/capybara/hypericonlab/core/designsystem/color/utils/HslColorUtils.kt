@@ -1,13 +1,8 @@
-package com.capybara.hypericonlab.core.color
+package com.capybara.hypericonlab.core.designsystem.color.utils
 
 import androidx.core.graphics.toColorInt
+import kotlin.math.abs
 
-/**
- * HSL 颜色空间工具。
- *
- * 用于双层背景下层颜色的自动亮度优化：当上下层背景颜色来源相同且为单色源（app/ctc）时，
- * 读取上层背景颜色，转换到 HSL 空间，对亮度分量 L 做偏移，生成与上层有对比度的下层颜色。
- */
 object HslColorUtils {
 
     // 自动亮度优化调参常量
@@ -80,7 +75,7 @@ object HslColorUtils {
         val s = if (delta == 0f) {
             0f
         } else {
-            delta / (1f - kotlin.math.abs(2f * l - 1f))
+            delta / (1f - abs(2f * l - 1f))
         }
 
         // 色相 H
@@ -105,8 +100,8 @@ object HslColorUtils {
             return intArrayOf(gray, gray, gray)
         }
 
-        val c = (1f - kotlin.math.abs(2f * l - 1f)) * s
-        val x = c * (1f - kotlin.math.abs((h / 60f) % 2f - 1f))
+        val c = (1f - abs(2f * l - 1f)) * s
+        val x = c * (1f - abs((h / 60f) % 2f - 1f))
         val m = l - c / 2f
 
         val (r, g, b) = when {

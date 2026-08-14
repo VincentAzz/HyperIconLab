@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.backdrops.LocalKyantControlsBackdrop
-import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
+import com.capybara.hypericonlab.core.designsystem.font.GoogleSansCodeFontFamily
 import kotlin.math.roundToInt
 
 @Composable

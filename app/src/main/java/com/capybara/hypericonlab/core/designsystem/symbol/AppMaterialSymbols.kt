@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme
+package com.capybara.hypericonlab.core.designsystem.symbol
 
 object AppMaterialSymbols
 
@@ -63,3 +63,6 @@ curl -o Symbol.kt ""
 curl -o Symbol.kt ""
 curl -o Symbol.kt ""
 */
+
+
+

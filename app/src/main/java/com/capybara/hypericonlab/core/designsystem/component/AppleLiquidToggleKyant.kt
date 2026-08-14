@@ -43,8 +43,8 @@ import com.capybara.hypericonlab.core.designsystem.blur.kyant.effects.lens
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.highlight.Highlight
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.shadow.InnerShadow
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.shadow.Shadow
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantCapsuleShape
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantCapsuleShape
 import kotlinx.coroutines.flow.collectLatest
 
 private object AppleLiquidToggleKyantDefaults {

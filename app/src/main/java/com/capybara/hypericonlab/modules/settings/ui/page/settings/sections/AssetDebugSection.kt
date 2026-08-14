@@ -6,9 +6,9 @@ import com.capybara.hypericonlab.BuildConfig
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.PrimaryActionButton
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.cloud_download
 import com.capybara.hypericonlab.core.designsystem.symbol.delete
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
 
 @Composable
 fun AssetDebugSection(

@@ -25,11 +25,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeMode
-import com.capybara.hypericonlab.core.designsystem.theme.material.animateAsState
-import com.capybara.hypericonlab.core.designsystem.theme.material.dynamicColorScheme
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeMode
+import com.capybara.hypericonlab.core.designsystem.color.material.animateAsState
+import com.capybara.hypericonlab.core.designsystem.color.material.dynamicColorScheme
+import com.capybara.hypericonlab.core.designsystem.color.miuix.miuixDefaultMaterialColorScheme
+import com.capybara.hypericonlab.core.designsystem.font.GoogleSansFlexFontFamily
+import com.capybara.hypericonlab.core.designsystem.font.isGoogleSansFlexEnabled
 
 private val LocalIsDark = staticCompositionLocalOf { false }
 private val LocalPaletteStyle = staticCompositionLocalOf { PaletteStyle.Expressive }

@@ -30,6 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.capybara.hypericonlab.core.designsystem.color.material.PaletteStyle
+import com.capybara.hypericonlab.core.designsystem.color.material.PresetColors
+import com.capybara.hypericonlab.core.designsystem.color.material.ThemeColorSpec
 import com.capybara.hypericonlab.core.designsystem.component.BaseItemContainer
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidgetAction
@@ -38,10 +41,7 @@ import com.capybara.hypericonlab.core.designsystem.component.SelectionSheet
 import com.capybara.hypericonlab.core.designsystem.component.SliderWidget
 import com.capybara.hypericonlab.core.designsystem.component.StyleChip
 import com.capybara.hypericonlab.core.designsystem.component.SwitchWidget
-import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
-import com.capybara.hypericonlab.core.designsystem.theme.material.PaletteStyle
-import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
-import com.capybara.hypericonlab.core.designsystem.theme.material.ThemeColorSpec
+import com.capybara.hypericonlab.core.designsystem.font.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.CTCConfigSection
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorPickerSheet
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ColorSwatchPreviewIcon

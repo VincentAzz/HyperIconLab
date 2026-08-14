@@ -29,12 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
+import com.capybara.hypericonlab.core.designsystem.animation.inspectDragGestures
+import com.capybara.hypericonlab.core.designsystem.config.ChipCornerInset
+import com.capybara.hypericonlab.core.designsystem.config.insetCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.check
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.ChipCornerInset
-import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
-import com.capybara.hypericonlab.core.designsystem.util.inspectDragGestures
 import kotlinx.coroutines.launch
 
 private object StyleChipLegacyDefaults {

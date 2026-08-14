@@ -57,8 +57,8 @@ import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarDe
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomBarItem
 import com.capybara.hypericonlab.core.designsystem.component.LocalAppleStyleControls
 import com.capybara.hypericonlab.core.designsystem.component.NotifyBadge
+import com.capybara.hypericonlab.core.designsystem.config.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.core.designsystem.theme.AppTheme
-import com.capybara.hypericonlab.core.designsystem.theme.isSmootherRoundedCornersEnabled
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.CustomPage
 import com.capybara.hypericonlab.modules.icon.ui.page.home.HomePage
 import com.capybara.hypericonlab.modules.icon.ui.page.task.TaskPage

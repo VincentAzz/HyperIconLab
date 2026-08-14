@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme
+package com.capybara.hypericonlab.core.designsystem.config
 
 import androidx.compose.ui.unit.dp
 

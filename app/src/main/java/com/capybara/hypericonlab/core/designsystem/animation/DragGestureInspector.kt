@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.util
+package com.capybara.hypericonlab.core.designsystem.animation
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown

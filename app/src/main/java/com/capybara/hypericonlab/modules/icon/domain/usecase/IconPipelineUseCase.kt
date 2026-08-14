@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.core.graphics.toColorInt
-import com.capybara.hypericonlab.core.color.HslColorUtils
+import com.capybara.hypericonlab.core.designsystem.color.utils.HslColorUtils
 import com.capybara.hypericonlab.modules.icon.domain.model.ColorMode
 import com.capybara.hypericonlab.modules.icon.domain.model.IconBuildConfig
 import com.capybara.hypericonlab.modules.render.BackgroundLayerRenderer

@@ -14,12 +14,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capybara.hypericonlab.R
 import com.capybara.hypericonlab.core.designsystem.blur.miuix.rememberMaterial3BlurBackdrop
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.color_lens
 import com.capybara.hypericonlab.core.designsystem.symbol.home
 import com.capybara.hypericonlab.core.designsystem.symbol.settings
 import com.capybara.hypericonlab.core.designsystem.symbol.task_alt
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.util.LocalWindowLayoutInfo
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.AssetUpdateCheckState
 import com.capybara.hypericonlab.modules.icon.domain.lawnicons.LawniconsAssetFacade
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeState

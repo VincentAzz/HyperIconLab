@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme.material
+package com.capybara.hypericonlab.core.designsystem.color.material
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.spring

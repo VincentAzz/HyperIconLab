@@ -34,9 +34,9 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.capybara.hypericonlab.core.designsystem.theme.SheetConfigCardOuterVerticalPadding
-import com.capybara.hypericonlab.core.designsystem.theme.currentPreferredCardCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.config.SheetConfigCardOuterVerticalPadding
+import com.capybara.hypericonlab.core.designsystem.config.currentPreferredCardCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
 import com.capybara.hypericonlab.modules.render.image.MaskAssetLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capybara.hypericonlab.core.designsystem.blur.LiquidGlassEngine
 import com.capybara.hypericonlab.core.designsystem.blur.kyant.config.KyantGlassTuning
-import com.capybara.hypericonlab.core.designsystem.theme.CardCornerSize
-import com.capybara.hypericonlab.core.designsystem.theme.material.PresetColors
-import com.capybara.hypericonlab.core.designsystem.theme.material.RawColor
+import com.capybara.hypericonlab.core.designsystem.color.material.PresetColors
+import com.capybara.hypericonlab.core.designsystem.color.material.RawColor
+import com.capybara.hypericonlab.core.designsystem.config.CardCornerSize
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsAction
 import com.capybara.hypericonlab.modules.settings.domain.model.ThemeSettingsState
 import com.capybara.hypericonlab.modules.settings.domain.provider.KyantGlassTuningController
@@ -20,7 +20,6 @@ import com.capybara.hypericonlab.modules.settings.domain.repository.FloatSetting
 import com.capybara.hypericonlab.modules.settings.domain.repository.IntSetting
 import com.capybara.hypericonlab.modules.settings.domain.repository.StringSetting
 import com.capybara.hypericonlab.modules.settings.domain.usecase.UpdateSettingUseCase
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

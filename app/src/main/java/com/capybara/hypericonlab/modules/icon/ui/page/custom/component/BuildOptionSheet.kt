@@ -30,12 +30,12 @@ import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.FloatingBottomSheet
 import com.capybara.hypericonlab.core.designsystem.component.SheetTitle
 import com.capybara.hypericonlab.core.designsystem.component.StyleChip
+import com.capybara.hypericonlab.core.designsystem.config.SheetConfigCardOuterVerticalPadding
+import com.capybara.hypericonlab.core.designsystem.config.currentSheetRoundedLayout
+import com.capybara.hypericonlab.core.designsystem.config.sheetCardContainerColor
+import com.capybara.hypericonlab.core.designsystem.symbol.AppMaterialSymbols
 import com.capybara.hypericonlab.core.designsystem.symbol.check
 import com.capybara.hypericonlab.core.designsystem.symbol.close
-import com.capybara.hypericonlab.core.designsystem.theme.AppMaterialSymbols
-import com.capybara.hypericonlab.core.designsystem.theme.SheetConfigCardOuterVerticalPadding
-import com.capybara.hypericonlab.core.designsystem.theme.currentSheetRoundedLayout
-import com.capybara.hypericonlab.core.designsystem.theme.sheetCardContainerColor
 import com.capybara.hypericonlab.modules.build.domain.model.ProductType
 import com.capybara.hypericonlab.modules.icon.domain.model.IconSetInfo
 import kotlinx.coroutines.launch

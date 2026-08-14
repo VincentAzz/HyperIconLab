@@ -28,10 +28,10 @@ import androidx.compose.ui.unit.dp
 import com.capybara.hypericonlab.core.designsystem.component.BaseWidget
 import com.capybara.hypericonlab.core.designsystem.component.SegmentedColumn
 import com.capybara.hypericonlab.core.designsystem.component.currentSegmentedColumnOuterCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.GoogleSansCodeFontFamily
-import com.capybara.hypericonlab.core.designsystem.theme.PreviewCornerInset
-import com.capybara.hypericonlab.core.designsystem.theme.insetCornerRadius
-import com.capybara.hypericonlab.core.designsystem.theme.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.config.PreviewCornerInset
+import com.capybara.hypericonlab.core.designsystem.config.insetCornerRadius
+import com.capybara.hypericonlab.core.designsystem.config.rememberKyantRoundedRectangleShape
+import com.capybara.hypericonlab.core.designsystem.font.GoogleSansCodeFontFamily
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTask
 import com.capybara.hypericonlab.modules.build.domain.model.BuildTaskStatus
 import com.capybara.hypericonlab.modules.icon.ui.page.custom.component.ConfigCard

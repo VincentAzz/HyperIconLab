@@ -1,4 +1,4 @@
-package com.capybara.hypericonlab.core.designsystem.theme
+package com.capybara.hypericonlab.core.designsystem.font
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
